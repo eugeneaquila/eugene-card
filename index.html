@@ -649,40 +649,37 @@
       ]
     };
 
-    // LOCAL STORAGE PERSISTENCE FUNCTIONS
-async function loadAppState() {
-  if (!supabaseClient) return;
+    // FETCH LIVE SUPABASE STATE
+    async function loadAppState() {
+      if (!supabaseClient) return;
 
-  // Fetch all cards live from Supabase PostgreSQL table
-  const { data, error } = await supabaseClient.from('cards').select('*').order('id', { ascending: true });
+      const { data, error } = await supabaseClient
+        .from('cards')
+        .select('*')
+        .order('id', { ascending: true });
 
-  if (error) {
-    console.error('Error fetching cards from Supabase:', error);
-    return;
-  }
+      if (error) {
+        console.error('Error fetching cards from Supabase:', error);
+        initDefaultInventory();
+        return;
+      }
 
-  if (data && data.length > 0) {
-    // Map database snake_case keys back to JS format
-    inventory = data.map(c => ({
-      id: c.id,
-      serial: c.serial,
-      name: c.name,
-      type: c.type,
-      price: parseFloat(c.price),
-      baseFloorPrice: parseFloat(c.base_floor_price),
-      owner: c.owner,
-      status: c.status,
-      imgUrl: c.img_url
-    }));
-    updateAllViews();
-  }
-}
-
-    function saveAppState() {
-      localStorage.setItem('eugene_card_inventory', JSON.stringify(inventory));
-      localStorage.setItem('eugene_card_trade_listings', JSON.stringify(tradeListings));
-      localStorage.setItem('eugene_card_trade_requests', JSON.stringify(tradeRequestsList));
-      localStorage.setItem('eugene_card_wishlist', JSON.stringify(Array.from(wishlist)));
+      if (data && data.length > 0) {
+        inventory = data.map(c => ({
+          id: c.id,
+          serial: c.serial,
+          name: c.name,
+          type: c.type,
+          price: parseFloat(c.price),
+          baseFloorPrice: parseFloat(c.base_floor_price || c.price),
+          owner: c.owner,
+          status: c.status,
+          imgUrl: c.img_url
+        }));
+        updateAllViews();
+      } else {
+        initDefaultInventory();
+      }
     }
 
     function initDefaultInventory() {
@@ -709,7 +706,17 @@ async function loadAppState() {
           imgUrl: `https://placehold.co/1080x1350/${isPremium ? '1e1b4b' : '0f172a'}/${isPremium ? 'fbbf24' : '3b82f6'}?text=Serial+${serialStr}`
         });
       }
-      saveAppState();
+      updateAllViews();
+    }
+
+    function setupRealtimeSync() {
+      if (!supabaseClient) return;
+      supabaseClient
+        .channel('public:cards')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => {
+          loadAppState();
+        })
+        .subscribe();
     }
 
     function updateAllViews() {
@@ -727,7 +734,8 @@ async function loadAppState() {
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      loadAppState();
+      await loadAppState();
+      setupRealtimeSync();
       renderAuthHeader();
       
       if (supabaseClient) {
@@ -795,9 +803,7 @@ async function loadAppState() {
       if (supabaseClient) {
         const { error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
-          options: {
-            redirectTo: window.location.origin
-          }
+          options: { redirectTo: window.location.origin }
         });
         if (error) showToast('Google Login Error: ' + error.message);
       } else {
@@ -829,9 +835,7 @@ async function loadAppState() {
     }
 
     async function logoutUser() {
-      if (supabaseClient) {
-        await supabaseClient.auth.signOut();
-      }
+      if (supabaseClient) await supabaseClient.auth.signOut();
       currentUser = null;
       renderAuthHeader();
       switchTab('catalog');
@@ -871,7 +875,6 @@ async function loadAppState() {
     function saveProfileChanges() {
       if (!currentUser) return;
 
-      const oldName = currentUser.name;
       const newName = document.getElementById('profile-edit-name-input').value.trim() || currentUser.name;
       const newAvatar = document.getElementById('profile-edit-avatar-input').value.trim() || currentUser.avatarUrl;
       const newBio = document.getElementById('profile-edit-bio-input').value.trim();
@@ -880,19 +883,11 @@ async function loadAppState() {
       currentUser.avatarUrl = newAvatar;
       currentUser.bio = newBio;
 
-      // Save custom user profile settings to localStorage
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify({
         name: newName,
         avatarUrl: newAvatar,
         bio: newBio
       }));
-
-      if (oldName !== newName) {
-        inventory.forEach(c => {
-          if (c.owner === oldName) c.owner = newName;
-        });
-        saveAppState();
-      }
 
       closeProfileManagerModal();
       renderAuthHeader();
@@ -1056,7 +1051,6 @@ async function loadAppState() {
         });
       }
 
-      saveAppState();
       closeListCardModal();
       renderTradingRoom();
       showToast('Card price listed for secondary trade!');
@@ -1064,7 +1058,6 @@ async function loadAppState() {
 
     function cancelTradeListing(listingId) {
       tradeListings = tradeListings.filter(t => t.id !== listingId);
-      saveAppState();
       renderTradingRoom();
       showToast('Trade listing removed.');
     }
@@ -1080,7 +1073,6 @@ async function loadAppState() {
         tradeListings = tradeListings.filter(t => t.id !== listingId);
       }
 
-      saveAppState();
       renderTradingRoom();
       renderCardGrid();
       renderOwnedCards();
@@ -1202,7 +1194,6 @@ async function loadAppState() {
         status: 'PENDING'
       });
 
-      saveAppState();
       closeProposeTradeModal();
       renderTradeRequestsGrid();
       showToast('Trade request offer sent!');
@@ -1222,7 +1213,6 @@ async function loadAppState() {
       }
 
       req.status = 'ACCEPTED';
-      saveAppState();
       renderTradeRequestsGrid();
       renderCardGrid();
       renderOwnedCards();
@@ -1233,7 +1223,6 @@ async function loadAppState() {
     function declineTradeRequest(reqId) {
       const req = tradeRequestsList.find(r => r.id === reqId);
       if (req) req.status = 'DECLINED';
-      saveAppState();
       renderTradeRequestsGrid();
       showToast('Trade request declined.');
     }
@@ -1248,7 +1237,6 @@ async function loadAppState() {
       card.status = 'AVAILABLE';
       tradeListings = tradeListings.filter(t => t.cardId !== cardId);
 
-      saveAppState();
       renderOwnedCards();
       renderCardGrid();
       renderTradingRoom();
@@ -1301,7 +1289,6 @@ async function loadAppState() {
         wishlist.add(cardId);
         showToast('Added to wishlist!');
       }
-      saveAppState();
       renderCardGrid();
       renderWishlistPage();
     }
@@ -1337,7 +1324,6 @@ async function loadAppState() {
 
     function clearWishlist() {
       wishlist.clear();
-      saveAppState();
       renderWishlistPage();
       renderCardGrid();
       showToast('Wishlist cleared.');
@@ -1402,48 +1388,47 @@ async function loadAppState() {
       reader.readAsDataURL(file);
     }
 
-async function saveInventoryCardChanges() {
-  if (!currentUser || !currentUser.isAdmin) return showToast('Admin permission required.');
+    async function saveInventoryCardChanges() {
+      if (!currentUser || !currentUser.isAdmin) return showToast('Admin permission required.');
 
-  const cardId = document.getElementById('edit-card-id').value;
-  const card = inventory.find(c => c.id === cardId);
-  if (!card) return;
+      const cardId = document.getElementById('edit-card-id').value;
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
 
-  const updatedName = document.getElementById('edit-card-name').value;
-  const updatedSerial = document.getElementById('edit-card-serial').value;
-  const updatedType = document.getElementById('edit-card-type').value;
-  const updatedPrice = parseFloat(document.getElementById('edit-card-price').value) || card.price;
-  const updatedStatus = document.getElementById('edit-card-status').value;
-  
-  const selectedOwner = document.getElementById('edit-card-owner-dropdown').value;
-  const updatedOwner = selectedOwner === 'Unowned / House' ? null : selectedOwner;
-  const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
-  const updatedImgUrl = document.getElementById('edit-card-img').value;
+      const updatedName = document.getElementById('edit-card-name').value;
+      const updatedSerial = document.getElementById('edit-card-serial').value;
+      const updatedType = document.getElementById('edit-card-type').value;
+      const updatedPrice = parseFloat(document.getElementById('edit-card-price').value) || card.price;
+      const updatedStatus = document.getElementById('edit-card-status').value;
+      
+      const selectedOwner = document.getElementById('edit-card-owner-dropdown').value;
+      const updatedOwner = selectedOwner === 'Unowned / House' ? null : selectedOwner;
+      const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
+      const updatedImgUrl = document.getElementById('edit-card-img').value;
 
-  // Sync edit directly to Supabase cloud database
-  const { error } = await supabaseClient
-    .from('cards')
-    .update({
-      name: updatedName,
-      serial: updatedSerial,
-      type: updatedType,
-      price: updatedPrice,
-      status: finalStatus,
-      owner: updatedOwner,
-      img_url: updatedImgUrl
-    })
-    .eq('id', cardId);
+      // Sync edit directly to Supabase cloud database
+      const { error } = await supabaseClient
+        .from('cards')
+        .update({
+          name: updatedName,
+          serial: updatedSerial,
+          type: updatedType,
+          price: updatedPrice,
+          status: finalStatus,
+          owner: updatedOwner,
+          img_url: updatedImgUrl
+        })
+        .eq('id', cardId);
 
-  if (error) {
-    showToast('Failed to sync changes: ' + error.message);
-    return;
-  }
+      if (error) {
+        showToast('Failed to sync changes: ' + error.message);
+        return;
+      }
 
-  // Update local memory and reload
-  closeInventoryModal();
-  await loadAppState();
-  showToast(`Globally updated card ${updatedSerial}!`);
-}    }
+      closeInventoryModal();
+      await loadAppState();
+      showToast(`Globally updated card ${updatedSerial}!`);
+    }
 
     // Card Details Modal
     function openCardDetailModal(cardId) {
