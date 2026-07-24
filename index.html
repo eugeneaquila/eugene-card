@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eugene Card Marketplace | Beta Edition</title>
 
-  <!-- Favicon -->
+  <!-- Browser Tab Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
 
   <!-- Supabase JS Client -->
@@ -18,16 +18,18 @@
       darkMode: 'class',
       theme: {
         extend: {
-          colors: { amber: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' } },
+          colors: {
+            amber: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
+          },
           fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
       }
     }
   </script>
 
-  <!-- FontAwesome & Google Fonts -->
+  <!-- FontAwesome Icons & Google Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #030712; color: #f3f4f6; }
@@ -35,18 +37,16 @@
       background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #451a03 100%);
       border: 1px solid rgba(245, 158, 11, 0.4);
       box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
-      transition: transform 0.2s ease, border-color 0.2s ease;
-      will-change: transform;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .card-holo-premium:hover { border-color: rgba(245, 158, 11, 0.9); transform: translateY(-4px); }
+    .card-holo-premium:hover { border-color: rgba(245, 158, 11, 0.9); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.25); }
     .card-holo-standard {
       background: linear-gradient(135deg, #0f172a 0%, #172554 50%, #1e1b4b 100%);
       border: 1px solid rgba(59, 130, 246, 0.3);
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
-      transition: transform 0.2s ease, border-color 0.2s ease;
-      will-change: transform;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .card-holo-standard:hover { border-color: rgba(59, 130, 246, 0.8); transform: translateY(-4px); }
+    .card-holo-standard:hover { border-color: rgba(59, 130, 246, 0.8); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #030712; }
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
@@ -54,6 +54,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
+  <!-- Embedded Logo SVG -->
   <svg style="display: none;">
     <defs>
       <g id="eugene-logo-mark">
@@ -68,8 +69,9 @@
   <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
+      <!-- Brand Logo -->
       <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('catalog')">
-        <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-indigo-500/30 p-1 flex items-center justify-center shadow-lg">
+        <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-indigo-500/30 p-1 flex items-center justify-center shadow-lg shadow-indigo-500/10">
           <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
         </div>
         <div>
@@ -121,6 +123,7 @@
         </button>
       </nav>
 
+      <!-- Cart & Auth Header -->
       <div class="flex items-center gap-2">
         <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
           <i class="fa-solid fa-cart-shopping text-sm text-amber-400"></i>
@@ -208,7 +211,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             <div class="bg-slate-950 rounded-2xl border border-amber-500/40 p-3 text-center flex flex-col items-center">
               <div class="w-full aspect-[4/5] max-h-64 bg-slate-900 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center mb-2">
-                <img id="auction-card-img" src="https://placehold.co/1080x1350/1e1b4b/fbbf24?text=Serial+*01" class="w-full h-full object-contain" loading="lazy" onerror="handleImgError(this, '*01')">
+                <img id="auction-card-img" src="https://placehold.co/1080x1350/1e1b4b/fbbf24?text=Serial+*01" class="w-full h-full object-contain">
               </div>
               <p id="auction-card-serial" class="text-2xl font-black text-amber-400 font-mono">*01</p>
             </div>
@@ -383,9 +386,7 @@
 
   </main>
 
-  <!-- MODALS -->
-
-  <!-- Profile Manager Modal -->
+  <!-- PROFILE MANAGER MODAL -->
   <div id="profile-manager-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeProfileManagerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
@@ -394,7 +395,7 @@
 
       <div class="text-center space-y-1">
         <div class="relative w-20 h-20 mx-auto mb-2">
-          <img id="profile-modal-avatar-preview" src="" class="w-20 h-20 rounded-full object-cover border-2 border-amber-500/50 shadow-lg bg-slate-950" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=user'">
+          <img id="profile-modal-avatar-preview" src="" class="w-20 h-20 rounded-full object-cover border-2 border-amber-500/50 shadow-lg bg-slate-950">
         </div>
         <h3 class="text-lg font-black text-white">Collector Profile Settings</h3>
         <p class="text-xs text-slate-400">Customize how your profile appears on the marketplace</p>
@@ -433,7 +434,7 @@
     </div>
   </div>
 
-  <!-- Holder Portfolio Modal -->
+  <!-- HOLDER PORTFOLIO MODAL -->
   <div id="holder-portfolio-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeHolderPortfolioModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
@@ -449,7 +450,7 @@
     </div>
   </div>
 
-  <!-- List Card Modal -->
+  <!-- LIST CARD MODAL -->
   <div id="list-card-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeListCardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
@@ -475,7 +476,7 @@
     </div>
   </div>
 
-  <!-- Propose Trade Modal -->
+  <!-- PROPOSE TRADE MODAL -->
   <div id="propose-trade-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeProposeTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
@@ -505,7 +506,7 @@
     </div>
   </div>
 
-  <!-- Card Detail Modal -->
+  <!-- CARD DETAIL MODAL -->
   <div id="card-detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeCardDetailModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
@@ -519,7 +520,7 @@
 
       <div class="w-full max-w-[220px] aspect-[4/5] mx-auto bg-slate-950 rounded-2xl border border-slate-800 p-2 text-center flex flex-col items-center justify-between shadow-inner">
         <div class="w-full h-48 bg-slate-900 rounded-xl overflow-hidden flex items-center justify-center">
-          <img id="detail-card-img" src="" class="w-full h-full object-contain" loading="lazy">
+          <img id="detail-card-img" src="" class="w-full h-full object-contain">
         </div>
         <p id="detail-card-serial" class="text-xl font-black text-amber-400 font-mono mt-1">*01</p>
       </div>
@@ -553,7 +554,7 @@
     </div>
   </div>
 
-  <!-- Edit Inventory Card Modal -->
+  <!-- EDIT INVENTORY CARD MODAL -->
   <div id="inventory-edit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl max-h-[90vh] overflow-y-auto">
       <button onclick="closeInventoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
@@ -659,7 +660,7 @@
     </div>
   </div>
 
-  <!-- Auth Modal -->
+  <!-- AUTH MODAL -->
   <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
@@ -680,7 +681,7 @@
     </div>
   </div>
 
-  <!-- Cart & Checkout -->
+  <!-- CART DRAWER & CHECKOUT -->
   <div id="cart-drawer-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden" onclick="toggleCartDrawer()"></div>
   <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6">
     <div>
@@ -715,6 +716,7 @@
     </div>
   </div>
 
+  <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 border border-amber-500/40 text-amber-300 text-xs font-semibold px-4 py-3 rounded-2xl shadow-xl transform translate-y-20 opacity-0 transition-all pointer-events-none">
     <span id="toast-msg">Action completed.</span>
   </div>
@@ -739,14 +741,7 @@
     let tradeListings = [];
     let tradeRequestsList = [];
     let transactionsList = [];
-    let currentTab = 'catalog';
     let ownerOptionsList = [];
-
-    // Image Error Fallback Handler
-    function handleImgError(imgEl, serialStr) {
-      imgEl.onerror = null;
-      imgEl.src = `https://placehold.co/1080x1350/0f172a/fbbf24?text=${encodeURIComponent(serialStr || 'Eugene Card')}`;
-    }
 
     function initDefaultInventory() {
       inventory = [];
@@ -860,7 +855,7 @@
             loadedFromDb = true;
           }
         } catch (err) {
-          console.warn('Supabase fetch exception, using fallback stock:', err);
+          console.warn('Supabase fetch exception, using local backup stock:', err);
         }
       }
 
@@ -869,9 +864,7 @@
       }
 
       loadSavedCart();
-      renderCurrentActiveView();
-      updateRemainingCardsCounter();
-      updateCartTotals();
+      updateAllViews();
     }
 
     function setupRealtimeSync() {
@@ -882,15 +875,15 @@
         .subscribe();
     }
 
-    function renderCurrentActiveView() {
-      if (currentTab === 'catalog') renderCardGrid();
-      else if (currentTab === 'dashboard') renderOwnedCards();
-      else if (currentTab === 'inventory') renderInventoryTable();
-      else if (currentTab === 'holders') renderHoldersTable();
-      else if (currentTab === 'trade') renderTradingRoom();
-      else if (currentTab === 'wishlist') renderWishlistPage();
-      else if (currentTab === 'history') fetchTransactionHistory();
-      else if (currentTab === 'admin') loadPendingTransactions();
+    function updateAllViews() {
+      renderCardGrid();
+      renderOwnedCards();
+      renderTradingRoom();
+      renderHoldersTable();
+      renderTransactionHistoryTable();
+      renderInventoryTable();
+      updateRemainingCardsCounter();
+      updateCartTotals();
     }
 
     function updateRemainingCardsCounter() {
@@ -901,8 +894,8 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       loadSavedWishlist();
-      initDefaultInventory(); // Immediate render before network fetch
-      renderCardGrid();
+      initDefaultInventory(); 
+      updateAllViews(); 
 
       await loadAppState();
       setupRealtimeSync();
@@ -943,7 +936,7 @@
         }
 
         const avatarImgHtml = currentUser.avatarUrl 
-          ? `<img src="${currentUser.avatarUrl}" class="w-7 h-7 rounded-full object-cover border border-slate-700" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=user'">`
+          ? `<img src="${currentUser.avatarUrl}" class="w-7 h-7 rounded-full object-cover border border-slate-700">`
           : `<i class="fa-solid fa-user-circle text-lg text-slate-400"></i>`;
 
         container.innerHTML = `
@@ -996,7 +989,7 @@
 
       closeAuthModal();
       renderAuthHeader();
-      renderCurrentActiveView();
+      updateAllViews();
     }
 
     async function logoutUser() {
@@ -1043,7 +1036,7 @@
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify({ name: newName, avatarUrl: newAvatar, bio: newBio }));
       closeProfileManagerModal();
       renderAuthHeader();
-      renderCurrentActiveView();
+      updateAllViews();
       showToast('Profile updated!');
     }
 
@@ -1079,7 +1072,7 @@
 
             <div class="w-full aspect-[4/5] bg-slate-950/80 rounded-xl border border-slate-800 p-1.5 flex flex-col justify-between mb-2 text-center overflow-hidden">
               <div class="w-full h-full flex items-center justify-center overflow-hidden rounded-lg bg-slate-900">
-                <img src="${card.imgUrl}" class="w-full h-full object-contain" loading="lazy" onerror="handleImgError(this, '${card.serial}')">
+                <img src="${card.imgUrl}" class="w-full h-full object-contain">
               </div>
             </div>
 
@@ -1174,6 +1167,11 @@
 
       const searchVal = (document.getElementById('inventory-search')?.value || '').toLowerCase();
       const filtered = inventory.filter(c => (c.serial || '').toLowerCase().includes(searchVal) || (c.name || '').toLowerCase().includes(searchVal) || (c.owner && c.owner.toLowerCase().includes(searchVal)));
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No cards found.</td></tr>`;
+        return;
+      }
 
       tbody.innerHTML = filtered.map(card => `
         <tr class="hover:bg-slate-950/60 transition-colors">
@@ -1337,7 +1335,7 @@
       card.printing = updatedPrinting;
 
       closeInventoryModal();
-      renderCurrentActiveView();
+      updateAllViews();
       showToast(`Updated ${updatedSerial} across all devices!`);
     }
 
@@ -1351,7 +1349,6 @@
       
       const imgEl = document.getElementById('detail-card-img');
       imgEl.src = card.imgUrl;
-      handleImgError(imgEl, card.serial);
 
       document.getElementById('detail-card-owner').innerText = card.owner || 'Unowned';
       document.getElementById('detail-card-price').innerText = formatIDR(card.price);
@@ -1481,8 +1478,6 @@
         return showToast('Admin access required.');
       }
 
-      currentTab = tabName;
-
       ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'holders', 'history'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const nav = document.getElementById(`nav-${t}`);
@@ -1496,7 +1491,14 @@
       if (activeView) activeView.classList.remove('hidden');
       if (activeNav && !adminTabs.includes(tabName)) activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap transition-all';
 
-      renderCurrentActiveView();
+      if (tabName === 'dashboard') renderOwnedCards();
+      if (tabName === 'wishlist') renderWishlistPage();
+      if (tabName === 'inventory') renderInventoryTable();
+      if (tabName === 'admin') loadPendingTransactions();
+      if (tabName === 'trade') renderTradingRoom();
+      if (tabName === 'holders') renderHoldersTable();
+      if (tabName === 'history') fetchTransactionHistory();
+      if (tabName === 'catalog') renderCardGrid();
     }
 
     function renderOwnedCards() {
@@ -1517,7 +1519,7 @@
       grid.innerHTML = owned.map(card => `
         <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-between space-y-2 cursor-pointer" onclick="openCardDetailModal('${card.id}')">
           <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 overflow-hidden flex items-center justify-center">
-            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded-lg" loading="lazy" onerror="handleImgError(this, '${card.serial}')">
+            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded-lg">
           </div>
           <div>
             <p class="font-bold text-xs text-white truncate">${card.name}</p>
@@ -1539,7 +1541,7 @@
       grid.innerHTML = items.map(card => `
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between cursor-pointer" onclick="openCardDetailModal('${card.id}')">
           <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 overflow-hidden flex items-center justify-center mb-2">
-            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded-lg" loading="lazy" onerror="handleImgError(this, '${card.serial}')">
+            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded-lg">
           </div>
           <p class="font-bold text-xs text-white truncate">${card.name}</p>
           <p class="font-mono text-amber-400 text-xs font-black">${card.serial}</p>
