@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eugene Card Marketplace | Beta Edition</title>
 
+  <!-- Browser Tab Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
+
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -651,10 +654,7 @@
     let tradeRequestsList = [];
     let isLoading = true;
 
-    // ─────────────────────────────────────────────────────────────────────
     // PERSISTENCE HELPER FUNCTIONS (LOCALSTORAGE)
-    // ─────────────────────────────────────────────────────────────────────
-    
     function loadSavedWishlist() {
       try {
         const saved = localStorage.getItem('eugene_wishlist_ids');
@@ -702,7 +702,7 @@
       }
     }
 
-    // Live Dynamic Auction Countdown Timer (3 hours 14 mins initial)
+    // Live Dynamic Auction Countdown Timer
     let auctionSecondsLeft = 3 * 3600 + 14 * 60 + 22;
 
     let auctionData = {
@@ -716,7 +716,6 @@
       ]
     };
 
-    // Live Auction Countdown Clock
     function startAuctionTimer() {
       setInterval(() => {
         if (auctionSecondsLeft > 0) {
@@ -947,7 +946,11 @@
       }
 
       const userMeta = user.user_metadata || {};
-      const name = customData.name || userMeta.full_name || userMeta.name || (isAdmin ? "Admin User" : email.split('@')[0]);
+      
+      // Name resolution prioritizing real Google Display Name over static fallback
+      const resolvedName = userMeta.full_name || userMeta.name || (email ? email.split('@')[0] : "Eugene");
+      const name = customData.name || resolvedName;
+      
       const avatarUrl = customData.avatarUrl || userMeta.avatar_url || userMeta.picture || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
       const bio = customData.bio || userMeta.bio || (isAdmin ? "Official Platform Admin" : "Beta Collector");
 
