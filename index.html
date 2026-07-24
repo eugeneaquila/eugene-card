@@ -117,9 +117,8 @@
         </button>
       </nav>
 
-      <!-- Cart, Visible Language Toggle & Auth Header -->
+      <!-- Cart, Language Toggle & Auth Header -->
       <div class="flex items-center gap-2">
-        <!-- Prominent Language Switcher Button -->
         <button onclick="toggleLanguage()" id="lang-btn" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-xs font-black text-amber-400 rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
           <i class="fa-solid fa-globe text-slate-400"></i> 
           <span id="lang-text">EN | ID</span>
@@ -302,13 +301,20 @@
       </div>
     </section>
 
-    <!-- ADMIN HUB -->
+    <!-- ADMIN HUB VIEW -->
     <section id="view-admin" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub & Transaction Approvals</h2>
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub & Transaction Approvals</h2>
+          <p class="text-xs text-slate-400 mt-1">Review pending customer purchases and transfer card ownership upon QRIS payment verification.</p>
+        </div>
+        <button onclick="loadPendingTransactions()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-rotate"></i> Refresh Queue
+        </button>
       </div>
+
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending Transaction Approvals</h4>
+        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending Orders Requiring Approval</h4>
         <div id="admin-pending-orders-list" class="space-y-3">
           <p class="text-xs text-slate-500">No pending transactions requiring approval.</p>
         </div>
@@ -950,6 +956,15 @@
         .channel('public:cards')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => {
           loadAppState();
+        })
+        .subscribe();
+
+      supabaseClient
+        .channel('public:transactions')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
+          if (currentUser && currentUser.isAdmin) {
+            loadPendingTransactions();
+          }
         })
         .subscribe();
     }
@@ -1640,7 +1655,6 @@
       const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
       const updatedImgUrl = document.getElementById('edit-card-img').value;
 
-      // Sync edit directly to Supabase cloud database
       const { error } = await supabaseClient
         .from('cards')
         .update({
@@ -1762,11 +1776,132 @@
 
     function closeCheckoutModal() { document.getElementById('checkout-modal').classList.add('hidden'); }
 
-    function submitOrderWithProof() {
+    // Submit Order & Save directly into Supabase
+    async function submitOrderWithProof() {
+      if (cart.length === 0) return showToast(currentLang === 'id' ? 'Keranjang kosong.' : 'Cart is empty.');
+
+      const orderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+      const subtotal = cart.reduce((s, i) => s + i.price, 0);
+      const totalAmount = subtotal * (1 + TRADE_FEE_PERCENT);
+
+      const newOrder = {
+        id: orderId,
+        user_name: currentUser ? currentUser.name : 'Guest Collector',
+        items: cart,
+        total_amount: totalAmount,
+        status: 'PENDING'
+      };
+
+      if (supabaseClient) {
+        const { error } = await supabaseClient
+          .from('transactions')
+          .insert([newOrder]);
+
+        if (error) {
+          console.error('Error saving transaction to Supabase:', error);
+          showToast('Failed to record order: ' + error.message);
+          return;
+        }
+      }
+
       showToast(currentLang === 'id' ? 'Pesanan dikirim! Menunggu verifikasi Admin.' : 'Order submitted! Waiting for Admin verification.');
       cart = [];
       updateCartTotals();
       closeCheckoutModal();
+      
+      if (currentUser && currentUser.isAdmin) {
+        loadPendingTransactions();
+      }
+    }
+
+    // ADMIN HUB - Load Pending Transactions
+    async function loadPendingTransactions() {
+      const container = document.getElementById('admin-pending-orders-list');
+      if (!container) return;
+
+      if (!supabaseClient) {
+        container.innerHTML = `<p class="text-xs text-slate-500">Supabase client not connected.</p>`;
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from('transactions')
+        .select('*')
+        .eq('status', 'PENDING')
+        .order('created_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500">${currentLang === 'id' ? 'Tidak ada transaksi pending.' : 'No pending transactions requiring approval.'}</p>`;
+        return;
+      }
+
+      container.innerHTML = data.map(order => `
+        <div class="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-amber-400 text-xs">${order.id}</span>
+              <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">${order.status}</span>
+            </div>
+            <p class="text-xs text-white font-bold mt-1">Buyer: ${order.user_name}</p>
+            <p class="text-[11px] text-slate-400">Total: <span class="font-mono text-emerald-400 font-bold">${formatIDR(order.total_amount)}</span></p>
+            <p class="text-[10px] text-slate-500 mt-0.5">Items: ${order.items.map(i => `${i.serial} (${i.name})`).join(', ')}</p>
+          </div>
+
+          <div class="flex gap-2 w-full sm:w-auto">
+            <button onclick="approveTransaction('${order.id}')" class="flex-1 sm:flex-none px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">
+              Approve & Transfer Cards
+            </button>
+            <button onclick="rejectTransaction('${order.id}')" class="flex-1 sm:flex-none px-3 py-2 bg-slate-800 text-rose-400 hover:bg-slate-700 font-bold text-xs rounded-xl transition-all">
+              Reject
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ADMIN HUB - Approve & Transfer Ownership
+    async function approveTransaction(orderId) {
+      if (!supabaseClient) return;
+
+      const { data: order, error: fetchErr } = await supabaseClient
+        .from('transactions')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+
+      if (fetchErr || !order) {
+        showToast('Transaction not found.');
+        return;
+      }
+
+      for (const item of order.items) {
+        await supabaseClient
+          .from('cards')
+          .update({ owner: order.user_name, status: 'SOLD' })
+          .eq('id', item.id);
+      }
+
+      await supabaseClient
+        .from('transactions')
+        .update({ status: 'APPROVED' })
+        .eq('id', orderId);
+
+      showToast(`Transaction ${orderId} approved! Ownership transferred.`);
+      await loadAppState();
+      loadPendingTransactions();
+    }
+
+    // ADMIN HUB - Reject Order
+    async function rejectTransaction(orderId) {
+      if (!supabaseClient) return;
+
+      await supabaseClient
+        .from('transactions')
+        .update({ status: 'REJECTED' })
+        .eq('id', orderId);
+
+      showToast(`Transaction ${orderId} rejected.`);
+      loadPendingTransactions();
     }
 
     // Holders Directory
@@ -1856,6 +1991,7 @@
       if (tabName === 'dashboard') renderOwnedCards();
       if (tabName === 'wishlist') renderWishlistPage();
       if (tabName === 'inventory') renderInventoryTable();
+      if (tabName === 'admin') loadPendingTransactions();
       if (tabName === 'trade') renderTradingRoom();
       if (tabName === 'auction') renderAuctionView();
       if (tabName === 'trade-req') renderTradeRequestsGrid();
