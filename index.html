@@ -650,47 +650,33 @@
     };
 
     // LOCAL STORAGE PERSISTENCE FUNCTIONS
-    function loadAppState() {
-      // Load Inventory
-      const savedInventory = localStorage.getItem('eugene_card_inventory');
-      if (savedInventory) {
-        try { inventory = JSON.parse(savedInventory); } catch (e) { initDefaultInventory(); }
-      } else {
-        initDefaultInventory();
-      }
+async function loadAppState() {
+  if (!supabaseClient) return;
 
-      // Load Trade Listings
-      const savedListings = localStorage.getItem('eugene_card_trade_listings');
-      if (savedListings) {
-        try { tradeListings = JSON.parse(savedListings); } catch (e) { tradeListings = []; }
-      } else {
-        tradeListings = [{ id: 'TL-1', cardId: 'card-2', seller: 'Muh. Bintang', askingPrice: 650000 }];
-      }
+  // Fetch all cards live from Supabase PostgreSQL table
+  const { data, error } = await supabaseClient.from('cards').select('*').order('id', { ascending: true });
 
-      // Load Trade Requests
-      const savedRequests = localStorage.getItem('eugene_card_trade_requests');
-      if (savedRequests) {
-        try { tradeRequestsList = JSON.parse(savedRequests); } catch (e) { tradeRequestsList = []; }
-      } else {
-        tradeRequestsList = [{
-          id: 'TR-101',
-          sender: 'Muh. Bintang',
-          receiver: 'Eugene Collector',
-          offeredCardId: 'card-2',
-          targetCardId: 'card-1',
-          cashSweetener: 150000,
-          status: 'PENDING'
-        }];
-      }
+  if (error) {
+    console.error('Error fetching cards from Supabase:', error);
+    return;
+  }
 
-      // Load Wishlist
-      const savedWishlist = localStorage.getItem('eugene_card_wishlist');
-      if (savedWishlist) {
-        try { wishlist = new Set(JSON.parse(savedWishlist)); } catch (e) { wishlist = new Set(); }
-      }
-
-      updateAllViews();
-    }
+  if (data && data.length > 0) {
+    // Map database snake_case keys back to JS format
+    inventory = data.map(c => ({
+      id: c.id,
+      serial: c.serial,
+      name: c.name,
+      type: c.type,
+      price: parseFloat(c.price),
+      baseFloorPrice: parseFloat(c.base_floor_price),
+      owner: c.owner,
+      status: c.status,
+      imgUrl: c.img_url
+    }));
+    updateAllViews();
+  }
+}
 
     function saveAppState() {
       localStorage.setItem('eugene_card_inventory', JSON.stringify(inventory));
@@ -1416,33 +1402,48 @@
       reader.readAsDataURL(file);
     }
 
-    function saveInventoryCardChanges() {
-      if (!currentUser || !currentUser.isAdmin) return showToast('Admin permission required.');
+async function saveInventoryCardChanges() {
+  if (!currentUser || !currentUser.isAdmin) return showToast('Admin permission required.');
 
-      const cardId = document.getElementById('edit-card-id').value;
-      const card = inventory.find(c => c.id === cardId);
-      if (!card) return;
+  const cardId = document.getElementById('edit-card-id').value;
+  const card = inventory.find(c => c.id === cardId);
+  if (!card) return;
 
-      card.name = document.getElementById('edit-card-name').value;
-      card.serial = document.getElementById('edit-card-serial').value;
-      card.type = document.getElementById('edit-card-type').value;
-      card.price = parseFloat(document.getElementById('edit-card-price').value) || card.price;
-      card.status = document.getElementById('edit-card-status').value;
-      
-      const selectedOwner = document.getElementById('edit-card-owner-dropdown').value;
-      card.owner = selectedOwner === 'Unowned / House' ? null : selectedOwner;
-      if (card.owner) card.status = 'SOLD';
+  const updatedName = document.getElementById('edit-card-name').value;
+  const updatedSerial = document.getElementById('edit-card-serial').value;
+  const updatedType = document.getElementById('edit-card-type').value;
+  const updatedPrice = parseFloat(document.getElementById('edit-card-price').value) || card.price;
+  const updatedStatus = document.getElementById('edit-card-status').value;
+  
+  const selectedOwner = document.getElementById('edit-card-owner-dropdown').value;
+  const updatedOwner = selectedOwner === 'Unowned / House' ? null : selectedOwner;
+  const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
+  const updatedImgUrl = document.getElementById('edit-card-img').value;
 
-      card.imgUrl = document.getElementById('edit-card-img').value;
+  // Sync edit directly to Supabase cloud database
+  const { error } = await supabaseClient
+    .from('cards')
+    .update({
+      name: updatedName,
+      serial: updatedSerial,
+      type: updatedType,
+      price: updatedPrice,
+      status: finalStatus,
+      owner: updatedOwner,
+      img_url: updatedImgUrl
+    })
+    .eq('id', cardId);
 
-      saveAppState();
-      closeInventoryModal();
-      renderInventoryTable();
-      renderCardGrid();
-      renderOwnedCards();
-      renderHoldersTable();
-      showToast(`Updated card ${card.serial}!`);
-    }
+  if (error) {
+    showToast('Failed to sync changes: ' + error.message);
+    return;
+  }
+
+  // Update local memory and reload
+  closeInventoryModal();
+  await loadAppState();
+  showToast(`Globally updated card ${updatedSerial}!`);
+}    }
 
     // Card Details Modal
     function openCardDetailModal(cardId) {
