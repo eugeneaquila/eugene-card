@@ -631,47 +631,6 @@
     
     const supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    // ─────────────────────────────────────────────────────────────────────
-    // FIX NOTES — "Admin Hub shows no pending transactions after checkout"
-    //
-    // Bug #1 (fixed in code below): submitOrderWithProof() was writing a
-    // client-generated string id like "id: 'ORD-4821'" into the
-    // "transactions" table. If that table's `id` column is an
-    // auto-incrementing bigint or a uuid (the Supabase default when you
-    // create a new table), Postgres rejects a value like "ORD-4821" with a
-    // type error. The insert silently failed, so no row was ever created —
-    // the Admin Hub had nothing to show because there was nothing to show.
-    // The code now tries the friendly id first, and automatically retries
-    // without it (letting the database assign its own id) if that specific
-    // type error occurs.
-    //
-    // Bug #2 (fixed in code below): loadPendingTransactions() and
-    // approveTransaction() assumed order.items is always a JS array. If the
-    // "items" column in Supabase is `text` instead of `json`/`jsonb`, it
-    // comes back as a raw string, and calling .map()/for-of on it throws —
-    // which silently aborted rendering and left the "No pending
-    // transactions" placeholder on screen even when rows existed. Both
-    // functions now defensively parse it.
-    //
-    // Bug #3 (cannot be fixed from this file — please check in Supabase):
-    // if Row Level Security (RLS) is enabled on "transactions" with no
-    // SELECT policy, the query below returns 0 rows for EVERYONE — not an
-    // error, just silently empty — even for the admin. If transactions
-    // still don't appear after this update, run something like this in the
-    // Supabase SQL editor:
-    //
-    //   alter table transactions enable row level security;
-    //   create policy "Allow insert for everyone"
-    //     on transactions for insert with check (true);
-    //   create policy "Allow read for authenticated users"
-    //     on transactions for select using (auth.role() = 'authenticated');
-    //   create policy "Allow update for authenticated users"
-    //     on transactions for update using (auth.role() = 'authenticated');
-    //
-    // (Tighten the select/update policies to your ADMIN_EMAILS below if you
-    // want only admins to read/update orders.)
-    // ─────────────────────────────────────────────────────────────────────
-
     const TRADE_FEE_PERCENT = 0.02;
     const OFFICIAL_QRIS_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
     
@@ -689,6 +648,62 @@
     let tradeListings = [];
     let tradeRequestsList = [];
     let isLoading = true;
+
+    // ─────────────────────────────────────────────────────────────────────
+    // PERSISTENCE HELPER FUNCTIONS (LOCALSTORAGE)
+    // ─────────────────────────────────────────────────────────────────────
+    
+    // Load saved wishlist from localStorage
+    function loadSavedWishlist() {
+      try {
+        const saved = localStorage.getItem('eugene_wishlist_ids');
+        if (saved) {
+          const parsedArr = JSON.parse(saved);
+          if (Array.isArray(parsedArr)) {
+            wishlist = new Set(parsedArr);
+          }
+        }
+      } catch (e) {
+        console.error('Error loading wishlist from storage:', e);
+      }
+    }
+
+    // Save wishlist to localStorage
+    function saveWishlistToStorage() {
+      try {
+        localStorage.setItem('eugene_wishlist_ids', JSON.stringify(Array.from(wishlist)));
+      } catch (e) {
+        console.error('Error saving wishlist to storage:', e);
+      }
+    }
+
+    // Load saved cart items from localStorage and re-link with fresh inventory data
+    function loadSavedCart() {
+      try {
+        const saved = localStorage.getItem('eugene_cart_items');
+        if (saved) {
+          const parsedCart = JSON.parse(saved);
+          if (Array.isArray(parsedCart)) {
+            // Re-match saved item IDs against current inventory to ensure fresh details/prices
+            cart = parsedCart.map(savedItem => {
+              const freshCard = inventory.find(c => c.id === savedItem.id);
+              return freshCard || savedItem;
+            }).filter(item => item && item.id);
+          }
+        }
+      } catch (e) {
+        console.error('Error loading cart from storage:', e);
+      }
+    }
+
+    // Save cart to localStorage
+    function saveCartToStorage() {
+      try {
+        localStorage.setItem('eugene_cart_items', JSON.stringify(cart));
+      } catch (e) {
+        console.error('Error saving cart to storage:', e);
+      }
+    }
 
     // Live Dynamic Auction Countdown Timer (3 hours 14 mins initial)
     let auctionSecondsLeft = 3 * 3600 + 14 * 60 + 22;
@@ -764,6 +779,9 @@
         initDefaultInventory();
       }
 
+      // Re-link saved cart items with fetched inventory
+      loadSavedCart();
+
       isLoading = false;
       updateAllViews();
     }
@@ -830,6 +848,7 @@
       renderTradingRoom();
       renderHoldersTable();
       updateRemainingCardsCounter();
+      updateCartTotals();
     }
 
     function updateRemainingCardsCounter() {
@@ -839,6 +858,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      // Restore persisted wishlist and cart from storage right on load
+      loadSavedWishlist();
+      loadSavedCart();
+
       await loadAppState();
       setupRealtimeSync();
       renderAuthHeader();
@@ -1396,6 +1419,8 @@
         wishlist.add(cardId);
         showToast('Added to wishlist!');
       }
+      
+      saveWishlistToStorage();
       renderCardGrid();
       renderWishlistPage();
     }
@@ -1431,6 +1456,7 @@
 
     function clearWishlist() {
       wishlist.clear();
+      saveWishlistToStorage();
       renderWishlistPage();
       renderCardGrid();
       showToast('Wishlist cleared.');
@@ -1562,12 +1588,14 @@
       const card = inventory.find(c => c.id === cardId);
       if (!card || cart.some(i => i.id === cardId)) return;
       cart.push(card);
+      saveCartToStorage();
       updateCartTotals();
       showToast(`Added ${card.serial} to cart.`);
     }
 
     function removeFromCart(cardId) {
       cart = cart.filter(item => item.id !== cardId);
+      saveCartToStorage();
       updateCartTotals();
       showToast('Item removed from cart.');
     }
@@ -1649,16 +1677,10 @@
         status: 'PENDING'
       };
 
-      // First attempt: a friendly, app-generated id (matches the "card-1"
-      // style ids already used in the "cards" table).
       let { error } = await supabaseClient
         .from('transactions')
         .insert([{ id: orderRef, ...baseOrder }]);
 
-      // Fallback: if the "id" column can't accept a text value like
-      // "ORD-4821" (e.g. it's an auto-incrementing bigint or a uuid column),
-      // retry and let the database assign its own id instead. This is what
-      // was silently breaking every checkout with zero visible error.
       if (error && (error.code === '22P02' || /invalid input syntax/i.test(error.message || ''))) {
         console.warn('Transaction insert with custom id failed, retrying without it:', error.message);
         ({ error } = await supabaseClient.from('transactions').insert([baseOrder]));
@@ -1672,6 +1694,7 @@
 
       showToast('Order submitted! Waiting for Admin verification.');
       cart = [];
+      saveCartToStorage();
       updateCartTotals();
       closeCheckoutModal();
       
@@ -1696,9 +1719,6 @@
         .eq('status', 'PENDING')
         .order('created_at', { ascending: false });
 
-      // Fallback: some "transactions" tables don't have a created_at
-      // column, which makes the query above fail outright. Retry without
-      // ordering instead of showing a false "nothing pending" state.
       if (error) {
         console.warn('Retrying pending-transactions query without ordering by created_at:', error.message);
         ({ data, error } = await supabaseClient
@@ -1708,9 +1728,6 @@
       }
 
       if (error) {
-        // Surface the real problem instead of pretending nothing is
-        // pending — this is almost always a missing Row Level Security
-        // SELECT policy on the "transactions" table.
         console.error('Error loading pending transactions:', error);
         container.innerHTML = `
           <div class="bg-rose-950/30 border border-rose-500/30 rounded-2xl p-4 text-xs text-rose-300 space-y-1">
@@ -1727,9 +1744,6 @@
       }
 
       container.innerHTML = data.map(order => {
-        // Defensive: some setups store "items" as a text/JSON string
-        // rather than jsonb, which would otherwise throw on .map() below
-        // and silently blank out the entire list.
         let items = order.items;
         if (typeof items === 'string') {
           try { items = JSON.parse(items); } catch (e) { items = []; }
@@ -1777,8 +1791,6 @@
         return;
       }
 
-      // Defensive: "items" may come back as a JSON string instead of an
-      // array depending on the column type.
       let items = order.items;
       if (typeof items === 'string') {
         try { items = JSON.parse(items); } catch (e) { items = []; }
