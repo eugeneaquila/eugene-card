@@ -541,8 +541,10 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Assign Owner (Enter Display Name)</label>
-          <input type="text" id="edit-card-owner-input" placeholder="Leave blank for Unowned (House)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none placeholder-slate-600">
+          <label class="block font-bold text-slate-400 mb-1">Assign Owner</label>
+          <select id="edit-card-owner-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+            <!-- Options dynamically populated by openInventoryModal -->
+          </select>
         </div>
 
         <div class="space-y-1">
@@ -653,7 +655,6 @@
     // PERSISTENCE HELPER FUNCTIONS (LOCALSTORAGE)
     // ─────────────────────────────────────────────────────────────────────
     
-    // Load saved wishlist from localStorage
     function loadSavedWishlist() {
       try {
         const saved = localStorage.getItem('eugene_wishlist_ids');
@@ -668,7 +669,6 @@
       }
     }
 
-    // Save wishlist to localStorage
     function saveWishlistToStorage() {
       try {
         localStorage.setItem('eugene_wishlist_ids', JSON.stringify(Array.from(wishlist)));
@@ -677,14 +677,12 @@
       }
     }
 
-    // Load saved cart items from localStorage and re-link with fresh inventory data
     function loadSavedCart() {
       try {
         const saved = localStorage.getItem('eugene_cart_items');
         if (saved) {
           const parsedCart = JSON.parse(saved);
           if (Array.isArray(parsedCart)) {
-            // Re-match saved item IDs against current inventory to ensure fresh details/prices
             cart = parsedCart.map(savedItem => {
               const freshCard = inventory.find(c => c.id === savedItem.id);
               return freshCard || savedItem;
@@ -696,7 +694,6 @@
       }
     }
 
-    // Save cart to localStorage
     function saveCartToStorage() {
       try {
         localStorage.setItem('eugene_cart_items', JSON.stringify(cart));
@@ -779,7 +776,6 @@
         initDefaultInventory();
       }
 
-      // Re-link saved cart items with fetched inventory
       loadSavedCart();
 
       isLoading = false;
@@ -858,7 +854,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      // Restore persisted wishlist and cart from storage right on load
       loadSavedWishlist();
       loadSavedCart();
 
@@ -1496,9 +1491,23 @@
       document.getElementById('edit-card-type').value = card.type;
       document.getElementById('edit-card-price').value = card.price;
       document.getElementById('edit-card-status').value = card.status;
-      document.getElementById('edit-card-owner-input').value = card.owner || '';
       document.getElementById('edit-card-img').value = card.imgUrl;
       document.getElementById('edit-card-file-input').value = '';
+
+      // Build Dynamic Dropdown List of Known Collectors
+      const ownersSet = new Set();
+      inventory.forEach(c => { if (c.owner) ownersSet.add(c.owner); });
+      if (currentUser && currentUser.name) ownersSet.add(currentUser.name);
+
+      const ownerSelect = document.getElementById('edit-card-owner-select');
+      const currentCardOwner = card.owner || '';
+
+      let optionsHtml = `<option value="" ${currentCardOwner === '' ? 'selected' : ''}>Unowned (House)</option>`;
+      ownersSet.forEach(ownerName => {
+        optionsHtml += `<option value="${ownerName}" ${currentCardOwner === ownerName ? 'selected' : ''}>${ownerName}</option>`;
+      });
+
+      ownerSelect.innerHTML = optionsHtml;
 
       document.getElementById('inventory-edit-modal').classList.remove('hidden');
     }
@@ -1529,8 +1538,9 @@
       const updatedType = document.getElementById('edit-card-type').value;
       const updatedPrice = parseFloat(document.getElementById('edit-card-price').value) || card.price;
       const updatedStatus = document.getElementById('edit-card-status').value;
-      const ownerInput = document.getElementById('edit-card-owner-input').value.trim();
-      const updatedOwner = ownerInput === '' ? null : ownerInput;
+      
+      const ownerSelectVal = document.getElementById('edit-card-owner-select').value;
+      const updatedOwner = ownerSelectVal === '' ? null : ownerSelectVal;
       const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
       const updatedImgUrl = document.getElementById('edit-card-img').value;
 
