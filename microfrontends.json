@@ -2,9 +2,16 @@
   "$schema": "https://openapi.vercel.sh/microfrontends.json",
   "applications": {
     "eugene-card": {
+      "default": true,
       "development": {
         "fallback": "eugene-card-nine.vercel.app"
-      }
+      },
+      "routing": [
+        {
+          "src": "/(.*)",
+          "dest": "/$1"
+        }
+      ]
     }
   }
 }
