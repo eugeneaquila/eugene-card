@@ -76,49 +76,55 @@
             <h1 class="font-extrabold text-base tracking-wider text-white uppercase">EUGENE CARD</h1>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Beta Edition</span>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block">Trading Card Marketplace & Exchange Hub</p>
+          <p class="text-xs text-slate-400 hidden sm:block" data-i18n="tagline">Trading Card Marketplace & Exchange Hub</p>
         </div>
       </div>
 
       <!-- Navigation Tabs -->
       <nav class="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 overflow-x-auto max-w-full">
         <button id="nav-catalog" onclick="switchTab('catalog')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-layer-group text-amber-400"></i> Collection
+          <i class="fa-solid fa-layer-group text-amber-400"></i> <span data-i18n="navCollection">Collection</span>
         </button>
         <button id="nav-trade" onclick="switchTab('trade')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-right-left text-amber-400"></i> Trade
+          <i class="fa-solid fa-right-left text-amber-400"></i> <span data-i18n="navTrade">Trade</span>
         </button>
         <button id="nav-auction" onclick="switchTab('auction')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-gavel text-emerald-400"></i> Auction
+          <i class="fa-solid fa-gavel text-emerald-400"></i> <span data-i18n="navAuction">Auction</span>
         </button>
         <button id="nav-trade-req" onclick="switchTab('trade-req')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-handshake text-purple-400"></i> Trade Requests
+          <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navTradeReq">Trade Requests</span>
         </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-users text-teal-400"></i> Holders
+          <i class="fa-solid fa-users text-teal-400"></i> <span data-i18n="navHolders">Holders</span>
         </button>
 
         <div class="h-4 w-px bg-slate-800 mx-1 self-center hidden sm:block"></div>
 
         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-vault text-amber-400"></i> My Vault
+          <i class="fa-solid fa-vault text-amber-400"></i> <span data-i18n="navVault">My Vault</span>
         </button>
         <button id="nav-wishlist" onclick="switchTab('wishlist')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-heart text-rose-400"></i> Wishlist
+          <i class="fa-solid fa-heart text-rose-400"></i> <span data-i18n="navWishlist">Wishlist</span>
         </button>
 
         <div id="admin-nav-separator" class="h-4 w-px bg-slate-800 mx-1 self-center hidden"></div>
 
         <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
-          <i class="fa-solid fa-boxes-stacked"></i> Inventory Mgmt
+          <i class="fa-solid fa-boxes-stacked"></i> <span data-i18n="navInventory">Inventory Mgmt</span>
         </button>
         <button id="nav-admin" onclick="switchTab('admin')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
-          <i class="fa-solid fa-shield-halved"></i> Admin Hub
+          <i class="fa-solid fa-shield-halved"></i> <span data-i18n="navAdmin">Admin Hub</span>
         </button>
       </nav>
 
-      <!-- Cart & Auth Header -->
+      <!-- Cart, Visible Language Toggle & Auth Header -->
       <div class="flex items-center gap-2">
+        <!-- Prominent Language Switcher Button -->
+        <button onclick="toggleLanguage()" id="lang-btn" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-xs font-black text-amber-400 rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-globe text-slate-400"></i> 
+          <span id="lang-text">EN | ID</span>
+        </button>
+
         <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
           <i class="fa-solid fa-cart-shopping text-sm text-amber-400"></i>
           <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
@@ -140,15 +146,15 @@
             <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
           </div>
           <div>
-            <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider">LIMITED EDITION</span>
-            <h2 class="text-lg font-black text-white mt-0.5">Beta Edition Card Stock</h2>
-            <p class="text-xs text-slate-400">Official Primary Market Availability</p>
+            <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider" data-i18n="badgeLimited">LIMITED EDITION</span>
+            <h2 class="text-lg font-black text-white mt-0.5" data-i18n="heroTitle">Beta Edition Card Stock</h2>
+            <p class="text-xs text-slate-400" data-i18n="heroSubtitle">Official Primary Market Availability</p>
           </div>
         </div>
         
         <div class="bg-slate-950/80 px-6 py-3 rounded-2xl border border-slate-800 text-center sm:text-right w-full sm:w-auto">
-          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Remaining Cards</p>
-          <p class="text-2xl font-black font-mono text-amber-400"><span id="remaining-cards-count">0</span> <span class="text-slate-500 text-sm font-normal">/ 50 Available</span></p>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" data-i18n="remainingTitle">Remaining Cards</p>
+          <p class="text-2xl font-black font-mono text-amber-400"><span id="remaining-cards-count">0</span> <span class="text-slate-500 text-sm font-normal" data-i18n="availableSuffix">/ 50 Available</span></p>
         </div>
       </div>
 
@@ -158,27 +164,24 @@
           <input type="text" id="search-input" oninput="debouncedRenderCardGrid()" placeholder="Search serial (*01) or card name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
         </div>
         <div class="flex items-center gap-1.5">
-          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">All (50)</button>
-          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Premium (25)</button>
-          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Standard (25)</button>
+          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all" data-i18n="filterAll">All (50)</button>
+          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="filterPremium">Premium (25)</button>
+          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="filterStandard">Standard (25)</button>
         </div>
       </div>
 
-      <!-- Card Grid / Skeleton Loader -->
-      <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        <!-- Rendered dynamically -->
-      </div>
+      <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </section>
 
     <!-- TRADING ROOM VIEW -->
     <section id="view-trade" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide">TRADING ROOM</h2>
-          <p class="text-xs text-slate-400 mt-1">Buy and sell directly with other collectors • 2% tax per trade</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="tradeRoomTitle">TRADING ROOM</h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="tradeRoomSub">Buy and sell directly with other collectors • 2% tax per trade</p>
         </div>
         <button onclick="openListCardForTradeModal()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center gap-2">
-          <i class="fa-solid fa-plus"></i> List a Card
+          <i class="fa-solid fa-plus"></i> <span data-i18n="btnListCard">List a Card</span>
         </button>
       </div>
 
@@ -188,19 +191,19 @@
     <!-- AUCTION ROOM VIEW -->
     <section id="view-auction" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide">AUCTION ROOM</h2>
-        <p class="text-xs text-slate-400 mt-1">Place competitive bids on rare serial cards before timer expires.</p>
+        <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="auctionTitle">AUCTION ROOM</h2>
+        <p class="text-xs text-slate-400 mt-1" data-i18n="auctionSub">Place competitive bids on rare serial cards before timer expires.</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
           <div class="flex justify-between items-center border-b border-slate-800 pb-3">
             <div>
-              <span class="text-[10px] bg-amber-500/20 text-amber-400 font-extrabold px-2.5 py-1 rounded-md border border-amber-500/30">FEATURED AUCTION</span>
+              <span class="text-[10px] bg-amber-500/20 text-amber-400 font-extrabold px-2.5 py-1 rounded-md border border-amber-500/30" data-i18n="badgeFeaturedAuction">FEATURED AUCTION</span>
               <h3 id="auction-card-title" class="text-lg font-black text-white mt-1">Eugene Genesis Card #01</h3>
             </div>
             <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-right">
-              <span class="text-[10px] text-slate-500 font-bold uppercase block">Time Remaining</span>
+              <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="timeRemaining">Time Remaining</span>
               <span id="auction-timer" class="text-lg font-black text-amber-400 font-mono">03h 14m 22s</span>
             </div>
           </div>
@@ -215,16 +218,16 @@
 
             <div class="space-y-4">
               <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
-                <p class="text-xs text-slate-400">Current Highest Bid</p>
+                <p class="text-xs text-slate-400" data-i18n="highestBidLabel">Current Highest Bid</p>
                 <p id="auction-current-bid" class="text-3xl font-black text-emerald-400 font-mono">Rp 750.000</p>
-                <p class="text-[10px] text-slate-400">High Bidder: <strong id="auction-high-bidder" class="text-white">Collector #104</strong></p>
+                <p class="text-[10px] text-slate-400"><span data-i18n="highBidderLabel">High Bidder:</span> <strong id="auction-high-bidder" class="text-white">Collector #104</strong></p>
               </div>
 
               <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-300">Your Bid Amount (IDR)</label>
+                <label class="block text-xs font-bold text-slate-300" data-i18n="yourBidLabel">Your Bid Amount (IDR)</label>
                 <div class="flex gap-2">
                   <input type="number" id="bid-input-amount" placeholder="e.g. 775000" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                  <button onclick="placeAuctionBid()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl">Place Bid</button>
+                  <button onclick="placeAuctionBid()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl" data-i18n="btnPlaceBid">Place Bid</button>
                 </div>
               </div>
             </div>
@@ -232,7 +235,7 @@
         </div>
 
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
-          <h4 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Live Bid History</h4>
+          <h4 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider" data-i18n="bidHistoryTitle">Live Bid History</h4>
           <div id="auction-bid-history" class="space-y-2 text-xs max-h-[280px] overflow-y-auto"></div>
         </div>
       </div>
@@ -242,11 +245,11 @@
     <section id="view-trade-req" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide">TRADE REQUESTS</h2>
-          <p class="text-xs text-slate-400 mt-1">Propose direct buy or trade offers on cards that already have an owner.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="tradeReqTitle">TRADE REQUESTS</h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="tradeReqSub">Propose direct buy or trade offers on cards that already have an owner.</p>
         </div>
         <button onclick="openProposeTradeModal()" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-xl shadow-lg flex items-center gap-2">
-          <i class="fa-solid fa-handshake"></i> Propose Card Trade
+          <i class="fa-solid fa-handshake"></i> <span data-i18n="btnProposeTrade">Propose Card Trade</span>
         </button>
       </div>
 
@@ -257,11 +260,11 @@
     <section id="view-dashboard" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Vault / Binder</h2>
-          <p class="text-xs text-slate-400 mt-1">Manage owned cards, adjust listing prices, or sell back instantly to Admin at floor price.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> <span data-i18n="vaultTitle">My Vault / Binder</span></h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="vaultSub">Manage owned cards, adjust listing prices, or sell back instantly to Admin at floor price.</p>
         </div>
         <button onclick="openProfileManagerModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-user-gear text-amber-400"></i> Profile Settings
+          <i class="fa-solid fa-user-gear text-amber-400"></i> <span data-i18n="btnProfileSettings">Profile Settings</span>
         </button>
       </div>
 
@@ -271,27 +274,27 @@
     <!-- WISHLIST VIEW -->
     <section id="view-wishlist" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center justify-between">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> Saved Wishlist</h2>
-        <button onclick="clearWishlist()" class="px-3 py-1.5 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl hover:bg-slate-700">Clear All</button>
+        <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> <span data-i18n="wishlistTitle">Saved Wishlist</span></h2>
+        <button onclick="clearWishlist()" class="px-3 py-1.5 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl hover:bg-slate-700" data-i18n="btnClearAll">Clear All</button>
       </div>
-      <p class="text-xs text-slate-400 -mt-2">Click on any card to directly propose a trade offer to its owner!</p>
+      <p class="text-xs text-slate-400 -mt-2" data-i18n="wishlistSub">Click on any card to directly propose a trade offer to its owner!</p>
       <div id="wishlist-page-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </section>
 
     <!-- HOLDERS VIEW -->
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide">Holders Directory</h2>
-        <p class="text-xs text-slate-400 mt-1">Click on any collector row or card serial to view their collection and send direct trade offers.</p>
+        <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="holdersTitle">Holders Directory</h2>
+        <p class="text-xs text-slate-400 mt-1" data-i18n="holdersSub">Click on any collector row or card serial to view their collection and send direct trade offers.</p>
       </div>
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
             <tr>
-              <th class="p-3">Owner Name</th>
-              <th class="p-3">Cards Owned</th>
-              <th class="p-3">Serials Held</th>
-              <th class="p-3 text-right">Action</th>
+              <th class="p-3" data-i18n="thOwner">Owner Name</th>
+              <th class="p-3" data-i18n="thCardsOwned">Cards Owned</th>
+              <th class="p-3" data-i18n="thSerials">Serials Held</th>
+              <th class="p-3 text-right" data-i18n="thAction">Action</th>
             </tr>
           </thead>
           <tbody id="holders-table-body" class="divide-y divide-slate-800"></tbody>
@@ -353,13 +356,13 @@
         <div class="relative w-20 h-20 mx-auto mb-2">
           <img id="profile-modal-avatar-preview" src="" class="w-20 h-20 rounded-full object-cover border-2 border-amber-500/50 shadow-lg bg-slate-950">
         </div>
-        <h3 class="text-lg font-black text-white">Collector Profile Settings</h3>
-        <p class="text-xs text-slate-400">Customize how your profile appears on the marketplace</p>
+        <h3 class="text-lg font-black text-white" data-i18n="profileModalTitle">Collector Profile Settings</h3>
+        <p class="text-xs text-slate-400" data-i18n="profileModalSub">Customize how your profile appears on the marketplace</p>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Display Name</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="lblDisplayName">Display Name</label>
           <input type="text" id="profile-edit-name-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
         </div>
 
@@ -369,21 +372,21 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Upload Custom Avatar Picture</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="lblUploadAvatar">Upload Custom Avatar Picture</label>
           <input type="file" id="profile-avatar-file-input" accept="image/*" onchange="handleProfileAvatarUpload(event)" class="w-full text-[11px] text-slate-400 bg-slate-950 border border-slate-800 rounded-xl p-2 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Or Avatar Image URL</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="lblOrAvatarUrl">Or Avatar Image URL</label>
           <input type="text" id="profile-edit-avatar-input" oninput="document.getElementById('profile-modal-avatar-preview').src = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-600 focus:border-amber-500 focus:outline-none" placeholder="https://example.com/avatar.png">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Collector Tagline / Bio</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="lblBio">Collector Tagline / Bio</label>
           <input type="text" id="profile-edit-bio-input" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
         </div>
 
-        <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all">
+        <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all" data-i18n="btnSaveProfile">
           Save Profile Updates
         </button>
       </div>
@@ -399,7 +402,7 @@
 
       <div class="border-b border-slate-800 pb-3">
         <h3 id="holder-modal-name" class="text-lg font-extrabold text-white">Collector Portfolio</h3>
-        <p class="text-xs text-slate-400">Click on any card to directly propose a trade offer to this collector.</p>
+        <p class="text-xs text-slate-400" data-i18n="holderModalSub">Click on any card to directly propose a trade offer to this collector.</p>
       </div>
 
       <div id="holder-cards-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[380px] overflow-y-auto p-1"></div>
@@ -413,21 +416,21 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <h3 class="text-base font-extrabold text-white text-center">List / Edit Card Trade Price</h3>
+      <h3 class="text-base font-extrabold text-white text-center" data-i18n="listModalTitle">List / Edit Card Trade Price</h3>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Select Owned Card</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="lblSelectOwnedCard">Select Owned Card</label>
           <select id="trade-select-owned-card" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none"></select>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Your Asking Price (IDR)</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="lblAskingPrice">Your Asking Price (IDR)</label>
           <input type="number" id="trade-asking-price-input" placeholder="e.g. 550000" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-amber-500 focus:outline-none">
-          <p class="text-[10px] text-slate-500 mt-1">A 2% platform trade fee will be applied to the buyer on purchase.</p>
+          <p class="text-[10px] text-slate-500 mt-1" data-i18n="taxNotice">A 2% platform trade fee will be applied to the buyer on purchase.</p>
         </div>
 
-        <button onclick="confirmListCardForTrade()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl shadow-lg hover:bg-amber-400 transition-all">Save Trade Listing</button>
+        <button onclick="confirmListCardForTrade()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl shadow-lg hover:bg-amber-400 transition-all" data-i18n="btnSaveTradeListing">Save Trade Listing</button>
       </div>
     </div>
   </div>
@@ -439,25 +442,25 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <h3 class="text-base font-extrabold text-white text-center">Propose P2P Card Trade</h3>
+      <h3 class="text-base font-extrabold text-white text-center" data-i18n="proposeModalTitle">Propose P2P Card Trade</h3>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Select Card You Want to Acquire</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="lblTargetCard">Select Card You Want to Acquire</label>
           <select id="trade-target-card-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none"></select>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Select Card You are Offering in Return</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="lblOfferedCard">Select Card You are Offering in Return</label>
           <select id="trade-offered-card-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none"></select>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Additional Cash Sweetener (IDR, Optional)</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="lblCashSweetener">Additional Cash Sweetener (IDR, Optional)</label>
           <input type="number" id="trade-cash-sweetener-input" placeholder="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-amber-500 focus:outline-none">
         </div>
 
-        <button onclick="submitTradeRequestOffer()" class="w-full py-3 bg-purple-600 text-white font-extrabold rounded-xl shadow-lg hover:bg-purple-500 transition-all">Send Trade Proposal</button>
+        <button onclick="submitTradeRequestOffer()" class="w-full py-3 bg-purple-600 text-white font-extrabold rounded-xl shadow-lg hover:bg-purple-500 transition-all" data-i18n="btnSendProposal">Send Trade Proposal</button>
       </div>
     </div>
   </div>
@@ -482,9 +485,9 @@
       </div>
 
       <div class="space-y-2 text-xs bg-slate-950 p-3 rounded-2xl border border-slate-800">
-        <div class="flex justify-between text-slate-400"><span>Owner:</span><strong id="detail-card-owner" class="text-white">Unowned</strong></div>
-        <div class="flex justify-between text-slate-400"><span>Floor Price:</span><strong id="detail-card-price" class="text-emerald-400 font-mono">Rp 0</strong></div>
-        <div class="flex justify-between text-slate-400"><span>Status:</span><strong id="detail-card-status" class="text-amber-400">AVAILABLE</strong></div>
+        <div class="flex justify-between text-slate-400"><span data-i18n="lblOwner">Owner:</span><strong id="detail-card-owner" class="text-white">Unowned</strong></div>
+        <div class="flex justify-between text-slate-400"><span data-i18n="lblFloorPrice">Floor Price:</span><strong id="detail-card-price" class="text-emerald-400 font-mono">Rp 0</strong></div>
+        <div class="flex justify-between text-slate-400"><span data-i18n="lblStatus">Status:</span><strong id="detail-card-status" class="text-amber-400">AVAILABLE</strong></div>
       </div>
 
       <div id="detail-card-action-container"></div>
@@ -569,12 +572,12 @@
         <div class="w-16 h-16 rounded-2xl mx-auto bg-slate-950 border border-indigo-500/40 p-2 shadow-lg flex items-center justify-center">
           <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
         </div>
-        <h3 class="text-lg font-black text-white">Log In to Eugene Card</h3>
-        <p class="text-xs text-slate-400">Sign in to customize your collector profile and trade cards.</p>
+        <h3 class="text-lg font-black text-white" data-i18n="loginTitle">Log In to Eugene Card</h3>
+        <p class="text-xs text-slate-400" data-i18n="loginSub">Sign in to customize your collector profile and trade cards.</p>
       </div>
 
       <button onclick="loginWithGoogle()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all">
-        <i class="fa-brands fa-google text-red-500 text-sm"></i> Continue with Google
+        <i class="fa-brands fa-google text-red-500 text-sm"></i> <span data-i18n="btnGoogle">Continue with Google</span>
       </button>
     </div>
   </div>
@@ -584,33 +587,33 @@
   <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6">
     <div>
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-        <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> Cart</h3>
+        <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> <span data-i18n="cartTitle">Cart</span></h3>
         <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div id="cart-items-container" class="py-4 space-y-3 overflow-y-auto max-h-[50vh]"></div>
     </div>
     <div class="space-y-4 pt-4 border-t border-slate-800">
       <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2 text-xs">
-        <div class="flex justify-between text-slate-400"><span>Subtotal</span><span id="cart-subtotal" class="font-mono text-white">Rp 0</span></div>
-        <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span>Total</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
+        <div class="flex justify-between text-slate-400"><span data-i18n="lblSubtotal">Subtotal</span><span id="cart-subtotal" class="font-mono text-white">Rp 0</span></div>
+        <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span data-i18n="lblTotal">Total</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
       </div>
-      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg hover:bg-amber-400 transition-all">Proceed to Payment</button>
+      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg hover:bg-amber-400 transition-all" data-i18n="btnCheckout">Proceed to Payment</button>
     </div>
   </div>
 
   <div id="checkout-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl text-center">
       <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-lg font-black text-white">Scan & Pay via Official QRIS</h3>
+      <h3 class="text-lg font-black text-white" data-i18n="qrisTitle">Scan & Pay via Official QRIS</h3>
       <p class="text-[10px] text-slate-400">Merchant: <strong class="text-white">Eugene Card, Toko Kartu</strong></p>
       
       <img id="qris-img-element" src="" class="w-52 h-52 mx-auto bg-white p-2 rounded-2xl shadow-inner border border-slate-800">
       
       <div>
-        <p class="text-[10px] text-slate-500 font-bold uppercase">Total Payment Amount (Inc. 2% Fee)</p>
+        <p class="text-[10px] text-slate-500 font-bold uppercase" data-i18n="qrisTotalLabel">Total Payment Amount (Inc. 2% Fee)</p>
         <p id="qris-amount-display" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
       </div>
-      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all">Submit Order for Admin Approval</button>
+      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all" data-i18n="btnSubmitOrder">Submit Order for Admin Approval</button>
     </div>
   </div>
 
@@ -636,6 +639,167 @@
       'yujinybwork@gmail.com'
     ];
 
+    // Multilingual Translations Object
+    const i18n = {
+      en: {
+        tagline: "Trading Card Marketplace & Exchange Hub",
+        navCollection: "Collection",
+        navTrade: "Trade",
+        navAuction: "Auction",
+        navTradeReq: "Trade Requests",
+        navHolders: "Holders",
+        navVault: "My Vault",
+        navWishlist: "Wishlist",
+        navInventory: "Inventory Mgmt",
+        navAdmin: "Admin Hub",
+        badgeLimited: "LIMITED EDITION",
+        heroTitle: "Beta Edition Card Stock",
+        heroSubtitle: "Official Primary Market Availability",
+        remainingTitle: "Remaining Cards",
+        availableSuffix: "/ 50 Available",
+        filterAll: "All (50)",
+        filterPremium: "Premium (25)",
+        filterStandard: "Standard (25)",
+        tradeRoomTitle: "TRADING ROOM",
+        tradeRoomSub: "Buy and sell directly with other collectors • 2% tax per trade",
+        btnListCard: "List a Card",
+        auctionTitle: "AUCTION ROOM",
+        auctionSub: "Place competitive bids on rare serial cards before timer expires.",
+        badgeFeaturedAuction: "FEATURED AUCTION",
+        timeRemaining: "Time Remaining",
+        highestBidLabel: "Current Highest Bid",
+        highBidderLabel: "High Bidder:",
+        yourBidLabel: "Your Bid Amount (IDR)",
+        btnPlaceBid: "Place Bid",
+        bidHistoryTitle: "Live Bid History",
+        tradeReqTitle: "TRADE REQUESTS",
+        tradeReqSub: "Propose direct buy or trade offers on cards that already have an owner.",
+        btnProposeTrade: "Propose Card Trade",
+        vaultTitle: "My Vault / Binder",
+        vaultSub: "Manage owned cards, adjust listing prices, or sell back instantly to Admin at floor price.",
+        btnProfileSettings: "Profile Settings",
+        wishlistTitle: "Saved Wishlist",
+        btnClearAll: "Clear All",
+        wishlistSub: "Click on any card to directly propose a trade offer to its owner!",
+        holdersTitle: "Holders Directory",
+        holdersSub: "Click on any collector row or card serial to view their collection and send direct trade offers.",
+        thOwner: "Owner Name",
+        thCardsOwned: "Cards Owned",
+        thSerials: "Serials Held",
+        thAction: "Action",
+        profileModalTitle: "Collector Profile Settings",
+        profileModalSub: "Customize how your profile appears on the marketplace",
+        lblDisplayName: "Display Name",
+        lblUploadAvatar: "Upload Custom Avatar Picture",
+        lblOrAvatarUrl: "Or Avatar Image URL",
+        lblBio: "Collector Tagline / Bio",
+        btnSaveProfile: "Save Profile Updates",
+        holderModalSub: "Click on any card to directly propose a trade offer to this collector.",
+        listModalTitle: "List / Edit Card Trade Price",
+        lblSelectOwnedCard: "Select Owned Card",
+        lblAskingPrice: "Your Asking Price (IDR)",
+        taxNotice: "A 2% platform trade fee will be applied to the buyer on purchase.",
+        btnSaveTradeListing: "Save Trade Listing",
+        proposeModalTitle: "Propose P2P Card Trade",
+        lblTargetCard: "Select Card You Want to Acquire",
+        lblOfferedCard: "Select Card You are Offering in Return",
+        lblCashSweetener: "Additional Cash Sweetener (IDR, Optional)",
+        btnSendProposal: "Send Trade Proposal",
+        lblOwner: "Owner:",
+        lblFloorPrice: "Floor Price:",
+        lblStatus: "Status:",
+        loginTitle: "Log In to Eugene Card",
+        loginSub: "Sign in to customize your collector profile and trade cards.",
+        btnGoogle: "Continue with Google",
+        cartTitle: "Cart",
+        lblSubtotal: "Subtotal",
+        lblTotal: "Total",
+        btnCheckout: "Proceed to Payment",
+        qrisTitle: "Scan & Pay via Official QRIS",
+        qrisTotalLabel: "Total Payment Amount (Inc. 2% Fee)",
+        btnSubmitOrder: "Submit Order for Admin Approval"
+      },
+      id: {
+        tagline: "Pasar Kartu Koleksi & Pusat Pertukaran",
+        navCollection: "Koleksi",
+        navTrade: "Perdagangan",
+        navAuction: "Lelang",
+        navTradeReq: "Permintaan Tukar",
+        navHolders: "Pemilik Kartu",
+        navVault: "Gudang Saya",
+        navWishlist: "Keinginan",
+        navInventory: "Manajemen Stok",
+        navAdmin: "Pusat Admin",
+        badgeLimited: "EDISI TERBATAS",
+        heroTitle: "Stok Kartu Edisi Beta",
+        heroSubtitle: "Ketersediaan Pasar Utama Resmi",
+        remainingTitle: "Sisa Kartu",
+        availableSuffix: "/ 50 Tersedia",
+        filterAll: "Semua (50)",
+        filterPremium: "Premium (25)",
+        filterStandard: "Standar (25)",
+        tradeRoomTitle: "RUANG PERDAGANGAN",
+        tradeRoomSub: "Jual beli langsung antar kolektor • Pajak 2% per transaksi",
+        btnListCard: "Daftarkan Kartu",
+        auctionTitle: "RUANG LELANG",
+        auctionSub: "Tawar harga terbaik untuk kartu langka sebelum waktu habis.",
+        badgeFeaturedAuction: "LELANG UNGGULAN",
+        timeRemaining: "Sisa Waktu",
+        highestBidLabel: "Penawaran Tertinggi Saat Ini",
+        highBidderLabel: "Penawar Tertinggi:",
+        yourBidLabel: "Jumlah Penawaran Anda (IDR)",
+        btnPlaceBid: "Kirim Penawaran",
+        bidHistoryTitle: "Riwayat Penawaran Langsung",
+        tradeReqTitle: "PERMINTAAN TUKAR",
+        tradeReqSub: "Ajukan tawaran beli atau tukar pada kartu yang sudah dimiliki kolektor lain.",
+        btnProposeTrade: "Ajukan Tukar Kartu",
+        vaultTitle: "Gudang / Koleksi Saya",
+        vaultSub: "Kelola kartu milik Anda, atur harga jual, atau jual kembali ke Admin sesuai harga dasar.",
+        btnProfileSettings: "Pengaturan Profil",
+        wishlistTitle: "Daftar Keinginan",
+        btnClearAll: "Hapus Semua",
+        wishlistSub: "Klik kartu mana saja untuk langsung mengajukan penawaran tukar kepada pemiliknya!",
+        holdersTitle: "Direktori Pemilik",
+        holdersSub: "Klik pada baris kolektor untuk melihat koleksi mereka dan mengirim penawaran tukar.",
+        thOwner: "Nama Pemilik",
+        thCardsOwned: "Kartu Dimiliki",
+        thSerials: "Serial Dimiliki",
+        thAction: "Tindakan",
+        profileModalTitle: "Pengaturan Profil Kolektor",
+        profileModalSub: "Atur penampilan profil Anda di dalam pasar",
+        lblDisplayName: "Nama Tampilan",
+        lblUploadAvatar: "Unggah Foto Profil Khusus",
+        lblOrAvatarUrl: "Atau URL Gambar Avatar",
+        lblBio: "Tagline / Bio Kolektor",
+        btnSaveProfile: "Simpan Perubahan Profil",
+        holderModalSub: "Klik kartu mana saja untuk langsung mengajukan penawaran tukar kepada kolektor ini.",
+        listModalTitle: "Daftarkan / Ubah Harga Jual",
+        lblSelectOwnedCard: "Pilih Kartu Yang Dimiliki",
+        lblAskingPrice: "Harga Penjualan Anda (IDR)",
+        taxNotice: "Biaya platform 2% akan dikenakan kepada pembeli saat transaksi.",
+        btnSaveTradeListing: "Simpan Jualan Kartu",
+        proposeModalTitle: "Ajukan Pertukaran Kartu P2P",
+        lblTargetCard: "Pilih Kartu Yang Ingin Anda Dapatkan",
+        lblOfferedCard: "Pilih Kartu Yang Anda Tawarkan",
+        lblCashSweetener: "Tambahan Uang Tunai (IDR, Opsional)",
+        btnSendProposal: "Kirim Proposal Tukar",
+        lblOwner: "Pemilik:",
+        lblFloorPrice: "Harga Dasar:",
+        lblStatus: "Status:",
+        loginTitle: "Masuk ke Eugene Card",
+        loginSub: "Masuk untuk mengatur profil kolektor Anda dan bertransaksi kartu.",
+        btnGoogle: "Lanjutkan dengan Google",
+        cartTitle: "Keranjang",
+        lblSubtotal: "Subtotal",
+        lblTotal: "Total",
+        btnCheckout: "Lanjut ke Pembayaran",
+        qrisTitle: "Pindai & Bayar via QRIS Resmi",
+        qrisTotalLabel: "Total Pembayaran (Termasuk Biaya 2%)",
+        btnSubmitOrder: "Kirim Pesanan untuk Persetujuan Admin"
+      }
+    };
+
+    let currentLang = localStorage.getItem('app_lang') || 'en';
     let currentUser = null;
     let cart = [];
     let wishlist = new Set();
@@ -644,6 +808,9 @@
     let tradeListings = [];
     let tradeRequestsList = [];
     let isLoading = true;
+
+    // Live Dynamic Auction Countdown Timer (3 hours 14 mins initial)
+    let auctionSecondsLeft = 3 * 3600 + 14 * 60 + 22;
 
     let auctionData = {
       cardId: 'card-1',
@@ -655,6 +822,47 @@
         { bidder: 'Collector #82', amount: 700000, time: '25 mins ago' }
       ]
     };
+
+    // Toggle Language Function
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'id' : 'en';
+      localStorage.setItem('app_lang', currentLang);
+      applyLanguageTranslations();
+    }
+
+    function applyLanguageTranslations() {
+      const btnText = document.getElementById('lang-text');
+      if (btnText) btnText.innerText = currentLang === 'en' ? 'EN | ID' : 'ID | EN';
+
+      const dict = i18n[currentLang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.innerText = dict[key];
+        }
+      });
+    }
+
+    // Live Auction Countdown Clock
+    function startAuctionTimer() {
+      setInterval(() => {
+        if (auctionSecondsLeft > 0) {
+          auctionSecondsLeft--;
+          const hrs = Math.floor(auctionSecondsLeft / 3600);
+          const mins = Math.floor((auctionSecondsLeft % 3600) / 60);
+          const secs = auctionSecondsLeft % 60;
+
+          const pad = n => n < 10 ? '0' + n : n;
+          const timerEl = document.getElementById('auction-timer');
+          if (timerEl) {
+            timerEl.innerText = `${pad(hrs)}h ${pad(mins)}m ${pad(secs)}s`;
+          }
+        } else {
+          const timerEl = document.getElementById('auction-timer');
+          if (timerEl) timerEl.innerText = "AUCTION ENDED";
+        }
+      }, 1000);
+    }
 
     // Debounce Utility
     let debounceTimer;
@@ -752,6 +960,7 @@
       renderTradingRoom();
       renderHoldersTable();
       updateRemainingCardsCounter();
+      applyLanguageTranslations();
     }
 
     function updateRemainingCardsCounter() {
@@ -764,6 +973,8 @@
       await loadAppState();
       setupRealtimeSync();
       renderAuthHeader();
+      applyLanguageTranslations();
+      startAuctionTimer();
       
       if (supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -866,12 +1077,12 @@
       currentUser = null;
       renderAuthHeader();
       switchTab('catalog');
-      showToast('Logged out.');
+      showToast(currentLang === 'id' ? 'Telah keluar.' : 'Logged out.');
     }
 
     // PROFILE MANAGER MODAL LOGIC
     function openProfileManagerModal() {
-      if (!currentUser) return showToast('Please log in first.');
+      if (!currentUser) return showToast(currentLang === 'id' ? 'Silakan masuk terlebih dahulu.' : 'Please log in first.');
 
       document.getElementById('profile-edit-name-input').value = currentUser.name || '';
       document.getElementById('profile-edit-email-input').value = currentUser.email || '';
@@ -894,7 +1105,7 @@
       reader.onload = function(e) {
         document.getElementById('profile-edit-avatar-input').value = e.target.result;
         document.getElementById('profile-modal-avatar-preview').src = e.target.result;
-        showToast('Avatar image loaded!');
+        showToast(currentLang === 'id' ? 'Foto avatar dimuat!' : 'Avatar image loaded!');
       };
       reader.readAsDataURL(file);
     }
@@ -919,7 +1130,7 @@
       closeProfileManagerModal();
       renderAuthHeader();
       updateAllViews();
-      showToast('Profile updated!');
+      showToast(currentLang === 'id' ? 'Profil diperbarui!' : 'Profile updated!');
     }
 
     // Card Catalog Renderer
@@ -937,7 +1148,7 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">No cards match your filter criteria.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">${currentLang === 'id' ? 'Tidak ada kartu yang cocok.' : 'No cards match your filter criteria.'}</div>`;
         return;
       }
 
@@ -967,16 +1178,16 @@
               <p class="text-[11px] font-extrabold text-white truncate">${card.name}</p>
               <div class="flex items-center justify-between">
                 <span class="text-xs font-mono text-emerald-400 font-extrabold">${formatIDR(card.price)}</span>
-                <span class="text-[9px] text-slate-400 truncate max-w-[80px]">${card.owner || 'Unowned'}</span>
+                <span class="text-[9px] text-slate-400 truncate max-w-[80px]">${card.owner || (currentLang === 'id' ? 'Tanpa Pemilik' : 'Unowned')}</span>
               </div>
 
               ${!isSold ? `
                 <button onclick="addToCart('${card.id}')" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all">
-                  Add to Cart
+                  ${currentLang === 'id' ? 'Tambah Keranjang' : 'Add to Cart'}
                 </button>
               ` : `
                 <button disabled class="w-full py-1.5 bg-slate-950 text-slate-600 font-bold text-[10px] rounded-xl cursor-not-allowed">
-                  Owned
+                  ${currentLang === 'id' ? 'Dimiliki' : 'Owned'}
                 </button>
               `}
             </div>
@@ -1002,7 +1213,7 @@
       if (!grid) return;
 
       if (tradeListings.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">No secondary trade listings yet. Be the first to list an owned card!</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">${currentLang === 'id' ? 'Belum ada jualan kartu sekunder.' : 'No secondary trade listings yet. Be the first to list an owned card!'}</div>`;
         return;
       }
 
@@ -1017,7 +1228,7 @@
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 flex flex-col justify-between">
             <div class="flex justify-between items-center text-xs">
               <span class="font-mono font-black text-amber-400">${card.serial}</span>
-              <span class="text-[10px] text-slate-400">Seller: <strong class="text-white">${item.seller}</strong></span>
+              <span class="text-[10px] text-slate-400">${currentLang === 'id' ? 'Penjual:' : 'Seller:'} <strong class="text-white">${item.seller}</strong></span>
             </div>
 
             <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 text-center overflow-hidden flex items-center justify-center">
@@ -1026,18 +1237,18 @@
 
             <div>
               <p class="text-[10px] font-extrabold text-white truncate mb-1">${card.name}</p>
-              <p class="text-[10px] text-slate-400 uppercase">Asking Price (+ 2% Tax)</p>
+              <p class="text-[10px] text-slate-400 uppercase">${currentLang === 'id' ? 'Harga Jual (+ Pajak 2%)' : 'Asking Price (+ 2% Tax)'}</p>
               <p class="text-base font-mono font-black text-emerald-400">${formatIDR(finalPrice)}</p>
             </div>
 
             ${isOwner ? `
               <div class="flex gap-2">
-                <button onclick="openListCardForTradeModal('${card.id}')" class="flex-1 py-2 bg-slate-800 text-amber-400 font-bold text-xs rounded-xl">Edit Price</button>
-                <button onclick="cancelTradeListing('${item.id}')" class="py-2 px-3 bg-slate-800 text-rose-400 font-bold text-xs rounded-xl">Cancel</button>
+                <button onclick="openListCardForTradeModal('${card.id}')" class="flex-1 py-2 bg-slate-800 text-amber-400 font-bold text-xs rounded-xl">${currentLang === 'id' ? 'Ubah Harga' : 'Edit Price'}</button>
+                <button onclick="cancelTradeListing('${item.id}')" class="py-2 px-3 bg-slate-800 text-rose-400 font-bold text-xs rounded-xl">${currentLang === 'id' ? 'Batal' : 'Cancel'}</button>
               </div>
             ` : `
               <button onclick="buyP2PListing('${item.id}')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-xl transition-all">
-                Buy Secondary Card
+                ${currentLang === 'id' ? 'Beli Kartu Sekunder' : 'Buy Secondary Card'}
               </button>
             `}
           </div>
@@ -1046,10 +1257,10 @@
     }
 
     function openListCardForTradeModal(preSelectedCardId = null) {
-      if (!currentUser) return showToast('Please log in first.');
+      if (!currentUser) return showToast(currentLang === 'id' ? 'Silakan masuk terlebih dahulu.' : 'Please log in first.');
 
       const ownedCards = inventory.filter(c => c.owner === currentUser.name);
-      if (ownedCards.length === 0) return showToast('You do not own any cards to list.');
+      if (ownedCards.length === 0) return showToast(currentLang === 'id' ? 'Anda tidak memiliki kartu untuk dijual.' : 'You do not own any cards to list.');
 
       const select = document.getElementById('trade-select-owned-card');
       select.innerHTML = ownedCards.map(c => `
@@ -1065,7 +1276,7 @@
       const cardId = document.getElementById('trade-select-owned-card').value;
       const price = parseFloat(document.getElementById('trade-asking-price-input').value);
 
-      if (!price || price <= 0) return showToast('Please enter a valid asking price.');
+      if (!price || price <= 0) return showToast(currentLang === 'id' ? 'Masukkan harga jual yang valid.' : 'Please enter a valid asking price.');
 
       const existingIndex = tradeListings.findIndex(t => t.cardId === cardId);
       if (existingIndex >= 0) {
@@ -1081,17 +1292,17 @@
 
       closeListCardModal();
       renderTradingRoom();
-      showToast('Card listed in Trading Room!');
+      showToast(currentLang === 'id' ? 'Kartu terdaftar di Ruang Perdagangan!' : 'Card listed in Trading Room!');
     }
 
     function cancelTradeListing(listingId) {
       tradeListings = tradeListings.filter(t => t.id !== listingId);
       renderTradingRoom();
-      showToast('Trade listing removed.');
+      showToast(currentLang === 'id' ? 'Jualan kartu dibatalkan.' : 'Trade listing removed.');
     }
 
     function buyP2PListing(listingId) {
-      if (!currentUser) return showToast('Please log in to purchase listings.');
+      if (!currentUser) return showToast(currentLang === 'id' ? 'Silakan masuk untuk membeli.' : 'Please log in to purchase listings.');
       const listing = tradeListings.find(t => t.id === listingId);
       if (!listing) return;
 
@@ -1105,7 +1316,7 @@
       renderCardGrid();
       renderOwnedCards();
       renderHoldersTable();
-      showToast(`Acquired ${card.serial} from ${listing.seller}!`);
+      showToast(`${currentLang === 'id' ? 'Mendapatkan' : 'Acquired'} ${card.serial} ${currentLang === 'id' ? 'dari' : 'from'} ${listing.seller}!`);
     }
 
     // Auction Functions
@@ -1122,20 +1333,20 @@
     }
 
     function placeAuctionBid() {
-      if (!currentUser) return showToast('Please log in to place bids.');
+      if (!currentUser) return showToast(currentLang === 'id' ? 'Silakan masuk untuk menawar.' : 'Please log in to place bids.');
       const val = parseFloat(document.getElementById('bid-input-amount').value);
 
-      if (!val || val <= auctionData.currentBid) return showToast('Bid must be higher than current bid.');
+      if (!val || val <= auctionData.currentBid) return showToast(currentLang === 'id' ? 'Penawaran harus lebih tinggi dari saat ini.' : 'Bid must be higher than current bid.');
 
       auctionData.currentBid = val;
       auctionData.highBidder = currentUser.name;
-      auctionData.bidHistory.unshift({ bidder: currentUser.name, amount: val, time: 'Just now' });
+      auctionData.bidHistory.unshift({ bidder: currentUser.name, amount: val, time: currentLang === 'id' ? 'Baru saja' : 'Just now' });
 
       document.getElementById('auction-current-bid').innerText = formatIDR(val);
       document.getElementById('auction-high-bidder').innerText = currentUser.name;
       document.getElementById('bid-input-amount').value = '';
       renderAuctionView();
-      showToast('Bid placed successfully!');
+      showToast(currentLang === 'id' ? 'Penawaran berhasil dikirim!' : 'Bid placed successfully!');
     }
 
     // Trade Requests
@@ -1144,7 +1355,7 @@
       if (!grid) return;
 
       if (tradeRequestsList.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No pending direct trade proposals.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">${currentLang === 'id' ? 'Belum ada permintaan tukar langsung.' : 'No pending direct trade proposals.'}</div>`;
         return;
       }
 
@@ -1161,24 +1372,24 @@
               <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300">${req.status}</span>
             </div>
 
-            <p class="text-slate-400">Proposer: <strong class="text-white">${req.sender}</strong> → Target: <strong class="text-white">${req.receiver}</strong></p>
+            <p class="text-slate-400">${currentLang === 'id' ? 'Pengaju:' : 'Proposer:'} <strong class="text-white">${req.sender}</strong> → ${currentLang === 'id' ? 'Target:' : 'Target:'} <strong class="text-white">${req.receiver}</strong></p>
 
             <div class="grid grid-cols-2 gap-2 text-center">
               <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
-                <p class="text-[9px] text-slate-500 uppercase">Offering:</p>
+                <p class="text-[9px] text-slate-500 uppercase">${currentLang === 'id' ? 'Menawarkan:' : 'Offering:'}</p>
                 <p class="font-bold text-amber-400">${offered ? offered.serial : 'N/A'}</p>
                 ${req.cashSweetener ? `<p class="text-[9px] text-emerald-400">+ ${formatIDR(req.cashSweetener)}</p>` : ''}
               </div>
               <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
-                <p class="text-[9px] text-slate-500 uppercase">Requesting:</p>
+                <p class="text-[9px] text-slate-500 uppercase">${currentLang === 'id' ? 'Meminta:' : 'Requesting:'}</p>
                 <p class="font-bold text-indigo-400">${target ? target.serial : 'N/A'}</p>
               </div>
             </div>
 
             ${isReceiver && req.status === 'PENDING' ? `
               <div class="flex gap-2 pt-1">
-                <button onclick="acceptTradeRequest('${req.id}')" class="flex-1 py-2 bg-emerald-500 text-slate-950 font-extrabold rounded-xl">Accept</button>
-                <button onclick="declineTradeRequest('${req.id}')" class="flex-1 py-2 bg-slate-800 text-slate-300 font-bold rounded-xl">Decline</button>
+                <button onclick="acceptTradeRequest('${req.id}')" class="flex-1 py-2 bg-emerald-500 text-slate-950 font-extrabold rounded-xl">${currentLang === 'id' ? 'Terima' : 'Accept'}</button>
+                <button onclick="declineTradeRequest('${req.id}')" class="flex-1 py-2 bg-slate-800 text-slate-300 font-bold rounded-xl">${currentLang === 'id' ? 'Tolak' : 'Decline'}</button>
               </div>
             ` : ''}
           </div>
@@ -1187,17 +1398,17 @@
     }
 
     function openProposeTradeModal(preSelectedTargetCardId = null) {
-      if (!currentUser) return showToast('Please log in first.');
+      if (!currentUser) return showToast(currentLang === 'id' ? 'Silakan masuk terlebih dahulu.' : 'Please log in first.');
 
       const owned = inventory.filter(c => c.owner === currentUser.name);
       const otherCards = inventory.filter(c => c.owner && c.owner !== currentUser.name);
 
-      if (owned.length === 0) return showToast('You need to own cards to propose a trade.');
-      if (otherCards.length === 0) return showToast('No eligible owned cards found to trade for.');
+      if (owned.length === 0) return showToast(currentLang === 'id' ? 'Anda harus memiliki kartu untuk melakukan penukaran.' : 'You need to own cards to propose a trade.');
+      if (otherCards.length === 0) return showToast(currentLang === 'id' ? 'Tidak ada kartu lain yang dapat ditukar.' : 'No eligible owned cards found to trade for.');
 
       document.getElementById('trade-offered-card-select').innerHTML = owned.map(c => `<option value="${c.id}">${c.serial} - ${c.name}</option>`).join('');
       document.getElementById('trade-target-card-select').innerHTML = otherCards.map(c => `
-        <option value="${c.id}" ${preSelectedTargetCardId === c.id ? 'selected' : ''}>${c.serial} - ${c.name} (Owner: ${c.owner})</option>
+        <option value="${c.id}" ${preSelectedTargetCardId === c.id ? 'selected' : ''}>${c.serial} - ${c.name} (${currentLang === 'id' ? 'Pemilik:' : 'Owner:'} ${c.owner})</option>
       `).join('');
 
       document.getElementById('propose-trade-modal').classList.remove('hidden');
@@ -1224,7 +1435,7 @@
 
       closeProposeTradeModal();
       renderTradeRequestsGrid();
-      showToast('Trade proposal sent!');
+      showToast(currentLang === 'id' ? 'Proposal tukar dikirim!' : 'Trade proposal sent!');
     }
 
     function acceptTradeRequest(reqId) {
@@ -1245,14 +1456,14 @@
       renderCardGrid();
       renderOwnedCards();
       renderHoldersTable();
-      showToast('Trade accepted! Ownership exchanged.');
+      showToast(currentLang === 'id' ? 'Penukaran diterima! Kepemilikan kartu ditukar.' : 'Trade accepted! Ownership exchanged.');
     }
 
     function declineTradeRequest(reqId) {
       const req = tradeRequestsList.find(r => r.id === reqId);
       if (req) req.status = 'DECLINED';
       renderTradeRequestsGrid();
-      showToast('Trade request declined.');
+      showToast(currentLang === 'id' ? 'Permintaan tukar ditolak.' : 'Trade request declined.');
     }
 
     // Sell Back to House
@@ -1269,7 +1480,7 @@
       renderCardGrid();
       renderTradingRoom();
       renderHoldersTable();
-      showToast(`Sold ${card.serial} back to House for ${formatIDR(card.baseFloorPrice)}!`);
+      showToast(`${currentLang === 'id' ? 'Menjual' : 'Sold'} ${card.serial} ${currentLang === 'id' ? 'kembali ke Rumah seharga' : 'back to House for'} ${formatIDR(card.baseFloorPrice)}!`);
     }
 
     // Vault Render
@@ -1278,14 +1489,14 @@
       if (!grid) return;
 
       if (!currentUser) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Please log in to view your binder.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">${currentLang === 'id' ? 'Silakan masuk untuk melihat gudang Anda.' : 'Please log in to view your binder.'}</div>`;
         return;
       }
 
       const owned = inventory.filter(c => c.owner === currentUser.name);
 
       if (owned.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No cards registered to your vault yet.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">${currentLang === 'id' ? 'Belum ada kartu di gudang Anda.' : 'No cards registered to your vault yet.'}</div>`;
         return;
       }
 
@@ -1297,11 +1508,11 @@
           <div>
             <p class="font-bold text-xs text-white truncate">${card.name}</p>
             <p class="font-mono text-amber-400 text-xs font-black">${card.serial}</p>
-            <p class="text-[10px] text-slate-400">Floor Price: ${formatIDR(card.baseFloorPrice)}</p>
+            <p class="text-[10px] text-slate-400">${currentLang === 'id' ? 'Harga Dasar:' : 'Floor Price:'} ${formatIDR(card.baseFloorPrice)}</p>
           </div>
           <div class="flex gap-1.5 pt-1">
-            <button onclick="openListCardForTradeModal('${card.id}')" class="flex-1 py-1.5 bg-slate-800 text-amber-400 font-bold text-[10px] rounded-lg hover:bg-slate-700 transition-all">Trade</button>
-            <button onclick="sellBackToHouse('${card.id}')" class="flex-1 py-1.5 bg-rose-950/40 border border-rose-500/30 text-rose-400 font-bold text-[10px] rounded-lg hover:bg-rose-900/50 transition-all">Sell Back</button>
+            <button onclick="openListCardForTradeModal('${card.id}')" class="flex-1 py-1.5 bg-slate-800 text-amber-400 font-bold text-[10px] rounded-lg hover:bg-slate-700 transition-all">${currentLang === 'id' ? 'Jual' : 'Trade'}</button>
+            <button onclick="sellBackToHouse('${card.id}')" class="flex-1 py-1.5 bg-rose-950/40 border border-rose-500/30 text-rose-400 font-bold text-[10px] rounded-lg hover:bg-rose-900/50 transition-all">${currentLang === 'id' ? 'Jual Balik' : 'Sell Back'}</button>
           </div>
         </div>
       `).join('');
@@ -1309,13 +1520,13 @@
 
     // Wishlist
     function toggleWishlist(cardId) {
-      if (!currentUser) return showToast('Please log in to use wishlist.');
+      if (!currentUser) return showToast(currentLang === 'id' ? 'Silakan masuk untuk fitur keinginan.' : 'Please log in to use wishlist.');
       if (wishlist.has(cardId)) {
         wishlist.delete(cardId);
-        showToast('Removed from wishlist.');
+        showToast(currentLang === 'id' ? 'Dihapus dari daftar keinginan.' : 'Removed from wishlist.');
       } else {
         wishlist.add(cardId);
-        showToast('Added to wishlist!');
+        showToast(currentLang === 'id' ? 'Ditambahkan ke daftar keinginan!' : 'Added to wishlist!');
       }
       renderCardGrid();
       renderWishlistPage();
@@ -1327,7 +1538,7 @@
 
       const items = inventory.filter(c => wishlist.has(c.id));
       if (items.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Your wishlist is empty.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">${currentLang === 'id' ? 'Daftar keinginan Anda kosong.' : 'Your wishlist is empty.'}</div>`;
         return;
       }
 
@@ -1339,11 +1550,11 @@
             </div>
             <p class="font-bold text-xs text-white truncate">${card.name}</p>
             <p class="font-mono text-amber-400 text-xs font-black">${card.serial}</p>
-            <p class="text-[10px] text-slate-400">Owner: ${card.owner || 'Unowned'}</p>
+            <p class="text-[10px] text-slate-400">${currentLang === 'id' ? 'Pemilik:' : 'Owner:'} ${card.owner || (currentLang === 'id' ? 'Tanpa Pemilik' : 'Unowned')}</p>
           </div>
 
           <div class="flex gap-1.5 mt-3" onclick="event.stopPropagation()">
-            <button onclick="openProposeTradeModal('${card.id}')" class="flex-1 py-1.5 bg-purple-600 text-white font-bold text-[10px] rounded-lg hover:bg-purple-500 transition-all">Offer Trade</button>
+            <button onclick="openProposeTradeModal('${card.id}')" class="flex-1 py-1.5 bg-purple-600 text-white font-bold text-[10px] rounded-lg hover:bg-purple-500 transition-all">${currentLang === 'id' ? 'Tawar Tukar' : 'Offer Trade'}</button>
             <button onclick="toggleWishlist('${card.id}')" class="py-1.5 px-2 bg-slate-800 text-rose-400 font-bold text-[10px] rounded-lg hover:bg-slate-700 transition-all"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
@@ -1354,7 +1565,7 @@
       wishlist.clear();
       renderWishlistPage();
       renderCardGrid();
-      showToast('Wishlist cleared.');
+      showToast(currentLang === 'id' ? 'Daftar keinginan dibersihkan.' : 'Wishlist cleared.');
     }
 
     // Admin Inventory Management
@@ -1462,15 +1673,15 @@
       document.getElementById('detail-card-serial').innerText = card.serial;
       document.getElementById('detail-card-edition').innerText = card.type;
       document.getElementById('detail-card-img').src = card.imgUrl;
-      document.getElementById('detail-card-owner').innerText = card.owner || 'Unowned (House)';
+      document.getElementById('detail-card-owner').innerText = card.owner || (currentLang === 'id' ? 'Tanpa Pemilik' : 'Unowned');
       document.getElementById('detail-card-price').innerText = formatIDR(card.price);
       document.getElementById('detail-card-status').innerText = card.status;
 
       const container = document.getElementById('detail-card-action-container');
       if (card.status === 'AVAILABLE') {
-        container.innerHTML = `<button onclick="addToCart('${card.id}'); closeCardDetailModal();" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Add Card to Cart</button>`;
+        container.innerHTML = `<button onclick="addToCart('${card.id}'); closeCardDetailModal();" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">${currentLang === 'id' ? 'Tambah Keranjang' : 'Add Card to Cart'}</button>`;
       } else {
-        container.innerHTML = `<button onclick="closeCardDetailModal(); openProposeTradeModal('${card.id}');" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-xl transition-all">Propose Direct Trade Offer</button>`;
+        container.innerHTML = `<button onclick="closeCardDetailModal(); openProposeTradeModal('${card.id}');" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-xl transition-all">${currentLang === 'id' ? 'Ajukan Tawaran Tukar' : 'Propose Direct Trade Offer'}</button>`;
       }
 
       document.getElementById('card-detail-modal').classList.remove('hidden');
@@ -1480,18 +1691,18 @@
 
     // Cart System
     function addToCart(cardId) {
-      if (!currentUser) return showToast('Please log in first.');
+      if (!currentUser) return showToast(currentLang === 'id' ? 'Silakan masuk terlebih dahulu.' : 'Please log in first.');
       const card = inventory.find(c => c.id === cardId);
       if (!card || cart.some(i => i.id === cardId)) return;
       cart.push(card);
       updateCartTotals();
-      showToast(`Added ${card.serial} to cart.`);
+      showToast(`${currentLang === 'id' ? 'Menambahkan' : 'Added'} ${card.serial} ${currentLang === 'id' ? 'ke keranjang.' : 'to cart.'}`);
     }
 
     function removeFromCart(cardId) {
       cart = cart.filter(item => item.id !== cardId);
       updateCartTotals();
-      showToast('Item removed from cart.');
+      showToast(currentLang === 'id' ? 'Item dihapus dari keranjang.' : 'Item removed from cart.');
     }
 
     function updateCartTotals() {
@@ -1503,7 +1714,7 @@
       if (badge) badge.innerText = cart.length;
 
       if (cart.length === 0) {
-        if (container) container.innerHTML = `<p class="text-center py-6 text-slate-500 text-xs">Cart is empty.</p>`;
+        if (container) container.innerHTML = `<p class="text-center py-6 text-slate-500 text-xs">${currentLang === 'id' ? 'Keranjang kosong.' : 'Cart is empty.'}</p>`;
         if (subtotalEl) subtotalEl.innerText = formatIDR(0);
         if (grandTotalEl) grandTotalEl.innerText = formatIDR(0);
         return;
@@ -1539,7 +1750,7 @@
     }
 
     function proceedToCheckout() {
-      if (cart.length === 0) return showToast('Cart is empty.');
+      if (cart.length === 0) return showToast(currentLang === 'id' ? 'Keranjang kosong.' : 'Cart is empty.');
       const total = cart.reduce((s, i) => s + i.price, 0) * (1 + TRADE_FEE_PERCENT);
       
       document.getElementById('qris-amount-display').innerText = formatIDR(total);
@@ -1552,7 +1763,7 @@
     function closeCheckoutModal() { document.getElementById('checkout-modal').classList.add('hidden'); }
 
     function submitOrderWithProof() {
-      showToast('Order submitted! Waiting for Admin verification.');
+      showToast(currentLang === 'id' ? 'Pesanan dikirim! Menunggu verifikasi Admin.' : 'Order submitted! Waiting for Admin verification.');
       cart = [];
       updateCartTotals();
       closeCheckoutModal();
@@ -1574,7 +1785,7 @@
       });
 
       if (Object.keys(ownersMap).length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500">No cards assigned to collectors yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500">${currentLang === 'id' ? 'Belum ada kartu yang dimiliki kolektor.' : 'No cards assigned to collectors yet.'}</td></tr>`;
         return;
       }
 
@@ -1590,20 +1801,20 @@
             `).join(', ')}
           </td>
           <td class="p-3 text-right">
-            <button class="px-2.5 py-1 bg-teal-500/20 text-teal-300 border border-teal-500/30 font-bold text-[10px] rounded-lg hover:bg-teal-500/30 transition-all">View & Offer</button>
+            <button class="px-2.5 py-1 bg-teal-500/20 text-teal-300 border border-teal-500/30 font-bold text-[10px] rounded-lg hover:bg-teal-500/30 transition-all">${currentLang === 'id' ? 'Lihat & Tawar' : 'View & Offer'}</button>
           </td>
         </tr>
       `).join('');
     }
 
     function openHolderPortfolioModal(ownerName) {
-      document.getElementById('holder-modal-name').innerText = `${ownerName}'s Collection`;
+      document.getElementById('holder-modal-name').innerText = `${ownerName} ${currentLang === 'id' ? 'Koleksi' : '\'s Collection'}`;
 
       const cards = inventory.filter(c => c.owner === ownerName);
       const grid = document.getElementById('holder-cards-grid');
 
       if (cards.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-8 text-slate-500 text-xs">No cards in collection.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-8 text-slate-500 text-xs">${currentLang === 'id' ? 'Belum ada kartu dalam koleksi.' : 'No cards in collection.'}</div>`;
       } else {
         grid.innerHTML = cards.map(c => `
           <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-2 text-center cursor-pointer hover:border-purple-500/50 transition-all flex flex-col justify-between" onclick="closeHolderPortfolioModal(); openProposeTradeModal('${c.id}');">
@@ -1612,7 +1823,7 @@
             </div>
             <p class="font-bold text-xs text-white truncate">${c.name}</p>
             <p class="font-mono text-amber-400 text-xs font-black">${c.serial}</p>
-            <button onclick="event.stopPropagation(); closeHolderPortfolioModal(); openProposeTradeModal('${c.id}');" class="w-full py-1.5 bg-purple-600 text-white font-bold text-[10px] rounded-lg">Offer Trade</button>
+            <button onclick="event.stopPropagation(); closeHolderPortfolioModal(); openProposeTradeModal('${c.id}');" class="w-full py-1.5 bg-purple-600 text-white font-bold text-[10px] rounded-lg">${currentLang === 'id' ? 'Tawar Tukar' : 'Offer Trade'}</button>
           </div>
         `).join('');
       }
@@ -1626,7 +1837,7 @@
     function switchTab(tabName) {
       const adminTabs = ['admin', 'inventory'];
       if (adminTabs.includes(tabName) && (!currentUser || !currentUser.isAdmin)) {
-        return showToast('Admin access required.');
+        return showToast(currentLang === 'id' ? 'Akses admin diperlukan.' : 'Admin access required.');
       }
 
       ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'holders'].forEach(t => {
@@ -1650,6 +1861,8 @@
       if (tabName === 'trade-req') renderTradeRequestsGrid();
       if (tabName === 'holders') renderHoldersTable();
       if (tabName === 'catalog') renderCardGrid();
+
+      applyLanguageTranslations();
     }
 
     function formatIDR(amount) {
