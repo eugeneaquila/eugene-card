@@ -469,7 +469,7 @@
     </div>
   </div>
 
-  <!-- CARD DETAILS MODAL -->
+  <!-- ENHANCED CARD DETAILS MODAL -->
   <div id="card-detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeCardDetailModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
@@ -477,21 +477,41 @@
       </button>
 
       <div class="text-center space-y-1">
-        <span id="detail-card-edition" class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">PREMIUM</span>
+        <span id="detail-card-edition-badge" class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">PREMIUM</span>
         <h3 id="detail-card-title" class="text-lg font-black text-white mt-1">Card Title</h3>
       </div>
 
-      <div class="w-full max-w-[220px] aspect-[4/5] mx-auto bg-slate-950 rounded-2xl border border-slate-800 p-2 text-center flex flex-col items-center justify-between">
+      <div class="w-full max-w-[220px] aspect-[4/5] mx-auto bg-slate-950 rounded-2xl border border-slate-800 p-2 text-center flex flex-col items-center justify-between shadow-inner">
         <div class="w-full h-48 bg-slate-900 rounded-xl overflow-hidden flex items-center justify-center">
           <img id="detail-card-img" src="" class="w-full h-full object-contain">
         </div>
         <p id="detail-card-serial" class="text-xl font-black text-amber-400 font-mono mt-1">*01</p>
       </div>
 
-      <div class="space-y-2 text-xs bg-slate-950 p-3 rounded-2xl border border-slate-800">
-        <div class="flex justify-between text-slate-400"><span>Owner:</span><strong id="detail-card-owner" class="text-white">Unowned</strong></div>
+      <!-- Extended Card Properties Grid -->
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
+          <span class="text-[10px] text-slate-500 font-bold uppercase block">Edition</span>
+          <strong id="detail-card-edition-text" class="text-amber-400 font-semibold">Beta Edition: #0</strong>
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
+          <span class="text-[10px] text-slate-500 font-bold uppercase block">SN (Serial No.)</span>
+          <strong id="detail-card-sn-text" class="text-indigo-400 font-mono">0021</strong>
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
+          <span class="text-[10px] text-slate-500 font-bold uppercase block">Tier</span>
+          <strong id="detail-card-tier-text" class="text-emerald-400 font-semibold">100</strong>
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
+          <span class="text-[10px] text-slate-500 font-bold uppercase block">Printing</span>
+          <strong id="detail-card-printing-text" class="text-purple-400 font-mono">1x</strong>
+        </div>
+      </div>
+
+      <div class="space-y-1.5 text-xs bg-slate-950 p-3 rounded-2xl border border-slate-800">
+        <div class="flex justify-between text-slate-400"><span>Current Owner:</span><strong id="detail-card-owner" class="text-white">Unowned</strong></div>
         <div class="flex justify-between text-slate-400"><span>Floor Price:</span><strong id="detail-card-price" class="text-emerald-400 font-mono">Rp 0</strong></div>
-        <div class="flex justify-between text-slate-400"><span>Status:</span><strong id="detail-card-status" class="text-amber-400">AVAILABLE</strong></div>
+        <div class="flex justify-between text-slate-400"><span>Availability:</span><strong id="detail-card-status" class="text-amber-400">AVAILABLE</strong></div>
       </div>
 
       <div id="detail-card-action-container"></div>
@@ -725,11 +745,12 @@
     let auctionData = {
       cardId: 'card-1',
       title: 'Eugene Genesis Card #01',
+      baseBid: 500000,
       currentBid: 750000,
       highBidder: 'Collector #104',
       bidHistory: [
-        { bidder: 'Collector #104', amount: 750000, time: '10 mins ago' },
-        { bidder: 'Collector #82', amount: 700000, time: '25 mins ago' }
+        { id: 'bid-1', bidder: 'Collector #104', amount: 750000, time: '10 mins ago' },
+        { id: 'bid-2', bidder: 'Collector #82', amount: 700000, time: '25 mins ago' }
       ]
     };
 
@@ -777,17 +798,25 @@
         console.error('Error fetching cards from Supabase:', error);
         initDefaultInventory();
       } else if (data && data.length > 0) {
-        inventory = data.map(c => ({
-          id: c.id,
-          serial: c.serial,
-          name: c.name,
-          type: c.type,
-          price: parseFloat(c.price),
-          baseFloorPrice: parseFloat(c.base_floor_price || c.price),
-          owner: c.owner,
-          status: c.status,
-          imgUrl: c.img_url
-        }));
+        inventory = data.map(c => {
+          const numId = parseInt(c.id.replace(/\D/g, '')) || 0;
+          return {
+            id: c.id,
+            serial: c.serial,
+            name: c.name,
+            type: c.type,
+            price: parseFloat(c.price),
+            baseFloorPrice: parseFloat(c.base_floor_price || c.price),
+            owner: c.owner,
+            status: c.status,
+            imgUrl: c.img_url,
+            // Extended Card Metadata Attributes
+            edition: c.edition || "Beta Edition: #0",
+            sn: c.sn || (c.serial ? c.serial.replace(/[^0-9]/g, '').padStart(4, '0') : "0021"),
+            tier: c.tier || (c.type === 'PREMIUM' ? 100 : 50),
+            printing: c.printing || "1x"
+          };
+        });
       } else {
         initDefaultInventory();
       }
@@ -818,6 +847,7 @@
       for (let i = 1; i <= 50; i++) {
         const isPremium = i <= 25;
         const serialStr = isPremium ? `*${i < 10 ? '0' + i : i}` : `*${i < 10 ? '00' + i : '0' + i}`;
+        const snFormatted = String(i).padStart(4, '0');
         const price = isPremium ? 500000 : 100000;
 
         inventory.push({
@@ -829,7 +859,11 @@
           baseFloorPrice: price,
           owner: null,
           status: 'AVAILABLE',
-          imgUrl: `https://placehold.co/1080x1350/${isPremium ? '1e1b4b' : '0f172a'}/${isPremium ? 'fbbf24' : '3b82f6'}?text=Serial+${serialStr}`
+          imgUrl: `https://placehold.co/1080x1350/${isPremium ? '1e1b4b' : '0f172a'}/${isPremium ? 'fbbf24' : '3b82f6'}?text=Serial+${serialStr}`,
+          edition: "Beta Edition: #0",
+          sn: snFormatted,
+          tier: isPremium ? 100 : 50,
+          printing: "1x"
         });
       }
       updateAllViews();
@@ -1233,17 +1267,39 @@
       showToast(`Acquired ${card.serial} from ${listing.seller}!`);
     }
 
-    // Auction Functions
+    // Auction Functions & Cancel Bidding
     function renderAuctionView() {
       const history = document.getElementById('auction-bid-history');
       if (!history) return;
 
-      history.innerHTML = auctionData.bidHistory.map(b => `
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
-          <div><p class="font-bold text-white">${b.bidder}</p><p class="text-[9px] text-slate-500">${b.time}</p></div>
-          <span class="font-mono font-bold text-emerald-400">${formatIDR(b.amount)}</span>
-        </div>
-      `).join('');
+      if (auctionData.bidHistory.length === 0) {
+        history.innerHTML = `<div class="p-3 text-center text-slate-500 text-xs">No active bids yet.</div>`;
+        return;
+      }
+
+      history.innerHTML = auctionData.bidHistory.map(b => {
+        const isUserBid = currentUser && currentUser.name === b.bidder;
+
+        return `
+          <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+            <div>
+              <p class="font-bold text-white flex items-center gap-1.5">
+                ${b.bidder}
+                ${isUserBid ? '<span class="text-[9px] bg-amber-500/20 text-amber-400 font-extrabold px-1.5 py-0.2 rounded border border-amber-500/30">You</span>' : ''}
+              </p>
+              <p class="text-[9px] text-slate-500">${b.time}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-emerald-400">${formatIDR(b.amount)}</span>
+              ${isUserBid ? `
+                <button onclick="cancelAuctionBid('${b.id}')" title="Cancel Bid" class="p-1.5 bg-rose-950/50 hover:bg-rose-900 text-rose-400 rounded-lg text-[10px] border border-rose-500/30 transition-all">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function placeAuctionBid() {
@@ -1252,15 +1308,44 @@
 
       if (!val || val <= auctionData.currentBid) return showToast('Bid must be higher than current bid.');
 
+      const newBidId = `bid-${Date.now()}`;
       auctionData.currentBid = val;
       auctionData.highBidder = currentUser.name;
-      auctionData.bidHistory.unshift({ bidder: currentUser.name, amount: val, time: 'Just now' });
+      auctionData.bidHistory.unshift({ id: newBidId, bidder: currentUser.name, amount: val, time: 'Just now' });
 
       document.getElementById('auction-current-bid').innerText = formatIDR(val);
       document.getElementById('auction-high-bidder').innerText = currentUser.name;
       document.getElementById('bid-input-amount').value = '';
       renderAuctionView();
       showToast('Bid placed successfully!');
+    }
+
+    function cancelAuctionBid(bidId) {
+      if (!currentUser) return;
+      const index = auctionData.bidHistory.findIndex(b => b.id === bidId);
+      if (index === -1) return;
+
+      const removedBid = auctionData.bidHistory[index];
+      if (removedBid.bidder !== currentUser.name && !currentUser.isAdmin) {
+        return showToast('You can only cancel your own bids.');
+      }
+
+      auctionData.bidHistory.splice(index, 1);
+
+      if (auctionData.bidHistory.length > 0) {
+        const highestRemaining = auctionData.bidHistory[0];
+        auctionData.currentBid = highestRemaining.amount;
+        auctionData.highBidder = highestRemaining.bidder;
+      } else {
+        auctionData.currentBid = auctionData.baseBid || 500000;
+        auctionData.highBidder = 'None';
+      }
+
+      document.getElementById('auction-current-bid').innerText = formatIDR(auctionData.currentBid);
+      document.getElementById('auction-high-bidder').innerText = auctionData.highBidder;
+
+      renderAuctionView();
+      showToast('Your bid has been cancelled.');
     }
 
     // Trade Requests
@@ -1415,7 +1500,7 @@
       }
 
       grid.innerHTML = owned.map(card => `
-        <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-between space-y-2">
+        <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-between space-y-2 cursor-pointer" onclick="openCardDetailModal('${card.id}')">
           <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 overflow-hidden flex items-center justify-center">
             <img src="${card.imgUrl}" class="w-full h-full object-contain rounded-lg">
           </div>
@@ -1424,7 +1509,7 @@
             <p class="font-mono text-amber-400 text-xs font-black">${card.serial}</p>
             <p class="text-[10px] text-slate-400">Floor Price: ${formatIDR(card.baseFloorPrice)}</p>
           </div>
-          <div class="flex gap-1.5 pt-1">
+          <div class="flex gap-1.5 pt-1" onclick="event.stopPropagation()">
             <button onclick="openListCardForTradeModal('${card.id}')" class="flex-1 py-1.5 bg-slate-800 text-amber-400 font-bold text-[10px] rounded-lg hover:bg-slate-700 transition-all">Trade</button>
             <button onclick="sellBackToHouse('${card.id}')" class="flex-1 py-1.5 bg-rose-950/40 border border-rose-500/30 text-rose-400 font-bold text-[10px] rounded-lg hover:bg-rose-900/50 transition-all">Sell Back</button>
           </div>
@@ -1459,7 +1544,7 @@
       }
 
       grid.innerHTML = items.map(card => `
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between cursor-pointer hover:border-slate-700 transition-all" onclick="openProposeTradeModal('${card.id}')">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between cursor-pointer hover:border-slate-700 transition-all" onclick="openCardDetailModal('${card.id}')">
           <div class="space-y-1">
             <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 overflow-hidden flex items-center justify-center mb-2">
               <img src="${card.imgUrl}" class="w-full h-full object-contain rounded-lg">
@@ -1643,18 +1728,24 @@
       showToast(`Updated card ${updatedSerial}!`);
     }
 
-    // Card Details Modal
+    // ENHANCED CARD DETAILS MODAL WITH METADATA (Printing, Edition, SN, Tier)
     function openCardDetailModal(cardId) {
       const card = inventory.find(c => c.id === cardId);
       if (!card) return;
 
       document.getElementById('detail-card-title').innerText = card.name;
       document.getElementById('detail-card-serial').innerText = card.serial;
-      document.getElementById('detail-card-edition').innerText = card.type;
+      document.getElementById('detail-card-edition-badge').innerText = card.type;
       document.getElementById('detail-card-img').src = card.imgUrl;
       document.getElementById('detail-card-owner').innerText = card.owner || 'Unowned';
       document.getElementById('detail-card-price').innerText = formatIDR(card.price);
       document.getElementById('detail-card-status').innerText = card.status;
+
+      // Populate extended metadata properties matching your card design
+      document.getElementById('detail-card-edition-text').innerText = card.edition || "Beta Edition: #0";
+      document.getElementById('detail-card-sn-text').innerText = card.sn || (card.serial ? card.serial.replace(/[^0-9]/g, '').padStart(4, '0') : "0021");
+      document.getElementById('detail-card-tier-text').innerText = card.tier || (card.type === 'PREMIUM' ? "100" : "50");
+      document.getElementById('detail-card-printing-text').innerText = card.printing || "1x";
 
       const container = document.getElementById('detail-card-action-container');
       if (card.status === 'AVAILABLE') {
