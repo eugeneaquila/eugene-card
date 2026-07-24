@@ -1847,7 +1847,7 @@
       reader.readAsDataURL(file);
     }
 
-    // FIXED: Guaranteed Immediate UI Update Across All Views
+    // PERSISTENT DB UPDATES FOR ALL USERS
     async function saveInventoryCardChanges() {
       if (!currentUser || !currentUser.isAdmin) return showToast('Admin permission required.');
 
@@ -1871,29 +1871,9 @@
       const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
       const updatedImgUrl = document.getElementById('edit-card-img').value;
 
-      // 1. Immediately update Local Memory State
-      card.name = updatedName;
-      card.serial = updatedSerial;
-      card.type = updatedType;
-      card.price = updatedPrice;
-      card.status = finalStatus;
-      card.owner = updatedOwner;
-      card.imgUrl = updatedImgUrl;
-      card.edition = updatedEdition;
-      card.sn = updatedSn;
-      card.tier = updatedTier;
-      card.printing = updatedPrinting;
-
-      // 2. Force Immediate UI Redraw
-      closeInventoryModal();
-      renderCardGrid();          // Collection Tab
-      renderInventoryTable();     // Inventory Tab
-      renderOwnedCards();        // Vault Tab
-      renderHoldersTable();      // Holders Tab
-
-      // 3. Sync with Supabase Database
+      // 1. Await Database Update First
       if (supabaseClient) {
-        const { error } = await supabaseClient
+        const { data, error } = await supabaseClient
           .from('cards')
           .update({
             name: updatedName,
@@ -1908,16 +1888,44 @@
             tier: updatedTier,
             printing: updatedPrinting
           })
-          .eq('id', cardId);
+          .eq('id', cardId)
+          .select();
 
         if (error) {
-          console.warn('Supabase database sync warning:', error.message);
-          showToast('Updated locally (Supabase column mismatch)');
+          console.error('Supabase DB Update Error:', error);
+          showToast('Database update error: ' + error.message);
+          return; // Stop execution if DB save failed
+        }
+
+        if (!data || data.length === 0) {
+          console.error('No rows returned! Check your Supabase RLS Policy.');
+          showToast('Save failed: Database blocked the update.');
           return;
         }
+
+        console.log('Successfully persisted to Supabase:', data);
       }
 
-      showToast(`Updated ${updatedSerial} successfully!`);
+      // 2. Sync Local State & Redraw UI
+      card.name = updatedName;
+      card.serial = updatedSerial;
+      card.type = updatedType;
+      card.price = updatedPrice;
+      card.status = finalStatus;
+      card.owner = updatedOwner;
+      card.imgUrl = updatedImgUrl;
+      card.edition = updatedEdition;
+      card.sn = updatedSn;
+      card.tier = updatedTier;
+      card.printing = updatedPrinting;
+
+      closeInventoryModal();
+      renderCardGrid();
+      renderInventoryTable();
+      renderOwnedCards();
+      renderHoldersTable();
+
+      showToast(`Updated ${updatedSerial} across all devices!`);
     }
 
     // ENHANCED CARD DETAILS MODAL WITH METADATA
