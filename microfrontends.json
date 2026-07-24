@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/microfrontends.json",
+  "applications": {
+    "eugene-card": {
+      "development": {
+        "fallback": "eugene-card-nine.vercel.app"
+      }
+    }
+  }
+}
