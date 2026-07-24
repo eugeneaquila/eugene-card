@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Beta Edition #0</title>
+  <title>Eugene Card Marketplace | Beta Edition</title>
 
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -33,15 +33,17 @@
     .card-holo-premium {
       background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #451a03 100%);
       border: 1px solid rgba(245, 158, 11, 0.4);
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .card-holo-premium:hover { border-color: rgba(245, 158, 11, 0.8); transform: translateY(-2px); }
+    .card-holo-premium:hover { border-color: rgba(245, 158, 11, 0.9); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.25); }
     .card-holo-standard {
       background: linear-gradient(135deg, #0f172a 0%, #172554 50%, #1e1b4b 100%);
       border: 1px solid rgba(59, 130, 246, 0.3);
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .card-holo-standard:hover { border-color: rgba(59, 130, 246, 0.7); transform: translateY(-2px); }
+    .card-holo-standard:hover { border-color: rgba(59, 130, 246, 0.8); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #030712; }
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
@@ -49,7 +51,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
-  <!-- Embedded Logo SVGs -->
+  <!-- Embedded Logo SVG -->
   <svg style="display: none;">
     <defs>
       <g id="eugene-logo-mark">
@@ -71,7 +73,7 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-base tracking-tight text-white uppercase tracking-wider">EUGENE CARD</h1>
+            <h1 class="font-extrabold text-base tracking-wider text-white uppercase">EUGENE CARD</h1>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Beta Edition</span>
           </div>
           <p class="text-xs text-slate-400 hidden sm:block">Trading Card Marketplace & Exchange Hub</p>
@@ -99,7 +101,7 @@
         <div class="h-4 w-px bg-slate-800 mx-1 self-center hidden sm:block"></div>
 
         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-vault text-amber-400"></i> Dashboard / Vault
+          <i class="fa-solid fa-vault text-amber-400"></i> My Vault
         </button>
         <button id="nav-wishlist" onclick="switchTab('wishlist')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-heart text-rose-400"></i> Wishlist
@@ -117,7 +119,7 @@
 
       <!-- Cart & Auth Header -->
       <div class="flex items-center gap-2">
-        <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center">
+        <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
           <i class="fa-solid fa-cart-shopping text-sm text-amber-400"></i>
           <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
         </button>
@@ -153,16 +155,19 @@
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800/80">
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="search-input" oninput="renderCardGrid()" placeholder="Search serial (*01) or card name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+          <input type="text" id="search-input" oninput="debouncedRenderCardGrid()" placeholder="Search serial (*01) or card name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
         </div>
         <div class="flex items-center gap-1.5">
-          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950">All (50)</button>
-          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400">Premium (25)</button>
-          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400">Standard (25)</button>
+          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">All (50)</button>
+          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Premium (25)</button>
+          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Standard (25)</button>
         </div>
       </div>
 
-      <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+      <!-- Card Grid / Skeleton Loader -->
+      <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <!-- Rendered dynamically -->
+      </div>
     </section>
 
     <!-- TRADING ROOM VIEW -->
@@ -170,7 +175,7 @@
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h2 class="text-2xl font-black text-white uppercase tracking-wide">TRADING ROOM</h2>
-          <p class="text-xs text-slate-400 mt-1">Buy and sell with other collectors • 2% tax per trade</p>
+          <p class="text-xs text-slate-400 mt-1">Buy and sell directly with other collectors • 2% tax per trade</p>
         </div>
         <button onclick="openListCardForTradeModal()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center gap-2">
           <i class="fa-solid fa-plus"></i> List a Card
@@ -212,7 +217,7 @@
               <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
                 <p class="text-xs text-slate-400">Current Highest Bid</p>
                 <p id="auction-current-bid" class="text-3xl font-black text-emerald-400 font-mono">Rp 750.000</p>
-                <p class="text-[10px] text-slate-400">High Bidder: <strong id="auction-high-bidder" class="text-white">Muh. Bintang</strong></p>
+                <p class="text-[10px] text-slate-400">High Bidder: <strong id="auction-high-bidder" class="text-white">Collector #104</strong></p>
               </div>
 
               <div class="space-y-2">
@@ -301,7 +306,9 @@
       </div>
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
         <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending Transaction Approvals</h4>
-        <div id="admin-pending-orders-list" class="space-y-3"></div>
+        <div id="admin-pending-orders-list" class="space-y-3">
+          <p class="text-xs text-slate-500">No pending transactions requiring approval.</p>
+        </div>
       </div>
     </section>
 
@@ -353,7 +360,7 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block font-bold text-slate-400 mb-1">Display Name</label>
-          <input type="text" id="profile-edit-name-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+          <input type="text" id="profile-edit-name-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
         </div>
 
         <div>
@@ -368,15 +375,15 @@
 
         <div>
           <label class="block font-bold text-slate-400 mb-1">Or Avatar Image URL</label>
-          <input type="text" id="profile-edit-avatar-input" oninput="document.getElementById('profile-modal-avatar-preview').src = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-600" placeholder="https://example.com/avatar.png">
+          <input type="text" id="profile-edit-avatar-input" oninput="document.getElementById('profile-modal-avatar-preview').src = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-600 focus:border-amber-500 focus:outline-none" placeholder="https://example.com/avatar.png">
         </div>
 
         <div>
           <label class="block font-bold text-slate-400 mb-1">Collector Tagline / Bio</label>
-          <input type="text" id="profile-edit-bio-input" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+          <input type="text" id="profile-edit-bio-input" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
         </div>
 
-        <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg">
+        <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all">
           Save Profile Updates
         </button>
       </div>
@@ -411,16 +418,16 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block font-bold text-slate-400 mb-1">Select Owned Card</label>
-          <select id="trade-select-owned-card" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></select>
+          <select id="trade-select-owned-card" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none"></select>
         </div>
 
         <div>
           <label class="block font-bold text-slate-400 mb-1">Your Asking Price (IDR)</label>
-          <input type="number" id="trade-asking-price-input" placeholder="e.g. 550000" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+          <input type="number" id="trade-asking-price-input" placeholder="e.g. 550000" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-amber-500 focus:outline-none">
           <p class="text-[10px] text-slate-500 mt-1">A 2% platform trade fee will be applied to the buyer on purchase.</p>
         </div>
 
-        <button onclick="confirmListCardForTrade()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl shadow-lg">Save Trade Listing</button>
+        <button onclick="confirmListCardForTrade()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl shadow-lg hover:bg-amber-400 transition-all">Save Trade Listing</button>
       </div>
     </div>
   </div>
@@ -437,20 +444,20 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block font-bold text-slate-400 mb-1">Select Card You Want to Acquire</label>
-          <select id="trade-target-card-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></select>
+          <select id="trade-target-card-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none"></select>
         </div>
 
         <div>
           <label class="block font-bold text-slate-400 mb-1">Select Card You are Offering in Return</label>
-          <select id="trade-offered-card-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white"></select>
+          <select id="trade-offered-card-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none"></select>
         </div>
 
         <div>
           <label class="block font-bold text-slate-400 mb-1">Additional Cash Sweetener (IDR, Optional)</label>
-          <input type="number" id="trade-cash-sweetener-input" placeholder="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white">
+          <input type="number" id="trade-cash-sweetener-input" placeholder="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-amber-500 focus:outline-none">
         </div>
 
-        <button onclick="submitTradeRequestOffer()" class="w-full py-3 bg-purple-600 text-white font-extrabold rounded-xl shadow-lg">Send Trade Proposal</button>
+        <button onclick="submitTradeRequestOffer()" class="w-full py-3 bg-purple-600 text-white font-extrabold rounded-xl shadow-lg hover:bg-purple-500 transition-all">Send Trade Proposal</button>
       </div>
     </div>
   </div>
@@ -498,17 +505,17 @@
 
         <div>
           <label class="block font-bold text-slate-400 mb-1">Card Name</label>
-          <input type="text" id="edit-card-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+          <input type="text" id="edit-card-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-bold text-slate-400 mb-1">Serial Number (SN)</label>
-            <input type="text" id="edit-card-serial" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <input type="text" id="edit-card-serial" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
           </div>
           <div>
             <label class="block font-bold text-slate-400 mb-1">Edition / Type</label>
-            <select id="edit-card-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <select id="edit-card-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
               <option value="PREMIUM">PREMIUM</option>
               <option value="STANDARD">STANDARD</option>
             </select>
@@ -518,11 +525,11 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-bold text-slate-400 mb-1">Price (IDR)</label>
-            <input type="number" id="edit-card-price" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <input type="number" id="edit-card-price" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
           </div>
           <div>
             <label class="block font-bold text-slate-400 mb-1">Status</label>
-            <select id="edit-card-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <select id="edit-card-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
               <option value="AVAILABLE">AVAILABLE</option>
               <option value="SOLD">SOLD</option>
             </select>
@@ -530,8 +537,8 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Assign Owner</label>
-          <select id="edit-card-owner-dropdown" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white"></select>
+          <label class="block font-bold text-slate-400 mb-1">Assign Owner (Enter Display Name)</label>
+          <input type="text" id="edit-card-owner-input" placeholder="Leave blank for Unowned (House)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none placeholder-slate-600">
         </div>
 
         <div class="space-y-1">
@@ -541,10 +548,10 @@
 
         <div>
           <label class="block font-bold text-slate-400 mb-1">Or Image URL</label>
-          <input type="text" id="edit-card-img" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+          <input type="text" id="edit-card-img" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
         </div>
 
-        <button onclick="saveInventoryCardChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400">
+        <button onclick="saveInventoryCardChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 transition-all">
           Save Customization
         </button>
       </div>
@@ -563,9 +570,10 @@
           <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
         </div>
         <h3 class="text-lg font-black text-white">Log In to Eugene Card</h3>
+        <p class="text-xs text-slate-400">Sign in to customize your collector profile and trade cards.</p>
       </div>
 
-      <button onclick="loginWithGoogle()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow">
+      <button onclick="loginWithGoogle()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all">
         <i class="fa-brands fa-google text-red-500 text-sm"></i> Continue with Google
       </button>
     </div>
@@ -586,7 +594,7 @@
         <div class="flex justify-between text-slate-400"><span>Subtotal</span><span id="cart-subtotal" class="font-mono text-white">Rp 0</span></div>
         <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span>Total</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
       </div>
-      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg">Proceed to Payment</button>
+      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg hover:bg-amber-400 transition-all">Proceed to Payment</button>
     </div>
   </div>
 
@@ -602,7 +610,7 @@
         <p class="text-[10px] text-slate-500 font-bold uppercase">Total Payment Amount (Inc. 2% Fee)</p>
         <p id="qris-amount-display" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
       </div>
-      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl">Submit Order for Admin Approval</button>
+      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all">Submit Order for Admin Approval</button>
     </div>
   </div>
 
@@ -622,18 +630,10 @@
     const TRADE_FEE_PERCENT = 0.02;
     const OFFICIAL_QRIS_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
     
-    // Multiple Allowed Admin Email Addresses
+    // Official Allowed Admin Emails
     const ADMIN_EMAILS = [
       'eugene.aquila06@gmail.com',
       'yujinybwork@gmail.com'
-    ];
-
-    let registeredUsers = [
-      { name: 'Unowned / House', email: '' },
-      { name: 'Eugene Admin', email: 'eugene.aquila06@gmail.com' },
-      { name: 'Yujin Aquila (Admin)', email: 'yujinybwork@gmail.com' },
-      { name: 'Eugene Collector', email: 'eugene@eugenecard.com' },
-      { name: 'Muh. Bintang', email: 'bintang@eugenecard.com' }
     ];
 
     let currentUser = null;
@@ -643,21 +643,33 @@
     let inventory = [];
     let tradeListings = [];
     let tradeRequestsList = [];
+    let isLoading = true;
 
     let auctionData = {
       cardId: 'card-1',
       title: 'Eugene Genesis Card #01',
       currentBid: 750000,
-      highBidder: 'Muh. Bintang',
+      highBidder: 'Collector #104',
       bidHistory: [
-        { bidder: 'Muh. Bintang', amount: 750000, time: '10 mins ago' },
-        { bidder: 'Eugene Collector', amount: 700000, time: '25 mins ago' }
+        { bidder: 'Collector #104', amount: 750000, time: '10 mins ago' },
+        { bidder: 'Collector #82', amount: 700000, time: '25 mins ago' }
       ]
     };
+
+    // Debounce Utility
+    let debounceTimer;
+    function debouncedRenderCardGrid() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        renderCardGrid();
+      }, 200);
+    }
 
     // FETCH LIVE SUPABASE STATE
     async function loadAppState() {
       if (!supabaseClient) return;
+      isLoading = true;
+      renderSkeletonLoader();
 
       const { data, error } = await supabaseClient
         .from('cards')
@@ -667,10 +679,7 @@
       if (error) {
         console.error('Error fetching cards from Supabase:', error);
         initDefaultInventory();
-        return;
-      }
-
-      if (data && data.length > 0) {
+      } else if (data && data.length > 0) {
         inventory = data.map(c => ({
           id: c.id,
           serial: c.serial,
@@ -682,10 +691,27 @@
           status: c.status,
           imgUrl: c.img_url
         }));
-        updateAllViews();
       } else {
         initDefaultInventory();
       }
+
+      isLoading = false;
+      updateAllViews();
+    }
+
+    function renderSkeletonLoader() {
+      const grid = document.getElementById('card-grid');
+      if (!grid) return;
+
+      grid.innerHTML = Array(10).fill(0).map(() => `
+        <div class="bg-slate-900/60 rounded-2xl p-3 border border-slate-800/80 animate-pulse space-y-3">
+          <div class="flex justify-between"><div class="w-12 h-4 bg-slate-800 rounded"></div><div class="w-4 h-4 bg-slate-800 rounded-full"></div></div>
+          <div class="w-full aspect-[4/5] bg-slate-800/80 rounded-xl"></div>
+          <div class="w-16 h-5 bg-slate-800 rounded mx-auto"></div>
+          <div class="w-full h-3 bg-slate-800 rounded"></div>
+          <div class="w-full h-8 bg-slate-800 rounded-xl"></div>
+        </div>
+      `).join('');
     }
 
     function initDefaultInventory() {
@@ -694,11 +720,6 @@
         const isPremium = i <= 25;
         const serialStr = isPremium ? `*${i < 10 ? '0' + i : i}` : `*${i < 10 ? '00' + i : '0' + i}`;
         const price = isPremium ? 500000 : 100000;
-        let owner = null;
-        let status = 'AVAILABLE';
-
-        if (i === 1) { owner = 'Eugene Collector'; status = 'SOLD'; }
-        if (i === 2) { owner = 'Muh. Bintang'; status = 'SOLD'; }
 
         inventory.push({
           id: `card-${i}`,
@@ -707,8 +728,8 @@
           type: isPremium ? 'PREMIUM' : 'STANDARD',
           price: price,
           baseFloorPrice: price,
-          owner: owner,
-          status: status,
+          owner: null,
+          status: 'AVAILABLE',
           imgUrl: `https://placehold.co/1080x1350/${isPremium ? '1e1b4b' : '0f172a'}/${isPremium ? 'fbbf24' : '3b82f6'}?text=Serial+${serialStr}`
         });
       }
@@ -791,13 +812,13 @@
               <span class="text-xs font-black text-white leading-tight">${currentUser.name}</span>
               <span class="text-[9px] font-bold ${currentUser.isAdmin ? 'text-rose-400' : 'text-amber-400'} font-mono">${currentUser.isAdmin ? 'Admin' : 'Collector'}</span>
             </div>
-            <button onclick="event.stopPropagation(); logoutUser();" class="p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg ml-1"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
+            <button onclick="event.stopPropagation(); logoutUser();" class="p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg ml-1 transition-all"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
           </div>
         `;
       } else {
         adminNavs.forEach(el => el.classList.add('hidden'));
         if (adminSep) adminSep.classList.add('hidden');
-        container.innerHTML = `<button onclick="openAuthModal()" class="px-3.5 py-2 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl">Log In</button>`;
+        container.innerHTML = `<button onclick="openAuthModal()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Log In</button>`;
       }
     }
 
@@ -817,7 +838,7 @@
       }
     }
 
-    // Process User Session & Saved Profile
+    // Process User Session & Saved Custom Profile
     function handleUserSession(user) {
       const email = user.email ? user.email.toLowerCase() : '';
       const isAdmin = ADMIN_EMAILS.some(a => a.toLowerCase() === email);
@@ -829,7 +850,7 @@
       }
 
       const userMeta = user.user_metadata || {};
-      const name = customData.name || userMeta.full_name || userMeta.name || (isAdmin ? "Eugene Admin" : email.split('@')[0]);
+      const name = customData.name || userMeta.full_name || userMeta.name || (isAdmin ? "Admin User" : email.split('@')[0]);
       const avatarUrl = customData.avatarUrl || userMeta.avatar_url || userMeta.picture || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
       const bio = customData.bio || userMeta.bio || (isAdmin ? "Official Platform Admin" : "Beta Collector");
 
@@ -898,11 +919,12 @@
       closeProfileManagerModal();
       renderAuthHeader();
       updateAllViews();
-      showToast('Profile updated and saved!');
+      showToast('Profile updated!');
     }
 
-    // Card Catalog
+    // Card Catalog Renderer
     function renderCardGrid() {
+      if (isLoading) return;
       const grid = document.getElementById('card-grid');
       if (!grid) return;
 
@@ -915,7 +937,7 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500 text-xs">No cards found.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">No cards match your filter criteria.</div>`;
         return;
       }
 
@@ -928,7 +950,7 @@
           <div class="${isPremium ? 'card-holo-premium' : 'card-holo-standard'} rounded-2xl p-3 flex flex-col justify-between relative cursor-pointer" onclick="openCardDetailModal('${card.id}')">
             <div class="flex items-center justify-between mb-2" onclick="event.stopPropagation()">
               <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${isPremium ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span>
-              <button onclick="toggleWishlist('${card.id}')" class="text-xs ${isWishlisted ? 'text-rose-500' : 'text-slate-600'}">
+              <button onclick="toggleWishlist('${card.id}')" class="text-xs ${isWishlisted ? 'text-rose-500' : 'text-slate-600 hover:text-rose-400'} transition-colors">
                 <i class="fa-solid fa-heart"></i>
               </button>
             </div>
@@ -949,7 +971,7 @@
               </div>
 
               ${!isSold ? `
-                <button onclick="addToCart('${card.id}')" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl">
+                <button onclick="addToCart('${card.id}')" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all">
                   Add to Cart
                 </button>
               ` : `
@@ -969,7 +991,7 @@
       currentFilter = type;
       ['ALL', 'PREMIUM', 'STANDARD'].forEach(f => {
         const btn = document.getElementById(`filter-${f}`);
-        if (btn) btn.className = f === type ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950' : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400';
+        if (btn) btn.className = f === type ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all' : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
       });
       renderCardGrid();
     }
@@ -980,7 +1002,7 @@
       if (!grid) return;
 
       if (tradeListings.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">No cards listed for trade yet. Be the first to list one!</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">No secondary trade listings yet. Be the first to list an owned card!</div>`;
         return;
       }
 
@@ -1014,7 +1036,7 @@
                 <button onclick="cancelTradeListing('${item.id}')" class="py-2 px-3 bg-slate-800 text-rose-400 font-bold text-xs rounded-xl">Cancel</button>
               </div>
             ` : `
-              <button onclick="buyP2PListing('${item.id}')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-xl">
+              <button onclick="buyP2PListing('${item.id}')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-xl transition-all">
                 Buy Secondary Card
               </button>
             `}
@@ -1059,7 +1081,7 @@
 
       closeListCardModal();
       renderTradingRoom();
-      showToast('Card price listed for secondary trade!');
+      showToast('Card listed in Trading Room!');
     }
 
     function cancelTradeListing(listingId) {
@@ -1069,7 +1091,7 @@
     }
 
     function buyP2PListing(listingId) {
-      if (!currentUser) return showToast('Please log in to buy secondary listings.');
+      if (!currentUser) return showToast('Please log in to purchase listings.');
       const listing = tradeListings.find(t => t.id === listingId);
       if (!listing) return;
 
@@ -1122,7 +1144,7 @@
       if (!grid) return;
 
       if (tradeRequestsList.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500 text-xs">No pending direct trade proposals.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No pending direct trade proposals.</div>`;
         return;
       }
 
@@ -1202,7 +1224,7 @@
 
       closeProposeTradeModal();
       renderTradeRequestsGrid();
-      showToast('Trade request offer sent!');
+      showToast('Trade proposal sent!');
     }
 
     function acceptTradeRequest(reqId) {
@@ -1256,14 +1278,14 @@
       if (!grid) return;
 
       if (!currentUser) {
-        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500 text-xs">Please log in to view your vault.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Please log in to view your binder.</div>`;
         return;
       }
 
       const owned = inventory.filter(c => c.owner === currentUser.name);
 
       if (owned.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500 text-xs">No cards registered to your vault yet.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No cards registered to your vault yet.</div>`;
         return;
       }
 
@@ -1278,8 +1300,8 @@
             <p class="text-[10px] text-slate-400">Floor Price: ${formatIDR(card.baseFloorPrice)}</p>
           </div>
           <div class="flex gap-1.5 pt-1">
-            <button onclick="openListCardForTradeModal('${card.id}')" class="flex-1 py-1.5 bg-slate-800 text-amber-400 font-bold text-[10px] rounded-lg">Trade</button>
-            <button onclick="sellBackToHouse('${card.id}')" class="flex-1 py-1.5 bg-rose-950/40 border border-rose-500/30 text-rose-400 font-bold text-[10px] rounded-lg">Sell Back</button>
+            <button onclick="openListCardForTradeModal('${card.id}')" class="flex-1 py-1.5 bg-slate-800 text-amber-400 font-bold text-[10px] rounded-lg hover:bg-slate-700 transition-all">Trade</button>
+            <button onclick="sellBackToHouse('${card.id}')" class="flex-1 py-1.5 bg-rose-950/40 border border-rose-500/30 text-rose-400 font-bold text-[10px] rounded-lg hover:bg-rose-900/50 transition-all">Sell Back</button>
           </div>
         </div>
       `).join('');
@@ -1305,12 +1327,12 @@
 
       const items = inventory.filter(c => wishlist.has(c.id));
       if (items.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500 text-xs">Your wishlist is empty.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Your wishlist is empty.</div>`;
         return;
       }
 
       grid.innerHTML = items.map(card => `
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between cursor-pointer" onclick="openProposeTradeModal('${card.id}')">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between cursor-pointer hover:border-slate-700 transition-all" onclick="openProposeTradeModal('${card.id}')">
           <div class="space-y-1">
             <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 overflow-hidden flex items-center justify-center mb-2">
               <img src="${card.imgUrl}" class="w-full h-full object-contain rounded-lg">
@@ -1321,8 +1343,8 @@
           </div>
 
           <div class="flex gap-1.5 mt-3" onclick="event.stopPropagation()">
-            <button onclick="openProposeTradeModal('${card.id}')" class="flex-1 py-1.5 bg-purple-600 text-white font-bold text-[10px] rounded-lg">Offer Trade</button>
-            <button onclick="toggleWishlist('${card.id}')" class="py-1.5 px-2 bg-slate-800 text-rose-400 font-bold text-[10px] rounded-lg"><i class="fa-solid fa-trash"></i></button>
+            <button onclick="openProposeTradeModal('${card.id}')" class="flex-1 py-1.5 bg-purple-600 text-white font-bold text-[10px] rounded-lg hover:bg-purple-500 transition-all">Offer Trade</button>
+            <button onclick="toggleWishlist('${card.id}')" class="py-1.5 px-2 bg-slate-800 text-rose-400 font-bold text-[10px] rounded-lg hover:bg-slate-700 transition-all"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       `).join('');
@@ -1345,7 +1367,7 @@
       const filtered = inventory.filter(c => c.serial.toLowerCase().includes(searchVal) || c.name.toLowerCase().includes(searchVal) || (c.owner && c.owner.toLowerCase().includes(searchVal)));
 
       tbody.innerHTML = filtered.map(card => `
-        <tr class="hover:bg-slate-950/60">
+        <tr class="hover:bg-slate-950/60 transition-colors">
           <td class="p-3 font-mono font-bold text-amber-400">${card.serial}</td>
           <td class="p-3 font-bold text-white">${card.name}</td>
           <td class="p-3 text-[10px] font-extrabold ${card.type === 'PREMIUM' ? 'text-amber-400' : 'text-blue-400'}">${card.type}</td>
@@ -1353,7 +1375,7 @@
           <td class="p-3 text-slate-300">${card.owner || 'Unowned (House)'}</td>
           <td class="p-3"><span class="text-[9px] font-bold px-2 py-0.5 rounded ${card.status === 'SOLD' ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">${card.status}</span></td>
           <td class="p-3 text-right">
-            <button onclick="openInventoryModal('${card.id}')" class="px-2.5 py-1 bg-slate-800 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-700">Edit Details</button>
+            <button onclick="openInventoryModal('${card.id}')" class="px-2.5 py-1 bg-slate-800 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-700 hover:bg-slate-700 transition-all">Edit Details</button>
           </td>
         </tr>
       `).join('');
@@ -1369,13 +1391,9 @@
       document.getElementById('edit-card-type').value = card.type;
       document.getElementById('edit-card-price').value = card.price;
       document.getElementById('edit-card-status').value = card.status;
+      document.getElementById('edit-card-owner-input').value = card.owner || '';
       document.getElementById('edit-card-img').value = card.imgUrl;
       document.getElementById('edit-card-file-input').value = '';
-
-      const dropdown = document.getElementById('edit-card-owner-dropdown');
-      dropdown.innerHTML = registeredUsers.map(u => `
-        <option value="${u.name}" ${card.owner === u.name ? 'selected' : ''}>${u.name} ${u.email ? '(' + u.email + ')' : ''}</option>
-      `).join('');
 
       document.getElementById('inventory-edit-modal').classList.remove('hidden');
     }
@@ -1406,9 +1424,8 @@
       const updatedType = document.getElementById('edit-card-type').value;
       const updatedPrice = parseFloat(document.getElementById('edit-card-price').value) || card.price;
       const updatedStatus = document.getElementById('edit-card-status').value;
-      
-      const selectedOwner = document.getElementById('edit-card-owner-dropdown').value;
-      const updatedOwner = selectedOwner === 'Unowned / House' ? null : selectedOwner;
+      const ownerInput = document.getElementById('edit-card-owner-input').value.trim();
+      const updatedOwner = ownerInput === '' ? null : ownerInput;
       const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
       const updatedImgUrl = document.getElementById('edit-card-img').value;
 
@@ -1433,7 +1450,7 @@
 
       closeInventoryModal();
       await loadAppState();
-      showToast(`Globally updated card ${updatedSerial}!`);
+      showToast(`Updated card ${updatedSerial}!`);
     }
 
     // Card Details Modal
@@ -1451,9 +1468,9 @@
 
       const container = document.getElementById('detail-card-action-container');
       if (card.status === 'AVAILABLE') {
-        container.innerHTML = `<button onclick="addToCart('${card.id}'); closeCardDetailModal();" class="w-full py-2.5 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl">Add Card to Cart</button>`;
+        container.innerHTML = `<button onclick="addToCart('${card.id}'); closeCardDetailModal();" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Add Card to Cart</button>`;
       } else {
-        container.innerHTML = `<button onclick="closeCardDetailModal(); openProposeTradeModal('${card.id}');" class="w-full py-2.5 bg-purple-600 text-white font-extrabold text-xs rounded-xl">Propose Direct Trade Offer</button>`;
+        container.innerHTML = `<button onclick="closeCardDetailModal(); openProposeTradeModal('${card.id}');" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-xl transition-all">Propose Direct Trade Offer</button>`;
       }
 
       document.getElementById('card-detail-modal').classList.remove('hidden');
@@ -1501,7 +1518,7 @@
             </div>
             <div class="flex items-center gap-3">
               <span class="font-mono text-emerald-400 font-bold">${formatIDR(item.price)}</span>
-              <button onclick="removeFromCart('${item.id}')" class="text-slate-500 hover:text-rose-400 text-xs p-1">
+              <button onclick="removeFromCart('${item.id}')" class="text-slate-500 hover:text-rose-400 text-xs p-1 transition-colors">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -1556,6 +1573,11 @@
         }
       });
 
+      if (Object.keys(ownersMap).length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500">No cards assigned to collectors yet.</td></tr>`;
+        return;
+      }
+
       tbody.innerHTML = Object.keys(ownersMap).map(k => `
         <tr class="hover:bg-slate-950/80 cursor-pointer text-xs transition-all" onclick="openHolderPortfolioModal('${k}')">
           <td class="p-3 font-bold text-white flex items-center gap-2">
@@ -1568,7 +1590,7 @@
             `).join(', ')}
           </td>
           <td class="p-3 text-right">
-            <button class="px-2.5 py-1 bg-teal-500/20 text-teal-300 border border-teal-500/30 font-bold text-[10px] rounded-lg">View & Offer</button>
+            <button class="px-2.5 py-1 bg-teal-500/20 text-teal-300 border border-teal-500/30 font-bold text-[10px] rounded-lg hover:bg-teal-500/30 transition-all">View & Offer</button>
           </td>
         </tr>
       `).join('');
@@ -1611,14 +1633,14 @@
         const view = document.getElementById(`view-${t}`);
         const nav = document.getElementById(`nav-${t}`);
         if (view) view.classList.add('hidden');
-        if (nav && !adminTabs.includes(t)) nav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap';
+        if (nav && !adminTabs.includes(t)) nav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all';
       });
 
       const activeView = document.getElementById(`view-${tabName}`);
       const activeNav = document.getElementById(`nav-${tabName}`);
 
       if (activeView) activeView.classList.remove('hidden');
-      if (activeNav && !adminTabs.includes(tabName)) activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap';
+      if (activeNav && !adminTabs.includes(tabName)) activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap transition-all';
 
       if (tabName === 'dashboard') renderOwnedCards();
       if (tabName === 'wishlist') renderWishlistPage();
