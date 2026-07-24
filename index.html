@@ -1847,6 +1847,7 @@
       reader.readAsDataURL(file);
     }
 
+    // FIXED: Guaranteed Immediate UI Update Across All Views
     async function saveInventoryCardChanges() {
       if (!currentUser || !currentUser.isAdmin) return showToast('Admin permission required.');
 
@@ -1870,7 +1871,7 @@
       const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
       const updatedImgUrl = document.getElementById('edit-card-img').value;
 
-      // Update local state first
+      // 1. Immediately update Local Memory State
       card.name = updatedName;
       card.serial = updatedSerial;
       card.type = updatedType;
@@ -1883,7 +1884,14 @@
       card.tier = updatedTier;
       card.printing = updatedPrinting;
 
-      // Sync to Supabase if connected
+      // 2. Force Immediate UI Redraw
+      closeInventoryModal();
+      renderCardGrid();          // Collection Tab
+      renderInventoryTable();     // Inventory Tab
+      renderOwnedCards();        // Vault Tab
+      renderHoldersTable();      // Holders Tab
+
+      // 3. Sync with Supabase Database
       if (supabaseClient) {
         const { error } = await supabaseClient
           .from('cards')
@@ -1903,13 +1911,13 @@
           .eq('id', cardId);
 
         if (error) {
-          console.warn('Supabase column update warning:', error.message);
+          console.warn('Supabase database sync warning:', error.message);
+          showToast('Updated locally (Supabase column mismatch)');
+          return;
         }
       }
 
-      closeInventoryModal();
-      updateAllViews();
-      showToast(`Updated card ${updatedSerial}!`);
+      showToast(`Updated ${updatedSerial} successfully!`);
     }
 
     // ENHANCED CARD DETAILS MODAL WITH METADATA
