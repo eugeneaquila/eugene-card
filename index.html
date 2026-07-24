@@ -631,6 +631,47 @@
     
     const supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
+    // ─────────────────────────────────────────────────────────────────────
+    // FIX NOTES — "Admin Hub shows no pending transactions after checkout"
+    //
+    // Bug #1 (fixed in code below): submitOrderWithProof() was writing a
+    // client-generated string id like "id: 'ORD-4821'" into the
+    // "transactions" table. If that table's `id` column is an
+    // auto-incrementing bigint or a uuid (the Supabase default when you
+    // create a new table), Postgres rejects a value like "ORD-4821" with a
+    // type error. The insert silently failed, so no row was ever created —
+    // the Admin Hub had nothing to show because there was nothing to show.
+    // The code now tries the friendly id first, and automatically retries
+    // without it (letting the database assign its own id) if that specific
+    // type error occurs.
+    //
+    // Bug #2 (fixed in code below): loadPendingTransactions() and
+    // approveTransaction() assumed order.items is always a JS array. If the
+    // "items" column in Supabase is `text` instead of `json`/`jsonb`, it
+    // comes back as a raw string, and calling .map()/for-of on it throws —
+    // which silently aborted rendering and left the "No pending
+    // transactions" placeholder on screen even when rows existed. Both
+    // functions now defensively parse it.
+    //
+    // Bug #3 (cannot be fixed from this file — please check in Supabase):
+    // if Row Level Security (RLS) is enabled on "transactions" with no
+    // SELECT policy, the query below returns 0 rows for EVERYONE — not an
+    // error, just silently empty — even for the admin. If transactions
+    // still don't appear after this update, run something like this in the
+    // Supabase SQL editor:
+    //
+    //   alter table transactions enable row level security;
+    //   create policy "Allow insert for everyone"
+    //     on transactions for insert with check (true);
+    //   create policy "Allow read for authenticated users"
+    //     on transactions for select using (auth.role() = 'authenticated');
+    //   create policy "Allow update for authenticated users"
+    //     on transactions for update using (auth.role() = 'authenticated');
+    //
+    // (Tighten the select/update policies to your ADMIN_EMAILS below if you
+    // want only admins to read/update orders.)
+    // ─────────────────────────────────────────────────────────────────────
+
     const TRADE_FEE_PERCENT = 0.02;
     const OFFICIAL_QRIS_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
     
@@ -1592,28 +1633,41 @@
     async function submitOrderWithProof() {
       if (cart.length === 0) return showToast('Cart is empty.');
 
-      const orderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+      if (!supabaseClient) {
+        showToast('Supabase client not connected — order cannot be saved.');
+        return;
+      }
+
+      const orderRef = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
       const subtotal = cart.reduce((s, i) => s + i.price, 0);
       const totalAmount = subtotal * (1 + TRADE_FEE_PERCENT);
 
-      const newOrder = {
-        id: orderId,
+      const baseOrder = {
         user_name: currentUser ? currentUser.name : 'Guest Collector',
         items: cart,
         total_amount: totalAmount,
         status: 'PENDING'
       };
 
-      if (supabaseClient) {
-        const { error } = await supabaseClient
-          .from('transactions')
-          .insert([newOrder]);
+      // First attempt: a friendly, app-generated id (matches the "card-1"
+      // style ids already used in the "cards" table).
+      let { error } = await supabaseClient
+        .from('transactions')
+        .insert([{ id: orderRef, ...baseOrder }]);
 
-        if (error) {
-          console.error('Error saving transaction to Supabase:', error);
-          showToast('Failed to record order: ' + error.message);
-          return;
-        }
+      // Fallback: if the "id" column can't accept a text value like
+      // "ORD-4821" (e.g. it's an auto-incrementing bigint or a uuid column),
+      // retry and let the database assign its own id instead. This is what
+      // was silently breaking every checkout with zero visible error.
+      if (error && (error.code === '22P02' || /invalid input syntax/i.test(error.message || ''))) {
+        console.warn('Transaction insert with custom id failed, retrying without it:', error.message);
+        ({ error } = await supabaseClient.from('transactions').insert([baseOrder]));
+      }
+
+      if (error) {
+        console.error('Error saving transaction to Supabase:', error);
+        showToast('Failed to record order: ' + error.message);
+        return;
       }
 
       showToast('Order submitted! Waiting for Admin verification.');
@@ -1636,18 +1690,53 @@
         return;
       }
 
-      const { data, error } = await supabaseClient
+      let { data, error } = await supabaseClient
         .from('transactions')
         .select('*')
         .eq('status', 'PENDING')
         .order('created_at', { ascending: false });
 
-      if (error || !data || data.length === 0) {
+      // Fallback: some "transactions" tables don't have a created_at
+      // column, which makes the query above fail outright. Retry without
+      // ordering instead of showing a false "nothing pending" state.
+      if (error) {
+        console.warn('Retrying pending-transactions query without ordering by created_at:', error.message);
+        ({ data, error } = await supabaseClient
+          .from('transactions')
+          .select('*')
+          .eq('status', 'PENDING'));
+      }
+
+      if (error) {
+        // Surface the real problem instead of pretending nothing is
+        // pending — this is almost always a missing Row Level Security
+        // SELECT policy on the "transactions" table.
+        console.error('Error loading pending transactions:', error);
+        container.innerHTML = `
+          <div class="bg-rose-950/30 border border-rose-500/30 rounded-2xl p-4 text-xs text-rose-300 space-y-1">
+            <p class="font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Could not load transactions.</p>
+            <p class="text-rose-400/80">${error.message}</p>
+            <p class="text-rose-400/60 mt-1">If orders submit successfully but never show up here, check that the Supabase "transactions" table has a Row Level Security SELECT policy allowing the admin account to read it.</p>
+          </div>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
         container.innerHTML = `<p class="text-xs text-slate-500">No pending transactions requiring approval.</p>`;
         return;
       }
 
-      container.innerHTML = data.map(order => `
+      container.innerHTML = data.map(order => {
+        // Defensive: some setups store "items" as a text/JSON string
+        // rather than jsonb, which would otherwise throw on .map() below
+        // and silently blank out the entire list.
+        let items = order.items;
+        if (typeof items === 'string') {
+          try { items = JSON.parse(items); } catch (e) { items = []; }
+        }
+        if (!Array.isArray(items)) items = [];
+
+        return `
         <div class="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
             <div class="flex items-center gap-2">
@@ -1656,7 +1745,7 @@
             </div>
             <p class="text-xs text-white font-bold mt-1">Buyer: ${order.user_name}</p>
             <p class="text-[11px] text-slate-400">Total: <span class="font-mono text-emerald-400 font-bold">${formatIDR(order.total_amount)}</span></p>
-            <p class="text-[10px] text-slate-500 mt-0.5">Items: ${order.items.map(i => `${i.serial} (${i.name})`).join(', ')}</p>
+            <p class="text-[10px] text-slate-500 mt-0.5">Items: ${items.length ? items.map(i => `${i.serial} (${i.name})`).join(', ') : 'No item data'}</p>
           </div>
 
           <div class="flex gap-2 w-full sm:w-auto">
@@ -1668,7 +1757,8 @@
             </button>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
 
     // ADMIN HUB - Approve & Transfer Ownership
@@ -1682,21 +1772,52 @@
         .single();
 
       if (fetchErr || !order) {
-        showToast('Transaction not found.');
+        console.error('Error fetching transaction to approve:', fetchErr);
+        showToast('Transaction not found: ' + (fetchErr ? fetchErr.message : 'unknown error'));
         return;
       }
 
-      for (const item of order.items) {
-        await supabaseClient
+      // Defensive: "items" may come back as a JSON string instead of an
+      // array depending on the column type.
+      let items = order.items;
+      if (typeof items === 'string') {
+        try { items = JSON.parse(items); } catch (e) { items = []; }
+      }
+      if (!Array.isArray(items)) items = [];
+
+      if (items.length === 0) {
+        showToast('This order has no item data to transfer — check the "items" column type.');
+        return;
+      }
+
+      const failedItems = [];
+      for (const item of items) {
+        const { error: cardErr } = await supabaseClient
           .from('cards')
           .update({ owner: order.user_name, status: 'SOLD' })
           .eq('id', item.id);
+
+        if (cardErr) {
+          console.error(`Failed to transfer card ${item.id}:`, cardErr);
+          failedItems.push(item.serial || item.id);
+        }
       }
 
-      await supabaseClient
+      if (failedItems.length > 0) {
+        showToast(`Failed to transfer: ${failedItems.join(', ')}. Check console / RLS UPDATE policy on "cards".`);
+        return;
+      }
+
+      const { error: statusErr } = await supabaseClient
         .from('transactions')
         .update({ status: 'APPROVED' })
         .eq('id', orderId);
+
+      if (statusErr) {
+        console.error('Failed to mark transaction approved:', statusErr);
+        showToast('Cards transferred, but failed to update order status: ' + statusErr.message);
+        return;
+      }
 
       showToast(`Transaction ${orderId} approved! Ownership transferred.`);
       await loadAppState();
@@ -1707,10 +1828,16 @@
     async function rejectTransaction(orderId) {
       if (!supabaseClient) return;
 
-      await supabaseClient
+      const { error } = await supabaseClient
         .from('transactions')
         .update({ status: 'REJECTED' })
         .eq('id', orderId);
+
+      if (error) {
+        console.error('Failed to reject transaction:', error);
+        showToast('Failed to reject transaction: ' + error.message);
+        return;
+      }
 
       showToast(`Transaction ${orderId} rejected.`);
       loadPendingTransactions();
