@@ -520,7 +520,7 @@
 
   <!-- EDIT INVENTORY CARD MODAL -->
   <div id="inventory-edit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl max-h-[90vh] overflow-y-auto">
       <button onclick="closeInventoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
         <i class="fa-solid fa-xmark"></i>
       </button>
@@ -537,15 +537,40 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-400 mb-1">Serial Number (SN)</label>
+            <label class="block font-bold text-slate-400 mb-1">Card Code (e.g. *01)</label>
             <input type="text" id="edit-card-serial" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-400 mb-1">Edition / Type</label>
+            <label class="block font-bold text-slate-400 mb-1">Type / Category</label>
             <select id="edit-card-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
               <option value="PREMIUM">PREMIUM</option>
               <option value="STANDARD">STANDARD</option>
             </select>
+          </div>
+        </div>
+
+        <!-- Extended Card Details Inputs for Admin Editing -->
+        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-3">
+          <p class="font-bold text-amber-400 uppercase text-[10px]">Extended Details</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-400 mb-1">Edition</label>
+              <input type="text" id="edit-card-edition" placeholder="e.g. Beta Edition: #0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-400 mb-1">SN (Serial No.)</label>
+              <input type="text" id="edit-card-sn" placeholder="e.g. 0021" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-400 mb-1">Tier</label>
+              <input type="text" id="edit-card-tier" placeholder="e.g. 100" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-400 mb-1">Printing</label>
+              <input type="text" id="edit-card-printing" placeholder="e.g. 1x" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+            </div>
           </div>
         </div>
 
@@ -799,7 +824,6 @@
         initDefaultInventory();
       } else if (data && data.length > 0) {
         inventory = data.map(c => {
-          const numId = parseInt(c.id.replace(/\D/g, '')) || 0;
           return {
             id: c.id,
             serial: c.serial,
@@ -813,7 +837,7 @@
             // Extended Card Metadata Attributes
             edition: c.edition || "Beta Edition: #0",
             sn: c.sn || (c.serial ? c.serial.replace(/[^0-9]/g, '').padStart(4, '0') : "0021"),
-            tier: c.tier || (c.type === 'PREMIUM' ? 100 : 50),
+            tier: c.tier || (c.type === 'PREMIUM' ? "100" : "50"),
             printing: c.printing || "1x"
           };
         });
@@ -862,7 +886,7 @@
           imgUrl: `https://placehold.co/1080x1350/${isPremium ? '1e1b4b' : '0f172a'}/${isPremium ? 'fbbf24' : '3b82f6'}?text=Serial+${serialStr}`,
           edition: "Beta Edition: #0",
           sn: snFormatted,
-          tier: isPremium ? 100 : 50,
+          tier: isPremium ? "100" : "50",
           printing: "1x"
         });
       }
@@ -1648,6 +1672,12 @@
       document.getElementById('edit-card-img').value = card.imgUrl;
       document.getElementById('edit-card-file-input').value = '';
 
+      // Populate extended metadata inputs
+      document.getElementById('edit-card-edition').value = card.edition || "Beta Edition: #0";
+      document.getElementById('edit-card-sn').value = card.sn || "0021";
+      document.getElementById('edit-card-tier').value = card.tier || "100";
+      document.getElementById('edit-card-printing').value = card.printing || "1x";
+
       // Build List of Known Collectors for Searchable Dropdown
       const ownersSet = new Set();
       inventory.forEach(c => { if (c.owner) ownersSet.add(c.owner); });
@@ -1700,31 +1730,55 @@
       const updatedPrice = parseFloat(document.getElementById('edit-card-price').value) || card.price;
       const updatedStatus = document.getElementById('edit-card-status').value;
       
+      const updatedEdition = document.getElementById('edit-card-edition').value.trim() || "Beta Edition: #0";
+      const updatedSn = document.getElementById('edit-card-sn').value.trim() || "0021";
+      const updatedTier = document.getElementById('edit-card-tier').value.trim() || "100";
+      const updatedPrinting = document.getElementById('edit-card-printing').value.trim() || "1x";
+
       const ownerSelectVal = document.getElementById('edit-card-owner-select').value;
       const updatedOwner = ownerSelectVal === '' ? null : ownerSelectVal;
       const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
       const updatedImgUrl = document.getElementById('edit-card-img').value;
 
-      const { error } = await supabaseClient
-        .from('cards')
-        .update({
-          name: updatedName,
-          serial: updatedSerial,
-          type: updatedType,
-          price: updatedPrice,
-          status: finalStatus,
-          owner: updatedOwner,
-          img_url: updatedImgUrl
-        })
-        .eq('id', cardId);
+      // Update local state first
+      card.name = updatedName;
+      card.serial = updatedSerial;
+      card.type = updatedType;
+      card.price = updatedPrice;
+      card.status = finalStatus;
+      card.owner = updatedOwner;
+      card.imgUrl = updatedImgUrl;
+      card.edition = updatedEdition;
+      card.sn = updatedSn;
+      card.tier = updatedTier;
+      card.printing = updatedPrinting;
 
-      if (error) {
-        showToast('Failed to sync changes: ' + error.message);
-        return;
+      // Sync to Supabase if connected
+      if (supabaseClient) {
+        const { error } = await supabaseClient
+          .from('cards')
+          .update({
+            name: updatedName,
+            serial: updatedSerial,
+            type: updatedType,
+            price: updatedPrice,
+            status: finalStatus,
+            owner: updatedOwner,
+            img_url: updatedImgUrl,
+            edition: updatedEdition,
+            sn: updatedSn,
+            tier: updatedTier,
+            printing: updatedPrinting
+          })
+          .eq('id', cardId);
+
+        if (error) {
+          console.warn('Supabase column update warning (using local fallback if schema lacks custom metadata columns):', error.message);
+        }
       }
 
       closeInventoryModal();
-      await loadAppState();
+      updateAllViews();
       showToast(`Updated card ${updatedSerial}!`);
     }
 
