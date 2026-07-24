@@ -100,6 +100,9 @@
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-users text-teal-400"></i> Holders
         </button>
+        <button id="nav-history" onclick="switchTab('history')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> History
+        </button>
 
         <div class="h-4 w-px bg-slate-800 mx-1 self-center hidden sm:block"></div>
 
@@ -251,6 +254,42 @@
       </div>
 
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- TRANSACTION HISTORY VIEW -->
+    <section id="view-history" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Transaction History</h2>
+          <p class="text-xs text-slate-400 mt-1">View completed sales, order statuses, and platform transaction records.</p>
+        </div>
+        
+        <div class="flex items-center gap-2 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+          <button onclick="setHistoryFilter('ALL')" id="history-filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">All Activity</button>
+          <button onclick="setHistoryFilter('MINE')" id="history-filter-MINE" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">My Purchases</button>
+          <button onclick="setHistoryFilter('APPROVED')" id="history-filter-APPROVED" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Approved Only</button>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto max-h-[550px]">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0 z-10">
+              <tr>
+                <th class="p-3.5">Order Ref</th>
+                <th class="p-3.5">Buyer</th>
+                <th class="p-3.5">Items Acquired</th>
+                <th class="p-3.5">Amount (IDR)</th>
+                <th class="p-3.5">Status</th>
+                <th class="p-3.5 text-right">Date / Time</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body" class="divide-y divide-slate-800/80">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <!-- DASHBOARD VIEW -->
@@ -710,9 +749,11 @@
     let cart = [];
     let wishlist = new Set();
     let currentFilter = 'ALL';
+    let historyFilter = 'ALL';
     let inventory = [];
     let tradeListings = [];
     let tradeRequestsList = [];
+    let transactionsList = [];
     let isLoading = true;
     let ownerOptionsList = [];
 
@@ -846,6 +887,7 @@
       }
 
       loadSavedCart();
+      await fetchTransactionHistory();
 
       isLoading = false;
       updateAllViews();
@@ -905,6 +947,7 @@
       supabaseClient
         .channel('public:transactions')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
+          fetchTransactionHistory();
           if (currentUser && currentUser.isAdmin) {
             loadPendingTransactions();
           }
@@ -917,6 +960,7 @@
       renderOwnedCards();
       renderTradingRoom();
       renderHoldersTable();
+      renderTransactionHistoryTable();
       updateRemainingCardsCounter();
       updateCartTotals();
     }
@@ -1177,6 +1221,92 @@
         if (btn) btn.className = f === type ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all' : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
       });
       renderCardGrid();
+    }
+
+    // TRANSACTION HISTORY ROOM LOGIC
+    async function fetchTransactionHistory() {
+      if (!supabaseClient) return;
+
+      let { data, error } = await supabaseClient
+        .from('transactions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        ({ data, error } = await supabaseClient
+          .from('transactions')
+          .select('*'));
+      }
+
+      if (!error && data) {
+        transactionsList = data;
+        renderTransactionHistoryTable();
+      }
+    }
+
+    function setHistoryFilter(type) {
+      historyFilter = type;
+      ['ALL', 'MINE', 'APPROVED'].forEach(f => {
+        const btn = document.getElementById(`history-filter-${f}`);
+        if (btn) btn.className = f === type ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all' : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
+      });
+      renderTransactionHistoryTable();
+    }
+
+    function renderTransactionHistoryTable() {
+      const tbody = document.getElementById('history-table-body');
+      if (!tbody) return;
+
+      if (transactionsList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">No transaction logs recorded yet.</td></tr>`;
+        return;
+      }
+
+      const filtered = transactionsList.filter(tx => {
+        if (historyFilter === 'MINE') {
+          return currentUser && tx.user_name && tx.user_name.toLowerCase() === currentUser.name.toLowerCase();
+        }
+        if (historyFilter === 'APPROVED') {
+          return tx.status === 'APPROVED';
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">No transaction records match your filter criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(tx => {
+        let items = tx.items;
+        if (typeof items === 'string') {
+          try { items = JSON.parse(items); } catch (e) { items = []; }
+        }
+        if (!Array.isArray(items)) items = [];
+
+        const itemsFormatted = items.length > 0 
+          ? items.map(i => `<span class="inline-block bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800 text-[10px] font-mono text-amber-400 mr-1 mb-1">${i.serial || 'Card'}</span>`).join('')
+          : '<span class="text-slate-500">N/A</span>';
+
+        let badgeClass = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+        if (tx.status === 'APPROVED') badgeClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+        if (tx.status === 'REJECTED') badgeClass = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+
+        const createdDate = tx.created_at ? new Date(tx.created_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }) : 'Recently';
+
+        return `
+          <tr class="hover:bg-slate-950/60 transition-colors">
+            <td class="p-3.5 font-mono font-extrabold text-indigo-400">${tx.id || 'ORD-000'}</td>
+            <td class="p-3.5 font-bold text-white">${tx.user_name || 'Guest'}</td>
+            <td class="p-3.5">${itemsFormatted}</td>
+            <td class="p-3.5 font-mono text-emerald-400 font-extrabold">${formatIDR(tx.total_amount || 0)}</td>
+            <td class="p-3.5">
+              <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${badgeClass}">${tx.status || 'PENDING'}</span>
+            </td>
+            <td class="p-3.5 text-right font-mono text-[10px] text-slate-400">${createdDate}</td>
+          </tr>
+        `;
+      }).join('');
     }
 
     // Trading Room
@@ -1773,7 +1903,7 @@
           .eq('id', cardId);
 
         if (error) {
-          console.warn('Supabase column update warning (using local fallback if schema lacks custom metadata columns):', error.message);
+          console.warn('Supabase column update warning:', error.message);
         }
       }
 
@@ -1782,7 +1912,7 @@
       showToast(`Updated card ${updatedSerial}!`);
     }
 
-    // ENHANCED CARD DETAILS MODAL WITH METADATA (Printing, Edition, SN, Tier)
+    // ENHANCED CARD DETAILS MODAL WITH METADATA
     function openCardDetailModal(cardId) {
       const card = inventory.find(c => c.id === cardId);
       if (!card) return;
@@ -1795,7 +1925,7 @@
       document.getElementById('detail-card-price').innerText = formatIDR(card.price);
       document.getElementById('detail-card-status').innerText = card.status;
 
-      // Populate extended metadata properties matching your card design
+      // Populate extended metadata properties
       document.getElementById('detail-card-edition-text').innerText = card.edition || "Beta Edition: #0";
       document.getElementById('detail-card-sn-text').innerText = card.sn || (card.serial ? card.serial.replace(/[^0-9]/g, '').padStart(4, '0') : "0021");
       document.getElementById('detail-card-tier-text').innerText = card.tier || (card.type === 'PREMIUM' ? "100" : "50");
@@ -1929,6 +2059,7 @@
       updateCartTotals();
       closeCheckoutModal();
       
+      await fetchTransactionHistory();
       if (currentUser && currentUser.isAdmin) {
         loadPendingTransactions();
       }
@@ -1951,7 +2082,6 @@
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.warn('Retrying pending-transactions query without ordering by created_at:', error.message);
         ({ data, error } = await supabaseClient
           .from('transactions')
           .select('*')
@@ -1964,7 +2094,6 @@
           <div class="bg-rose-950/30 border border-rose-500/30 rounded-2xl p-4 text-xs text-rose-300 space-y-1">
             <p class="font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Could not load transactions.</p>
             <p class="text-rose-400/80">${error.message}</p>
-            <p class="text-rose-400/60 mt-1">If orders submit successfully but never show up here, check that the Supabase "transactions" table has a Row Level Security SELECT policy allowing the admin account to read it.</p>
           </div>`;
         return;
       }
@@ -2029,7 +2158,7 @@
       if (!Array.isArray(items)) items = [];
 
       if (items.length === 0) {
-        showToast('This order has no item data to transfer — check the "items" column type.');
+        showToast('This order has no item data to transfer.');
         return;
       }
 
@@ -2047,7 +2176,7 @@
       }
 
       if (failedItems.length > 0) {
-        showToast(`Failed to transfer: ${failedItems.join(', ')}. Check console / RLS UPDATE policy on "cards".`);
+        showToast(`Failed to transfer: ${failedItems.join(', ')}.`);
         return;
       }
 
@@ -2083,6 +2212,7 @@
       }
 
       showToast(`Transaction ${orderId} rejected.`);
+      await fetchTransactionHistory();
       loadPendingTransactions();
     }
 
@@ -2157,7 +2287,7 @@
         return showToast('Admin access required.');
       }
 
-      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'holders'].forEach(t => {
+      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'holders', 'history'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const nav = document.getElementById(`nav-${t}`);
         if (view) view.classList.add('hidden');
@@ -2178,6 +2308,7 @@
       if (tabName === 'auction') renderAuctionView();
       if (tabName === 'trade-req') renderTradeRequestsGrid();
       if (tabName === 'holders') renderHoldersTable();
+      if (tabName === 'history') fetchTransactionHistory();
       if (tabName === 'catalog') renderCardGrid();
     }
 
