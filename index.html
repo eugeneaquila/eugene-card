@@ -30,7 +30,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #030712; color: #f3f4f6; contain-intrinsic-size: 1000px; }
+    body { font-family: 'Inter', sans-serif; background-color: #030712; color: #f3f4f6; }
     .card-holo-premium {
       background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #451a03 100%);
       border: 1px solid rgba(245, 158, 11, 0.4);
@@ -739,7 +739,6 @@
     let tradeListings = [];
     let tradeRequestsList = [];
     let transactionsList = [];
-    let isLoading = true;
     let currentTab = 'catalog';
     let ownerOptionsList = [];
 
@@ -747,6 +746,32 @@
     function handleImgError(imgEl, serialStr) {
       imgEl.onerror = null;
       imgEl.src = `https://placehold.co/1080x1350/0f172a/fbbf24?text=${encodeURIComponent(serialStr || 'Eugene Card')}`;
+    }
+
+    function initDefaultInventory() {
+      inventory = [];
+      for (let i = 1; i <= 50; i++) {
+        const isPremium = i <= 25;
+        const serialStr = isPremium ? `*${i < 10 ? '0' + i : i}` : `*${i < 10 ? '00' + i : '0' + i}`;
+        const snFormatted = String(i).padStart(4, '0');
+        const price = isPremium ? 500000 : 100000;
+
+        inventory.push({
+          id: `card-${i}`,
+          serial: serialStr,
+          name: isPremium ? `Eugene Premium #${i}` : `Eugene Standard #${i}`,
+          type: isPremium ? 'PREMIUM' : 'STANDARD',
+          price: price,
+          baseFloorPrice: price,
+          owner: null,
+          status: 'AVAILABLE',
+          imgUrl: `https://placehold.co/1080x1350/${isPremium ? '1e1b4b' : '0f172a'}/${isPremium ? 'fbbf24' : '3b82f6'}?text=Serial+${encodeURIComponent(serialStr)}`,
+          edition: "Beta Edition: #0",
+          sn: snFormatted,
+          tier: isPremium ? "100" : "50",
+          printing: "1x"
+        });
+      }
     }
 
     function loadSavedWishlist() {
@@ -807,34 +832,43 @@
     }
 
     async function loadAppState() {
-      if (!supabaseClient) return;
-      isLoading = true;
+      let loadedFromDb = false;
 
-      const { data, error } = await supabaseClient
-        .from('cards')
-        .select('*')
-        .order('id', { ascending: true });
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('cards')
+            .select('*')
+            .order('id', { ascending: true });
 
-      if (!error && data && data.length > 0) {
-        inventory = data.map(c => ({
-          id: c.id,
-          serial: c.serial,
-          name: c.name,
-          type: c.type,
-          price: parseFloat(c.price),
-          baseFloorPrice: parseFloat(c.base_floor_price || c.price),
-          owner: c.owner,
-          status: c.status,
-          imgUrl: c.img_url || `https://placehold.co/1080x1350/0f172a/fbbf24?text=${encodeURIComponent(c.serial)}`,
-          edition: c.edition || "Beta Edition: #0",
-          sn: c.sn || "0001",
-          tier: c.tier || "100",
-          printing: c.printing || "1x"
-        }));
+          if (!error && data && data.length > 0) {
+            inventory = data.map(c => ({
+              id: c.id,
+              serial: c.serial || `*${c.id}`,
+              name: c.name || 'Unnamed Card',
+              type: c.type || 'STANDARD',
+              price: parseFloat(c.price || 0),
+              baseFloorPrice: parseFloat(c.base_floor_price || c.price || 0),
+              owner: c.owner || null,
+              status: c.status || 'AVAILABLE',
+              imgUrl: c.img_url || `https://placehold.co/1080x1350/0f172a/fbbf24?text=${encodeURIComponent(c.serial || 'Card')}`,
+              edition: c.edition || "Beta Edition: #0",
+              sn: c.sn || "0001",
+              tier: c.tier || "100",
+              printing: c.printing || "1x"
+            }));
+            loadedFromDb = true;
+          }
+        } catch (err) {
+          console.warn('Supabase fetch exception, using fallback stock:', err);
+        }
+      }
+
+      if (!loadedFromDb || inventory.length === 0) {
+        initDefaultInventory();
       }
 
       loadSavedCart();
-      isLoading = false;
       renderCurrentActiveView();
       updateRemainingCardsCounter();
       updateCartTotals();
@@ -867,7 +901,8 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       loadSavedWishlist();
-      loadSavedCart();
+      initDefaultInventory(); // Immediate render before network fetch
+      renderCardGrid();
 
       await loadAppState();
       setupRealtimeSync();
@@ -1019,7 +1054,7 @@
       const searchVal = (document.getElementById('search-input')?.value || '').toLowerCase();
       const filtered = inventory.filter(card => {
         const matchesFilter = currentFilter === 'ALL' ? true : card.type === currentFilter;
-        const matchesSearch = card.serial.toLowerCase().includes(searchVal) || card.name.toLowerCase().includes(searchVal);
+        const matchesSearch = (card.serial || '').toLowerCase().includes(searchVal) || (card.name || '').toLowerCase().includes(searchVal);
         return matchesFilter && matchesSearch;
       });
 
@@ -1138,7 +1173,7 @@
       if (!tbody) return;
 
       const searchVal = (document.getElementById('inventory-search')?.value || '').toLowerCase();
-      const filtered = inventory.filter(c => c.serial.toLowerCase().includes(searchVal) || c.name.toLowerCase().includes(searchVal) || (c.owner && c.owner.toLowerCase().includes(searchVal)));
+      const filtered = inventory.filter(c => (c.serial || '').toLowerCase().includes(searchVal) || (c.name || '').toLowerCase().includes(searchVal) || (c.owner && c.owner.toLowerCase().includes(searchVal)));
 
       tbody.innerHTML = filtered.map(card => `
         <tr class="hover:bg-slate-950/60 transition-colors">
