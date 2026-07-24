@@ -621,11 +621,17 @@
 
     const TRADE_FEE_PERCENT = 0.02;
     const OFFICIAL_QRIS_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
-    const ADMIN_EMAIL = 'eugene.aquila06@gmail.com';
+    
+    // Multiple Allowed Admin Email Addresses
+    const ADMIN_EMAILS = [
+      'eugene.aquila06@gmail.com',
+      'yujinybwork@gmail.com'
+    ];
 
     let registeredUsers = [
       { name: 'Unowned / House', email: '' },
-      { name: 'Eugene Admin', email: ADMIN_EMAIL },
+      { name: 'Eugene Admin', email: 'eugene.aquila06@gmail.com' },
+      { name: 'Yujin Aquila (Admin)', email: 'yujinybwork@gmail.com' },
       { name: 'Eugene Collector', email: 'eugene@eugenecard.com' },
       { name: 'Muh. Bintang', email: 'bintang@eugenecard.com' }
     ];
@@ -814,7 +820,7 @@
     // Process User Session & Saved Profile
     function handleUserSession(user) {
       const email = user.email ? user.email.toLowerCase() : '';
-      const isAdmin = email === ADMIN_EMAIL.toLowerCase();
+      const isAdmin = ADMIN_EMAILS.some(a => a.toLowerCase() === email);
 
       const savedCustomProfile = localStorage.getItem(`profile_${email}`);
       let customData = {};
