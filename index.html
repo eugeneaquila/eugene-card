@@ -79,58 +79,67 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-base tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Beta Edition</span>
+            <h1 class="font-extrabold text-base tracking-wider text-white uppercase" data-i18n="brandTitle">EUGENE CARD</h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30" data-i18n="betaEdition">Beta Edition</span>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block">Trading Card Marketplace & Exchange Hub</p>
+          <p class="text-xs text-slate-400 hidden sm:block" data-i18n="brandSubtitle">Trading Card Marketplace & Exchange Hub</p>
         </div>
       </div>
 
       <!-- Navigation Tabs -->
       <nav class="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 overflow-x-auto max-w-full">
         <button id="nav-catalog" onclick="switchTab('catalog')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-layer-group text-amber-400"></i> Collection
+          <i class="fa-solid fa-layer-group text-amber-400"></i> <span data-i18n="navCollection">Collection</span>
         </button>
         <button id="nav-trade" onclick="switchTab('trade')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-right-left text-amber-400"></i> Trade
+          <i class="fa-solid fa-right-left text-amber-400"></i> <span data-i18n="navTrade">Trade</span>
         </button>
         <button id="nav-auction" onclick="switchTab('auction')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-gavel text-emerald-400"></i> Auction
+          <i class="fa-solid fa-gavel text-emerald-400"></i> <span data-i18n="navAuction">Auction</span>
         </button>
         <button id="nav-trade-req" onclick="switchTab('trade-req')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-handshake text-purple-400"></i> Trade Requests
+          <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navRequests">Trade Requests</span>
+        </button>
+        <button id="nav-analytics" onclick="switchTab('analytics')" class="analytics-nav-btn hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
+          <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span>
         </button>
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-comments text-indigo-400"></i> Inbox / Chat
+          <i class="fa-solid fa-comments text-indigo-400"></i> <span data-i18n="navInbox">Inbox</span>
         </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-users text-teal-400"></i> Holders
+          <i class="fa-solid fa-users text-teal-400"></i> <span data-i18n="navHolders">Holders</span>
         </button>
         <button id="nav-history" onclick="switchTab('history')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> History
+          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span data-i18n="navHistory">History</span>
         </button>
 
         <div class="h-4 w-px bg-slate-800 mx-1 self-center hidden sm:block"></div>
 
         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-vault text-amber-400"></i> My Vault
+          <i class="fa-solid fa-vault text-amber-400"></i> <span data-i18n="navVault">My Vault</span>
         </button>
         <button id="nav-wishlist" onclick="switchTab('wishlist')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-heart text-rose-400"></i> Wishlist
+          <i class="fa-solid fa-heart text-rose-400"></i> <span data-i18n="navWishlist">Wishlist</span>
         </button>
 
         <div id="admin-nav-separator" class="h-4 w-px bg-slate-800 mx-1 self-center hidden"></div>
 
         <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
-          <i class="fa-solid fa-boxes-stacked"></i> Inventory Mgmt
+          <i class="fa-solid fa-boxes-stacked"></i> <span data-i18n="navInventory">Inventory</span>
         </button>
         <button id="nav-admin" onclick="switchTab('admin')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
-          <i class="fa-solid fa-shield-halved"></i> Admin Hub
+          <i class="fa-solid fa-shield-halved"></i> <span data-i18n="navAdmin">Admin Hub</span>
         </button>
       </nav>
 
-      <!-- Cart, Notifications & Auth Header -->
+      <!-- Language Toggle, Cart, Notifications & Auth Header -->
       <div class="flex items-center gap-2 shrink-0">
+        <!-- Language Switcher Button -->
+        <button onclick="toggleLanguage()" class="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-mono font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-1" title="Switch Language / Ganti Bahasa">
+          <i class="fa-solid fa-globe text-[11px]"></i>
+          <span id="current-lang-label">EN</span>
+        </button>
+
         <button id="notif-toggle-btn" onclick="toggleNotificationMenu()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
           <i class="fa-solid fa-bell text-sm text-amber-400"></i>
           <span id="notification-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-indigo-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
@@ -194,10 +203,10 @@
     <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-cookie-bite text-xs text-amber-400"></i>
-        <h4 class="text-xs font-extrabold text-white">Cookie & Activity Logs</h4>
+        <h4 class="text-xs font-extrabold text-white" data-i18n="notifHeader">Cookie & Activity Logs</h4>
       </div>
       <div class="flex items-center gap-3">
-        <button onclick="clearNotifications()" class="text-[10px] font-bold text-slate-400 hover:text-rose-400 transition-colors">Clear All</button>
+        <button onclick="clearNotifications()" class="text-[10px] font-bold text-slate-400 hover:text-rose-400 transition-colors" data-i18n="clearAll">Clear All</button>
         <button onclick="toggleNotificationMenu()" class="text-slate-400 hover:text-white text-xs p-1"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
@@ -218,27 +227,27 @@
             <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
           </div>
           <div>
-            <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider">LIMITED EDITION</span>
-            <h2 class="text-lg font-black text-white mt-0.5">Beta Edition Card Stock</h2>
-            <p class="text-xs text-slate-400">Official Primary Market Availability</p>
+            <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider" data-i18n="limitedEdition">LIMITED EDITION</span>
+            <h2 class="text-lg font-black text-white mt-0.5" data-i18n="betaStockTitle">Beta Edition Card Stock</h2>
+            <p class="text-xs text-slate-400" data-i18n="betaStockSubtitle">Official QRIS Primary Market Availability (2% Tax Included)</p>
           </div>
         </div>
         
         <div class="bg-slate-950/80 px-6 py-3 rounded-2xl border border-slate-800 text-center sm:text-right w-full sm:w-auto">
-          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Remaining Cards</p>
-          <p class="text-2xl font-black font-mono text-amber-400"><span id="remaining-cards-count">0</span> <span class="text-slate-500 text-sm font-normal">/ 50 Available</span></p>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" data-i18n="remainingCards">Remaining Cards</p>
+          <p class="text-2xl font-black font-mono text-amber-400"><span id="remaining-cards-count">0</span> <span class="text-slate-500 text-sm font-normal" data-i18n="availableSuffix">/ 50 Available</span></p>
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800/80">
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="search-input" oninput="debouncedRenderCardGrid()" placeholder="Search serial (*01 / *001) or card name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+          <input type="text" id="search-input" oninput="debouncedRenderCardGrid()" placeholder="Search serial (*01 / *001) or card name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500" data-i18n-placeholder="searchPlaceholder">
         </div>
         <div class="flex items-center gap-1.5">
-          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">All</button>
-          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Premium</button>
-          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Standard</button>
+          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all" data-i18n="filterAll">All</button>
+          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="filterPremium">Premium</button>
+          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="filterStandard">Standard</button>
         </div>
       </div>
 
@@ -249,11 +258,11 @@
     <section id="view-trade" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide">TRADING ROOM</h2>
-          <p class="text-xs text-slate-400 mt-1">Buy and sell directly with other collectors • 2% tax per trade</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="tradeRoomTitle">TRADING ROOM</h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="tradeRoomSubtitle">Buy and sell directly with other collectors via QRIS • 2% tax per trade</p>
         </div>
         <button onclick="openListCardForTradeModal()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center gap-2">
-          <i class="fa-solid fa-plus"></i> List a Card
+          <i class="fa-solid fa-plus"></i> <span data-i18n="listCardBtn">List a Card</span>
         </button>
       </div>
 
@@ -264,8 +273,8 @@
     <section id="view-auction" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide">AUCTION ROOM</h2>
-          <p class="text-xs text-slate-400 mt-1">Place competitive bids on rare serial cards before timer expires.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="auctionRoomTitle">AUCTION ROOM</h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="auctionRoomSubtitle">Place competitive QRIS bids on rare serial cards before timer expires.</p>
         </div>
         <div id="auction-header-action-container"></div>
       </div>
@@ -274,11 +283,11 @@
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
           <div class="flex justify-between items-center border-b border-slate-800 pb-3">
             <div>
-              <span class="text-[10px] bg-amber-500/20 text-amber-400 font-extrabold px-2.5 py-1 rounded-md border border-amber-500/30">FEATURED AUCTION</span>
+              <span class="text-[10px] bg-amber-500/20 text-amber-400 font-extrabold px-2.5 py-1 rounded-md border border-amber-500/30" data-i18n="featuredAuction">FEATURED AUCTION</span>
               <h3 id="auction-card-title" class="text-lg font-black text-white mt-1">Eugene Genesis Card #01</h3>
             </div>
             <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-right">
-              <span class="text-[10px] text-slate-500 font-bold uppercase block">Time Remaining</span>
+              <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="timeRemaining">Time Remaining</span>
               <span id="auction-timer" class="text-lg font-black text-amber-400 font-mono">03h 14m 22s</span>
             </div>
           </div>
@@ -289,21 +298,21 @@
                 <img id="auction-card-img" src="https://placehold.co/1080x1350/1e1b4b/fbbf24?text=Serial+*01" loading="lazy" class="w-full h-full object-contain">
               </div>
               <p id="auction-card-serial" class="text-2xl font-black text-amber-400 font-mono">*01</p>
-              <p id="auction-card-owner-info" class="text-[10px] text-slate-400 mt-1">Owner: <strong class="text-white">Admin House</strong></p>
+              <p id="auction-card-owner-info" class="text-[10px] text-slate-400 mt-1"><span data-i18n="ownerLabel">Owner</span>: <strong class="text-white">Admin House</strong></p>
             </div>
 
             <div class="space-y-4">
               <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
-                <p class="text-xs text-slate-400">Current Highest Bid</p>
+                <p class="text-xs text-slate-400" data-i18n="highestBid">Current Highest Bid</p>
                 <p id="auction-current-bid" class="text-3xl font-black text-emerald-400 font-mono">Rp 750.000</p>
-                <p class="text-[10px] text-slate-400">High Bidder: <strong id="auction-high-bidder" class="text-white">Collector #104</strong></p>
+                <p class="text-[10px] text-slate-400"><span data-i18n="highBidderLabel">High Bidder</span>: <strong id="auction-high-bidder" class="text-white">Collector #104</strong></p>
               </div>
 
               <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-300">Your Bid Amount (IDR)</label>
+                <label class="block text-xs font-bold text-slate-300" data-i18n="bidAmountLabel">Your Bid Amount (IDR) - QRIS</label>
                 <div class="flex gap-2">
                   <input type="number" id="bid-input-amount" placeholder="e.g. 775000" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                  <button onclick="placeAuctionBid()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl">Place Bid</button>
+                  <button onclick="placeAuctionBid()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl" data-i18n="placeBidBtn">Place Bid</button>
                 </div>
               </div>
             </div>
@@ -311,7 +320,7 @@
         </div>
 
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
-          <h4 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Live Bid History</h4>
+          <h4 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider" data-i18n="liveBidHistory">Live Bid History</h4>
           <div id="auction-bid-history" class="space-y-2 text-xs max-h-[280px] overflow-y-auto"></div>
         </div>
       </div>
@@ -321,42 +330,86 @@
     <section id="view-trade-req" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide">TRADE REQUESTS</h2>
-          <p class="text-xs text-slate-400 mt-1">Propose direct buy or trade offers on cards that already have an owner.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="tradeReqTitle">TRADE REQUESTS</h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="tradeReqSubtitle">Propose QRIS buy or trade offers on cards that already have an owner.</p>
         </div>
         <button onclick="openProposeTradeModal()" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-xl shadow-lg flex items-center gap-2">
-          <i class="fa-solid fa-handshake"></i> Propose Card Trade
+          <i class="fa-solid fa-handshake"></i> <span data-i18n="proposeTradeBtn">Propose Card Trade</span>
         </button>
       </div>
 
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
+    <!-- MARKET ANALYTICS VIEW (ADMIN & PLUS MEMBER ONLY) -->
+    <section id="view-analytics" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-amber-950/60 via-slate-900 to-indigo-950/60 border border-amber-500/40 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider">EXCLUSIVE ACCESS</span>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide mt-1"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> Market Analytics & Valuation</h2>
+          <p class="text-xs text-slate-400 mt-1">Real-time marketplace metrics, floor price trends, and volume statistics.</p>
+        </div>
+        <button onclick="renderMarketAnalytics()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-rotate"></i> Refresh Analytics
+        </button>
+      </div>
+
+      <!-- ANALYTICS METRIC CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Total Marketplace Volume</p>
+          <p id="analytics-total-volume" class="text-2xl font-black text-emerald-400 font-mono">Rp 0</p>
+          <p class="text-[10px] text-emerald-500"><i class="fa-solid fa-arrow-trend-up"></i> +14.2% this week</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Average Floor Price</p>
+          <p id="analytics-avg-floor" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
+          <p class="text-[10px] text-slate-400">Across 50 edition cards</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Collected / Owned</p>
+          <p id="analytics-collected-count" class="text-2xl font-black text-indigo-400 font-mono">0 / 50</p>
+          <p class="text-[10px] text-slate-400">Primary & Secondary holders</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Active Trade Requests</p>
+          <p id="analytics-trade-reqs" class="text-2xl font-black text-purple-400 font-mono">0</p>
+          <p class="text-[10px] text-slate-400">Pending & countered</p>
+        </div>
+      </div>
+
+      <!-- RECENT PRICE TRENDS TABLE -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+        <h3 class="text-xs font-extrabold text-white uppercase tracking-wider">Top Card Valuation Index</h3>
+        <div id="analytics-valuation-list" class="space-y-2"></div>
+      </div>
+    </section>
+
     <!-- INBOX / CHAT VIEW -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Direct Messages & Support Inbox</h2>
-          <p class="text-xs text-slate-400 mt-1">Search collectors to start a chat or view ongoing direct conversations.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> <span data-i18n="inboxTitle">Direct Messages & Support Inbox</span></h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="inboxSubtitle">Search collectors to start a chat or view ongoing direct conversations.</p>
         </div>
         <button onclick="loadUserInboxThreads()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-indigo-400 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-rotate"></i> Refresh Inbox
+          <i class="fa-solid fa-rotate"></i> <span data-i18n="refreshInbox">Refresh Inbox</span>
         </button>
       </div>
 
       <!-- SEARCH & START CHAT WITH OTHER USERS -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
-        <h3 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-user-plus text-amber-400 mr-1.5"></i> Find & Chat Collector</h3>
+        <h3 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-user-plus text-amber-400 mr-1.5"></i> <span data-i18n="findCollector">Find & Chat Collector</span></h3>
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="user-chat-search-input" oninput="searchUsersForChat()" placeholder="Type collector name or email to start a chat..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <input type="text" id="user-chat-search-input" oninput="searchUsersForChat()" placeholder="Type collector name or email to start a chat..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500" data-i18n-placeholder="chatSearchPlaceholder">
         </div>
         <div id="user-chat-search-results" class="space-y-2 hidden max-h-48 overflow-y-auto"></div>
       </div>
 
       <!-- EXISTING CHAT THREADS -->
       <div id="inbox-threads-list" class="space-y-3">
-        <p class="text-xs text-slate-500 text-center py-10">Loading messages...</p>
+        <p class="text-xs text-slate-500 text-center py-10" data-i18n="loadingMessages">Loading messages...</p>
       </div>
     </section>
 
@@ -364,14 +417,14 @@
     <section id="view-history" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Transaction History</h2>
-          <p class="text-xs text-slate-400 mt-1">View completed sales, order statuses, and platform transaction records.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> <span data-i18n="historyTitle">Transaction History (QRIS)</span></h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="historySubtitle">View completed QRIS purchases, order statuses, and 2% platform tax records.</p>
         </div>
         
         <div class="flex items-center gap-2 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
-          <button onclick="setHistoryFilter('ALL')" id="history-filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">All Activity</button>
-          <button onclick="setHistoryFilter('MINE')" id="history-filter-MINE" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">My Purchases</button>
-          <button onclick="setHistoryFilter('APPROVED')" id="history-filter-APPROVED" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Approved Only</button>
+          <button onclick="setHistoryFilter('ALL')" id="history-filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all" data-i18n="histAll">All Activity</button>
+          <button onclick="setHistoryFilter('MINE')" id="history-filter-MINE" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="histMine">My Purchases</button>
+          <button onclick="setHistoryFilter('APPROVED')" id="history-filter-APPROVED" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="histApproved">Approved Only</button>
         </div>
       </div>
 
@@ -380,13 +433,13 @@
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0 z-10">
               <tr>
-                <th class="p-3.5">Order Ref</th>
-                <th class="p-3.5">Buyer</th>
-                <th class="p-3.5">Items Acquired</th>
-                <th class="p-3.5">Amount (IDR)</th>
-                <th class="p-3.5">Proof / QRIS</th>
-                <th class="p-3.5">Status</th>
-                <th class="p-3.5 text-right">Date / Time</th>
+                <th class="p-3.5" data-i18n="thOrderRef">Order Ref</th>
+                <th class="p-3.5" data-i18n="thBuyer">Buyer</th>
+                <th class="p-3.5" data-i18n="thItems">Items Acquired</th>
+                <th class="p-3.5" data-i18n="thAmount">Amount (IDR + 2% Tax)</th>
+                <th class="p-3.5" data-i18n="thProof">QRIS Receipt</th>
+                <th class="p-3.5" data-i18n="thStatus">Status</th>
+                <th class="p-3.5 text-right" data-i18n="thDate">Date / Time</th>
               </tr>
             </thead>
             <tbody id="history-table-body" class="divide-y divide-slate-800/80"></tbody>
@@ -400,10 +453,10 @@
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
           <h2 id="dashboard-heading" class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Vault / Binder</h2>
-          <p id="dashboard-subheading" class="text-xs text-slate-400 mt-1">Manage owned cards, sell back instantly to Admin, or place them into Auction/Trade.</p>
+          <p id="dashboard-subheading" class="text-xs text-slate-400 mt-1">Manage owned cards, sell back instantly to Admin via QRIS, or place them into Auction/Trade.</p>
         </div>
         <button onclick="openProfileManagerModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-user-gear text-amber-400"></i> Profile Settings
+          <i class="fa-solid fa-user-gear text-amber-400"></i> <span data-i18n="profileSettingsBtn">Profile Settings</span>
         </button>
       </div>
 
@@ -413,27 +466,27 @@
     <!-- WISHLIST VIEW -->
     <section id="view-wishlist" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center justify-between">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> Saved Wishlist</h2>
-        <button onclick="clearWishlist()" class="px-3 py-1.5 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl hover:bg-slate-700">Clear All</button>
+        <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> <span data-i18n="wishlistTitle">Saved Wishlist</span></h2>
+        <button onclick="clearWishlist()" class="px-3 py-1.5 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl hover:bg-slate-700" data-i18n="clearAll">Clear All</button>
       </div>
-      <p class="text-xs text-slate-400 -mt-2">Click on any card to directly propose a trade offer to its owner!</p>
+      <p class="text-xs text-slate-400 -mt-2" data-i18n="wishlistSubtitle">Click on any card to directly propose a trade offer to its owner!</p>
       <div id="wishlist-page-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </section>
 
     <!-- HOLDERS VIEW -->
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide">Holders Directory</h2>
-        <p class="text-xs text-slate-400 mt-1">Click on any collector row or card serial to view their collection and send direct trade offers.</p>
+        <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="holdersTitle">Holders Directory</h2>
+        <p class="text-xs text-slate-400 mt-1" data-i18n="holdersSubtitle">Click on any collector row or card serial to view their collection and send direct trade offers.</p>
       </div>
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
             <tr>
-              <th class="p-3">Owner Name</th>
-              <th class="p-3">Cards Owned</th>
-              <th class="p-3">Serials Held</th>
-              <th class="p-3 text-right">Action</th>
+              <th class="p-3" data-i18n="thOwnerName">Owner Name</th>
+              <th class="p-3" data-i18n="thCardsOwned">Cards Owned</th>
+              <th class="p-3" data-i18n="thSerialsHeld">Serials Held</th>
+              <th class="p-3 text-right" data-i18n="thAction">Action</th>
             </tr>
           </thead>
           <tbody id="holders-table-body" class="divide-y divide-slate-800"></tbody>
@@ -455,7 +508,7 @@
 
       <!-- PENDING ORDERS -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending Orders Requiring Action</h4>
+        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending QRIS Orders Requiring Action</h4>
         <div id="admin-pending-orders-list" class="space-y-3">
           <p class="text-xs text-slate-500">No pending transactions requiring approval.</p>
         </div>
@@ -536,7 +589,7 @@
   <div id="propose-trade-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeProposeTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Propose Card Offer</h3>
+      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Propose QRIS Trade Offer</h3>
       
       <div class="space-y-3 text-xs">
         <div class="relative">
@@ -562,7 +615,7 @@
         <div>
           <label class="block font-bold text-slate-400 mb-1">Offer Type</label>
           <select id="trade-req-type-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
-            <option value="BUY">Direct Buy Offer</option>
+            <option value="BUY">Direct QRIS Buy Offer</option>
             <option value="TRADE">Card-for-Card Trade</option>
           </select>
         </div>
@@ -572,7 +625,7 @@
           <input type="text" id="trade-req-notes-input" placeholder="e.g. Offering Rp 150.000 or trade with *02" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
         </div>
 
-        <button onclick="submitTradeRequest()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg">Submit Proposal</button>
+        <button onclick="submitTradeRequest()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg">Submit QRIS Proposal</button>
       </div>
     </div>
   </div>
@@ -622,7 +675,7 @@
 
   <!-- PROFILE MANAGER & PERSONA SWITCHER MODAL -->
   <div id="profile-manager-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl max-h-[90vh] overflow-y-auto">
       <button onclick="closeProfileManagerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
         <i class="fa-solid fa-xmark"></i>
       </button>
@@ -632,21 +685,32 @@
           <img id="profile-modal-avatar-preview" src="" class="w-20 h-20 rounded-full object-cover border-2 border-amber-500/50 shadow-lg bg-slate-950">
         </div>
         <h3 class="text-lg font-black text-white">Collector Profile Settings</h3>
-        <p class="text-xs text-slate-400">Customize how your profile appears on the marketplace</p>
+        <p class="text-xs text-slate-400">Customize how your profile and socials appear on the marketplace</p>
       </div>
 
       <!-- PERSONA SWITCHER FOR MULTI-ACCOUNT TESTING -->
       <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2">
         <label class="block text-[11px] font-bold text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-users-gear mr-1"></i> Account Persona Switcher</label>
-        <p class="text-[10px] text-slate-400">Switch between your Admin profile or Collector handle under this email:</p>
-        <div class="grid grid-cols-2 gap-2 pt-1">
-          <button onclick="switchAccountPersona('eugene.aquila06')" class="py-2 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 font-extrabold text-[11px] rounded-xl border border-rose-500/30 flex items-center justify-center gap-1.5 transition-all">
-            <i class="fa-solid fa-shield-halved text-xs"></i> Admin Persona
+        <div class="grid grid-cols-3 gap-1.5 pt-1">
+          <button onclick="switchAccountPersona('eugene.aquila06')" class="py-2 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 font-extrabold text-[10px] rounded-xl border border-rose-500/30 flex items-center justify-center gap-1 transition-all">
+            <i class="fa-solid fa-shield-halved text-xs"></i> Admin
           </button>
-          <button onclick="switchAccountPersona('Eugene')" class="py-2 bg-amber-950/40 hover:bg-amber-900/40 text-amber-300 font-extrabold text-[11px] rounded-xl border border-amber-500/30 flex items-center justify-center gap-1.5 transition-all">
-            <i class="fa-solid fa-user text-xs"></i> Collector Persona
+          <button onclick="switchAccountPersona('Eugene Plus')" class="py-2 bg-amber-950/40 hover:bg-amber-900/40 text-amber-300 font-extrabold text-[10px] rounded-xl border border-amber-500/30 flex items-center justify-center gap-1 transition-all">
+            <i class="fa-solid fa-star text-xs"></i> Plus Member
+          </button>
+          <button onclick="switchAccountPersona('Eugene')" class="py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 font-extrabold text-[10px] rounded-xl border border-slate-700 flex items-center justify-center gap-1 transition-all">
+            <i class="fa-solid fa-user text-xs"></i> Standard
           </button>
         </div>
+      </div>
+
+      <!-- PLUS MEMBER STATUS TOGGLE -->
+      <div class="bg-slate-950 p-3 rounded-2xl border border-amber-500/30 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-white"><i class="fa-solid fa-crown text-amber-400 mr-1"></i> Plus Member Tier Status</p>
+          <p class="text-[10px] text-slate-400">Grants access to Market Analytics & perks</p>
+        </div>
+        <button id="profile-plus-toggle-btn" onclick="togglePlusMemberStatus()" class="px-3 py-1.5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-lg shadow">Active</button>
       </div>
 
       <div class="space-y-3 text-xs">
@@ -673,6 +737,23 @@
         <div>
           <label class="block font-bold text-slate-400 mb-1">Collector Tagline / Bio</label>
           <input type="text" id="profile-edit-bio-input" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
+        </div>
+
+        <!-- SOCIAL MEDIA LINKS (OPTIONAL) -->
+        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+          <label class="block font-bold text-amber-400 uppercase text-[10px]"><i class="fa-solid fa-share-nodes mr-1"></i> Social Media Links (Optional)</label>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-instagram text-rose-400 mr-1"></i> Instagram Handle / URL</label>
+            <input type="text" id="profile-edit-ig-input" placeholder="e.g. @eugene_cards" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-x-twitter text-slate-300 mr-1"></i> X / Twitter URL</label>
+            <input type="text" id="profile-edit-x-input" placeholder="e.g. x.com/eugene" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-solid fa-globe text-indigo-400 mr-1"></i> Portfolio / Website URL</label>
+            <input type="text" id="profile-edit-web-input" placeholder="e.g. eugenecards.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
+          </div>
         </div>
 
         <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all">
@@ -862,7 +943,7 @@
   <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6">
     <div>
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-        <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> Cart</h3>
+        <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> Cart (QRIS Checkout)</h3>
         <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div id="cart-items-container" class="py-4 space-y-3 overflow-y-auto max-h-[50vh]"></div>
@@ -870,9 +951,10 @@
     <div class="space-y-4 pt-4 border-t border-slate-800">
       <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2 text-xs">
         <div class="flex justify-between text-slate-400"><span>Subtotal</span><span id="cart-subtotal" class="font-mono text-white">Rp 0</span></div>
-        <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span>Total</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
+        <div class="flex justify-between text-slate-400"><span>Platform Tax (2%)</span><span id="cart-tax" class="font-mono text-amber-400">Rp 0</span></div>
+        <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span>Total (Inc. 2% Tax)</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
       </div>
-      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg hover:bg-amber-400 transition-all">Proceed to Payment</button>
+      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg hover:bg-amber-400 transition-all">Proceed to QRIS Payment</button>
     </div>
   </div>
 
@@ -886,7 +968,7 @@
       <img id="qris-img-element" src="" class="w-48 h-48 mx-auto bg-white p-2 rounded-2xl shadow-inner border border-slate-800">
       
       <div>
-        <p class="text-[10px] text-slate-500 font-bold uppercase">Total Payment Amount (Inc. 2% Fee)</p>
+        <p class="text-[10px] text-slate-500 font-bold uppercase">Total Payment Amount (Inc. 2% Platform Tax)</p>
         <p id="qris-amount-display" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
       </div>
 
@@ -899,7 +981,7 @@
         </div>
       </div>
 
-      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all">Submit Order for Admin Approval</button>
+      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all">Submit QRIS Order for Admin Approval</button>
     </div>
   </div>
 
@@ -929,6 +1011,7 @@
     const OFFICIAL_QRIS_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
     const ADMIN_EMAILS = ['eugene.aquila06@gmail.com', 'yujinybwork@gmail.com', 'eugene.aquila06', 'admin house'];
 
+    let currentLanguage = 'EN';
     let currentUser = null;
     let cart = [];
     let wishlist = new Set();
@@ -954,6 +1037,172 @@
     const CARDS_PER_BATCH = 10;
     let scrollObserver = null;
 
+    // Dictionary for EN | ID translation
+    const i18nDict = {
+      EN: {
+        brandTitle: "EUGENE CARD",
+        betaEdition: "Beta Edition",
+        brandSubtitle: "Trading Card Marketplace & Exchange Hub",
+        navCollection: "Collection",
+        navTrade: "Trade",
+        navAuction: "Auction",
+        navRequests: "Trade Requests",
+        navAnalytics: "Analytics",
+        navInbox: "Inbox",
+        navHolders: "Holders",
+        navHistory: "History",
+        navVault: "My Vault",
+        navWishlist: "Wishlist",
+        navInventory: "Inventory",
+        navAdmin: "Admin Hub",
+        notifHeader: "Cookie & Activity Logs",
+        clearAll: "Clear All",
+        limitedEdition: "LIMITED EDITION",
+        betaStockTitle: "Beta Edition Card Stock",
+        betaStockSubtitle: "Official QRIS Primary Market Availability (2% Tax Included)",
+        remainingCards: "Remaining Cards",
+        availableSuffix: "/ 50 Available",
+        searchPlaceholder: "Search serial (*01 / *001) or card name...",
+        filterAll: "All",
+        filterPremium: "Premium",
+        filterStandard: "Standard",
+        tradeRoomTitle: "TRADING ROOM",
+        tradeRoomSubtitle: "Buy and sell directly with other collectors via QRIS • 2% tax per trade",
+        listCardBtn: "List a Card",
+        auctionRoomTitle: "AUCTION ROOM",
+        auctionRoomSubtitle: "Place competitive QRIS bids on rare serial cards before timer expires.",
+        featuredAuction: "FEATURED AUCTION",
+        timeRemaining: "Time Remaining",
+        ownerLabel: "Owner",
+        highestBid: "Current Highest Bid",
+        highBidderLabel: "High Bidder",
+        bidAmountLabel: "Your Bid Amount (IDR) - QRIS",
+        placeBidBtn: "Place Bid",
+        liveBidHistory: "Live Bid History",
+        tradeReqTitle: "TRADE REQUESTS",
+        tradeReqSubtitle: "Propose QRIS buy or trade offers on cards that already have an owner.",
+        proposeTradeBtn: "Propose Card Trade",
+        inboxTitle: "Direct Messages & Support Inbox",
+        inboxSubtitle: "Search collectors to start a chat or view ongoing direct conversations.",
+        refreshInbox: "Refresh Inbox",
+        findCollector: "Find & Chat Collector",
+        chatSearchPlaceholder: "Type collector name or email to start a chat...",
+        loadingMessages: "Loading messages...",
+        historyTitle: "Transaction History (QRIS)",
+        historySubtitle: "View completed QRIS purchases, order statuses, and 2% platform tax records.",
+        histAll: "All Activity",
+        histMine: "My Purchases",
+        histApproved: "Approved Only",
+        thOrderRef: "Order Ref",
+        thBuyer: "Buyer",
+        thItems: "Items Acquired",
+        thAmount: "Amount (IDR + 2% Tax)",
+        thProof: "QRIS Receipt",
+        thStatus: "Status",
+        thDate: "Date / Time",
+        profileSettingsBtn: "Profile Settings",
+        wishlistTitle: "Saved Wishlist",
+        wishlistSubtitle: "Click on any card to directly propose a trade offer to its owner!",
+        holdersTitle: "Holders Directory",
+        holdersSubtitle: "Click on any collector row or card serial to view their collection and send direct trade offers.",
+        thOwnerName: "Owner Name",
+        thCardsOwned: "Cards Owned",
+        thSerialsHeld: "Serials Held",
+        thAction: "Action"
+      },
+      ID: {
+        brandTitle: "EUGENE CARD",
+        betaEdition: "Edisi Beta",
+        brandSubtitle: "Pasar Kartu Koleksi & Pusat Pertukaran",
+        navCollection: "Koleksi",
+        navTrade: "Perdagangan",
+        navAuction: "Lelang",
+        navRequests: "Permintaan Tukar",
+        navAnalytics: "Analitik",
+        navInbox: "Pesan",
+        navHolders: "Kolektor",
+        navHistory: "Riwayat",
+        navVault: "Brankas",
+        navWishlist: "Keinginan",
+        navInventory: "Inventaris",
+        navAdmin: "Admin Hub",
+        notifHeader: "Cookie & Catatan Aktivitas",
+        clearAll: "Hapus Semua",
+        limitedEdition: "EDISI TERBATAS",
+        betaStockTitle: "Stok Kartu Edisi Beta",
+        betaStockSubtitle: "Ketersediaan Pasar Primer QRIS Resmi (Pajak 2% Termasuk)",
+        remainingCards: "Sisa Kartu",
+        availableSuffix: "/ 50 Tersedia",
+        searchPlaceholder: "Cari serial (*01 / *001) atau nama kartu...",
+        filterAll: "Semua",
+        filterPremium: "Premium",
+        filterStandard: "Standar",
+        tradeRoomTitle: "RUANG PERDAGANGAN",
+        tradeRoomSubtitle: "Beli dan jual langsung dengan kolektor lain via QRIS • Pajak 2% per transaksi",
+        listCardBtn: "Jual/Tukar Kartu",
+        auctionRoomTitle: "RUANG LELANG",
+        auctionRoomSubtitle: "Ajukan penawaran QRIS kompetitif pada kartu langka sebelum waktu habis.",
+        featuredAuction: "LELANG UTAMA",
+        timeRemaining: "Sisa Waktu",
+        ownerLabel: "Pemilik",
+        highestBid: "Penawaran Tertinggi",
+        highBidderLabel: "Penawar Tertinggi",
+        bidAmountLabel: "Jumlah Penawaran (IDR) - QRIS",
+        placeBidBtn: "Ajukan Tawaran",
+        liveBidHistory: "Riwayat Tawaran Langsung",
+        tradeReqTitle: "PERMINTAAN TUKAR",
+        tradeReqSubtitle: "Ajukan penawaran beli/tukar QRIS untuk kartu yang sudah dimiliki kolektor lain.",
+        proposeTradeBtn: "Ajukan Penawaran",
+        inboxTitle: "Pesan Langsung & Kotak Masuk",
+        inboxSubtitle: "Cari kolektor untuk memulai obrolan atau melihat percakapan aktif.",
+        refreshInbox: "Muat Ulang Pesan",
+        findCollector: "Cari & Chat Kolektor",
+        chatSearchPlaceholder: "Ketik nama kolektor atau email...",
+        loadingMessages: "Memuat pesan...",
+        historyTitle: "Riwayat Transaksi (QRIS)",
+        historySubtitle: "Lihat pembelian QRIS selesai, status pesanan, dan catatan pajak platform 2%.",
+        histAll: "Semua Aktivitas",
+        histMine: "Pembelian Saya",
+        histApproved: "Disetujui Saja",
+        thOrderRef: "Ref Pesanan",
+        thBuyer: "Pembeli",
+        thItems: "Kartu Didapat",
+        thAmount: "Jumlah (IDR + Pajak 2%)",
+        thProof: "Bukti QRIS",
+        thStatus: "Status",
+        thDate: "Tanggal / Waktu",
+        profileSettingsBtn: "Pengaturan Profil",
+        wishlistTitle: "Daftar Keinginan",
+        wishlistSubtitle: "Klik kartu apa saja untuk langsung mengajukan penawaran tukar kepada pemiliknya!",
+        holdersTitle: "Direktori Kolektor",
+        holdersSubtitle: "Klik baris kolektor atau serial kartu untuk melihat koleksi dan mengirim tawaran.",
+        thOwnerName: "Nama Kolektor",
+        thCardsOwned: "Jumlah Kartu",
+        thSerialsHeld: "Serial Dipegang",
+        thAction: "Aksi"
+      }
+    };
+
+    function toggleLanguage() {
+      currentLanguage = currentLanguage === 'EN' ? 'ID' : 'EN';
+      const btnLabel = document.getElementById('current-lang-label');
+      if (btnLabel) btnLabel.innerText = currentLanguage;
+      applyTranslations();
+      showToast(currentLanguage === 'ID' ? 'Bahasa diubah ke Bahasa Indonesia' : 'Language switched to English');
+    }
+
+    function applyTranslations() {
+      const dict = i18nDict[currentLanguage];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerText = dict[key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) el.setAttribute('placeholder', dict[key]);
+      });
+    }
+
     function isUserAdmin(identifier) {
       if (!identifier) return false;
       const lower = identifier.toLowerCase().trim();
@@ -964,8 +1213,11 @@
       if (!currentUser) return;
       currentUser.name = personaName;
       currentUser.isAdmin = isUserAdmin(personaName) || isUserAdmin(currentUser.email);
-      
-      const profilePayload = { name: personaName, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio };
+      if (personaName.includes('Plus')) {
+        currentUser.isPlusMember = true;
+      }
+
+      const profilePayload = { name: personaName, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio, isPlusMember: currentUser.isPlusMember, socialIg: currentUser.socialIg, socialX: currentUser.socialX, socialWeb: currentUser.socialWeb };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
 
@@ -973,6 +1225,17 @@
       updateAllViews();
       closeProfileManagerModal();
       showToast(`Switched active persona to: ${personaName}`);
+    }
+
+    function togglePlusMemberStatus() {
+      if (!currentUser) return;
+      currentUser.isPlusMember = !currentUser.isPlusMember;
+      const btn = document.getElementById('profile-plus-toggle-btn');
+      if (btn) {
+        btn.innerText = currentUser.isPlusMember ? 'Active' : 'Inactive';
+        btn.className = currentUser.isPlusMember ? 'px-3 py-1.5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-lg shadow' : 'px-3 py-1.5 bg-slate-800 text-slate-400 font-bold text-[10px] rounded-lg';
+      }
+      saveProfileChanges();
     }
 
     function setCookie(name, value, days = 30) {
@@ -1717,6 +1980,45 @@
       updateCartTotals();
       renderAuctionView();
       renderTradeRequests();
+      if (!document.getElementById('view-analytics').classList.contains('hidden')) {
+        renderMarketAnalytics();
+      }
+    }
+
+    function renderMarketAnalytics() {
+      if (!currentUser || (!currentUser.isAdmin && !currentUser.isPlusMember)) {
+        switchTab('catalog');
+        return showToast('Market Analytics is restricted to Admins and Plus Members.');
+      }
+
+      const totalVol = transactionsList.filter(t => t.status === 'APPROVED').reduce((sum, t) => sum + (t.total_amount || 0), 0);
+      const avgFloor = inventory.length > 0 ? inventory.reduce((s, c) => s + c.price, 0) / inventory.length : 0;
+      const collectedCount = inventory.filter(c => c.owner !== null).length;
+
+      document.getElementById('analytics-total-volume').innerText = formatIDR(totalVol);
+      document.getElementById('analytics-avg-floor').innerText = formatIDR(avgFloor);
+      document.getElementById('analytics-collected-count').innerText = `${collectedCount} / ${inventory.length}`;
+      document.getElementById('analytics-trade-reqs').innerText = tradeRequestsList.length;
+
+      const valuationList = document.getElementById('analytics-valuation-list');
+      if (valuationList) {
+        const sorted = [...inventory].sort((a,b) => b.price - a.price).slice(0, 8);
+        valuationList.innerHTML = sorted.map(c => `
+          <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex justify-between items-center text-xs">
+            <div class="flex items-center gap-3">
+              <img src="${c.imgUrl}" class="w-10 h-10 object-contain rounded bg-slate-900 border border-slate-800">
+              <div>
+                <p class="font-bold text-white">${c.name} (${c.serial})</p>
+                <p class="text-[10px] text-slate-400">Owner: ${c.owner || 'Unowned (House)'}</p>
+              </div>
+            </div>
+            <div class="text-right font-mono">
+              <p class="font-extrabold text-emerald-400">${formatIDR(c.price)}</p>
+              <p class="text-[9px] text-amber-400">${c.type} Tier</p>
+            </div>
+          </div>
+        `).join('');
+      }
     }
 
     function renderAuctionView() {
@@ -1811,14 +2113,21 @@
     function renderAuthHeader() {
       const container = document.getElementById('auth-header-container');
       const adminNavs = document.querySelectorAll('.admin-only-nav');
+      const analyticsNavs = document.querySelectorAll('.analytics-nav-btn');
       const adminSep = document.getElementById('admin-nav-separator');
 
       if (currentUser) {
         if (currentUser.isAdmin) {
           adminNavs.forEach(el => el.classList.remove('hidden'));
+          analyticsNavs.forEach(el => el.classList.remove('hidden'));
           if (adminSep) adminSep.classList.remove('hidden');
         } else {
           adminNavs.forEach(el => el.classList.add('hidden'));
+          if (currentUser.isPlusMember) {
+            analyticsNavs.forEach(el => el.classList.remove('hidden'));
+          } else {
+            analyticsNavs.forEach(el => el.classList.add('hidden'));
+          }
           if (adminSep) adminSep.classList.add('hidden');
         }
 
@@ -1826,18 +2135,22 @@
           ? `<img src="${currentUser.avatarUrl}" class="w-7 h-7 rounded-full object-cover border border-slate-700">`
           : `<i class="fa-solid fa-user-circle text-lg text-slate-400"></i>`;
 
+        let badgeText = currentUser.isAdmin ? 'Admin' : (currentUser.isPlusMember ? 'Plus Member' : 'Collector');
+        let badgeColor = currentUser.isAdmin ? 'text-rose-400' : (currentUser.isPlusMember ? 'text-amber-400' : 'text-slate-400');
+
         container.innerHTML = `
           <div class="flex items-center gap-2.5 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl p-1.5 pl-2.5 cursor-pointer transition-all" onclick="openProfileManagerModal()">
             ${avatarImgHtml}
             <div class="flex flex-col text-right">
               <span class="text-xs font-black text-white leading-tight">${currentUser.name}</span>
-              <span class="text-[9px] font-bold ${currentUser.isAdmin ? 'text-rose-400' : 'text-amber-400'} font-mono">${currentUser.isAdmin ? 'Admin' : 'Collector'}</span>
+              <span class="text-[9px] font-bold ${badgeColor} font-mono">${badgeText}</span>
             </div>
             <button onclick="event.stopPropagation(); logoutUser();" class="p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg ml-1 transition-all"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
           </div>
         `;
       } else {
         adminNavs.forEach(el => el.classList.add('hidden'));
+        analyticsNavs.forEach(el => el.classList.add('hidden'));
         if (adminSep) adminSep.classList.add('hidden');
         container.innerHTML = `<button onclick="openAuthModal()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Log In</button>`;
       }
@@ -1868,10 +2181,14 @@
       const resolvedName = user.displayName || (email ? email.split('@')[0] : "Eugene");
       const name = customData.name || resolvedName;
       const isAdmin = isUserAdmin(name) || isUserAdmin(email);
+      const isPlusMember = customData.isPlusMember !== undefined ? customData.isPlusMember : true;
       const avatarUrl = customData.avatarUrl || user.photoURL || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
       const bio = customData.bio || (isAdmin ? "Official Platform Admin" : "Beta Collector");
+      const socialIg = customData.socialIg || '';
+      const socialX = customData.socialX || '';
+      const socialWeb = customData.socialWeb || '';
 
-      currentUser = { name, email, isAdmin, avatarUrl, bio };
+      currentUser = { name, email, isAdmin, isPlusMember, avatarUrl, bio, socialIg, socialX, socialWeb };
 
       closeAuthModal();
       renderAuthHeader();
@@ -1893,7 +2210,17 @@
       document.getElementById('profile-edit-email-input').value = currentUser.email || '';
       document.getElementById('profile-edit-avatar-input').value = currentUser.avatarUrl || '';
       document.getElementById('profile-edit-bio-input').value = currentUser.bio || '';
+      document.getElementById('profile-edit-ig-input').value = currentUser.socialIg || '';
+      document.getElementById('profile-edit-x-input').value = currentUser.socialX || '';
+      document.getElementById('profile-edit-web-input').value = currentUser.socialWeb || '';
       document.getElementById('profile-modal-avatar-preview').src = currentUser.avatarUrl || '';
+
+      const plusBtn = document.getElementById('profile-plus-toggle-btn');
+      if (plusBtn) {
+        plusBtn.innerText = currentUser.isPlusMember ? 'Active' : 'Inactive';
+        plusBtn.className = currentUser.isPlusMember ? 'px-3 py-1.5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-lg shadow' : 'px-3 py-1.5 bg-slate-800 text-slate-400 font-bold text-[10px] rounded-lg';
+      }
+
       document.getElementById('profile-manager-modal').classList.remove('hidden');
     }
 
@@ -1915,13 +2242,19 @@
       const newName = document.getElementById('profile-edit-name-input').value.trim() || currentUser.name;
       const newAvatar = document.getElementById('profile-edit-avatar-input').value.trim() || currentUser.avatarUrl;
       const newBio = document.getElementById('profile-edit-bio-input').value.trim();
+      const newIg = document.getElementById('profile-edit-ig-input').value.trim();
+      const newX = document.getElementById('profile-edit-x-input').value.trim();
+      const newWeb = document.getElementById('profile-edit-web-input').value.trim();
 
       currentUser.name = newName;
       currentUser.avatarUrl = newAvatar;
       currentUser.bio = newBio;
+      currentUser.socialIg = newIg;
+      currentUser.socialX = newX;
+      currentUser.socialWeb = newWeb;
       currentUser.isAdmin = isUserAdmin(newName) || isUserAdmin(currentUser.email);
 
-      const profilePayload = { name: newName, avatarUrl: newAvatar, bio: newBio };
+      const profilePayload = { name: newName, avatarUrl: newAvatar, bio: newBio, isPlusMember: currentUser.isPlusMember, socialIg: newIg, socialX: newX, socialWeb: newWeb };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
 
@@ -1929,7 +2262,7 @@
       renderAuthHeader();
       updateAllViews();
       showToast('Profile updated!');
-      addNotification('Profile Updated', 'Your collector profile details were saved.', 'fa-user-gear text-amber-400');
+      addNotification('Profile Updated', 'Your collector profile and social links were saved.', 'fa-user-gear text-amber-400');
     }
 
     function renderCardGrid() {
@@ -2084,7 +2417,7 @@
             <td class="p-3.5 font-mono font-extrabold text-indigo-400">${tx.id || 'ORD-000'}</td>
             <td class="p-3.5 font-bold text-white">${tx.user_name || 'Guest'}</td>
             <td class="p-3.5">${itemsFormatted}</td>
-            <td class="p-3.5 font-mono text-emerald-400 font-extrabold">${formatIDR(tx.total_amount || 0)}</td>
+            <td class="p-3.5 font-mono text-emerald-400 font-extrabold">${formatIDR(tx.total_amount || 0)} <span class="text-[9px] text-amber-400 block font-normal">Includes 2% Tax</span></td>
             <td class="p-3.5">${proofBtn}</td>
             <td class="p-3.5"><span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${badgeClass}">${tx.status || 'PENDING'}</span></td>
             <td class="p-3.5 text-right font-mono text-[10px] text-slate-400">${tx.created_at ? new Date(tx.created_at).toLocaleDateString() : 'Recently'}</td>
@@ -2318,7 +2651,7 @@
 
       const container = document.getElementById('detail-card-action-container');
       if (card.status === 'AVAILABLE') {
-        container.innerHTML = `<button onclick="addToCart('${card.id}'); closeCardDetailModal();" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Add Card to Cart</button>`;
+        container.innerHTML = `<button onclick="addToCart('${card.id}'); closeCardDetailModal();" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Add Card to Cart (QRIS)</button>`;
       } else {
         container.innerHTML = `<button disabled class="w-full py-2.5 bg-slate-950 text-slate-600 font-bold text-xs rounded-xl cursor-not-allowed">Already Owned</button>`;
       }
@@ -2333,12 +2666,12 @@
       const card = inventory.find(c => c.id === cardId);
       if (!card || card.owner !== currentUser.name) return showToast('You do not own this card.');
 
-      if (!confirm(`Are you sure you want to sell ${card.serial} back to Admin at floor price (${formatIDR(card.price)})?`)) return;
+      if (!confirm(`Sell back ${card.serial} to Admin via QRIS payout at floor price (${formatIDR(card.price)})?`)) return;
 
       try {
         await db.collection("cards").doc(cardId).update({ owner: null, status: 'AVAILABLE' });
         showToast(`Successfully sold ${card.serial} back to Admin!`);
-        addNotification('Card Sold Back', `Returned ${card.serial} to house stock.`, 'fa-rotate-left text-amber-400');
+        addNotification('Card Sold Back (QRIS Payout)', `Returned ${card.serial} to house stock.`, 'fa-rotate-left text-amber-400');
         await loadAppState();
       } catch (e) {
         showToast('Error selling back: ' + e.message);
@@ -2358,7 +2691,7 @@
       }
 
       document.getElementById('list-card-select-container')?.classList.remove('hidden');
-      document.getElementById('list-modal-title').innerText = 'List Card for Trade';
+      document.getElementById('list-modal-title').innerText = 'List Card for QRIS Trade';
       document.getElementById('list-price-label').innerText = 'Asking Price (IDR)';
       document.getElementById('list-modal-mode').value = 'trade';
       document.getElementById('list-card-modal').classList.remove('hidden');
@@ -2376,10 +2709,10 @@
       document.getElementById('list-card-select-container')?.classList.add('hidden');
 
       if (mode === 'auction') {
-        document.getElementById('list-modal-title').innerText = `List ${card.serial} for Auction`;
+        document.getElementById('list-modal-title').innerText = `List ${card.serial} for QRIS Auction`;
         document.getElementById('list-price-label').innerText = 'Starting Bid Amount (IDR)';
       } else {
-        document.getElementById('list-modal-title').innerText = `List ${card.serial} for Trade`;
+        document.getElementById('list-modal-title').innerText = `List ${card.serial} for QRIS Trade`;
         document.getElementById('list-price-label').innerText = 'Asking Price (IDR)';
       }
 
@@ -2413,7 +2746,7 @@
         try {
           await db.collection("system").doc("activeAuction").set(auctionData);
           closeListCardModal();
-          showToast(`Successfully set ${card.serial} as active auction!`);
+          showToast(`Successfully set ${card.serial} as active QRIS auction!`);
           addNotification('Auction Started', `Card ${card.serial} is now live in the Auction Room.`, 'fa-gavel text-emerald-400');
           await fetchActiveAuction();
           switchTab('auction');
@@ -2436,8 +2769,8 @@
         try {
           await db.collection("listings").doc(listingId).set(listingData);
           closeListCardModal();
-          showToast(`Listed ${card.serial} in the Trading Room!`);
-          addNotification('Card Listed', `Published ${card.serial} for trade/sale.`, 'fa-tag text-amber-400');
+          showToast(`Listed ${card.serial} in the Trading Room with QRIS support!`);
+          addNotification('Card Listed', `Published ${card.serial} for QRIS trade/sale.`, 'fa-tag text-amber-400');
           await fetchListings();
           switchTab('trade');
         } catch (e) {
@@ -2473,7 +2806,7 @@
       if (!currentUser) return showToast('Please log in.');
       const cardId = document.getElementById('trade-req-card-id').value;
       const type = document.getElementById('trade-req-type-select').value;
-      const notes = document.getElementById('trade-req-notes-input').value.trim() || 'Direct offer';
+      const notes = document.getElementById('trade-req-notes-input').value.trim() || 'Direct QRIS offer';
 
       if (!cardId) return showToast('Please select a target card from the dropdown.');
 
@@ -2498,7 +2831,7 @@
       try {
         await db.collection("tradeRequests").doc(reqId).set(requestData);
         closeProposeTradeModal();
-        showToast('Trade/Buy proposal submitted successfully!');
+        showToast('QRIS Trade/Buy proposal submitted successfully!');
         addNotification('Trade Proposal Sent', `Proposed ${type} offer to ${card.owner} for ${card.serial}.`, 'fa-handshake text-purple-400');
         await fetchTradeRequests();
         switchTab('trade-req');
@@ -2538,7 +2871,7 @@
         return showToast('Only the target card owner or Admin can accept this proposal.');
       }
 
-      if (!confirm(`Accept offer from ${req.proposer} for ${req.serial}? Ownership will transfer to ${req.proposer}.`)) return;
+      if (!confirm(`Accept offer from ${req.proposer} for ${req.serial}? Ownership will transfer to ${req.proposer} via QRIS settlement.`)) return;
 
       try {
         const batch = db.batch();
@@ -2636,7 +2969,7 @@
       if (!req) return;
 
       document.getElementById('counter-req-id-target').value = reqId;
-      document.getElementById('counter-notes-input').value = `Counter offer to ${req.proposer}: `;
+      document.getElementById('counter-notes-input').value = `Counter QRIS offer to ${req.proposer}: `;
       document.getElementById('counter-offer-modal').classList.remove('hidden');
     }
 
@@ -2663,23 +2996,6 @@
         await fetchTradeRequests();
       } catch (e) {
         showToast('Error submitting counter offer: ' + e.message);
-      }
-    }
-
-    async function cancelTradeRequest(reqId, proposerName) {
-      if (!currentUser) return;
-      if (!currentUser.isAdmin && currentUser.name !== proposerName) {
-        return showToast('Only the proposer or Admin can cancel this trade request.');
-      }
-
-      if (!confirm('Cancel this trade proposal?')) return;
-
-      try {
-        await db.collection("tradeRequests").doc(reqId).delete();
-        showToast('Trade request canceled.');
-        await fetchTradeRequests();
-      } catch (e) {
-        showToast('Error canceling request: ' + e.message);
       }
     }
 
@@ -2815,7 +3131,7 @@
             </div>
             <div class="space-y-1.5">
               <div class="grid grid-cols-2 gap-1.5">
-                <button onclick="addToCart('${item.cardId}')" class="py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all">Buy</button>
+                <button onclick="addToCart('${item.cardId}')" class="py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all">Buy (QRIS)</button>
                 <button onclick="openDirectChat('${item.seller}', 'Listing ${item.serial}')" class="py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-xl transition-all"><i class="fa-solid fa-comments"></i> Chat</button>
               </div>
               ${canCancel ? `
@@ -2848,6 +3164,7 @@
       const badge = document.getElementById('cart-badge-count');
       const container = document.getElementById('cart-items-container');
       const subtotalEl = document.getElementById('cart-subtotal');
+      const taxEl = document.getElementById('cart-tax');
       const grandTotalEl = document.getElementById('cart-grand-total');
 
       if (badge) badge.innerText = cart.length;
@@ -2855,6 +3172,7 @@
       if (cart.length === 0) {
         if (container) container.innerHTML = `<p class="text-center py-6 text-slate-500 text-xs">Cart is empty.</p>`;
         if (subtotalEl) subtotalEl.innerText = formatIDR(0);
+        if (taxEl) taxEl.innerText = formatIDR(0);
         if (grandTotalEl) grandTotalEl.innerText = formatIDR(0);
         return;
       }
@@ -2877,9 +3195,11 @@
       }
 
       const subtotal = cart.reduce((s, i) => s + i.price, 0);
-      const total = subtotal * (1 + TRADE_FEE_PERCENT);
+      const taxAmount = subtotal * TRADE_FEE_PERCENT;
+      const total = subtotal + taxAmount;
 
       if (subtotalEl) subtotalEl.innerText = formatIDR(subtotal);
+      if (taxEl) taxEl.innerText = formatIDR(taxAmount);
       if (grandTotalEl) grandTotalEl.innerText = formatIDR(total);
     }
 
@@ -2890,7 +3210,8 @@
 
     function proceedToCheckout() {
       if (cart.length === 0) return showToast('Cart is empty.');
-      const total = cart.reduce((s, i) => s + i.price, 0) * (1 + TRADE_FEE_PERCENT);
+      const subtotal = cart.reduce((s, i) => s + i.price, 0);
+      const total = subtotal * (1 + TRADE_FEE_PERCENT);
       
       document.getElementById('qris-amount-display').innerText = formatIDR(total);
       document.getElementById('qris-img-element').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(OFFICIAL_QRIS_STRING)}`;
@@ -2908,7 +3229,8 @@
 
       const proofImgData = document.getElementById('qris-proof-img-data').value;
       const orderRef = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
-      const totalAmount = cart.reduce((s, i) => s + i.price, 0) * (1 + TRADE_FEE_PERCENT);
+      const subtotal = cart.reduce((s, i) => s + i.price, 0);
+      const totalAmount = subtotal * (1 + TRADE_FEE_PERCENT);
 
       const baseOrder = {
         id: orderRef,
@@ -2925,8 +3247,8 @@
 
       try {
         await db.collection("transactions").doc(orderRef).set(baseOrder);
-        showToast('Order submitted! Waiting for Admin verification.');
-        addNotification('Order Submitted', `Order reference ${orderRef} (${cart.length} cards) sent to Admin approval queue.`, 'fa-cart-check text-emerald-400');
+        showToast('QRIS Order submitted! Waiting for Admin verification.');
+        addNotification('QRIS Order Submitted', `Order reference ${orderRef} (${cart.length} cards, inc. 2% tax) sent to Admin approval queue.`, 'fa-cart-check text-emerald-400');
 
         cart = [];
         saveCartToStorage();
@@ -2944,22 +3266,32 @@
 
     function switchTab(tabName) {
       const adminTabs = ['admin', 'inventory'];
+      const analyticsTabs = ['analytics'];
+
       if (adminTabs.includes(tabName) && !currentUser?.isAdmin) {
         return showToast('Admin access required.');
       }
 
-      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history'].forEach(t => {
+      if (analyticsTabs.includes(tabName) && (!currentUser || (!currentUser.isAdmin && !currentUser.isPlusMember))) {
+        return showToast('Market Analytics requires Plus Member status or Admin privileges.');
+      }
+
+      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'analytics', 'inbox', 'holders', 'history'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const nav = document.getElementById(`nav-${t}`);
         if (view) view.classList.add('hidden');
-        if (nav && !adminTabs.includes(t)) nav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all';
+        if (nav && !adminTabs.includes(t) && !analyticsTabs.includes(t)) {
+          nav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all';
+        }
       });
 
       const activeView = document.getElementById(`view-${tabName}`);
       const activeNav = document.getElementById(`nav-${tabName}`);
 
       if (activeView) activeView.classList.remove('hidden');
-      if (activeNav && !adminTabs.includes(tabName)) activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap transition-all';
+      if (activeNav && !adminTabs.includes(tabName) && !analyticsTabs.includes(tabName)) {
+        activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap transition-all';
+      }
 
       if (tabName !== 'dashboard') {
         viewedCollectorFilter = null;
@@ -2969,6 +3301,7 @@
       if (tabName === 'wishlist') renderWishlistPage();
       if (tabName === 'inventory') renderInventoryTable();
       if (tabName === 'admin') loadPendingTransactions();
+      if (tabName === 'analytics') renderMarketAnalytics();
       if (tabName === 'inbox') loadUserInboxThreads();
       if (tabName === 'holders') renderHoldersTable();
       if (tabName === 'history') fetchTransactionHistory();
@@ -3004,7 +3337,7 @@
         heading.innerHTML = `<i class="fa-solid fa-vault text-amber-400 mr-2"></i> ${targetUser}'s Binder`;
       }
       if (subheading) {
-        subheading.innerText = viewedCollectorFilter ? `Viewing collector inventory directory.` : `Manage owned cards, sell back instantly to Admin, or place them into Auction/Trade.`;
+        subheading.innerText = viewedCollectorFilter ? `Viewing collector inventory directory.` : `Manage owned cards, sell back instantly to Admin via QRIS, or place them into Auction/Trade.`;
       }
 
       const owned = inventory.filter(c => c.owner === targetUser);
@@ -3027,7 +3360,7 @@
           ${isMyBinder ? `
             <div class="space-y-1.5 pt-1 border-t border-slate-800/80" onclick="event.stopPropagation()">
               <button onclick="sellBackToAdmin('${card.id}')" class="w-full py-1.5 bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 font-extrabold text-[10px] rounded-xl border border-rose-500/30 transition-all flex items-center justify-center gap-1">
-                <i class="fa-solid fa-rotate-left"></i> Sell Back to Admin
+                <i class="fa-solid fa-rotate-left"></i> Sell Back to Admin (QRIS)
               </button>
               <div class="grid grid-cols-2 gap-1">
                 <button onclick="openListCardModal('${card.id}', 'auction')" class="py-1.5 bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-400 font-extrabold text-[10px] rounded-xl border border-emerald-500/30 transition-all flex items-center justify-center gap-1">
@@ -3135,11 +3468,11 @@
               <div class="space-y-1">
                 <div class="flex items-center gap-2">
                   <span class="font-mono font-black text-indigo-400">${order.id}</span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">PENDING</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">PENDING QRIS</span>
                 </div>
                 <p class="text-white font-bold">Buyer: <span class="text-amber-300">${order.user_name}</span></p>
                 <p class="text-slate-400 text-[11px]">Items: <strong class="text-slate-200">${itemsListStr || 'N/A'}</strong></p>
-                <p class="text-emerald-400 font-mono font-black">${formatIDR(order.total_amount || 0)}</p>
+                <p class="text-emerald-400 font-mono font-black">${formatIDR(order.total_amount || 0)} <span class="text-[9px] text-amber-400 font-normal">(Includes 2% Tax)</span></p>
                 ${proofPreview}
               </div>
               
