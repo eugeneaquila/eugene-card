@@ -325,8 +325,8 @@
     <section id="view-dashboard" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Vault / Binder</h2>
-          <p class="text-xs text-slate-400 mt-1">Manage owned cards, sell back instantly to Admin, or place them into Auction/Trade.</p>
+          <h2 id="dashboard-heading" class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Vault / Binder</h2>
+          <p id="dashboard-subheading" class="text-xs text-slate-400 mt-1">Manage owned cards, sell back instantly to Admin, or place them into Auction/Trade.</p>
         </div>
         <button onclick="openProfileManagerModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl border border-slate-700 flex items-center gap-2">
           <i class="fa-solid fa-user-gear text-amber-400"></i> Profile Settings
@@ -446,6 +446,36 @@
           <input type="number" id="list-card-price-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
         </div>
         <button onclick="submitCardListingModal()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl hover:bg-amber-400 transition-all">Publish Listing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPOSE DIRECT TRADE REQUEST MODAL -->
+  <div id="propose-trade-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeProposeTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Propose Card Offer</h3>
+      
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Select Card to Request</label>
+          <select id="trade-req-card-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500"></select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Offer Type</label>
+          <select id="trade-req-type-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+            <option value="BUY">Direct Buy Offer</option>
+            <option value="TRADE">Card-for-Card Trade</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Proposed Offer Amount / Notes (IDR or Details)</label>
+          <input type="text" id="trade-req-notes-input" placeholder="e.g. Offering Rp 150.000 or trade with *02" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+        </div>
+
+        <button onclick="submitTradeRequest()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg">Submit Proposal</button>
       </div>
     </div>
   </div>
@@ -770,6 +800,8 @@
     let systemNotifications = [];
     let activeListings = [];
     let activeAuction = null;
+    let tradeRequestsList = [];
+    let viewedCollectorFilter = null;
 
     let visibleCardCount = 10;
     const CARDS_PER_BATCH = 10;
@@ -1145,6 +1177,7 @@
       loadSavedCart();
       await fetchListings();
       await fetchActiveAuction();
+      await fetchTradeRequests();
       updateAllViews();
     }
 
@@ -1170,6 +1203,17 @@
         renderAuctionView();
       } catch (e) {
         console.warn('Fetch auction error:', e);
+      }
+    }
+
+    async function fetchTradeRequests() {
+      try {
+        const snapshot = await db.collection("tradeRequests").get();
+        tradeRequestsList = [];
+        snapshot.forEach(doc => tradeRequestsList.push({ id: doc.id, ...doc.data() }));
+        renderTradeRequests();
+      } catch (e) {
+        console.warn('Fetch trade requests error:', e);
       }
     }
 
@@ -1203,6 +1247,10 @@
         fetchListings();
       });
 
+      db.collection("tradeRequests").onSnapshot((snapshot) => {
+        fetchTradeRequests();
+      });
+
       db.collection("system").doc("activeAuction").onSnapshot((doc) => {
         if (doc.exists) {
           activeAuction = doc.data();
@@ -1227,6 +1275,7 @@
       updateRemainingCardsCounter();
       updateCartTotals();
       renderAuctionView();
+      renderTradeRequests();
     }
 
     function renderAuctionView() {
@@ -1879,6 +1928,114 @@
       }
     }
 
+    function openProposeTradeModal() {
+      if (!currentUser) return showToast('Please log in first.');
+      const selectEl = document.getElementById('trade-req-card-select');
+      
+      const ownedByOthers = inventory.filter(c => c.owner && c.owner !== currentUser.name);
+      if (ownedByOthers.length === 0) {
+        return showToast('No cards owned by other collectors available to request right now.');
+      }
+
+      selectEl.innerHTML = ownedByOthers.map(c => `
+        <option value="${c.id}">${c.serial} - ${c.name} (Owned by ${c.owner})</option>
+      `).join('');
+
+      document.getElementById('propose-trade-modal').classList.remove('hidden');
+    }
+
+    function closeProposeTradeModal() {
+      document.getElementById('propose-trade-modal').classList.add('hidden');
+    }
+
+    async function submitTradeRequest() {
+      if (!currentUser) return showToast('Please log in.');
+      const cardId = document.getElementById('trade-req-card-select').value;
+      const type = document.getElementById('trade-req-type-select').value;
+      const notes = document.getElementById('trade-req-notes-input').value.trim() || 'Direct offer';
+
+      const card = inventory.find(c => c.id === cardId);
+      if (!card || !card.owner) return showToast('Invalid card target.');
+
+      const reqId = 'treq-' + Date.now();
+      const requestData = {
+        id: reqId,
+        cardId: cardId,
+        serial: card.serial,
+        cardName: card.name,
+        cardImg: card.imgUrl,
+        targetOwner: card.owner,
+        proposer: currentUser.name,
+        offerType: type,
+        notes: notes,
+        created_at: new Date().toISOString()
+      };
+
+      try {
+        await db.collection("tradeRequests").doc(reqId).set(requestData);
+        closeProposeTradeModal();
+        showToast('Trade/Buy proposal submitted successfully!');
+        addNotification('Trade Proposal Sent', `Proposed ${type} offer to ${card.owner} for ${card.serial}.`, 'fa-handshake text-purple-400');
+        await fetchTradeRequests();
+        switchTab('trade-req');
+      } catch (e) {
+        showToast('Error submitting trade proposal: ' + e.message);
+      }
+    }
+
+    async function cancelTradeRequest(reqId, proposerName) {
+      if (!currentUser) return;
+      if (!currentUser.isAdmin && currentUser.name !== proposerName) {
+        return showToast('Only the proposer or Admin can cancel this trade request.');
+      }
+
+      if (!confirm('Cancel this trade proposal?')) return;
+
+      try {
+        await db.collection("tradeRequests").doc(reqId).delete();
+        showToast('Trade request canceled.');
+        await fetchTradeRequests();
+      } catch (e) {
+        showToast('Error canceling request: ' + e.message);
+      }
+    }
+
+    function renderTradeRequests() {
+      const grid = document.getElementById('trade-requests-grid');
+      if (!grid) return;
+
+      if (tradeRequestsList.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No active trade requests or offers currently pending.</div>`;
+        return;
+      }
+
+      grid.innerHTML = tradeRequestsList.map(req => {
+        const canCancel = currentUser && (currentUser.isAdmin || currentUser.name === req.proposer || currentUser.name === req.targetOwner);
+
+        return `
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex gap-4 items-center">
+            <div class="w-20 h-24 bg-slate-950 rounded-xl p-1 border border-slate-800 shrink-0 flex items-center justify-center overflow-hidden">
+              <img src="${req.cardImg}" class="w-full h-full object-contain">
+            </div>
+            <div class="flex-1 space-y-1 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="font-black text-amber-400 font-mono">${req.serial}</span>
+                <span class="text-[9px] font-extrabold px-2 py-0.5 rounded ${req.offerType === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-purple-500/20 text-purple-400'}">${req.offerType}</span>
+              </div>
+              <p class="font-bold text-white">${req.cardName}</p>
+              <p class="text-[11px] text-slate-400">Owner: <strong class="text-white">${req.targetOwner}</strong></p>
+              <p class="text-[11px] text-slate-400">Proposed by: <strong class="text-indigo-400">${req.proposer}</strong></p>
+              <p class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800/80">Offer: ${req.notes}</p>
+              
+              ${canCancel ? `
+                <button onclick="cancelTradeRequest('${req.id}', '${req.proposer}')" class="mt-2 px-3 py-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-bold text-[10px] rounded-lg border border-rose-500/30 transition-all">Cancel Request</button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     async function cancelTradeListing(listingId, sellerName) {
       if (!currentUser) return;
       if (!currentUser.isAdmin && currentUser.name !== sellerName) {
@@ -2077,6 +2234,10 @@
       if (activeView) activeView.classList.remove('hidden');
       if (activeNav && !adminTabs.includes(tabName)) activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap transition-all';
 
+      if (tabName !== 'dashboard') {
+        viewedCollectorFilter = null;
+      }
+
       if (tabName === 'dashboard') renderOwnedCards();
       if (tabName === 'wishlist') renderWishlistPage();
       if (tabName === 'inventory') renderInventoryTable();
@@ -2085,26 +2246,45 @@
       if (tabName === 'history') fetchTransactionHistory();
       if (tabName === 'trade') fetchListings();
       if (tabName === 'auction') fetchActiveAuction();
+      if (tabName === 'trade-req') fetchTradeRequests();
       if (tabName === 'catalog') {
         visibleCardCount = 10;
         renderCardGrid();
       }
     }
 
+    function viewCollectorVault(collectorName) {
+      viewedCollectorFilter = collectorName;
+      switchTab('dashboard');
+    }
+
     function renderOwnedCards() {
       const grid = document.getElementById('owned-cards-grid');
+      const heading = document.getElementById('dashboard-heading');
+      const subheading = document.getElementById('dashboard-subheading');
       if (!grid) return;
 
-      if (!currentUser) {
+      const targetUser = viewedCollectorFilter || currentUser?.name;
+
+      if (!targetUser) {
         grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Please log in to view your binder.</div>`;
         return;
       }
 
-      const owned = inventory.filter(c => c.owner === currentUser.name);
+      if (heading) {
+        heading.innerHTML = `<i class="fa-solid fa-vault text-amber-400 mr-2"></i> ${targetUser}'s Binder`;
+      }
+      if (subheading) {
+        subheading.innerText = viewedCollectorFilter ? `Viewing collector inventory directory.` : `Manage owned cards, sell back instantly to Admin, or place them into Auction/Trade.`;
+      }
+
+      const owned = inventory.filter(c => c.owner === targetUser);
       if (owned.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No cards registered to your vault yet.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No cards registered to this vault yet.</div>`;
         return;
       }
+
+      const isMyBinder = currentUser && currentUser.name === targetUser;
 
       grid.innerHTML = owned.map(card => `
         <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-between space-y-3 cursor-pointer" onclick="openCardDetailModal('${card.id}')">
@@ -2115,19 +2295,21 @@
             <p class="font-bold text-xs text-white truncate">${card.name}</p>
             <p class="font-mono text-amber-400 text-xs font-black">${card.serial}</p>
           </div>
-          <div class="space-y-1.5 pt-1 border-t border-slate-800/80" onclick="event.stopPropagation()">
-            <button onclick="sellBackToAdmin('${card.id}')" class="w-full py-1.5 bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 font-extrabold text-[10px] rounded-xl border border-rose-500/30 transition-all flex items-center justify-center gap-1">
-              <i class="fa-solid fa-rotate-left"></i> Sell Back to Admin
-            </button>
-            <div class="grid grid-cols-2 gap-1">
-              <button onclick="openListCardModal('${card.id}', 'auction')" class="py-1.5 bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-400 font-extrabold text-[10px] rounded-xl border border-emerald-500/30 transition-all flex items-center justify-center gap-1">
-                <i class="fa-solid fa-gavel"></i> Auction
+          ${isMyBinder ? `
+            <div class="space-y-1.5 pt-1 border-t border-slate-800/80" onclick="event.stopPropagation()">
+              <button onclick="sellBackToAdmin('${card.id}')" class="w-full py-1.5 bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 font-extrabold text-[10px] rounded-xl border border-rose-500/30 transition-all flex items-center justify-center gap-1">
+                <i class="fa-solid fa-rotate-left"></i> Sell Back to Admin
               </button>
-              <button onclick="openListCardModal('${card.id}', 'trade')" class="py-1.5 bg-purple-950/40 hover:bg-purple-900/40 text-purple-400 font-extrabold text-[10px] rounded-xl border border-purple-500/30 transition-all flex items-center justify-center gap-1">
-                <i class="fa-solid fa-right-left"></i> Trade
-              </button>
+              <div class="grid grid-cols-2 gap-1">
+                <button onclick="openListCardModal('${card.id}', 'auction')" class="py-1.5 bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-400 font-extrabold text-[10px] rounded-xl border border-emerald-500/30 transition-all flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-gavel"></i> Auction
+                </button>
+                <button onclick="openListCardModal('${card.id}', 'trade')" class="py-1.5 bg-purple-950/40 hover:bg-purple-900/40 text-purple-400 font-extrabold text-[10px] rounded-xl border border-purple-500/30 transition-all flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-right-left"></i> Trade
+                </button>
+              </div>
             </div>
-          </div>
+          ` : ''}
         </div>
       `).join('');
     }
@@ -2179,9 +2361,14 @@
 
       tbody.innerHTML = Object.keys(ownersMap).map(k => `
         <tr class="hover:bg-slate-950/80 text-xs transition-all">
-          <td class="p-3 font-bold text-white"><i class="fa-solid fa-user-circle text-teal-400 mr-2"></i> ${k}</td>
+          <td class="p-3 font-bold text-white cursor-pointer hover:text-amber-400" onclick="viewCollectorVault('${k}')">
+            <i class="fa-solid fa-user-circle text-teal-400 mr-2"></i> <u>${k}</u>
+          </td>
           <td class="p-3 font-mono text-amber-400 font-bold">${ownersMap[k].cards}</td>
           <td class="p-3 font-mono text-slate-400">${ownersMap[k].serials.join(', ')}</td>
+          <td class="p-3 text-right">
+            <button onclick="viewCollectorVault('${k}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-700">View Binder</button>
+          </td>
         </tr>
       `).join('');
     }
