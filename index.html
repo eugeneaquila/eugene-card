@@ -123,12 +123,37 @@
         </button>
       </nav>
 
-      <!-- Cart & Auth Header -->
+      <!-- Cart, Notifications & Auth Header -->
       <div class="flex items-center gap-2">
+        
+        <!-- NOTIFICATION BUTTON & DROPDOWN -->
+        <div class="relative">
+          <button onclick="toggleNotificationMenu()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
+            <i class="fa-solid fa-bell text-sm text-amber-400"></i>
+            <span id="notification-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-indigo-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
+          </button>
+
+          <!-- Notification Menu Overlay -->
+          <div id="notification-dropdown" class="absolute right-0 mt-2 w-80 sm:w-96 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 hidden overflow-hidden">
+            <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-cookie-bite text-xs text-amber-400"></i>
+                <h4 class="text-xs font-extrabold text-white">Cookie & Activity Logs</h4>
+              </div>
+              <button onclick="clearNotifications()" class="text-[10px] font-bold text-slate-400 hover:text-rose-400 transition-colors">Clear All</button>
+            </div>
+            
+            <div id="notification-list" class="max-h-80 overflow-y-auto divide-y divide-slate-800/60 p-1">
+              <div class="p-6 text-center text-xs text-slate-500">No recent notifications.</div>
+            </div>
+          </div>
+        </div>
+
         <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
           <i class="fa-solid fa-cart-shopping text-sm text-amber-400"></i>
           <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
         </button>
+
         <div id="auth-header-container"></div>
       </div>
 
@@ -401,6 +426,31 @@
     </section>
 
   </main>
+
+  <!-- LOADING ANIMATION MODAL FOR IMPORT / EXPORT -->
+  <div id="loading-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl relative">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-600/10 border border-indigo-500/30 flex items-center justify-center">
+        <i id="loading-modal-spinner" class="fa-solid fa-circle-notch fa-spin text-2xl text-indigo-400"></i>
+      </div>
+      
+      <div>
+        <h3 id="loading-modal-title" class="text-base font-extrabold text-white">Processing Data...</h3>
+        <p id="loading-modal-subtitle" class="text-xs text-slate-400 mt-1">Please wait while the inventory updates.</p>
+      </div>
+
+      <!-- Animated Progress Bar -->
+      <div id="import-progress-container" class="space-y-1.5 hidden">
+        <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+          <div id="import-progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-amber-400 w-0 transition-all duration-200"></div>
+        </div>
+        <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 px-0.5">
+          <span id="import-progress-status">0 / 0</span>
+          <span id="import-progress-percent">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- PROFILE MANAGER MODAL -->
   <div id="profile-manager-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
@@ -684,25 +734,55 @@
     let inventory = [];
     let transactionsList = [];
     let ownerOptionsList = [];
+    let systemNotifications = [];
 
     // Scroll Pagination Variables
-    let visibleCardCount = 10; // Initially render ~2 rows
-    const CARDS_PER_BATCH = 10; // Load 2 rows per batch on scroll
+    let visibleCardCount = 10;
+    const CARDS_PER_BATCH = 10;
     let scrollObserver = null;
 
-    // Local Storage Backup for Persistent Overrides
+    /* COOKIE HELPER UTILITIES */
+    function setCookie(name, value, days = 30) {
+      try {
+        const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+        document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(typeof value === 'object' ? JSON.stringify(value) : value)}; expires=${expires}; path=/; SameSite=Lax`;
+      } catch (e) { console.warn('Cookie set exception:', e); }
+    }
+
+    function getCookie(name) {
+      try {
+        const encodedName = encodeURIComponent(name);
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+          const [key, val] = cookie.trim().split('=');
+          if (key === encodedName && val) {
+            const decoded = decodeURIComponent(val);
+            try { return JSON.parse(decoded); } catch (e) { return decoded; }
+          }
+        }
+      } catch (e) { console.warn('Cookie parse exception:', e); }
+      return null;
+    }
+
+    function deleteCookie(name) {
+      document.cookie = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+    }
+
+    // Local Storage & Cookie Dual Backup for Overrides
     function getCardOverrides() {
       try {
-        const saved = localStorage.getItem('eugene_cards_override');
-        return saved ? JSON.parse(saved) : {};
-      } catch (e) {
-        return {};
-      }
+        const savedLocal = localStorage.getItem('eugene_cards_override');
+        if (savedLocal) return JSON.parse(savedLocal);
+        const savedCookie = getCookie('eugene_cards_override');
+        if (savedCookie) return savedCookie;
+      } catch (e) {}
+      return {};
     }
 
     function saveCardOverrides(overrides) {
       try {
         localStorage.setItem('eugene_cards_override', JSON.stringify(overrides));
+        setCookie('eugene_cards_override', overrides, 30);
       } catch (e) {}
     }
 
@@ -714,6 +794,72 @@
         }
         return card;
       });
+    }
+
+    /* NOTIFICATION LOGIC WITH COOKIES LOGGING */
+    function loadNotifications() {
+      try {
+        const savedLocal = localStorage.getItem('eugene_notifications');
+        const savedCookie = getCookie('eugene_notifications');
+        systemNotifications = savedLocal ? JSON.parse(savedLocal) : (savedCookie || []);
+      } catch (e) { systemNotifications = []; }
+      renderNotifications();
+    }
+
+    function addNotification(title, message, iconClass = 'fa-info-circle text-indigo-400') {
+      const newNotif = {
+        id: 'notif-' + Date.now(),
+        title,
+        message,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        iconClass
+      };
+      systemNotifications.unshift(newNotif);
+      if (systemNotifications.length > 20) systemNotifications.pop();
+      try {
+        localStorage.setItem('eugene_notifications', JSON.stringify(systemNotifications));
+        setCookie('eugene_notifications', systemNotifications, 7);
+      } catch (e) {}
+      renderNotifications();
+    }
+
+    function renderNotifications() {
+      const badge = document.getElementById('notification-badge');
+      const list = document.getElementById('notification-list');
+      
+      if (badge) badge.innerText = systemNotifications.length;
+      if (!list) return;
+
+      if (systemNotifications.length === 0) {
+        list.innerHTML = `<div class="p-6 text-center text-xs text-slate-500">No recent notifications.</div>`;
+        return;
+      }
+
+      list.innerHTML = systemNotifications.map(n => `
+        <div class="p-3 hover:bg-slate-950/80 transition-colors flex items-start gap-3 text-xs">
+          <div class="mt-0.5 p-2 rounded-xl bg-slate-950 border border-slate-800"><i class="fa-solid ${n.iconClass}"></i></div>
+          <div class="flex-1 space-y-0.5">
+            <div class="flex justify-between items-center">
+              <span class="font-extrabold text-white text-[11px]">${n.title}</span>
+              <span class="text-[9px] font-mono text-slate-500">${n.time}</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-snug">${n.message}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleNotificationMenu() {
+      const dropdown = document.getElementById('notification-dropdown');
+      if (dropdown) dropdown.classList.toggle('hidden');
+    }
+
+    function clearNotifications() {
+      systemNotifications = [];
+      localStorage.removeItem('eugene_notifications');
+      deleteCookie('eugene_notifications');
+      renderNotifications();
+      showToast('Notifications cleared.');
     }
 
     function initDefaultInventory() {
@@ -751,32 +897,37 @@
       inventory = applyCardOverrides(inventory);
     }
 
-    /* BACKUP EXPORT & IMPORT FUNCTIONALITY */
+    /* BACKUP EXPORT & IMPORT WITH ANIMATION AND NOTIFICATIONS */
     function exportInventoryBackup() {
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
 
-      const backupData = {
-        exportedAt: new Date().toISOString(),
-        exportedBy: currentUser.email || currentUser.name,
-        inventoryCount: inventory.length,
-        cards: inventory,
-        overrides: getCardOverrides()
-      };
+      showLoadingModal('Generating Backup...', 'Compiling JSON schema state...', false);
 
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      const filename = `eugene_inventory_backup_${new Date().toISOString().slice(0,10)}.json`;
+      setTimeout(() => {
+        const backupData = {
+          exportedAt: new Date().toISOString(),
+          exportedBy: currentUser.email || currentUser.name,
+          inventoryCount: inventory.length,
+          cards: inventory,
+          overrides: getCardOverrides()
+        };
 
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", filename);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const downloadAnchor = document.createElement('a');
+        const filename = `eugene_inventory_backup_${new Date().toISOString().slice(0,10)}.json`;
 
-      showToast('Inventory backup downloaded!');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", filename);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+
+        hideLoadingModal();
+        showToast('Inventory backup downloaded!');
+        addNotification('Backup Downloaded', `Successfully exported state containing ${inventory.length} cards.`, 'fa-download text-amber-400');
+      }, 600);
     }
 
-    /* ONE-BY-ONE SEQUENTIAL IMPORT TO PREVENT PAYLOAD & TIMEOUT ISSUES */
     async function importInventoryBackup(event) {
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
 
@@ -794,14 +945,13 @@
             return;
           }
 
-          if (!confirm(`Import ${importedCards.length} cards one by one into the database?`)) {
+          if (!confirm(`Import ${importedCards.length} cards sequentially into database?`)) {
             event.target.value = '';
             return;
           }
 
-          showToast(`Starting sequential import of ${importedCards.length} items...`);
+          showLoadingModal('Importing Inventory Backup', 'Updating inventory database sequential records...', true);
 
-          // 1. Save Overrides locally
           const overrides = getCardOverrides();
           importedCards.forEach(c => {
             overrides[c.id] = {
@@ -820,13 +970,15 @@
           });
           saveCardOverrides(overrides);
 
-          // 2. Perform ONE-BY-ONE Sequential Upsert to Supabase
           let successCount = 0;
           let errorCount = 0;
+          const total = importedCards.length;
 
           if (supabaseClient) {
-            for (let i = 0; i < importedCards.length; i++) {
+            for (let i = 0; i < total; i++) {
               const c = importedCards[i];
+              updateImportProgress(i + 1, total, `Processing ${c.serial || c.id}...`);
+
               const singlePayload = {
                 id: c.id,
                 serial: c.serial,
@@ -858,24 +1010,23 @@
                 console.error(`Exception during single import ${c.id}:`, err);
                 errorCount++;
               }
-
-              if ((i + 1) % 10 === 0 || i === importedCards.length - 1) {
-                showToast(`Import Progress: ${i + 1}/${importedCards.length} processed...`);
-              }
             }
           }
 
-          // 3. Reload App State
           await loadAppState();
+          hideLoadingModal();
 
           if (errorCount > 0) {
-            showToast(`Imported ${successCount} cards. (${errorCount} failed - check console)`);
+            showToast(`Imported ${successCount} cards (${errorCount} failed).`);
+            addNotification('Import Completed with Warnings', `Imported ${successCount} items; ${errorCount} records encountered errors.`, 'fa-triangle-exclamation text-amber-400');
           } else {
             showToast(`Successfully imported all ${successCount} cards!`);
+            addNotification('Backup Import Complete', `Successfully imported ${successCount} cards into the live stock catalog.`, 'fa-circle-check text-emerald-400');
           }
 
         } catch (err) {
           console.error('Import parse error:', err);
+          hideLoadingModal();
           showToast('Failed to parse JSON backup file.');
         } finally {
           event.target.value = '';
@@ -884,28 +1035,66 @@
       reader.readAsText(file);
     }
 
+    function showLoadingModal(title, subtitle, isProgress = false) {
+      document.getElementById('loading-modal-title').innerText = title;
+      document.getElementById('loading-modal-subtitle').innerText = subtitle;
+      const progressContainer = document.getElementById('import-progress-container');
+      
+      if (isProgress) {
+        progressContainer.classList.remove('hidden');
+        updateImportProgress(0, 100, 'Initializing...');
+      } else {
+        progressContainer.classList.add('hidden');
+      }
+      
+      document.getElementById('loading-modal').classList.remove('hidden');
+    }
+
+    function updateImportProgress(current, total, label) {
+      const pct = Math.round((current / total) * 100);
+      document.getElementById('import-progress-bar').style.width = `${pct}%`;
+      document.getElementById('import-progress-status').innerText = `${current} / ${total}`;
+      document.getElementById('import-progress-percent').innerText = `${pct}%`;
+      if (label) document.getElementById('loading-modal-subtitle').innerText = label;
+    }
+
+    function hideLoadingModal() {
+      document.getElementById('loading-modal').classList.add('hidden');
+    }
+
     function loadSavedWishlist() {
       try {
-        const saved = localStorage.getItem('eugene_wishlist_ids');
-        if (saved) wishlist = new Set(JSON.parse(saved));
+        const savedLocal = localStorage.getItem('eugene_wishlist_ids');
+        const savedCookie = getCookie('eugene_wishlist_ids');
+        const saved = savedLocal ? JSON.parse(savedLocal) : savedCookie;
+        if (saved) wishlist = new Set(saved);
       } catch (e) {}
     }
 
     function saveWishlistToStorage() {
-      try { localStorage.setItem('eugene_wishlist_ids', JSON.stringify(Array.from(wishlist))); } catch (e) {}
+      try { 
+        const arr = Array.from(wishlist);
+        localStorage.setItem('eugene_wishlist_ids', JSON.stringify(arr));
+        setCookie('eugene_wishlist_ids', arr, 30);
+      } catch (e) {}
     }
 
     function loadSavedCart() {
       try {
-        const saved = localStorage.getItem('eugene_cart_items');
+        const savedLocal = localStorage.getItem('eugene_cart_items');
+        const savedCookie = getCookie('eugene_cart_items');
+        const saved = savedLocal ? JSON.parse(savedLocal) : savedCookie;
         if (saved) {
-          cart = JSON.parse(saved).map(savedItem => inventory.find(c => c.id === savedItem.id) || savedItem).filter(Boolean);
+          cart = saved.map(savedItem => inventory.find(c => c.id === savedItem.id) || savedItem).filter(Boolean);
         }
       } catch (e) {}
     }
 
     function saveCartToStorage() {
-      try { localStorage.setItem('eugene_cart_items', JSON.stringify(cart)); } catch (e) {}
+      try { 
+        localStorage.setItem('eugene_cart_items', JSON.stringify(cart));
+        setCookie('eugene_cart_items', cart, 7);
+      } catch (e) {}
     }
 
     let auctionSecondsLeft = 3 * 3600 + 14 * 60 + 22;
@@ -1010,6 +1199,7 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       loadSavedWishlist();
+      loadNotifications();
       initDefaultInventory(); 
       updateAllViews(); 
 
@@ -1036,8 +1226,15 @@
       document.addEventListener('click', (e) => {
         const trigger = document.getElementById('owner-dropdown-trigger');
         const menu = document.getElementById('owner-dropdown-menu');
+        const notifBtn = e.target.closest('button');
+        const notifDropdown = document.getElementById('notification-dropdown');
+
         if (trigger && menu && !trigger.contains(e.target) && !menu.contains(e.target)) {
           menu.classList.add('hidden');
+        }
+
+        if (notifDropdown && !notifDropdown.contains(e.target) && (!notifBtn || !notifBtn.getAttribute('onclick')?.includes('toggleNotificationMenu'))) {
+          notifDropdown.classList.add('hidden');
         }
       });
     });
@@ -1094,10 +1291,10 @@
       const email = user.email ? user.email.toLowerCase() : '';
       const isAdmin = ADMIN_EMAILS.some(a => a.toLowerCase() === email);
 
-      const savedCustomProfile = localStorage.getItem(`profile_${email}`);
+      const savedCustomProfile = localStorage.getItem(`profile_${email}`) || getCookie(`profile_${email}`);
       let customData = {};
       if (savedCustomProfile) {
-        try { customData = JSON.parse(savedCustomProfile); } catch (e) {}
+        try { customData = typeof savedCustomProfile === 'object' ? savedCustomProfile : JSON.parse(savedCustomProfile); } catch (e) {}
       }
 
       const userMeta = user.user_metadata || {};
@@ -1155,11 +1352,15 @@
       currentUser.avatarUrl = newAvatar;
       currentUser.bio = newBio;
 
-      localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify({ name: newName, avatarUrl: newAvatar, bio: newBio }));
+      const profilePayload = { name: newName, avatarUrl: newAvatar, bio: newBio };
+      localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
+      setCookie(`profile_${currentUser.email}`, profilePayload, 30);
+
       closeProfileManagerModal();
       renderAuthHeader();
       updateAllViews();
       showToast('Profile updated!');
+      addNotification('Profile Updated', 'Your collector profile details were saved.', 'fa-user-gear text-amber-400');
     }
 
     /* RENDER CARD GRID WITH LAZY LOADING & SCROLL PAGINATION */
@@ -1492,6 +1693,7 @@
       closeInventoryModal();
       updateAllViews();
       showToast(`Updated ${updatedSerial} across sessions!`);
+      addNotification('Card Updated', `Modified specifications for ${updatedSerial} (${updatedName}).`, 'fa-pen-to-square text-amber-400');
     }
 
     function openCardDetailModal(cardId) {
@@ -1621,6 +1823,8 @@
       }
 
       showToast('Order submitted! Waiting for Admin verification.');
+      addNotification('Order Submitted', `Order reference ${orderRef} (${cart.length} cards) sent to Admin approval queue.`, 'fa-cart-check text-emerald-400');
+
       cart = [];
       saveCartToStorage();
       updateCartTotals();
@@ -1795,6 +1999,8 @@
       await supabaseClient.from('transactions').update({ status: 'APPROVED' }).eq('id', orderId);
       
       showToast(`Transaction ${orderId} approved and items transferred!`);
+      addNotification('Order Approved', `Order ${orderId} approved. Card ownership assigned to ${order?.user_name || 'Buyer'}.`, 'fa-circle-check text-emerald-400');
+      
       await loadAppState();
       loadPendingTransactions();
     }
@@ -1808,6 +2014,8 @@
       await supabaseClient.from('transactions').update({ status: 'REJECTED' }).eq('id', orderId);
       
       showToast(`Transaction ${orderId} has been rejected.`);
+      addNotification('Order Rejected', `Order ${orderId} was marked as rejected by Admin.`, 'fa-circle-xmark text-rose-400');
+      
       fetchTransactionHistory();
       loadPendingTransactions();
     }
