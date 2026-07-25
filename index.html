@@ -341,7 +341,7 @@
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
-    <!-- MARKET ANALYTICS VIEW (ADMIN & PLUS MEMBER ONLY) -->
+    <!-- MARKET ANALYTICS VIEW (ADMIN ONLY) -->
     <section id="view-analytics" class="hidden space-y-6">
       <div class="bg-gradient-to-r from-amber-950/60 via-slate-900 to-indigo-950/60 border border-amber-500/40 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -699,13 +699,21 @@
           <img id="profile-modal-avatar-preview" src="" class="w-20 h-20 rounded-full object-cover border-2 border-amber-500/50 shadow-lg bg-slate-950">
         </div>
         <h3 class="text-lg font-black text-white">Collector Profile Settings</h3>
-        <p class="text-xs text-slate-400">Customize how your profile and socials appear on the marketplace</p>
+        <p class="text-xs text-slate-400">Customize how your profile, username, and socials appear on the marketplace</p>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
           <label class="block font-bold text-slate-400 mb-1">Display Name</label>
           <input type="text" id="profile-edit-name-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Username (@handle)</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 font-bold">@</span>
+            <input type="text" id="profile-edit-username-input" placeholder="e.g. eugenecards" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-7 pr-3 py-2 text-white focus:border-amber-500 focus:outline-none">
+          </div>
         </div>
 
         <div>
@@ -1201,10 +1209,11 @@
     function switchAccountPersona(personaName) {
       if (!currentUser) return;
       currentUser.name = personaName;
+      currentUser.username = personaName.toLowerCase().replace(/\s+/g, '_');
       currentUser.isAdmin = isUserAdmin(personaName) || isUserAdmin(currentUser.email);
-      currentUser.isPlusMember = false; // Plus members not released yet
+      currentUser.isPlusMember = false;
 
-      const profilePayload = { name: personaName, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio, isPlusMember: false, socialIg: currentUser.socialIg, socialX: currentUser.socialX, socialWeb: currentUser.socialWeb };
+      const profilePayload = { name: personaName, username: currentUser.username, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio, isPlusMember: false, socialIg: currentUser.socialIg, socialX: currentUser.socialX, socialWeb: currentUser.socialWeb };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
 
@@ -1339,6 +1348,7 @@
 
       if (currentUser) {
         foundUsersMap.delete(currentUser.name);
+        if (currentUser.username) foundUsersMap.delete(currentUser.username);
       }
 
       if (foundUsersMap.size === 0) {
@@ -1371,13 +1381,13 @@
 
     function openDirectChat(targetUserName, contextInfo = 'Trade Chat') {
       if (!currentUser) return showToast('Please log in to start a chat.');
-      if (currentUser.name === targetUserName && !currentUser.isAdmin) {
+      if ((currentUser.name === targetUserName || currentUser.username === targetUserName) && !currentUser.isAdmin) {
         return showToast('Cannot chat with yourself.');
       }
 
       currentChatTargetUser = targetUserName;
 
-      const participants = [currentUser.name, targetUserName].sort();
+      const participants = [currentUser.username || currentUser.name, targetUserName].sort();
       currentChatContextId = `chat-${participants.join('-vs-')}`;
 
       document.getElementById('chat-target-user-name').innerText = targetUserName;
@@ -1445,7 +1455,7 @@
 
         container.innerHTML = snapshot.docs.map(doc => {
           const msg = doc.data();
-          const isMe = currentUser && msg.sender === currentUser.name;
+          const isMe = currentUser && (msg.sender === currentUser.name || msg.sender === currentUser.username);
           const isSenderAdmin = isUserAdmin(msg.sender);
 
           return `
@@ -1478,14 +1488,14 @@
         const chatDocRef = db.collection("chats").doc(currentChatContextId);
         batch.set(chatDocRef, {
           lastMessage: text || (chatAttachedImage ? '[Screenshot / Image]' : ''),
-          lastSender: currentUser.name,
+          lastSender: currentUser.username || currentUser.name,
           participants: currentChatContextId.replace('chat-', '').split('-vs-'),
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
         const msgDocRef = chatDocRef.collection("messages").doc();
         const payload = {
-          sender: currentUser.name,
+          sender: currentUser.username || currentUser.name,
           text: text,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -1522,7 +1532,8 @@
         const myThreads = [];
         snapshot.forEach(doc => {
           const chatId = doc.id;
-          if (chatId.includes(currentUser.name) || currentUser.isAdmin) {
+          const myIdent = currentUser.username || currentUser.name;
+          if (chatId.includes(myIdent) || currentUser.isAdmin) {
             myThreads.push({ id: chatId, ...doc.data() });
           }
         });
@@ -1534,7 +1545,8 @@
 
         container.innerHTML = myThreads.map(c => {
           const rawNames = c.id.replace('chat-', '').split('-vs-');
-          const otherUser = rawNames.find(name => name !== currentUser.name) || (rawNames[0] || 'Collector');
+          const myIdent = currentUser.username || currentUser.name;
+          const otherUser = rawNames.find(name => name !== myIdent) || (rawNames[0] || 'Collector');
           const lastMsg = c.lastMessage || 'Click to view conversation';
           const isOtherAdmin = isUserAdmin(otherUser);
 
@@ -2020,7 +2032,7 @@
       if (imgEl) imgEl.src = activeAuction.imgUrl || "https://placehold.co/1080x1350/1e1b4b/fbbf24?text=Card";
       if (ownerEl) ownerEl.innerHTML = `Owner: <strong class="text-white">${activeAuction.owner || 'Admin'}</strong>`;
 
-      const canCancel = currentUser && (currentUser.isAdmin || currentUser.name === activeAuction.owner);
+      const canCancel = currentUser && (currentUser.isAdmin || currentUser.name === activeAuction.owner || currentUser.username === activeAuction.owner);
       if (actionContainer) {
         if (canCancel) {
           actionContainer.innerHTML = `
@@ -2099,7 +2111,7 @@
           if (adminSep) adminSep.classList.remove('hidden');
         } else {
           adminNavs.forEach(el => el.classList.add('hidden'));
-          analyticsNavs.forEach(el => el.classList.add('hidden')); // Hidden for standard users
+          analyticsNavs.forEach(el => el.classList.add('hidden'));
           if (adminSep) adminSep.classList.add('hidden');
         }
 
@@ -2107,7 +2119,7 @@
           ? `<img src="${currentUser.avatarUrl}" class="w-7 h-7 rounded-full object-cover border border-slate-700">`
           : `<i class="fa-solid fa-user-circle text-lg text-slate-400"></i>`;
 
-        let badgeText = currentUser.isAdmin ? 'Admin' : 'Standard Member';
+        let badgeText = currentUser.isAdmin ? 'Admin' : (currentUser.username ? `@${currentUser.username}` : 'Standard Member');
         let badgeColor = currentUser.isAdmin ? 'text-rose-400' : 'text-slate-400';
 
         container.innerHTML = `
@@ -2152,15 +2164,16 @@
 
       const resolvedName = user.displayName || (email ? email.split('@')[0] : "Eugene");
       const name = customData.name || resolvedName;
-      const isAdmin = isUserAdmin(name) || isUserAdmin(email);
-      const isPlusMember = false; // Plus members not released yet
+      const username = customData.username || name.toLowerCase().replace(/\s+/g, '_');
+      const isAdmin = isUserAdmin(name) || isUserAdmin(email) || isUserAdmin(username);
+      const isPlusMember = false;
       const avatarUrl = customData.avatarUrl || user.photoURL || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
       const bio = customData.bio || (isAdmin ? "Official Platform Admin" : "Standard Collector");
       const socialIg = customData.socialIg || '';
       const socialX = customData.socialX || '';
       const socialWeb = customData.socialWeb || '';
 
-      currentUser = { name, email, isAdmin, isPlusMember, avatarUrl, bio, socialIg, socialX, socialWeb };
+      currentUser = { name, username, email, isAdmin, isPlusMember, avatarUrl, bio, socialIg, socialX, socialWeb };
 
       closeAuthModal();
       renderAuthHeader();
@@ -2179,6 +2192,7 @@
     function openProfileManagerModal() {
       if (!currentUser) return showToast('Please log in first.');
       document.getElementById('profile-edit-name-input').value = currentUser.name || '';
+      document.getElementById('profile-edit-username-input').value = currentUser.username || '';
       document.getElementById('profile-edit-email-input').value = currentUser.email || '';
       document.getElementById('profile-edit-avatar-input').value = currentUser.avatarUrl || '';
       document.getElementById('profile-edit-bio-input').value = currentUser.bio || '';
@@ -2206,6 +2220,8 @@
     function saveProfileChanges() {
       if (!currentUser) return;
       const newName = document.getElementById('profile-edit-name-input').value.trim() || currentUser.name;
+      const rawUsername = document.getElementById('profile-edit-username-input').value.trim();
+      const newUsername = rawUsername ? rawUsername.replace(/^@/, '').toLowerCase().replace(/\s+/g, '_') : (currentUser.username || newName.toLowerCase().replace(/\s+/g, '_'));
       const newAvatar = document.getElementById('profile-edit-avatar-input').value.trim() || currentUser.avatarUrl;
       const newBio = document.getElementById('profile-edit-bio-input').value.trim();
       const newIg = document.getElementById('profile-edit-ig-input').value.trim();
@@ -2213,22 +2229,23 @@
       const newWeb = document.getElementById('profile-edit-web-input').value.trim();
 
       currentUser.name = newName;
+      currentUser.username = newUsername;
       currentUser.avatarUrl = newAvatar;
       currentUser.bio = newBio;
       currentUser.socialIg = newIg;
       currentUser.socialX = newX;
       currentUser.socialWeb = newWeb;
-      currentUser.isAdmin = isUserAdmin(newName) || isUserAdmin(currentUser.email);
+      currentUser.isAdmin = isUserAdmin(newName) || isUserAdmin(currentUser.email) || isUserAdmin(newUsername);
 
-      const profilePayload = { name: newName, avatarUrl: newAvatar, bio: newBio, isPlusMember: false, socialIg: newIg, socialX: newX, socialWeb: newWeb };
+      const profilePayload = { name: newName, username: newUsername, avatarUrl: newAvatar, bio: newBio, isPlusMember: false, socialIg: newIg, socialX: newX, socialWeb: newWeb };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
 
       closeProfileManagerModal();
       renderAuthHeader();
       updateAllViews();
-      showToast('Profile updated!');
-      addNotification('Profile Updated', 'Your collector profile and social links were saved.', 'fa-user-gear text-amber-400');
+      showToast('Profile and username updated!');
+      addNotification('Profile Updated', `Your username (@${newUsername}) and profile details were saved.`, 'fa-user-gear text-amber-400');
     }
 
     function renderCardGrid() {
@@ -2351,9 +2368,10 @@
         if (historyFilter === 'MINE') {
           if (!currentUser) return false;
           const myName = (currentUser.name || '').trim().toLowerCase();
+          const myUsername = (currentUser.username || '').trim().toLowerCase();
           const myEmailName = (currentUser.email ? currentUser.email.split('@')[0] : '').trim().toLowerCase();
           const txUser = (tx.user_name || '').trim().toLowerCase();
-          return txUser === myName || (myEmailName && txUser === myEmailName);
+          return txUser === myName || txUser === myUsername || (myEmailName && txUser === myEmailName);
         }
         if (historyFilter === 'APPROVED') return tx.status === 'APPROVED';
         return true;
@@ -2516,6 +2534,7 @@
       const ownersSet = new Set();
       inventory.forEach(c => { if (c.owner) ownersSet.add(c.owner); });
       if (currentUser?.name) ownersSet.add(currentUser.name);
+      if (currentUser?.username) ownersSet.add(currentUser.username);
 
       const currentCardOwner = card.owner || '';
       ownerOptionsList = [{ value: '', label: 'Unowned (House)' }];
@@ -2630,7 +2649,8 @@
     async function sellBackToAdmin(cardId) {
       if (!currentUser) return showToast('Please log in.');
       const card = inventory.find(c => c.id === cardId);
-      if (!card || card.owner !== currentUser.name) return showToast('You do not own this card.');
+      const myIdent = currentUser.username || currentUser.name;
+      if (!card || (card.owner !== currentUser.name && card.owner !== currentUser.username)) return showToast('You do not own this card.');
 
       if (!confirm(`Sell back ${card.serial} to Admin via QRIS payout at floor price (${formatIDR(card.price)})?`)) return;
 
@@ -2646,7 +2666,8 @@
 
     function openListCardForTradeModal() {
       if (!currentUser) return showToast('Please log in first.');
-      const myCards = inventory.filter(c => c.owner === currentUser.name);
+      const myIdent = currentUser.username || currentUser.name;
+      const myCards = inventory.filter(c => c.owner === currentUser.name || c.owner === currentUser.username);
       if (myCards.length === 0) return showToast('You do not own any cards to list.');
 
       const selectEl = document.getElementById('list-card-select-input');
@@ -2696,13 +2717,15 @@
       const card = inventory.find(c => c.id === cardId);
       if (!card || !price) return showToast('Please select a valid card and enter a price.');
 
+      const activeUserIdent = currentUser.username || currentUser.name;
+
       if (mode === 'auction') {
         const auctionData = {
           cardId: cardId,
           serial: card.serial,
           name: card.name,
           imgUrl: card.imgUrl,
-          owner: currentUser.name,
+          owner: activeUserIdent,
           startingPrice: price,
           currentBid: price,
           highBidder: 'None',
@@ -2728,7 +2751,7 @@
           type: card.type,
           imgUrl: card.imgUrl,
           price: price,
-          seller: currentUser.name,
+          seller: activeUserIdent,
           created_at: new Date().toISOString()
         };
 
@@ -2747,8 +2770,9 @@
 
     function openProposeTradeModal() {
       if (!currentUser) return showToast('Please log in first.');
+      const myIdent = currentUser.username || currentUser.name;
       
-      const ownedByOthers = inventory.filter(c => c.owner && c.owner !== currentUser.name);
+      const ownedByOthers = inventory.filter(c => c.owner && c.owner !== currentUser.name && c.owner !== currentUser.username);
       if (ownedByOthers.length === 0) {
         return showToast('No cards owned by other collectors available to request right now.');
       }
@@ -2779,6 +2803,7 @@
       const card = inventory.find(c => c.id === cardId);
       if (!card || !card.owner) return showToast('Invalid card target.');
 
+      const activeUserIdent = currentUser.username || currentUser.name;
       const reqId = 'treq-' + Date.now();
       const requestData = {
         id: reqId,
@@ -2787,7 +2812,7 @@
         cardName: card.name,
         cardImg: card.imgUrl,
         targetOwner: card.owner,
-        proposer: currentUser.name,
+        proposer: activeUserIdent,
         offerType: type,
         notes: notes,
         status: 'PENDING',
@@ -2811,7 +2836,8 @@
       const req = tradeRequestsList.find(r => r.id === reqId);
       if (!req) return;
 
-      if (req.proposer !== currentUser.name && !currentUser.isAdmin) {
+      const myIdent = currentUser.username || currentUser.name;
+      if (req.proposer !== currentUser.name && req.proposer !== currentUser.username && !currentUser.isAdmin) {
         return showToast('You can only cancel/withdraw your own proposed trade requests.');
       }
 
@@ -2832,7 +2858,8 @@
       const req = tradeRequestsList.find(r => r.id === reqId);
       if (!req) return showToast('Proposal not found.');
 
-      const canAccept = (req.targetOwner === currentUser.name) || currentUser.isAdmin;
+      const myIdent = currentUser.username || currentUser.name;
+      const canAccept = (req.targetOwner === currentUser.name || req.targetOwner === currentUser.username) || currentUser.isAdmin;
       if (!canAccept) {
         return showToast('Only the target card owner or Admin can accept this proposal.');
       }
@@ -2863,7 +2890,8 @@
       const req = tradeRequestsList.find(r => r.id === reqId);
       if (!req) return showToast('Proposal not found.');
 
-      if (req.proposer !== currentUser.name && !currentUser.isAdmin) {
+      const myIdent = currentUser.username || currentUser.name;
+      if (req.proposer !== currentUser.name && req.proposer !== currentUser.username && !currentUser.isAdmin) {
         return showToast('Only the original offer proposer or Admin can accept this counter offer.');
       }
 
@@ -2893,7 +2921,8 @@
       const req = tradeRequestsList.find(r => r.id === reqId);
       if (!req) return;
 
-      if (req.proposer !== currentUser.name && !currentUser.isAdmin) {
+      const myIdent = currentUser.username || currentUser.name;
+      if (req.proposer !== currentUser.name && req.proposer !== currentUser.username && !currentUser.isAdmin) {
         return showToast('Only the proposer can reject this counter offer.');
       }
 
@@ -2914,7 +2943,8 @@
       const req = tradeRequestsList.find(r => r.id === reqId);
       if (!req) return;
 
-      if (req.targetOwner !== currentUser.name && !currentUser.isAdmin) {
+      const myIdent = currentUser.username || currentUser.name;
+      if (req.targetOwner !== currentUser.name && req.targetOwner !== currentUser.username && !currentUser.isAdmin) {
         return showToast('Only the card owner can reject this proposal.');
       }
 
@@ -2975,8 +3005,9 @@
       }
 
       grid.innerHTML = tradeRequestsList.map(req => {
-        const isProposer = currentUser && currentUser.name === req.proposer;
-        const isTargetOwner = currentUser && (currentUser.name === req.targetOwner || currentUser.isAdmin);
+        const myIdent = currentUser ? (currentUser.username || currentUser.name) : '';
+        const isProposer = currentUser && (req.proposer === currentUser.name || req.proposer === currentUser.username);
+        const isTargetOwner = currentUser && (req.targetOwner === currentUser.name || req.targetOwner === currentUser.username || currentUser.isAdmin);
         const isCountered = req.status === 'COUNTERED';
         const isAccepted = req.status === 'ACCEPTED';
         const isRejected = req.status === 'REJECTED';
@@ -3032,7 +3063,8 @@
 
     async function cancelTradeListing(listingId, sellerName) {
       if (!currentUser) return;
-      if (!currentUser.isAdmin && currentUser.name !== sellerName) {
+      const myIdent = currentUser.username || currentUser.name;
+      if (!currentUser.isAdmin && currentUser.name !== sellerName && currentUser.username !== sellerName) {
         return showToast('Only the card owner or Admin can cancel this listing.');
       }
 
@@ -3052,7 +3084,8 @@
       if (!currentUser) return;
       if (!activeAuction) return showToast('No active auction to cancel.');
 
-      const isOwner = currentUser.name === activeAuction.owner;
+      const myIdent = currentUser.username || currentUser.name;
+      const isOwner = currentUser.name === activeAuction.owner || currentUser.username === activeAuction.owner;
       const isAdmin = currentUser.isAdmin;
 
       if (!isAdmin && !isOwner) {
@@ -3082,7 +3115,8 @@
       }
 
       grid.innerHTML = activeListings.map(item => {
-        const canCancel = currentUser && (currentUser.isAdmin || currentUser.name === item.seller);
+        const myIdent = currentUser ? (currentUser.username || currentUser.name) : '';
+        const canCancel = currentUser && (currentUser.isAdmin || currentUser.name === item.seller || currentUser.username === item.seller);
 
         return `
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between space-y-2">
@@ -3197,10 +3231,11 @@
       const orderRef = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
       const subtotal = cart.reduce((s, i) => s + i.price, 0);
       const totalAmount = subtotal * (1 + TRADE_FEE_PERCENT);
+      const activeUserIdent = currentUser ? (currentUser.username || currentUser.name) : 'Guest Collector';
 
       const baseOrder = {
         id: orderRef,
-        user_name: currentUser ? currentUser.name : 'Guest Collector',
+        user_name: activeUserIdent,
         items: cart,
         total_amount: totalAmount,
         status: 'PENDING',
@@ -3292,7 +3327,8 @@
       const subheading = document.getElementById('dashboard-subheading');
       if (!grid) return;
 
-      const targetUser = viewedCollectorFilter || currentUser?.name;
+      const activeUserIdent = currentUser ? (currentUser.username || currentUser.name) : '';
+      const targetUser = viewedCollectorFilter || activeUserIdent;
 
       if (!targetUser) {
         grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Please log in to view your binder.</div>`;
@@ -3306,13 +3342,13 @@
         subheading.innerText = viewedCollectorFilter ? `Viewing collector inventory directory.` : `Manage owned cards, sell back instantly to Admin via QRIS, or place them into Auction/Trade.`;
       }
 
-      const owned = inventory.filter(c => c.owner === targetUser);
+      const owned = inventory.filter(c => c.owner === targetUser || (currentUser && (c.owner === currentUser.name || c.owner === currentUser.username)));
       if (owned.length === 0) {
         grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No cards registered to this vault yet.</div>`;
         return;
       }
 
-      const isMyBinder = currentUser && currentUser.name === targetUser;
+      const isMyBinder = currentUser && (currentUser.name === targetUser || currentUser.username === targetUser);
 
       grid.innerHTML = owned.map(card => `
         <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-between space-y-3 cursor-pointer" onclick="openCardDetailModal('${card.id}')">
@@ -3390,7 +3426,7 @@
       tbody.innerHTML = Object.keys(ownersMap).map(k => `
         <tr class="hover:bg-slate-950/80 text-xs transition-all">
           <td class="p-3 font-bold text-white cursor-pointer hover:text-amber-400" onclick="viewedCollectorVault('${k}')">
-            <i class="fa-solid fa-user-circle text-teal-400 mr-2"></i> <u>${k}</u>
+            <i class="fa-solid fa-user-circle text-teal-400 mr-2"></i> <u>${k.startsWith('@') ? k : '@' + k}</u>
           </td>
           <td class="p-3 font-mono text-amber-400 font-bold">${ownersMap[k].cards}</td>
           <td class="p-3 font-mono text-slate-400">${ownersMap[k].serials.join(', ')}</td>
