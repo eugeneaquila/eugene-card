@@ -1481,13 +1481,17 @@
 
     function openDirectChat(targetUserName, contextInfo = 'Trade Chat') {
       if (!currentUser) return showToast('Please log in to start a chat.');
-      if ((currentUser.name === targetUserName || currentUser.username === targetUserName) && !currentUser.isAdmin) {
+      
+      const myIdent = (currentUser.username || currentUser.name || '').trim().toLowerCase();
+      const targetIdent = targetUserName.trim().toLowerCase();
+
+      if (myIdent === targetIdent && !currentUser.isAdmin) {
         return showToast('Cannot chat with yourself.');
       }
 
       currentChatTargetUser = targetUserName;
 
-      const participants = [currentUser.username || currentUser.name, targetUserName].sort();
+      const participants = [myIdent, targetIdent].sort();
       currentChatContextId = `chat-${participants.join('-vs-')}`;
 
       document.getElementById('chat-target-user-name').innerText = targetUserName;
@@ -1597,7 +1601,7 @@
         batch.set(chatDocRef, {
           lastMessage: text || (chatAttachedImage ? '[Screenshot / Image]' : ''),
           lastSender: currentUser.username || currentUser.name,
-          participants: currentChatContextId.replace('chat-', '').split('-vs-'),
+          participants: [currentUser.username || currentUser.name, currentChatTargetUser].map(p => p.toLowerCase()),
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
@@ -1637,26 +1641,36 @@
           return;
         }
 
-        const myThreads = [];
-        const myName = (currentUser.name || '').trim().toLowerCase();
-        const myUsername = (currentUser.username || '').trim().toLowerCase();
+        const myUsername = (currentUser.username || currentUser.name || '').trim().toLowerCase();
+        const threadsMap = new Map();
 
         snapshot.forEach(doc => {
           const chatId = doc.id;
-          const lowerChatId = chatId.toLowerCase();
-          if (currentUser.isAdmin || lowerChatId.includes(myName) || (myUsername && lowerChatId.includes(myUsername))) {
-            myThreads.push({ id: chatId, ...doc.data() });
+          const data = doc.data();
+          const participants = data.participants || chatId.replace('chat-', '').split('-vs-');
+          const lowerParticipants = participants.map(p => p.toLowerCase());
+
+          const isParticipant = lowerParticipants.includes(myUsername) || lowerParticipants.includes((currentUser.name || '').toLowerCase());
+          
+          if (currentUser.isAdmin || isParticipant) {
+            const otherUserRaw = participants.find(p => p.toLowerCase() !== myUsername && p.toLowerCase() !== (currentUser.name || '').toLowerCase()) || participants[0] || 'Collector';
+            const uniqueKey = otherUserRaw.toLowerCase();
+
+            if (!threadsMap.has(uniqueKey) || (data.updatedAt && threadsMap.get(uniqueKey).updatedAt < data.updatedAt)) {
+              threadsMap.set(uniqueKey, { id: chatId, otherUser: otherUserRaw, ...data });
+            }
           }
         });
 
-        if (myThreads.length === 0) {
+        const uniqueThreads = Array.from(threadsMap.values());
+
+        if (uniqueThreads.length === 0) {
           container.innerHTML = `<p class="text-xs text-slate-500 text-center py-10">No chat messages in your inbox.</p>`;
           return;
         }
 
-        container.innerHTML = myThreads.map(c => {
-          const rawNames = c.id.replace('chat-', '').split('-vs-');
-          const otherUser = rawNames.find(name => name.toLowerCase() !== myName && name.toLowerCase() !== myUsername) || (rawNames[0] || 'Collector');
+        container.innerHTML = uniqueThreads.map(c => {
+          const otherUser = c.otherUser;
           const lastMsg = c.lastMessage || 'Click to view conversation';
           const isOtherAdmin = isUserAdmin(otherUser);
           const otherUserAvatar = getCollectorAvatar(otherUser);
@@ -1681,7 +1695,7 @@
         }).join('');
       }, err => {
         console.warn('Inbox snapshot error:', err);
-        container.innerHTML = `<p class="text-xs text-rose-400 text-center py-10">Error fetching inbox messages. Check Firestore rules or connection.</p>`;
+        container.innerHTML = `<p class="text-xs text-rose-400 text-center py-10">Error fetching inbox messages.</p>`;
       });
     }
 
