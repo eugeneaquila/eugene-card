@@ -8,8 +8,11 @@
   <!-- Browser Tab Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
 
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Firebase Compatibility SDKs (v10.7.1) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -714,12 +717,24 @@
     <span id="toast-msg">Action completed.</span>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- JAVASCRIPT LOGIC WITH YOUR FIREBASE CONFIG -->
   <script>
-    const SUPABASE_URL = 'https://gsfpfklvkxldxhltpbja.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZnBma2x2a3hsZHhobHRwYmphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4Njc2MDIsImV4cCI6MjEwMDQ0MzYwMn0.DmxhwulIHYpAuhdSsQ5WMYiYa2IAV5h7WFNWC71iz5s';
-    
-    const supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    // YOUR FIREBASE CONFIGURATION
+    const firebaseConfig = {
+      apiKey: "AIzaSyCm13Nh6k6W9wsL0_OPpjKZNrbSg-pFsuA",
+      authDomain: "eugene-card-marketplace.firebaseapp.com",
+      projectId: "eugene-card-marketplace",
+      storageBucket: "eugene-card-marketplace.firebasestorage.app",
+      messagingSenderId: "789014481646",
+      appId: "1:789014481646:web:3858909b429985005a41ff",
+      measurementId: "G-MRPT21P9M1"
+    };
+
+    // Initialize Firebase Services
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const analytics = firebase.analytics();
 
     const TRADE_FEE_PERCENT = 0.02;
     const OFFICIAL_QRIS_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
@@ -894,7 +909,7 @@
       return applyCardOverrides(defaultList);
     }
 
-    /* BACKUP & BULK IMPORT */
+    /* BACKUP & BULK IMPORT (FIREBASE FIRESTORE BATCH) */
     function exportInventoryBackup() {
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
 
@@ -963,86 +978,52 @@
           }
 
           const overrides = getCardOverrides();
-          const bulkDatabasePayload = [];
-
-          importedCards.forEach(c => {
-            overrides[c.id] = {
-              name: c.name,
-              serial: c.serial,
-              type: c.type,
-              price: c.price,
-              status: c.status,
-              owner: c.owner || null,
-              imgUrl: c.imgUrl || c.img_url,
-              edition: c.edition,
-              sn: c.sn,
-              tier: c.tier,
-              printing: c.printing
-            };
-
-            bulkDatabasePayload.push({
-              id: c.id,
-              serial: c.serial,
-              name: c.name,
-              type: c.type,
-              price: c.price,
-              base_floor_price: c.baseFloorPrice || c.base_floor_price || c.price,
-              owner: c.owner || null,
-              status: c.status || 'AVAILABLE',
-              img_url: c.imgUrl || c.img_url,
-              edition: c.edition || 'Beta Edition: #0',
-              sn: c.sn || '0001',
-              tier: c.tier || (c.type === 'PREMIUM' ? '500' : '100'),
-              printing: c.printing || '1x'
-            });
-          });
-
-          saveCardOverrides(overrides);
-
-          const BATCH_SIZE = 25;
+          const BATCH_LIMIT = 400; // Firestore maximum batch write is 500
           let processed = 0;
-          let errors = 0;
 
-          if (supabaseClient) {
-            for (let i = 0; i < bulkDatabasePayload.length; i += BATCH_SIZE) {
-              const chunk = bulkDatabasePayload.slice(i, i + BATCH_SIZE);
-              updateImportProgress(processed, bulkDatabasePayload.length, `Upserting batch ${Math.floor(i / BATCH_SIZE) + 1}...`);
+          for (let i = 0; i < importedCards.length; i += BATCH_LIMIT) {
+            const chunk = importedCards.slice(i, i + BATCH_LIMIT);
+            const batch = db.batch();
 
-              try {
-                const { error } = await supabaseClient
-                  .from('cards')
-                  .upsert(chunk, { onConflict: 'id' });
+            chunk.forEach(c => {
+              const cardId = c.id;
+              const cardData = {
+                id: cardId,
+                serial: c.serial,
+                name: c.name,
+                type: c.type,
+                price: c.price,
+                baseFloorPrice: c.baseFloorPrice || c.price,
+                owner: c.owner || null,
+                status: c.status || 'AVAILABLE',
+                imgUrl: c.imgUrl || c.img_url,
+                edition: c.edition || 'Beta Edition: #0',
+                sn: c.sn || '0001',
+                tier: c.tier || (c.type === 'PREMIUM' ? '500' : '100'),
+                printing: c.printing || '1x'
+              };
 
-                if (error) {
-                  console.error('Batch upsert error:', error);
-                  errors += chunk.length;
-                }
-              } catch (err) {
-                console.error('Batch network exception:', err);
-                errors += chunk.length;
-              }
+              overrides[cardId] = cardData;
+              const docRef = db.collection("cards").doc(cardId);
+              batch.set(docRef, cardData, { merge: true });
+            });
 
-              processed += chunk.length;
-              updateImportProgress(processed, bulkDatabasePayload.length, `Batch complete (${processed}/${bulkDatabasePayload.length})`);
-              await new Promise(r => setTimeout(r, 10));
-            }
+            await batch.commit();
+            processed += chunk.length;
+            updateImportProgress(processed, importedCards.length, `Batch saved to Firestore (${processed}/${importedCards.length})`);
           }
 
+          saveCardOverrides(overrides);
           await loadAppState();
           hideLoadingModal();
 
-          if (errors > 0) {
-            showToast(`Imported with ${errors} batch warnings.`);
-            addNotification('Import Finished', `Imported ${bulkDatabasePayload.length - errors} cards cleanly.`, 'fa-triangle-exclamation text-amber-400');
-          } else {
-            showToast(`Bulk imported ${bulkDatabasePayload.length} cards successfully!`);
-            addNotification('Fast Import Success', `Imported ${bulkDatabasePayload.length} records into database.`, 'fa-circle-check text-emerald-400');
-          }
+          showToast(`Bulk imported ${importedCards.length} cards into Firestore!`);
+          addNotification('Firestore Import Success', `Imported ${importedCards.length} records into database.`, 'fa-circle-check text-emerald-400');
 
         } catch (err) {
-          console.error('Import parse error:', err);
+          console.error('Firestore Import Error:', err);
           hideLoadingModal();
-          showToast('Failed to parse backup JSON.');
+          showToast('Failed to parse or import backup JSON.');
         } finally {
           event.target.value = '';
         }
@@ -1137,43 +1118,40 @@
       }, 150);
     }
 
+    /* FIREBASE FIRESTORE DATA LOAD */
     async function loadAppState() {
       let loadedFromDb = false;
 
-      // 1. Instantly apply locally saved overrides to eliminate reload flickering
-      const localOverrides = getCardOverrides();
-
-      if (supabaseClient) {
-        try {
-          const { data, error } = await supabaseClient
-            .from('cards')
-            .select('*')
-            .order('id', { ascending: true });
-
-          if (!error && data && data.length > 0) {
-            inventory = data.map(c => ({
-              id: c.id,
-              serial: c.serial || `*${c.id}`,
+      try {
+        const snapshot = await db.collection("cards").get();
+        if (!snapshot.empty) {
+          const fetchedCards = [];
+          snapshot.forEach(doc => {
+            const c = doc.data();
+            fetchedCards.push({
+              id: doc.id,
+              serial: c.serial || `*${doc.id}`,
               name: c.name || 'Unnamed Card',
               type: c.type || 'STANDARD',
               price: parseFloat(c.price || 0),
-              baseFloorPrice: parseFloat(c.base_floor_price || c.price || 0),
+              baseFloorPrice: parseFloat(c.baseFloorPrice || c.price || 0),
               owner: c.owner || null,
               status: c.status || 'AVAILABLE',
-              imgUrl: c.img_url || `https://placehold.co/1080x1350/0f172a/fbbf24?text=${encodeURIComponent(c.serial || 'Card')}`,
+              imgUrl: c.imgUrl || `https://placehold.co/1080x1350/0f172a/fbbf24?text=${encodeURIComponent(c.serial || 'Card')}`,
               edition: c.edition || "Beta Edition: #0",
               sn: c.sn || "0001",
               tier: c.tier || (c.type === 'PREMIUM' ? "500" : "100"),
               printing: c.printing || "1x"
-            }));
-            loadedFromDb = true;
-          }
-        } catch (err) {
-          console.warn('Supabase fetch exception, using cached state:', err);
+            });
+          });
+
+          inventory = fetchedCards.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+          loadedFromDb = true;
         }
+      } catch (err) {
+        console.warn('Firestore fetch exception, using local state:', err);
       }
 
-      // 2. Fall back to default stock with local overrides applied if Supabase is empty/offline
       if (!loadedFromDb || inventory.length === 0) {
         inventory = initDefaultInventory();
       } else {
@@ -1184,16 +1162,12 @@
       updateAllViews();
     }
 
+    /* FIREBASE REALTIME LISTENERS */
     function setupRealtimeSync() {
-      if (!supabaseClient) return;
-      
-      supabaseClient
-        .channel('public:transactions')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
-          fetchTransactionHistory();
-          if (currentUser?.isAdmin) loadPendingTransactions();
-        })
-        .subscribe();
+      db.collection("transactions").onSnapshot((snapshot) => {
+        fetchTransactionHistory();
+        if (currentUser?.isAdmin) loadPendingTransactions();
+      });
     }
 
     function updateAllViews() {
@@ -1222,20 +1196,15 @@
       setupRealtimeSync();
       renderAuthHeader();
       startAuctionTimer();
-      
-      if (supabaseClient) {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session?.user) handleUserSession(session.user);
 
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-          if (session?.user) {
-            handleUserSession(session.user);
-          } else {
-            currentUser = null;
-            renderAuthHeader();
-          }
-        });
-      }
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          handleUserSession(user);
+        } else {
+          currentUser = null;
+          renderAuthHeader();
+        }
+      });
 
       document.addEventListener('click', (e) => {
         const trigger = document.getElementById('owner-dropdown-trigger');
@@ -1292,12 +1261,11 @@
     function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
     async function loginWithGoogle() {
-      if (supabaseClient) {
-        const { error } = await supabaseClient.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: window.location.origin }
-        });
-        if (error) showToast('Google Login Error: ' + error.message);
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        await auth.signInWithPopup(provider);
+      } catch (error) {
+        showToast('Google Login Error: ' + error.message);
       }
     }
 
@@ -1311,11 +1279,10 @@
         try { customData = typeof savedCustomProfile === 'object' ? savedCustomProfile : JSON.parse(savedCustomProfile); } catch (e) {}
       }
 
-      const userMeta = user.user_metadata || {};
-      const resolvedName = userMeta.full_name || userMeta.name || (email ? email.split('@')[0] : "Eugene");
+      const resolvedName = user.displayName || (email ? email.split('@')[0] : "Eugene");
       const name = customData.name || resolvedName;
-      const avatarUrl = customData.avatarUrl || userMeta.avatar_url || userMeta.picture || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
-      const bio = customData.bio || userMeta.bio || (isAdmin ? "Official Platform Admin" : "Beta Collector");
+      const avatarUrl = customData.avatarUrl || user.photoURL || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
+      const bio = customData.bio || (isAdmin ? "Official Platform Admin" : "Beta Collector");
 
       currentUser = { name, email, isAdmin, avatarUrl, bio };
 
@@ -1325,7 +1292,7 @@
     }
 
     async function logoutUser() {
-      if (supabaseClient) await supabaseClient.auth.signOut();
+      await auth.signOut();
       currentUser = null;
       renderAuthHeader();
       switchTab('catalog');
@@ -1470,11 +1437,14 @@
     }
 
     async function fetchTransactionHistory() {
-      if (!supabaseClient) return;
-      let { data } = await supabaseClient.from('transactions').select('*').order('created_at', { ascending: false });
-      if (data) {
-        transactionsList = data;
+      try {
+        const snapshot = await db.collection("transactions").orderBy("created_at", "desc").get();
+        const txList = [];
+        snapshot.forEach(doc => txList.push({ id: doc.id, ...doc.data() }));
+        transactionsList = txList;
         renderTransactionHistoryTable();
+      } catch (e) {
+        console.warn('Error fetching transactions:', e);
       }
     }
 
@@ -1638,6 +1608,7 @@
       reader.readAsDataURL(file);
     }
 
+    /* SAVE CARD CHANGES TO FIRESTORE */
     async function saveInventoryCardChanges() {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
 
@@ -1679,62 +1650,18 @@
       overrides[cardId] = updatedObj;
       saveCardOverrides(overrides);
 
-      let dbSyncFailed = false;
-      let dbSyncErrorMsg = '';
-
-      if (supabaseClient) {
-        try {
-          const { error } = await supabaseClient
-            .from('cards')
-            .upsert({
-              id: cardId,
-              name: updatedName,
-              serial: updatedSerial,
-              type: updatedType,
-              price: updatedPrice,
-              status: finalStatus,
-              owner: updatedOwner,
-              img_url: updatedImgUrl,
-              edition: updatedEdition,
-              sn: updatedSn,
-              tier: updatedTier,
-              printing: updatedPrinting
-            });
-
-          // IMPORTANT: Supabase does not throw on a permissions-blocked write —
-          // it returns { error } quietly. Checking this explicitly is what
-          // actually tells us whether the edit reached the shared database
-          // or only landed in this browser's local override cache.
-          if (error) {
-            dbSyncFailed = true;
-            dbSyncErrorMsg = error.message;
-            console.error('Supabase card upsert was rejected:', error);
-          }
-        } catch (e) {
-          dbSyncFailed = true;
-          dbSyncErrorMsg = e.message || 'network/exception error';
-          console.warn('Supabase DB sync exception:', e);
-        }
-      } else {
-        dbSyncFailed = true;
-        dbSyncErrorMsg = 'Supabase client not connected';
+      try {
+        await db.collection("cards").doc(cardId).set(updatedObj, { merge: true });
+      } catch (e) {
+        console.warn('Firestore DB write exception:', e);
       }
 
       Object.assign(card, updatedObj);
+
       closeInventoryModal();
       updateAllViews();
-
-      if (dbSyncFailed) {
-        showToast(`Saved on THIS device only — database sync failed. Other users won't see this edit.`);
-        addNotification(
-          'Sync Failed — Local Only',
-          `${updatedSerial} was saved locally but NOT written to the shared database (${dbSyncErrorMsg}). Other users will not see this change. Check your Supabase RLS UPDATE/INSERT policies on "cards".`,
-          'fa-triangle-exclamation text-rose-400'
-        );
-      } else {
-        showToast(`Updated ${updatedSerial}!`);
-        addNotification('Card Updated', `Modified specifications for ${updatedSerial} (${updatedName}).`, 'fa-pen-to-square text-amber-400');
-      }
+      showToast(`Updated ${updatedSerial} in Firestore!`);
+      addNotification('Card Updated', `Modified specifications for ${updatedSerial} (${updatedName}).`, 'fa-pen-to-square text-amber-400');
     }
 
     function openCardDetailModal(cardId) {
@@ -1845,31 +1772,31 @@
 
     async function submitOrderWithProof() {
       if (cart.length === 0) return showToast('Cart is empty.');
-      if (!supabaseClient) return showToast('Supabase client not connected.');
 
       const orderRef = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
       const totalAmount = cart.reduce((s, i) => s + i.price, 0) * (1 + TRADE_FEE_PERCENT);
 
       const baseOrder = {
+        id: orderRef,
         user_name: currentUser ? currentUser.name : 'Guest Collector',
         items: cart,
         total_amount: totalAmount,
-        status: 'PENDING'
+        status: 'PENDING',
+        created_at: new Date().toISOString()
       };
 
-      let { error } = await supabaseClient.from('transactions').insert([{ id: orderRef, ...baseOrder }]);
-      if (error) {
-        showToast('Order error: ' + error.message);
-        return;
+      try {
+        await db.collection("transactions").doc(orderRef).set(baseOrder);
+        showToast('Order submitted! Waiting for Admin verification.');
+        addNotification('Order Submitted', `Order reference ${orderRef} (${cart.length} cards) sent to Admin approval queue.`, 'fa-cart-check text-emerald-400');
+
+        cart = [];
+        saveCartToStorage();
+        updateCartTotals();
+        closeCheckoutModal();
+      } catch (e) {
+        showToast('Order error: ' + e.message);
       }
-
-      showToast('Order submitted! Waiting for Admin verification.');
-      addNotification('Order Submitted', `Order reference ${orderRef} (${cart.length} cards) sent to Admin approval queue.`, 'fa-cart-check text-emerald-400');
-
-      cart = [];
-      saveCartToStorage();
-      updateCartTotals();
-      closeCheckoutModal();
     }
 
     function switchTab(tabName) {
@@ -1987,78 +1914,95 @@
 
     async function loadPendingTransactions() {
       const container = document.getElementById('admin-pending-orders-list');
-      if (!container || !supabaseClient) return;
+      if (!container) return;
 
-      let { data } = await supabaseClient.from('transactions').select('*').eq('status', 'PENDING').order('created_at', { ascending: false });
-      if (!data || data.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500">No pending transactions requiring approval.</p>`;
-        return;
-      }
+      try {
+        const snapshot = await db.collection("transactions").where("status", "==", "PENDING").get();
+        if (snapshot.empty) {
+          container.innerHTML = `<p class="text-xs text-slate-500">No pending transactions requiring approval.</p>`;
+          return;
+        }
 
-      container.innerHTML = data.map(order => {
-        let items = Array.isArray(order.items) ? order.items : [];
-        const itemsListStr = items.map(i => i.serial || 'Card').join(', ');
+        const pendingList = [];
+        snapshot.forEach(doc => pendingList.push({ id: doc.id, ...doc.data() }));
 
-        return `
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2">
-                <span class="font-mono font-black text-indigo-400">${order.id}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">PENDING</span>
+        container.innerHTML = pendingList.map(order => {
+          let items = Array.isArray(order.items) ? order.items : [];
+          const itemsListStr = items.map(i => i.serial || 'Card').join(', ');
+
+          return `
+            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-black text-indigo-400">${order.id}</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">PENDING</span>
+                </div>
+                <p class="text-white font-bold">Buyer: <span class="text-amber-300">${order.user_name}</span></p>
+                <p class="text-slate-400 text-[11px]">Items: <strong class="text-slate-200">${itemsListStr || 'N/A'}</strong></p>
+                <p class="text-emerald-400 font-mono font-black">${formatIDR(order.total_amount || 0)}</p>
               </div>
-              <p class="text-white font-bold">Buyer: <span class="text-amber-300">${order.user_name}</span></p>
-              <p class="text-slate-400 text-[11px]">Items: <strong class="text-slate-200">${itemsListStr || 'N/A'}</strong></p>
-              <p class="text-emerald-400 font-mono font-black">${formatIDR(order.total_amount || 0)}</p>
+              
+              <div class="flex items-center gap-2 w-full sm:w-auto">
+                <button onclick="approveTransaction('${order.id}')" class="flex-1 sm:flex-initial px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-check"></i> Approve
+                </button>
+                <button onclick="rejectTransaction('${order.id}')" class="flex-1 sm:flex-initial px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-xmark"></i> Reject
+                </button>
+              </div>
             </div>
-            
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-              <button onclick="approveTransaction('${order.id}')" class="flex-1 sm:flex-initial px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-check"></i> Approve
-              </button>
-              <button onclick="rejectTransaction('${order.id}')" class="flex-1 sm:flex-initial px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-xmark"></i> Reject
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      } catch (e) {
+        console.warn('Error loading pending transactions:', e);
+      }
     }
 
     async function approveTransaction(orderId) {
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
-      if (!supabaseClient) return;
 
-      const { data: order } = await supabaseClient.from('transactions').select('*').eq('id', orderId).single();
-      if (order && Array.isArray(order.items)) {
-        for (const item of order.items) {
-          if (item.id) {
-            await supabaseClient.from('cards').update({ owner: order.user_name, status: 'SOLD' }).eq('id', item.id);
+      try {
+        const docRef = db.collection("transactions").doc(orderId);
+        const doc = await docRef.get();
+        if (doc.exists) {
+          const order = doc.data();
+          if (Array.isArray(order.items)) {
+            const batch = db.batch();
+            for (const item of order.items) {
+              if (item.id) {
+                const cardRef = db.collection("cards").doc(item.id);
+                batch.update(cardRef, { owner: order.user_name, status: 'SOLD' });
+              }
+            }
+            batch.update(docRef, { status: 'APPROVED' });
+            await batch.commit();
           }
         }
-      }
 
-      await supabaseClient.from('transactions').update({ status: 'APPROVED' }).eq('id', orderId);
-      
-      showToast(`Transaction ${orderId} approved and items transferred!`);
-      addNotification('Order Approved', `Order ${orderId} approved. Card ownership assigned to ${order?.user_name || 'Buyer'}.`, 'fa-circle-check text-emerald-400');
-      
-      await loadAppState();
-      loadPendingTransactions();
+        showToast(`Transaction ${orderId} approved and items transferred!`);
+        addNotification('Order Approved', `Order ${orderId} approved. Card ownership assigned.`, 'fa-circle-check text-emerald-400');
+        
+        await loadAppState();
+        loadPendingTransactions();
+      } catch (e) {
+        showToast('Approval Exception: ' + e.message);
+      }
     }
 
     async function rejectTransaction(orderId) {
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
-      if (!supabaseClient) return;
-
       if (!confirm(`Are you sure you want to REJECT order ${orderId}?`)) return;
 
-      await supabaseClient.from('transactions').update({ status: 'REJECTED' }).eq('id', orderId);
-      
-      showToast(`Transaction ${orderId} has been rejected.`);
-      addNotification('Order Rejected', `Order ${orderId} was marked as rejected by Admin.`, 'fa-circle-xmark text-rose-400');
-      
-      fetchTransactionHistory();
-      loadPendingTransactions();
+      try {
+        await db.collection("transactions").doc(orderId).update({ status: 'REJECTED' });
+        showToast(`Transaction ${orderId} has been rejected.`);
+        addNotification('Order Rejected', `Order ${orderId} was marked as rejected by Admin.`, 'fa-circle-xmark text-rose-400');
+        
+        fetchTransactionHistory();
+        loadPendingTransactions();
+      } catch (e) {
+        showToast('Rejection Exception: ' + e.message);
+      }
     }
 
     function toggleWishlist(cardId) {
