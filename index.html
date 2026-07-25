@@ -751,7 +751,7 @@
 
         <div>
           <label class="block font-bold text-slate-400 mb-1">Collector Tagline / Bio</label>
-          <input type="text" id="profile-edit-bio-input" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
+          <textarea id="profile-edit-bio-input" rows="3" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none resize-y"></textarea>
         </div>
 
         <!-- SOCIAL MEDIA LINKS (OPTIONAL) -->
@@ -760,6 +760,10 @@
           <div>
             <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-instagram text-rose-400 mr-1"></i> Instagram Handle / URL</label>
             <input type="text" id="profile-edit-ig-input" placeholder="e.g. @eugene_cards or https://instagram.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-x-twitter text-slate-300 mr-1"></i> X/Twitter Handle / URL</label>
+            <input type="text" id="profile-edit-twitter-input" placeholder="e.g. @eugene_cards or https://twitter.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
           </div>
           <div>
             <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-tiktok text-cyan-400 mr-1"></i> TikTok Handle / URL</label>
@@ -1306,7 +1310,7 @@
       currentUser.isAdmin = isUserAdmin(personaName) || isUserAdmin(currentUser.email);
       currentUser.isPlusMember = false;
 
-      const profilePayload = { name: personaName, username: currentUser.username, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio, isPlusMember: false, socialIg: currentUser.socialIg, socialTiktok: currentUser.socialTiktok, socialWeb: currentUser.socialWeb };
+      const profilePayload = { name: personaName, username: currentUser.username, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio, isPlusMember: false, socialIg: currentUser.socialIg, socialTwitter: currentUser.socialTwitter, socialTiktok: currentUser.socialTiktok, socialWeb: currentUser.socialWeb };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
 
@@ -2295,12 +2299,13 @@
       const avatarUrl = customData.avatarUrl || user.photoURL || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
       const bio = customData.bio || (isAdmin ? "Official Platform Admin" : "Standard Collector");
       const socialIg = customData.socialIg || '';
+      const socialTwitter = customData.socialTwitter || '';
       const socialTiktok = customData.socialTiktok || '';
       const socialWeb = customData.socialWeb || '';
 
-      currentUser = { name, username, email, isAdmin, isPlusMember, avatarUrl, bio, socialIg, socialTiktok, socialWeb };
+      currentUser = { name, username, email, isAdmin, isPlusMember, avatarUrl, bio, socialIg, socialTwitter, socialTiktok, socialWeb };
 
-      const profilePayload = { name, username, avatarUrl, bio, isPlusMember, socialIg, socialTiktok, socialWeb };
+      const profilePayload = { name, username, avatarUrl, bio, isPlusMember, socialIg, socialTwitter, socialTiktok, socialWeb };
       localStorage.setItem(`profile_${email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${email}`, profilePayload, 30);
       try {
@@ -2329,6 +2334,7 @@
       document.getElementById('profile-edit-avatar-input').value = currentUser.avatarUrl || '';
       document.getElementById('profile-edit-bio-input').value = currentUser.bio || '';
       document.getElementById('profile-edit-ig-input').value = currentUser.socialIg || '';
+      document.getElementById('profile-edit-twitter-input').value = currentUser.socialTwitter || '';
       document.getElementById('profile-edit-tiktok-input').value = currentUser.socialTiktok || '';
       document.getElementById('profile-edit-web-input').value = currentUser.socialWeb || '';
       document.getElementById('profile-modal-avatar-preview').src = currentUser.avatarUrl || '';
@@ -2375,6 +2381,7 @@
       const newAvatar = document.getElementById('profile-edit-avatar-input').value.trim() || currentUser.avatarUrl;
       const newBio = document.getElementById('profile-edit-bio-input').value.trim();
       const newIg = document.getElementById('profile-edit-ig-input').value.trim();
+      const newTwitter = document.getElementById('profile-edit-twitter-input').value.trim();
       const newTiktok = document.getElementById('profile-edit-tiktok-input').value.trim();
       const newWeb = document.getElementById('profile-edit-web-input').value.trim();
 
@@ -2383,11 +2390,12 @@
       currentUser.avatarUrl = newAvatar;
       currentUser.bio = newBio;
       currentUser.socialIg = newIg;
+      currentUser.socialTwitter = newTwitter;
       currentUser.socialTiktok = newTiktok;
       currentUser.socialWeb = newWeb;
       currentUser.isAdmin = isUserAdmin(newName) || isUserAdmin(currentUser.email) || isUserAdmin(newUsername);
 
-      const profilePayload = { name: newName, username: newUsername, avatarUrl: newAvatar, bio: newBio, isPlusMember: false, socialIg: newIg, socialTiktok: newTiktok, socialWeb: newWeb };
+      const profilePayload = { name: newName, username: newUsername, avatarUrl: newAvatar, bio: newBio, isPlusMember: false, socialIg: newIg, socialTwitter: newTwitter, socialTiktok: newTiktok, socialWeb: newWeb };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
 
@@ -3507,6 +3515,11 @@
         if (collectorProfile.socialIg) {
           const igVal = collectorProfile.socialIg.startsWith('http') ? collectorProfile.socialIg : `https://instagram.com/${collectorProfile.socialIg.replace('@', '')}`;
           linksHtml += `<a href="${igVal}" target="_blank" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-rose-400 border border-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"><i class="fa-brands fa-instagram"></i> Instagram</a>`;
+        }
+
+        if (collectorProfile.socialTwitter) {
+          const twitterVal = collectorProfile.socialTwitter.startsWith('http') ? collectorProfile.socialTwitter : `https://twitter.com/${collectorProfile.socialTwitter.replace('@', '')}`;
+          linksHtml += `<a href="${twitterVal}" target="_blank" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"><i class="fa-brands fa-x-twitter"></i> X / Twitter</a>`;
         }
 
         if (collectorProfile.socialTiktok) {
