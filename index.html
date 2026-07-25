@@ -141,7 +141,7 @@
     </div>
   </header>
 
-  <!-- FIXED FLOATING NOTIFICATION OVERLAY PANEL (TOP-RIGHT VIEWPORT) -->
+  <!-- FIXED FLOATING NOTIFICATION OVERLAY PANEL -->
   <div id="notification-dropdown" class="fixed top-16 right-4 sm:right-8 w-80 sm:w-96 bg-slate-900/95 border border-amber-500/40 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-[9999] hidden overflow-hidden backdrop-blur-xl">
     <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
       <div class="flex items-center gap-2">
@@ -426,7 +426,7 @@
 
   </main>
 
-  <!-- NON-BLOCKING FLOATING IMPORT PROGRESS WIDGET (BOTTOM RIGHT) -->
+  <!-- NON-BLOCKING FLOATING IMPORT PROGRESS WIDGET -->
   <div id="loading-modal" class="fixed bottom-6 right-6 z-[9999] hidden pointer-events-auto">
     <div class="bg-slate-900/95 border border-indigo-500/40 rounded-2xl max-w-xs w-80 p-4 space-y-3 shadow-2xl backdrop-blur-xl relative">
       <div class="flex items-center justify-between">
@@ -735,7 +735,6 @@
     let ownerOptionsList = [];
     let systemNotifications = [];
 
-    // Scroll Pagination Variables
     let visibleCardCount = 10;
     const CARDS_PER_BATCH = 10;
     let scrollObserver = null;
@@ -767,7 +766,6 @@
       document.cookie = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
     }
 
-    // Local Storage & Cookie Dual Backup for Overrides
     function getCardOverrides() {
       try {
         const savedLocal = localStorage.getItem('eugene_cards_override');
@@ -795,7 +793,7 @@
       });
     }
 
-    /* NOTIFICATION LOGIC WITH COOKIES LOGGING */
+    /* NOTIFICATION LOGIC */
     function loadNotifications() {
       try {
         const savedLocal = localStorage.getItem('eugene_notifications');
@@ -896,7 +894,7 @@
       return applyCardOverrides(defaultList);
     }
 
-    /* HIGH-PERFORMANCE OPTIMIZED BACKUP & BULK IMPORT */
+    /* BACKUP & BULK IMPORT */
     function exportInventoryBackup() {
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
 
@@ -999,10 +997,8 @@
             });
           });
 
-          // Save to local cache first for instant persistence across refreshes
           saveCardOverrides(overrides);
 
-          // Fast Bulk Upsert in Chunks of 25 items
           const BATCH_SIZE = 25;
           let processed = 0;
           let errors = 0;
@@ -1028,7 +1024,7 @@
 
               processed += chunk.length;
               updateImportProgress(processed, bulkDatabasePayload.length, `Batch complete (${processed}/${bulkDatabasePayload.length})`);
-              await new Promise(r => setTimeout(r, 10)); // Yield main UI thread
+              await new Promise(r => setTimeout(r, 10));
             }
           }
 
@@ -1144,6 +1140,9 @@
     async function loadAppState() {
       let loadedFromDb = false;
 
+      // 1. Instantly apply locally saved overrides to eliminate reload flickering
+      const localOverrides = getCardOverrides();
+
       if (supabaseClient) {
         try {
           const { data, error } = await supabaseClient
@@ -1170,10 +1169,11 @@
             loadedFromDb = true;
           }
         } catch (err) {
-          console.warn('Supabase fetch exception, falling back to cached overrides:', err);
+          console.warn('Supabase fetch exception, using cached state:', err);
         }
       }
 
+      // 2. Fall back to default stock with local overrides applied if Supabase is empty/offline
       if (!loadedFromDb || inventory.length === 0) {
         inventory = initDefaultInventory();
       } else {
@@ -1184,11 +1184,9 @@
       updateAllViews();
     }
 
-    // Prevents cross-client refreshes when someone else opens or reloads the page
     function setupRealtimeSync() {
       if (!supabaseClient) return;
       
-      // Transactions live update only (won't interrupt card views)
       supabaseClient
         .channel('public:transactions')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
@@ -1379,7 +1377,7 @@
       addNotification('Profile Updated', 'Your collector profile details were saved.', 'fa-user-gear text-amber-400');
     }
 
-    /* RENDER CARD GRID WITH LAZY LOADING & SCROLL PAGINATION */
+    /* RENDER CARD GRID WITH LAZY LOADING */
     function renderCardGrid() {
       const grid = document.getElementById('card-grid');
       if (!grid) return;
@@ -1685,7 +1683,8 @@
         try {
           await supabaseClient
             .from('cards')
-            .update({
+            .upsert({
+              id: cardId,
               name: updatedName,
               serial: updatedSerial,
               type: updatedType,
@@ -1697,8 +1696,7 @@
               sn: updatedSn,
               tier: updatedTier,
               printing: updatedPrinting
-            })
-            .eq('id', cardId);
+            });
         } catch (e) {
           console.warn('Supabase DB sync exception, persisted locally:', e);
         }
