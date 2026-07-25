@@ -432,13 +432,27 @@
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub & Revenue Dashboard</h2>
-          <p class="text-xs text-slate-400 mt-1">Review customer QRIS payments, verify earnings, and approve transactions.</p>
+          <p class="text-xs text-slate-400 mt-1">Review customer QRIS payments, verify earnings, and manage support chats.</p>
         </div>
-        <button onclick="loadPendingTransactions()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-rotate"></i> Refresh Queue
+        <button onclick="refreshAdminHub()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-rotate"></i> Refresh Hub
         </button>
       </div>
 
+      <!-- ADMIN CHAT INBOX -->
+      <div class="bg-slate-900 border border-indigo-500/30 rounded-3xl p-6 space-y-4">
+        <div class="flex justify-between items-center">
+          <h4 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-headset text-amber-400"></i> Incoming Admin Support & Income Chats
+          </h4>
+          <span class="text-[10px] text-slate-400 font-mono">Live Firestore Threads</span>
+        </div>
+        <div id="admin-chat-inbox-list" class="space-y-2 max-h-60 overflow-y-auto">
+          <p class="text-xs text-slate-500">Loading support chat threads...</p>
+        </div>
+      </div>
+
+      <!-- PENDING ORDERS -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
         <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending Orders Requiring Action</h4>
         <div id="admin-pending-orders-list" class="space-y-3">
@@ -1017,15 +1031,36 @@
 
     function chatToAdmin() {
       if (!currentUser) return showToast('Please log in first.');
-      openDirectChat('Admin Support', 'Platform Settlement & Admin Support');
+      
+      if (currentUser.isAdmin) {
+        switchTab('admin');
+        showToast('Viewing Admin Support Inbox.');
+      } else {
+        openDirectChat('Admin Support', 'Platform Settlement & Admin Support');
+      }
     }
 
     function openDirectChat(targetUserName, contextInfo = 'Trade Chat') {
       if (!currentUser) return showToast('Please log in to start a chat.');
-      if (currentUser.name === targetUserName) return showToast('Cannot chat with yourself.');
+      if (currentUser.name === targetUserName && !currentUser.isAdmin) {
+        return showToast('Cannot chat with yourself.');
+      }
 
       currentChatTargetUser = targetUserName;
-      const participants = [currentUser.name, targetUserName].sort();
+
+      let participants;
+      if (targetUserName === 'Admin Support' || (currentUser.isAdmin && targetUserName !== currentUser.name)) {
+        if (!currentUser.isAdmin && targetUserName === 'Admin Support') {
+          participants = ['Admin Support', currentUser.name].sort();
+        } else if (currentUser.isAdmin) {
+          participants = ['Admin Support', targetUserName].sort();
+        } else {
+          participants = [currentUser.name, targetUserName].sort();
+        }
+      } else {
+        participants = [currentUser.name, targetUserName].sort();
+      }
+
       currentChatContextId = `chat-${participants.join('-vs-')}`;
 
       document.getElementById('chat-target-user-name').innerText = targetUserName;
@@ -1495,7 +1530,10 @@
 
       db.collection("transactions").onSnapshot((snapshot) => {
         fetchTransactionHistory();
-        if (currentUser?.isAdmin) loadPendingTransactions();
+        if (currentUser?.isAdmin) {
+          loadPendingTransactions();
+          loadAdminChatInbox();
+        }
       });
     }
 
@@ -2409,7 +2447,17 @@
         return;
       }
 
-      const myIncomingOffers = tradeRequestsList.filter(r => r.targetOwner === currentUser.name && (r.status === 'PENDING' || r.status === 'COUNTERED'));
+      const myIncomingOffers = tradeRequestsList.filter(r => {
+        const isTargetedToMe = r.targetOwner === currentUser.name;
+        const isAdminTarget = currentUser.isAdmin && (
+          !r.targetOwner || 
+          r.targetOwner === 'Admin' || 
+          r.targetOwner === 'Admin House' || 
+          r.targetOwner === 'Admin Support' || 
+          r.targetOwner === 'Unowned'
+        );
+        return (isTargetedToMe || isAdminTarget) && (r.status === 'PENDING' || r.status === 'COUNTERED');
+      });
 
       if (myIncomingOffers.length === 0) {
         grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No pending incoming trade offers for your cards right now.</div>`;
@@ -2692,6 +2740,12 @@
       }
     }
 
+    function refreshAdminHub() {
+      loadPendingTransactions();
+      loadAdminChatInbox();
+      showToast('Admin Hub refreshed.');
+    }
+
     function switchTab(tabName) {
       const adminTabs = ['admin', 'inventory'];
       if (adminTabs.includes(tabName) && !currentUser?.isAdmin) {
@@ -2718,7 +2772,10 @@
       if (tabName === 'dashboard') renderOwnedCards();
       if (tabName === 'wishlist') renderWishlistPage();
       if (tabName === 'inventory') renderInventoryTable();
-      if (tabName === 'admin') loadPendingTransactions();
+      if (tabName === 'admin') {
+        loadPendingTransactions();
+        loadAdminChatInbox();
+      }
       if (tabName === 'holders') renderHoldersTable();
       if (tabName === 'history') fetchTransactionHistory();
       if (tabName === 'trade') fetchListings();
@@ -2851,19 +2908,72 @@
       `).join('');
     }
 
+    async function loadAdminChatInbox() {
+      const container = document.getElementById('admin-chat-inbox-list');
+      if (!container || !currentUser?.isAdmin) return;
+
+      try {
+        const snapshot = await db.collection("chats").get();
+        if (snapshot.empty) {
+          container.innerHTML = `<p class="text-xs text-slate-500">No active support chat threads.</p>`;
+          return;
+        }
+
+        const chats = [];
+        snapshot.forEach(doc => {
+          if (doc.id.includes('Admin Support') || doc.id.includes(currentUser.name)) {
+            chats.push({ id: doc.id });
+          }
+        });
+
+        if (chats.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-500">No active support chat threads found.</p>`;
+          return;
+        }
+
+        container.innerHTML = chats.map(c => {
+          const parts = c.id.replace('chat-', '').split('-vs-');
+          const otherUser = parts.find(p => p !== 'Admin Support' && p !== currentUser.name) || 'Collector';
+
+          return `
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+              <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-user-circle text-amber-400 text-base"></i>
+                <div>
+                  <p class="font-bold text-white">${otherUser}</p>
+                  <p class="text-[10px] text-slate-500 font-mono">${c.id}</p>
+                </div>
+              </div>
+              <button onclick="openDirectChat('${otherUser}', 'Admin Support Thread')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-lg transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-comments"></i> Open Chat
+              </button>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.warn('Error loading admin chat inbox:', e);
+      }
+    }
+
     async function loadPendingTransactions() {
       const container = document.getElementById('admin-pending-orders-list');
       if (!container) return;
 
       try {
-        const snapshot = await db.collection("transactions").where("status", "==", "PENDING").get();
-        if (snapshot.empty) {
+        const snapshot = await db.collection("transactions").get();
+        const pendingList = [];
+        
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.status === 'PENDING') {
+            pendingList.push({ id: doc.id, ...data });
+          }
+        });
+
+        if (pendingList.length === 0) {
           container.innerHTML = `<p class="text-xs text-slate-500">No pending transactions requiring approval.</p>`;
           return;
         }
-
-        const pendingList = [];
-        snapshot.forEach(doc => pendingList.push({ id: doc.id, ...doc.data() }));
 
         container.innerHTML = pendingList.map(order => {
           let items = Array.isArray(order.items) ? order.items : [];
