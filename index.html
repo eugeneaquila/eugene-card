@@ -51,9 +51,23 @@
     ::-webkit-scrollbar-track { background: #030712; }
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
   </style>
-<!-- Header -->
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black relative">
+
+  <!-- Embedded Logo SVG -->
+  <svg style="display: none;">
+    <defs>
+      <g id="eugene-logo-mark">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#4f46e5" stroke-width="5" stroke-dasharray="210 50" transform="rotate(-45 50 50)"/>
+        <polygon points="50,18 80,35 80,68 50,85 20,68 20,35" fill="#6366f1"/>
+        <path d="M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    </defs>
+  </svg>
+
+  <!-- Header -->
   <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
       <!-- Brand Logo -->
       <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="switchTab('catalog')">
@@ -112,32 +126,13 @@
       <!-- Cart, Notifications & Auth Header -->
       <div class="flex items-center gap-2 shrink-0">
         
-        <!-- NOTIFICATION BUTTON -->
+        <!-- SINGLE NOTIFICATION BUTTON IN HEADER -->
         <button id="notif-toggle-btn" onclick="toggleNotificationMenu()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
           <i class="fa-solid fa-bell text-sm text-amber-400"></i>
           <span id="notification-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-indigo-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
         </button>
 
-        <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
-          <i class="fa-solid fa-cart-shopping text-sm text-amber-400"></i>
-          <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
-        </button>
-
-        <div id="auth-header-container"></div>
-      </div>
-
-    </div>
-  </header>      </nav>
-
-      <!-- Cart, Notifications & Auth Header -->
-      <div class="flex items-center gap-2">
-        
-        <!-- NOTIFICATION BUTTON -->
-        <button onclick="toggleNotificationMenu()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
-          <i class="fa-solid fa-bell text-sm text-amber-400"></i>
-          <span id="notification-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-indigo-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
-        </button>
-
+        <!-- CART BUTTON IN HEADER -->
         <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
           <i class="fa-solid fa-cart-shopping text-sm text-amber-400"></i>
           <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
@@ -149,8 +144,8 @@
     </div>
   </header>
 
-  <!-- FIXED UPPER-RIGHT NOTIFICATION OVERLAY PANEL -->
-  <div id="notification-dropdown" class="fixed top-16 right-4 sm:right-6 w-80 sm:w-96 bg-slate-900 border border-amber-500/30 rounded-2xl shadow-2xl z-50 hidden overflow-hidden backdrop-blur-lg">
+  <!-- FIXED FLOATING NOTIFICATION OVERLAY PANEL (TOP-RIGHT VIEWPORT) -->
+  <div id="notification-dropdown" class="fixed top-16 right-4 sm:right-8 w-80 sm:w-96 bg-slate-900/95 border border-amber-500/40 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-[9999] hidden overflow-hidden backdrop-blur-xl">
     <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-cookie-bite text-xs text-amber-400"></i>
@@ -158,7 +153,7 @@
       </div>
       <div class="flex items-center gap-3">
         <button onclick="clearNotifications()" class="text-[10px] font-bold text-slate-400 hover:text-rose-400 transition-colors">Clear All</button>
-        <button onclick="toggleNotificationMenu()" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="toggleNotificationMenu()" class="text-slate-400 hover:text-white text-xs p-1"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
     
@@ -1259,14 +1254,14 @@
       document.addEventListener('click', (e) => {
         const trigger = document.getElementById('owner-dropdown-trigger');
         const menu = document.getElementById('owner-dropdown-menu');
-        const notifBtn = e.target.closest('button');
+        const notifBtn = document.getElementById('notif-toggle-btn');
         const notifDropdown = document.getElementById('notification-dropdown');
 
         if (trigger && menu && !trigger.contains(e.target) && !menu.contains(e.target)) {
           menu.classList.add('hidden');
         }
 
-        if (notifDropdown && !notifDropdown.contains(e.target) && (!notifBtn || !notifBtn.getAttribute('onclick')?.includes('toggleNotificationMenu'))) {
+        if (notifDropdown && notifBtn && !notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
           notifDropdown.classList.add('hidden');
         }
       });
