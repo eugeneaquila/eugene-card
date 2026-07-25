@@ -1245,7 +1245,6 @@
       if (!nameOrUsername) return null;
       const key = nameOrUsername.toLowerCase().trim();
       
-      // Check global profiles cache
       for (let emailKey in globalCollectorProfiles) {
         const p = globalCollectorProfiles[emailKey];
         if (p.name?.toLowerCase() === key || p.username?.toLowerCase() === key || emailKey.toLowerCase() === key) {
@@ -1253,7 +1252,6 @@
         }
       }
 
-      // Check localStorage/cookie cache
       try {
         for (let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i);
@@ -1289,7 +1287,6 @@
       
       const newUsername = personaName.toLowerCase().replace(/\s+/g, '_');
       
-      // Verify username uniqueness against other accounts
       let isTaken = false;
       for (let emailKey in globalCollectorProfiles) {
         if (emailKey !== currentUser.email) {
@@ -1390,7 +1387,7 @@
       }
 
       list.innerHTML = systemNotifications.map(n => `
-        <div class="p-3 hover:bg-slate-950/80 transition-colors flex items-start gap-3 text-xs">
+        <div class="p-3 hover:bg-slate-950/85 transition-colors flex items-start gap-3 text-xs">
           <div class="mt-0.5 p-2 rounded-xl bg-slate-950 border border-slate-800"><i class="fa-solid ${n.iconClass}"></i></div>
           <div class="flex-1 space-y-0.5">
             <div class="flex justify-between items-center">
@@ -1641,10 +1638,13 @@
         }
 
         const myThreads = [];
+        const myName = (currentUser.name || '').trim().toLowerCase();
+        const myUsername = (currentUser.username || '').trim().toLowerCase();
+
         snapshot.forEach(doc => {
           const chatId = doc.id;
-          const myIdent = currentUser.username || currentUser.name;
-          if (chatId.includes(myIdent) || currentUser.isAdmin) {
+          const lowerChatId = chatId.toLowerCase();
+          if (currentUser.isAdmin || lowerChatId.includes(myName) || (myUsername && lowerChatId.includes(myUsername))) {
             myThreads.push({ id: chatId, ...doc.data() });
           }
         });
@@ -1656,8 +1656,7 @@
 
         container.innerHTML = myThreads.map(c => {
           const rawNames = c.id.replace('chat-', '').split('-vs-');
-          const myIdent = currentUser.username || currentUser.name;
-          const otherUser = rawNames.find(name => name !== myIdent) || (rawNames[0] || 'Collector');
+          const otherUser = rawNames.find(name => name.toLowerCase() !== myName && name.toLowerCase() !== myUsername) || (rawNames[0] || 'Collector');
           const lastMsg = c.lastMessage || 'Click to view conversation';
           const isOtherAdmin = isUserAdmin(otherUser);
           const otherUserAvatar = getCollectorAvatar(otherUser);
@@ -1682,7 +1681,7 @@
         }).join('');
       }, err => {
         console.warn('Inbox snapshot error:', err);
-        container.innerHTML = `<p class="text-xs text-rose-400 text-center py-10">Error fetching inbox messages.</p>`;
+        container.innerHTML = `<p class="text-xs text-rose-400 text-center py-10">Error fetching inbox messages. Check Firestore rules or connection.</p>`;
       });
     }
 
@@ -2279,7 +2278,6 @@
       const name = customData.name || resolvedName;
       let username = customData.username || name.toLowerCase().replace(/\s+/g, '_');
 
-      // Ensure username uniqueness
       let isTaken = false;
       for (let emailKey in globalCollectorProfiles) {
         if (emailKey !== email) {
@@ -2361,7 +2359,6 @@
       const rawUsername = document.getElementById('profile-edit-username-input').value.trim();
       const newUsername = rawUsername ? rawUsername.replace(/^@/, '').toLowerCase().replace(/\s+/g, '_') : (currentUser.username || newName.toLowerCase().replace(/\s+/g, '_'));
 
-      // Verify global username uniqueness
       await loadCollectorProfiles();
       let isTaken = false;
       for (let emailKey in globalCollectorProfiles) {
