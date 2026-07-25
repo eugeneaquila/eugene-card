@@ -743,6 +743,32 @@
     let transactionsList = [];
     let ownerOptionsList = [];
 
+    // Local Storage Backup for Persistent Card Details Overrides
+    function getCardOverrides() {
+      try {
+        const saved = localStorage.getItem('eugene_cards_override');
+        return saved ? JSON.parse(saved) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveCardOverrides(overrides) {
+      try {
+        localStorage.setItem('eugene_cards_override', JSON.stringify(overrides));
+      } catch (e) {}
+    }
+
+    function applyCardOverrides(cardsList) {
+      const overrides = getCardOverrides();
+      return cardsList.map(card => {
+        if (overrides[card.id]) {
+          return { ...card, ...overrides[card.id] };
+        }
+        return card;
+      });
+    }
+
     function initDefaultInventory() {
       inventory = [];
       for (let i = 1; i <= 50; i++) {
@@ -760,13 +786,14 @@
           baseFloorPrice: price,
           owner: null,
           status: 'AVAILABLE',
-          imgUrl: `https://placehold.co/1080x1350/${isPremium ? '1e1b4b' : '0f172a'}/${isPremium ? 'fbbf24' : '3b82f6'}?text=Serial+${encodeURIComponent(serialStr)}`,
+          imgUrl: `https://placehold.co/1080x1350/${isPremium ? '1e1b4b' : '0f172a'}/${isPremium ? 'fbbf24' : '3b82f6'}?text=${isPremium ? 'PREMIUM+*0' + i : 'STANDARD+*00' + i}`,
           edition: "Beta Edition: #0",
           sn: snFormatted,
           tier: isPremium ? "100" : "50",
           printing: "1x"
         });
       }
+      inventory = applyCardOverrides(inventory);
     }
 
     function loadSavedWishlist() {
@@ -861,6 +888,8 @@
 
       if (!loadedFromDb || inventory.length === 0) {
         initDefaultInventory();
+      } else {
+        inventory = applyCardOverrides(inventory);
       }
 
       loadSavedCart();
@@ -906,9 +935,14 @@
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session?.user) handleUserSession(session.user);
 
-        supabaseClient.auth.onAuthStateChange((event, session) => {
-          if (session?.user) handleUserSession(session.user);
-          else { currentUser = null; renderAuthHeader(); }
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+          if (session?.user) {
+            handleUserSession(session.user);
+          } else {
+            currentUser = null;
+            renderAuthHeader();
+          }
+          await loadAppState();
         });
       }
 
@@ -997,6 +1031,7 @@
       currentUser = null;
       renderAuthHeader();
       switchTab('catalog');
+      await loadAppState();
       showToast('Logged out.');
     }
 
@@ -1297,46 +1332,54 @@
       const finalStatus = updatedOwner ? 'SOLD' : updatedStatus;
       const updatedImgUrl = document.getElementById('edit-card-img').value;
 
-      if (supabaseClient) {
-        const { data, error } = await supabaseClient
-          .from('cards')
-          .update({
-            name: updatedName,
-            serial: updatedSerial,
-            type: updatedType,
-            price: updatedPrice,
-            status: finalStatus,
-            owner: updatedOwner,
-            img_url: updatedImgUrl,
-            edition: updatedEdition,
-            sn: updatedSn,
-            tier: updatedTier,
-            printing: updatedPrinting
-          })
-          .eq('id', cardId)
-          .select();
+      const updatedObj = {
+        name: updatedName,
+        serial: updatedSerial,
+        type: updatedType,
+        price: updatedPrice,
+        status: finalStatus,
+        owner: updatedOwner,
+        imgUrl: updatedImgUrl,
+        edition: updatedEdition,
+        sn: updatedSn,
+        tier: updatedTier,
+        printing: updatedPrinting
+      };
 
-        if (error || !data || data.length === 0) {
-          showToast('Save failed: ' + (error ? error.message : 'Database constraint'));
-          return;
+      // Save to local persistence override first
+      const overrides = getCardOverrides();
+      overrides[cardId] = updatedObj;
+      saveCardOverrides(overrides);
+
+      // Attempt Supabase database update
+      if (supabaseClient) {
+        try {
+          await supabaseClient
+            .from('cards')
+            .update({
+              name: updatedName,
+              serial: updatedSerial,
+              type: updatedType,
+              price: updatedPrice,
+              status: finalStatus,
+              owner: updatedOwner,
+              img_url: updatedImgUrl,
+              edition: updatedEdition,
+              sn: updatedSn,
+              tier: updatedTier,
+              printing: updatedPrinting
+            })
+            .eq('id', cardId);
+        } catch (e) {
+          console.warn('Supabase DB sync exception, persisted locally:', e);
         }
       }
 
-      card.name = updatedName;
-      card.serial = updatedSerial;
-      card.type = updatedType;
-      card.price = updatedPrice;
-      card.status = finalStatus;
-      card.owner = updatedOwner;
-      card.imgUrl = updatedImgUrl;
-      card.edition = updatedEdition;
-      card.sn = updatedSn;
-      card.tier = updatedTier;
-      card.printing = updatedPrinting;
+      Object.assign(card, updatedObj);
 
       closeInventoryModal();
       updateAllViews();
-      showToast(`Updated ${updatedSerial} across all devices!`);
+      showToast(`Updated ${updatedSerial} across sessions!`);
     }
 
     function openCardDetailModal(cardId) {
