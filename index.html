@@ -211,7 +211,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             <div class="bg-slate-950 rounded-2xl border border-amber-500/40 p-3 text-center flex flex-col items-center">
               <div class="w-full aspect-[4/5] max-h-64 bg-slate-900 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center mb-2">
-                <img id="auction-card-img" src="https://placehold.co/1080x1350/1e1b4b/fbbf24?text=Serial+*01" class="w-full h-full object-contain">
+                <img id="auction-card-img" src="https://placehold.co/1080x1350/1e1b4b/fbbf24?text=Serial+*01" loading="lazy" class="w-full h-full object-contain">
               </div>
               <p id="auction-card-serial" class="text-2xl font-black text-amber-400 font-mono">*01</p>
             </div>
@@ -570,7 +570,7 @@
 
       <div class="w-full max-w-[220px] aspect-[4/5] mx-auto bg-slate-950 rounded-2xl border border-slate-800 p-2 text-center flex flex-col items-center justify-between shadow-inner">
         <div class="w-full h-48 bg-slate-900 rounded-xl overflow-hidden flex items-center justify-center">
-          <img id="detail-card-img" src="" class="w-full h-full object-contain">
+          <img id="detail-card-img" src="" loading="lazy" class="w-full h-full object-contain">
         </div>
         <p id="detail-card-serial" class="text-xl font-black text-amber-400 font-mono mt-1">*01</p>
       </div>
@@ -685,6 +685,11 @@
     let transactionsList = [];
     let ownerOptionsList = [];
 
+    // Scroll Pagination Variables
+    let visibleCardCount = 10; // Initially render ~2 rows
+    const CARDS_PER_BATCH = 10; // Load 2 rows per batch on scroll
+    let scrollObserver = null;
+
     // Local Storage Backup for Persistent Overrides
     function getCardOverrides() {
       try {
@@ -717,15 +722,11 @@
         const isPremium = i <= 25;
         const cardNum = isPremium ? i : i - 25;
         
-        // Premium: card-01 to card-025, *01 to *025
-        // Standard: card-001 to card-0025, *001 to *0025
         const padLen = isPremium ? (cardNum < 10 ? 2 : 3) : (cardNum < 10 ? 3 : 4);
         const paddedNum = String(cardNum).padStart(padLen, '0');
         
         const cardId = `card-${paddedNum}`;
         const serialStr = `*${paddedNum}`;
-        
-        // FIXED: Uses cardNum so SN matches the card number (0001 to 0025)
         const snFormatted = String(cardNum).padStart(4, '0');
         
         const price = isPremium ? 500000 : 100000;
@@ -797,7 +798,6 @@
             return;
           }
 
-          // 1. Save Overrides locally
           const overrides = {};
           importedCards.forEach(c => {
             overrides[c.id] = {
@@ -816,7 +816,6 @@
           });
           saveCardOverrides(overrides);
 
-          // 2. Sync to Supabase DB if connected
           if (supabaseClient) {
             const dbPayload = importedCards.map(c => ({
               id: c.id,
@@ -840,7 +839,6 @@
             }
           }
 
-          // 3. Reload App State
           await loadAppState();
           showToast(`Successfully imported ${importedCards.length} cards!`);
         } catch (err) {
@@ -896,7 +894,10 @@
     let debounceTimer;
     function debouncedRenderCardGrid() {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(renderCardGrid, 150);
+      debounceTimer = setTimeout(() => {
+        visibleCardCount = 10; // Reset scroll slice on search input
+        renderCardGrid();
+      }, 150);
     }
 
     async function loadAppState() {
@@ -1128,6 +1129,7 @@
       showToast('Profile updated!');
     }
 
+    /* RENDER CARD GRID WITH LAZY LOADING & SCROLL PAGINATION */
     function renderCardGrid() {
       const grid = document.getElementById('card-grid');
       if (!grid) return;
@@ -1144,7 +1146,9 @@
         return;
       }
 
-      grid.innerHTML = filtered.map(card => {
+      const visibleCards = filtered.slice(0, visibleCardCount);
+
+      grid.innerHTML = visibleCards.map(card => {
         const isPremium = card.type === 'PREMIUM';
         const isSold = card.status === 'SOLD';
         const isWishlisted = wishlist.has(card.id);
@@ -1160,7 +1164,7 @@
 
             <div class="w-full aspect-[4/5] bg-slate-950/80 rounded-xl border border-slate-800 p-1.5 flex flex-col justify-between mb-2 text-center overflow-hidden">
               <div class="w-full h-full flex items-center justify-center overflow-hidden rounded-lg bg-slate-900">
-                <img src="${card.imgUrl}" class="w-full h-full object-contain">
+                <img src="${card.imgUrl}" loading="lazy" class="w-full h-full object-contain">
               </div>
             </div>
 
@@ -1182,10 +1186,34 @@
           </div>
         `;
       }).join('');
+
+      if (visibleCardCount < filtered.length) {
+        grid.innerHTML += `<div id="scroll-sentinel" class="col-span-full h-10 flex items-center justify-center text-xs text-slate-500 font-mono">Loading more cards...</div>`;
+        setupScrollSentinel(filtered.length);
+      }
+    }
+
+    function setupScrollSentinel(totalFilteredLength) {
+      if (scrollObserver) scrollObserver.disconnect();
+
+      const sentinel = document.getElementById('scroll-sentinel');
+      if (!sentinel) return;
+
+      scrollObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          if (visibleCardCount < totalFilteredLength) {
+            visibleCardCount += CARDS_PER_BATCH;
+            renderCardGrid();
+          }
+        }
+      }, { rootMargin: '100px' });
+
+      scrollObserver.observe(sentinel);
     }
 
     function setFilter(type) {
       currentFilter = type;
+      visibleCardCount = 10; // Reset scroll slice
       ['ALL', 'PREMIUM', 'STANDARD'].forEach(f => {
         const btn = document.getElementById(`filter-${f}`);
         if (btn) btn.className = f === type ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all' : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
@@ -1591,7 +1619,10 @@
       if (tabName === 'admin') loadPendingTransactions();
       if (tabName === 'holders') renderHoldersTable();
       if (tabName === 'history') fetchTransactionHistory();
-      if (tabName === 'catalog') renderCardGrid();
+      if (tabName === 'catalog') {
+        visibleCardCount = 10;
+        renderCardGrid();
+      }
     }
 
     function renderOwnedCards() {
@@ -1612,7 +1643,7 @@
       grid.innerHTML = owned.map(card => `
         <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-between space-y-2 cursor-pointer" onclick="openCardDetailModal('${card.id}')">
           <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 overflow-hidden flex items-center justify-center">
-            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded-lg">
+            <img src="${card.imgUrl}" loading="lazy" class="w-full h-full object-contain rounded-lg">
           </div>
           <div>
             <p class="font-bold text-xs text-white truncate">${card.name}</p>
@@ -1634,7 +1665,7 @@
       grid.innerHTML = items.map(card => `
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between cursor-pointer" onclick="openCardDetailModal('${card.id}')">
           <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 overflow-hidden flex items-center justify-center mb-2">
-            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded-lg">
+            <img src="${card.imgUrl}" loading="lazy" class="w-full h-full object-contain rounded-lg">
           </div>
           <p class="font-bold text-xs text-white truncate">${card.name}</p>
           <p class="font-mono text-amber-400 text-xs font-black">${card.serial}</p>
@@ -1719,7 +1750,6 @@
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
       if (!supabaseClient) return;
 
-      // 1. Fetch order details to transfer cards
       const { data: order } = await supabaseClient.from('transactions').select('*').eq('id', orderId).single();
       if (order && Array.isArray(order.items)) {
         for (const item of order.items) {
@@ -1729,7 +1759,6 @@
         }
       }
 
-      // 2. Mark order status APPROVED
       await supabaseClient.from('transactions').update({ status: 'APPROVED' }).eq('id', orderId);
       
       showToast(`Transaction ${orderId} approved and items transferred!`);
