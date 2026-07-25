@@ -462,6 +462,22 @@
         </button>
       </div>
 
+      <!-- COLLECTOR SOCIAL LINKS CARD (CLICKABLE) -->
+      <div id="collector-social-banner" class="hidden bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <img id="dashboard-banner-avatar" src="" class="w-12 h-12 rounded-full object-cover border-2 border-amber-500/40 bg-slate-950">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="dashboard-banner-name" class="text-sm font-extrabold text-white">Collector Name</h3>
+              <span id="dashboard-banner-username" class="text-xs font-mono text-amber-400">@username</span>
+            </div>
+            <p id="dashboard-banner-bio" class="text-xs text-slate-400 mt-0.5">Collector Bio</p>
+          </div>
+        </div>
+
+        <div id="dashboard-banner-links" class="flex items-center gap-2"></div>
+      </div>
+
       <div id="owned-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
     </section>
 
@@ -740,18 +756,18 @@
 
         <!-- SOCIAL MEDIA LINKS (OPTIONAL) -->
         <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-          <label class="block font-bold text-amber-400 uppercase text-[10px]"><i class="fa-solid fa-share-nodes mr-1"></i> Social Media Links (Optional)</label>
+          <label class="block font-bold text-amber-400 uppercase text-[10px]"><i class="fa-solid fa-share-nodes mr-1"></i> Social Media & Links (Optional)</label>
           <div>
             <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-instagram text-rose-400 mr-1"></i> Instagram Handle / URL</label>
-            <input type="text" id="profile-edit-ig-input" placeholder="e.g. @eugene_cards" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
+            <input type="text" id="profile-edit-ig-input" placeholder="e.g. @eugene_cards or https://instagram.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
           </div>
           <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-x-twitter text-slate-300 mr-1"></i> X / Twitter URL</label>
-            <input type="text" id="profile-edit-x-input" placeholder="e.g. x.com/eugene" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-tiktok text-cyan-400 mr-1"></i> TikTok Handle / URL</label>
+            <input type="text" id="profile-edit-tiktok-input" placeholder="e.g. @eugene_cards or https://tiktok.com/@..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
           </div>
           <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-solid fa-globe text-indigo-400 mr-1"></i> Portfolio / Website URL</label>
-            <input type="text" id="profile-edit-web-input" placeholder="e.g. eugenecards.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-solid fa-globe text-indigo-400 mr-1"></i> Website URL (Clickable)</label>
+            <input type="text" id="profile-edit-web-input" placeholder="e.g. https://eugenecards.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
           </div>
         </div>
 
@@ -1221,15 +1237,15 @@
       }
     }
 
-    function getCollectorAvatar(nameOrUsername) {
+    function getCollectorProfile(nameOrUsername) {
       if (!nameOrUsername) return null;
       const key = nameOrUsername.toLowerCase().trim();
       
       // Check global profiles cache
       for (let emailKey in globalCollectorProfiles) {
         const p = globalCollectorProfiles[emailKey];
-        if (p.name?.toLowerCase() === key || p.username?.toLowerCase() === key) {
-          if (p.avatarUrl) return p.avatarUrl;
+        if (p.name?.toLowerCase() === key || p.username?.toLowerCase() === key || emailKey.toLowerCase() === key) {
+          return p;
         }
       }
 
@@ -1240,12 +1256,23 @@
           if (k.startsWith('profile_')) {
             const val = JSON.parse(localStorage.getItem(k));
             if (val.name?.toLowerCase() === key || val.username?.toLowerCase() === key) {
-              if (val.avatarUrl) return val.avatarUrl;
+              return val;
             }
           }
         }
       } catch (e) {}
 
+      return null;
+    }
+
+    function getCollectorAvatar(nameOrUsername) {
+      if (!nameOrUsername) return null;
+      const profile = getCollectorProfile(nameOrUsername);
+      if (profile && profile.avatarUrl) {
+        return profile.avatarUrl;
+      }
+
+      const key = nameOrUsername.toLowerCase().trim();
       if (isUserAdmin(nameOrUsername)) {
         return `https://api.dicebear.com/7.x/identicon/svg?seed=admin_${key}`;
       }
@@ -1279,7 +1306,7 @@
       currentUser.isAdmin = isUserAdmin(personaName) || isUserAdmin(currentUser.email);
       currentUser.isPlusMember = false;
 
-      const profilePayload = { name: personaName, username: currentUser.username, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio, isPlusMember: false, socialIg: currentUser.socialIg, socialX: currentUser.socialX, socialWeb: currentUser.socialWeb };
+      const profilePayload = { name: personaName, username: currentUser.username, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio, isPlusMember: false, socialIg: currentUser.socialIg, socialTiktok: currentUser.socialTiktok, socialWeb: currentUser.socialWeb };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
 
@@ -2268,12 +2295,12 @@
       const avatarUrl = customData.avatarUrl || user.photoURL || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
       const bio = customData.bio || (isAdmin ? "Official Platform Admin" : "Standard Collector");
       const socialIg = customData.socialIg || '';
-      const socialX = customData.socialX || '';
+      const socialTiktok = customData.socialTiktok || '';
       const socialWeb = customData.socialWeb || '';
 
-      currentUser = { name, username, email, isAdmin, isPlusMember, avatarUrl, bio, socialIg, socialX, socialWeb };
+      currentUser = { name, username, email, isAdmin, isPlusMember, avatarUrl, bio, socialIg, socialTiktok, socialWeb };
 
-      const profilePayload = { name, username, avatarUrl, bio, isPlusMember, socialIg, socialX, socialWeb };
+      const profilePayload = { name, username, avatarUrl, bio, isPlusMember, socialIg, socialTiktok, socialWeb };
       localStorage.setItem(`profile_${email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${email}`, profilePayload, 30);
       try {
@@ -2302,7 +2329,7 @@
       document.getElementById('profile-edit-avatar-input').value = currentUser.avatarUrl || '';
       document.getElementById('profile-edit-bio-input').value = currentUser.bio || '';
       document.getElementById('profile-edit-ig-input').value = currentUser.socialIg || '';
-      document.getElementById('profile-edit-x-input').value = currentUser.socialX || '';
+      document.getElementById('profile-edit-tiktok-input').value = currentUser.socialTiktok || '';
       document.getElementById('profile-edit-web-input').value = currentUser.socialWeb || '';
       document.getElementById('profile-modal-avatar-preview').src = currentUser.avatarUrl || '';
 
@@ -2348,7 +2375,7 @@
       const newAvatar = document.getElementById('profile-edit-avatar-input').value.trim() || currentUser.avatarUrl;
       const newBio = document.getElementById('profile-edit-bio-input').value.trim();
       const newIg = document.getElementById('profile-edit-ig-input').value.trim();
-      const newX = document.getElementById('profile-edit-x-input').value.trim();
+      const newTiktok = document.getElementById('profile-edit-tiktok-input').value.trim();
       const newWeb = document.getElementById('profile-edit-web-input').value.trim();
 
       currentUser.name = newName;
@@ -2356,11 +2383,11 @@
       currentUser.avatarUrl = newAvatar;
       currentUser.bio = newBio;
       currentUser.socialIg = newIg;
-      currentUser.socialX = newX;
+      currentUser.socialTiktok = newTiktok;
       currentUser.socialWeb = newWeb;
       currentUser.isAdmin = isUserAdmin(newName) || isUserAdmin(currentUser.email) || isUserAdmin(newUsername);
 
-      const profilePayload = { name: newName, username: newUsername, avatarUrl: newAvatar, bio: newBio, isPlusMember: false, socialIg: newIg, socialX: newX, socialWeb: newWeb };
+      const profilePayload = { name: newName, username: newUsername, avatarUrl: newAvatar, bio: newBio, isPlusMember: false, socialIg: newIg, socialTiktok: newTiktok, socialWeb: newWeb };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
 
@@ -3453,6 +3480,7 @@
       const grid = document.getElementById('owned-cards-grid');
       const heading = document.getElementById('dashboard-heading');
       const subheading = document.getElementById('dashboard-subheading');
+      const socialBanner = document.getElementById('collector-social-banner');
       if (!grid) return;
 
       const activeUserIdent = currentUser ? (currentUser.username || currentUser.name) : '';
@@ -3460,7 +3488,40 @@
 
       if (!targetUser) {
         grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Please log in to view your binder.</div>`;
+        if (socialBanner) socialBanner.classList.add('hidden');
         return;
+      }
+
+      const collectorProfile = getCollectorProfile(targetUser) || (currentUser && (currentUser.name === targetUser || currentUser.username === targetUser) ? currentUser : null);
+
+      if (socialBanner && collectorProfile) {
+        socialBanner.classList.remove('hidden');
+        document.getElementById('dashboard-banner-avatar').src = collectorProfile.avatarUrl || getCollectorAvatar(targetUser);
+        document.getElementById('dashboard-banner-name').innerText = collectorProfile.name || targetUser;
+        document.getElementById('dashboard-banner-username').innerText = collectorProfile.username ? `@${collectorProfile.username}` : `@${targetUser}`;
+        document.getElementById('dashboard-banner-bio').innerText = collectorProfile.bio || 'Collector & Trading Card Enthusiast';
+
+        const linksContainer = document.getElementById('dashboard-banner-links');
+        let linksHtml = '';
+
+        if (collectorProfile.socialIg) {
+          const igVal = collectorProfile.socialIg.startsWith('http') ? collectorProfile.socialIg : `https://instagram.com/${collectorProfile.socialIg.replace('@', '')}`;
+          linksHtml += `<a href="${igVal}" target="_blank" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-rose-400 border border-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"><i class="fa-brands fa-instagram"></i> Instagram</a>`;
+        }
+
+        if (collectorProfile.socialTiktok) {
+          const tiktokVal = collectorProfile.socialTiktok.startsWith('http') ? collectorProfile.socialTiktok : `https://tiktok.com/@${collectorProfile.socialTiktok.replace('@', '')}`;
+          linksHtml += `<a href="${tiktokVal}" target="_blank" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-cyan-400 border border-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"><i class="fa-brands fa-tiktok"></i> TikTok</a>`;
+        }
+
+        if (collectorProfile.socialWeb) {
+          const webVal = collectorProfile.socialWeb.startsWith('http') ? collectorProfile.socialWeb : `https://${collectorProfile.socialWeb}`;
+          linksHtml += `<a href="${webVal}" target="_blank" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-indigo-400 border border-slate-800 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"><i class="fa-solid fa-globe"></i> Website</a>`;
+        }
+
+        linksContainer.innerHTML = linksHtml;
+      } else if (socialBanner) {
+        socialBanner.classList.add('hidden');
       }
 
       if (heading) {
@@ -3611,7 +3672,7 @@
                 </div>
                 <p class="text-white font-bold flex items-center gap-2">Buyer: <img src="${buyerAvatar}" class="w-5 h-5 rounded-full object-cover"> <span class="text-amber-300">${order.user_name}</span></p>
                 <p class="text-slate-400 text-[11px]">Items: <strong class="text-slate-200">${itemsListStr || 'N/A'}</strong></p>
-                <p class="text-emerald-400 font-mono font-black">${formatIDR(order.total_amount || 0)} <span class="text-[9px] text-amber-400 font-normal">(Includes 2% Tax)</span></p>
+                <p class="text-emerald-400 font-mono font-black">${formatIDR(order.total_amount || 0)} <span class="text-[9px] font-amber-400 font-normal">(Includes 2% Tax)</span></p>
                 ${proofPreview}
               </div>
               
