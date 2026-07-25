@@ -100,6 +100,9 @@
         <button id="nav-trade-req" onclick="switchTab('trade-req')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-handshake text-purple-400"></i> Trade Requests
         </button>
+        <button id="nav-trade-offers" onclick="switchTab('trade-offers')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+          <i class="fa-solid fa-envelope-open-text text-indigo-400"></i> Trade Offers
+        </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-users text-teal-400"></i> Holders
         </button>
@@ -287,6 +290,21 @@
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
+    <!-- TRADE OFFERS VIEW (FOR CARD OWNERS) -->
+    <section id="view-trade-offers" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-envelope-open-text text-indigo-400 mr-2"></i> Trade Offers Inbox</h2>
+          <p class="text-xs text-slate-400 mt-1">Review incoming buy and trade requests for your cards. Accept, reject, or send a counter offer.</p>
+        </div>
+        <button onclick="renderTradeOffersInbox()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-indigo-400 rounded-xl border border-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-rotate"></i> Refresh Inbox
+        </button>
+      </div>
+
+      <div id="trade-offers-inbox-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
     <!-- TRANSACTION HISTORY VIEW -->
     <section id="view-history" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -440,11 +458,18 @@
       <h3 id="list-modal-title" class="text-base font-extrabold text-white">List Card for Trade</h3>
       <input type="hidden" id="list-card-id-target">
       <input type="hidden" id="list-modal-mode" value="trade">
+      
       <div class="space-y-3 text-xs">
+        <div id="list-card-select-container" class="hidden">
+          <label class="block font-bold text-slate-400 mb-1">Select Card from Your Vault</label>
+          <select id="list-card-select-input" onchange="document.getElementById('list-card-id-target').value = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"></select>
+        </div>
+
         <div>
           <label class="block font-bold text-slate-400 mb-1" id="list-price-label">Asking Price (IDR)</label>
           <input type="number" id="list-card-price-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
         </div>
+
         <button onclick="submitCardListingModal()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl hover:bg-amber-400 transition-all">Publish Listing</button>
       </div>
     </div>
@@ -457,9 +482,24 @@
       <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Propose Card Offer</h3>
       
       <div class="space-y-3 text-xs">
-        <div>
-          <label class="block font-bold text-slate-400 mb-1">Select Card to Request</label>
-          <select id="trade-req-card-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500"></select>
+        <div class="relative">
+          <label class="block font-bold text-slate-400 mb-1">Select Card to Request (Search by Serial or Owner)</label>
+          <input type="hidden" id="trade-req-card-id" value="">
+          
+          <button type="button" id="trade-dropdown-trigger" onclick="toggleTradeCardDropdown()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-left text-white flex justify-between items-center focus:outline-none focus:border-purple-500">
+            <span id="trade-dropdown-label">Select a card...</span>
+            <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
+          </button>
+
+          <div id="trade-dropdown-menu" class="absolute top-full left-0 w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl shadow-2xl z-50 hidden overflow-hidden">
+            <div class="p-2 border-b border-slate-800">
+              <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
+                <input type="text" id="trade-search-input" oninput="filterTradeCardOptions()" placeholder="Search serial (*01) or owner..." class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-purple-500">
+              </div>
+            </div>
+            <div id="trade-dropdown-list" class="max-h-48 overflow-y-auto divide-y divide-slate-900"></div>
+          </div>
         </div>
 
         <div>
@@ -476,6 +516,24 @@
         </div>
 
         <button onclick="submitTradeRequest()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg">Submit Proposal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUNTER OFFER MODAL -->
+  <div id="counter-offer-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeCounterOfferModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-pen-to-square text-amber-400 mr-2"></i> Send Counter Offer</h3>
+      <input type="hidden" id="counter-req-id-target">
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Your Counter Terms / Revised Offer Notes</label>
+          <input type="text" id="counter-notes-input" placeholder="e.g. Counter offer: I want Rp 250.000 or *05 instead." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+
+        <button onclick="submitCounterOffer()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-lg">Submit Counter Offer</button>
       </div>
     </div>
   </div>
@@ -797,6 +855,7 @@
     let inventory = [];
     let transactionsList = [];
     let ownerOptionsList = [];
+    let tradeCardOptionsList = [];
     let systemNotifications = [];
     let activeListings = [];
     let activeAuction = null;
@@ -1212,6 +1271,7 @@
         tradeRequestsList = [];
         snapshot.forEach(doc => tradeRequestsList.push({ id: doc.id, ...doc.data() }));
         renderTradeRequests();
+        renderTradeOffersInbox();
       } catch (e) {
         console.warn('Fetch trade requests error:', e);
       }
@@ -1276,6 +1336,7 @@
       updateCartTotals();
       renderAuctionView();
       renderTradeRequests();
+      renderTradeOffersInbox();
     }
 
     function renderAuctionView() {
@@ -1346,13 +1407,19 @@
       });
 
       document.addEventListener('click', (e) => {
-        const trigger = document.getElementById('owner-dropdown-trigger');
-        const menu = document.getElementById('owner-dropdown-menu');
+        const ownerTrigger = document.getElementById('owner-dropdown-trigger');
+        const ownerMenu = document.getElementById('owner-dropdown-menu');
+        const tradeTrigger = document.getElementById('trade-dropdown-trigger');
+        const tradeMenu = document.getElementById('trade-dropdown-menu');
         const notifBtn = document.getElementById('notif-toggle-btn');
         const notifDropdown = document.getElementById('notification-dropdown');
 
-        if (trigger && menu && !trigger.contains(e.target) && !menu.contains(e.target)) {
-          menu.classList.add('hidden');
+        if (ownerTrigger && ownerMenu && !ownerTrigger.contains(e.target) && !ownerMenu.contains(e.target)) {
+          ownerMenu.classList.add('hidden');
+        }
+
+        if (tradeTrigger && tradeMenu && !tradeTrigger.contains(e.target) && !tradeMenu.contains(e.target)) {
+          tradeMenu.classList.add('hidden');
         }
 
         if (notifDropdown && notifBtn && !notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
@@ -1699,6 +1766,44 @@
       document.getElementById('owner-dropdown-menu').classList.add('hidden');
     }
 
+    function toggleTradeCardDropdown() {
+      const menu = document.getElementById('trade-dropdown-menu');
+      if (!menu) return;
+      if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        document.getElementById('trade-search-input').value = '';
+        filterTradeCardOptions();
+        document.getElementById('trade-search-input').focus();
+      } else {
+        menu.classList.add('hidden');
+      }
+    }
+
+    function filterTradeCardOptions() {
+      const query = (document.getElementById('trade-search-input')?.value || '').toLowerCase();
+      const listContainer = document.getElementById('trade-dropdown-list');
+      const selectedVal = document.getElementById('trade-req-card-id').value;
+      const filtered = tradeCardOptionsList.filter(item => item.searchText.includes(query));
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `<div class="p-3 text-center text-slate-500 text-[11px]">No matching cards found</div>`;
+        return;
+      }
+
+      listContainer.innerHTML = filtered.map(item => `
+        <div onclick="selectTradeCardOption('${item.value}', '${item.label}')" class="px-3 py-2 text-xs text-slate-200 hover:bg-purple-600 hover:text-white cursor-pointer flex justify-between items-center transition-colors ${selectedVal === item.value ? 'font-bold bg-slate-900 text-purple-400' : ''}">
+          <span>${item.label}</span>
+          ${selectedVal === item.value ? '<i class="fa-solid fa-check text-[10px]"></i>' : ''}
+        </div>
+      `).join('');
+    }
+
+    function selectTradeCardOption(value, label) {
+      document.getElementById('trade-req-card-id').value = value;
+      document.getElementById('trade-dropdown-label').innerText = label;
+      document.getElementById('trade-dropdown-menu').classList.add('hidden');
+    }
+
     function openInventoryModal(cardId) {
       const card = inventory.find(c => c.id === cardId);
       if (!card) return;
@@ -1848,6 +1953,25 @@
       }
     }
 
+    function openListCardForTradeModal() {
+      if (!currentUser) return showToast('Please log in first.');
+      const myCards = inventory.filter(c => c.owner === currentUser.name);
+      if (myCards.length === 0) return showToast('You do not own any cards to list.');
+
+      const selectEl = document.getElementById('list-card-select-input');
+      if (selectEl) {
+        selectEl.innerHTML = myCards.map(c => `<option value="${c.id}">${c.serial} - ${c.name}</option>`).join('');
+        document.getElementById('list-card-id-target').value = myCards[0].id;
+        document.getElementById('list-card-price-input').value = myCards[0].price;
+      }
+
+      document.getElementById('list-card-select-container')?.classList.remove('hidden');
+      document.getElementById('list-modal-title').innerText = 'List Card for Trade';
+      document.getElementById('list-price-label').innerText = 'Asking Price (IDR)';
+      document.getElementById('list-modal-mode').value = 'trade';
+      document.getElementById('list-card-modal').classList.remove('hidden');
+    }
+
     function openListCardModal(cardId, mode = 'trade') {
       if (!currentUser) return showToast('Please log in first.');
       const card = inventory.find(c => c.id === cardId);
@@ -1856,6 +1980,8 @@
       document.getElementById('list-card-id-target').value = cardId;
       document.getElementById('list-modal-mode').value = mode;
       document.getElementById('list-card-price-input').value = card.price;
+
+      document.getElementById('list-card-select-container')?.classList.add('hidden');
 
       if (mode === 'auction') {
         document.getElementById('list-modal-title').innerText = `List ${card.serial} for Auction`;
@@ -1877,7 +2003,7 @@
       const mode = document.getElementById('list-modal-mode').value;
       const price = parseFloat(document.getElementById('list-card-price-input').value);
       const card = inventory.find(c => c.id === cardId);
-      if (!card || !price) return showToast('Invalid details.');
+      if (!card || !price) return showToast('Please select a valid card and enter a price.');
 
       if (mode === 'auction') {
         const auctionData = {
@@ -1930,29 +2056,34 @@
 
     function openProposeTradeModal() {
       if (!currentUser) return showToast('Please log in first.');
-      const selectEl = document.getElementById('trade-req-card-select');
       
       const ownedByOthers = inventory.filter(c => c.owner && c.owner !== currentUser.name);
       if (ownedByOthers.length === 0) {
         return showToast('No cards owned by other collectors available to request right now.');
       }
 
-      selectEl.innerHTML = ownedByOthers.map(c => `
-        <option value="${c.id}">${c.serial} - ${c.name} (Owned by ${c.owner})</option>
-      `).join('');
+      tradeCardOptionsList = ownedByOthers.map(c => ({
+        value: c.id,
+        label: `${c.serial} - ${c.name} (${c.owner})`,
+        searchText: `${c.serial} ${c.name} ${c.owner}`.toLowerCase()
+      }));
 
+      selectTradeCardOption('', 'Select a card...');
       document.getElementById('propose-trade-modal').classList.remove('hidden');
     }
 
     function closeProposeTradeModal() {
       document.getElementById('propose-trade-modal').classList.add('hidden');
+      document.getElementById('trade-dropdown-menu')?.classList.add('hidden');
     }
 
     async function submitTradeRequest() {
       if (!currentUser) return showToast('Please log in.');
-      const cardId = document.getElementById('trade-req-card-select').value;
+      const cardId = document.getElementById('trade-req-card-id').value;
       const type = document.getElementById('trade-req-type-select').value;
       const notes = document.getElementById('trade-req-notes-input').value.trim() || 'Direct offer';
+
+      if (!cardId) return showToast('Please select a target card from the dropdown.');
 
       const card = inventory.find(c => c.id === cardId);
       if (!card || !card.owner) return showToast('Invalid card target.');
@@ -1968,6 +2099,7 @@
         proposer: currentUser.name,
         offerType: type,
         notes: notes,
+        status: 'PENDING',
         created_at: new Date().toISOString()
       };
 
@@ -1981,6 +2113,132 @@
       } catch (e) {
         showToast('Error submitting trade proposal: ' + e.message);
       }
+    }
+
+    async function acceptTradeRequest(reqId) {
+      if (!currentUser) return showToast('Please log in.');
+      const req = tradeRequestsList.find(r => r.id === reqId);
+      if (!req) return showToast('Proposal not found.');
+
+      if (req.targetOwner !== currentUser.name && !currentUser.isAdmin) {
+        return showToast('Only the card owner can accept this trade proposal.');
+      }
+
+      if (!confirm(`Accept trade request from ${req.proposer} for card ${req.serial}? Ownership will transfer to ${req.proposer}.`)) return;
+
+      try {
+        const batch = db.batch();
+        const cardRef = db.collection("cards").doc(req.cardId);
+        batch.update(cardRef, { owner: req.proposer, status: 'SOLD' });
+
+        const reqRef = db.collection("tradeRequests").doc(reqId);
+        batch.update(reqRef, { status: 'ACCEPTED' });
+
+        await batch.commit();
+
+        showToast(`Trade accepted! ${req.serial} has been transferred to ${req.proposer}.`);
+        addNotification('Trade Offer Accepted', `Transferred card ${req.serial} to ${req.proposer}.`, 'fa-check text-emerald-400');
+
+        await loadAppState();
+      } catch (e) {
+        showToast('Error accepting trade: ' + e.message);
+      }
+    }
+
+    async function rejectTradeRequest(reqId) {
+      if (!currentUser) return showToast('Please log in.');
+      const req = tradeRequestsList.find(r => r.id === reqId);
+      if (!req) return;
+
+      if (req.targetOwner !== currentUser.name && !currentUser.isAdmin) {
+        return showToast('Only the card owner can reject this proposal.');
+      }
+
+      if (!confirm('Reject this trade request?')) return;
+
+      try {
+        await db.collection("tradeRequests").doc(reqId).update({ status: 'REJECTED' });
+        showToast('Trade offer rejected.');
+        addNotification('Trade Offer Rejected', `Rejected offer from ${req.proposer} for ${req.serial}.`, 'fa-xmark text-rose-400');
+        await fetchTradeRequests();
+      } catch (e) {
+        showToast('Error rejecting trade: ' + e.message);
+      }
+    }
+
+    function openCounterOfferModal(reqId) {
+      const req = tradeRequestsList.find(r => r.id === reqId);
+      if (!req) return;
+
+      document.getElementById('counter-req-id-target').value = reqId;
+      document.getElementById('counter-notes-input').value = `Counter offer to ${req.proposer}: `;
+      document.getElementById('counter-offer-modal').classList.remove('hidden');
+    }
+
+    function closeCounterOfferModal() {
+      document.getElementById('counter-offer-modal').classList.add('hidden');
+    }
+
+    async function submitCounterOffer() {
+      const reqId = document.getElementById('counter-req-id-target').value;
+      const counterNotes = document.getElementById('counter-notes-input').value.trim();
+      const req = tradeRequestsList.find(r => r.id === reqId);
+
+      if (!req || !counterNotes) return showToast('Invalid details.');
+
+      try {
+        await db.collection("tradeRequests").doc(reqId).update({
+          notes: counterNotes,
+          status: 'COUNTERED'
+        });
+
+        closeCounterOfferModal();
+        showToast('Counter offer sent!');
+        addNotification('Counter Offer Sent', `Submitted counter offer for ${req.serial}.`, 'fa-pen-to-square text-amber-400');
+        await fetchTradeRequests();
+      } catch (e) {
+        showToast('Error submitting counter offer: ' + e.message);
+      }
+    }
+
+    function renderTradeOffersInbox() {
+      const grid = document.getElementById('trade-offers-inbox-grid');
+      if (!grid) return;
+
+      if (!currentUser) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Please log in to view incoming trade offers.</div>`;
+        return;
+      }
+
+      const myIncomingOffers = tradeRequestsList.filter(r => r.targetOwner === currentUser.name && (r.status === 'PENDING' || r.status === 'COUNTERED'));
+
+      if (myIncomingOffers.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No pending incoming trade offers for your cards right now.</div>`;
+        return;
+      }
+
+      grid.innerHTML = myIncomingOffers.map(req => `
+        <div class="bg-slate-900 border border-indigo-500/30 rounded-2xl p-4 flex gap-4 items-center">
+          <div class="w-20 h-24 bg-slate-950 rounded-xl p-1 border border-slate-800 shrink-0 flex items-center justify-center overflow-hidden">
+            <img src="${req.cardImg}" class="w-full h-full object-contain">
+          </div>
+          <div class="flex-1 space-y-1 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="font-black text-amber-400 font-mono">${req.serial}</span>
+              <span class="text-[9px] font-extrabold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">${req.status || 'PENDING'}</span>
+            </div>
+            <p class="font-bold text-white">${req.cardName}</p>
+            <p class="text-[11px] text-slate-400">Proposer: <strong class="text-indigo-400">${req.proposer}</strong></p>
+            <p class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800/80">Offer Details: ${req.notes}</p>
+            
+            <div class="flex items-center gap-2 pt-2">
+              <button onclick="acceptTradeRequest('${req.id}')" class="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all shadow">Accept Offer</button>
+              <button onclick="openCounterOfferModal('${req.id}')" class="flex-1 py-1.5 bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 font-extrabold text-[10px] rounded-xl border border-amber-500/30 transition-all">Counter</button>
+              <button onclick="rejectTradeRequest('${req.id}')" class="py-1.5 px-3 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-extrabold text-[10px] rounded-xl border border-rose-500/30 transition-all">Reject</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
 
     async function cancelTradeRequest(reqId, proposerName) {
@@ -2221,7 +2479,7 @@
         return showToast('Admin access required.');
       }
 
-      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'holders', 'history'].forEach(t => {
+      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'trade-offers', 'holders', 'history'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const nav = document.getElementById(`nav-${t}`);
         if (view) view.classList.add('hidden');
@@ -2247,6 +2505,7 @@
       if (tabName === 'trade') fetchListings();
       if (tabName === 'auction') fetchActiveAuction();
       if (tabName === 'trade-req') fetchTradeRequests();
+      if (tabName === 'trade-offers') renderTradeOffersInbox();
       if (tabName === 'catalog') {
         visibleCardCount = 10;
         renderCardGrid();
