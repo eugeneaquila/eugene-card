@@ -776,6 +776,7 @@
       showToast('Inventory backup downloaded!');
     }
 
+    /* ONE-BY-ONE SEQUENTIAL IMPORT TO PREVENT PAYLOAD & TIMEOUT ISSUES */
     async function importInventoryBackup(event) {
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
 
@@ -793,12 +794,15 @@
             return;
           }
 
-          if (!confirm(`Are you sure you want to import ${importedCards.length} cards? This will update local storage and Supabase database.`)) {
+          if (!confirm(`Import ${importedCards.length} cards one by one into the database?`)) {
             event.target.value = '';
             return;
           }
 
-          const overrides = {};
+          showToast(`Starting sequential import of ${importedCards.length} items...`);
+
+          // 1. Save Overrides locally
+          const overrides = getCardOverrides();
           importedCards.forEach(c => {
             overrides[c.id] = {
               name: c.name,
@@ -816,31 +820,60 @@
           });
           saveCardOverrides(overrides);
 
-          if (supabaseClient) {
-            const dbPayload = importedCards.map(c => ({
-              id: c.id,
-              serial: c.serial,
-              name: c.name,
-              type: c.type,
-              price: c.price,
-              base_floor_price: c.baseFloorPrice || c.base_floor_price || c.price,
-              owner: c.owner || null,
-              status: c.status || 'AVAILABLE',
-              img_url: c.imgUrl || c.img_url,
-              edition: c.edition || 'Beta Edition: #0',
-              sn: c.sn || '0001',
-              tier: c.tier || (c.type === 'PREMIUM' ? '500' : '100'),
-              printing: c.printing || '1x'
-            }));
+          // 2. Perform ONE-BY-ONE Sequential Upsert to Supabase
+          let successCount = 0;
+          let errorCount = 0;
 
-            const { error } = await supabaseClient.from('cards').upsert(dbPayload, { onConflict: 'id' });
-            if (error) {
-              console.warn('Supabase backup import sync warning:', error);
+          if (supabaseClient) {
+            for (let i = 0; i < importedCards.length; i++) {
+              const c = importedCards[i];
+              const singlePayload = {
+                id: c.id,
+                serial: c.serial,
+                name: c.name,
+                type: c.type,
+                price: c.price,
+                base_floor_price: c.baseFloorPrice || c.base_floor_price || c.price,
+                owner: c.owner || null,
+                status: c.status || 'AVAILABLE',
+                img_url: c.imgUrl || c.img_url,
+                edition: c.edition || 'Beta Edition: #0',
+                sn: c.sn || '0001',
+                tier: c.tier || (c.type === 'PREMIUM' ? '500' : '100'),
+                printing: c.printing || '1x'
+              };
+
+              try {
+                const { error } = await supabaseClient
+                  .from('cards')
+                  .upsert([singlePayload], { onConflict: 'id' });
+
+                if (error) {
+                  console.error(`Failed to import card ID ${c.id}:`, error.message);
+                  errorCount++;
+                } else {
+                  successCount++;
+                }
+              } catch (err) {
+                console.error(`Exception during single import ${c.id}:`, err);
+                errorCount++;
+              }
+
+              if ((i + 1) % 10 === 0 || i === importedCards.length - 1) {
+                showToast(`Import Progress: ${i + 1}/${importedCards.length} processed...`);
+              }
             }
           }
 
+          // 3. Reload App State
           await loadAppState();
-          showToast(`Successfully imported ${importedCards.length} cards!`);
+
+          if (errorCount > 0) {
+            showToast(`Imported ${successCount} cards. (${errorCount} failed - check console)`);
+          } else {
+            showToast(`Successfully imported all ${successCount} cards!`);
+          }
+
         } catch (err) {
           console.error('Import parse error:', err);
           showToast('Failed to parse JSON backup file.');
@@ -895,7 +928,7 @@
     function debouncedRenderCardGrid() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        visibleCardCount = 10; // Reset scroll slice on search input
+        visibleCardCount = 10;
         renderCardGrid();
       }, 150);
     }
@@ -1213,7 +1246,7 @@
 
     function setFilter(type) {
       currentFilter = type;
-      visibleCardCount = 10; // Reset scroll slice
+      visibleCardCount = 10;
       ['ALL', 'PREMIUM', 'STANDARD'].forEach(f => {
         const btn = document.getElementById(`filter-${f}`);
         if (btn) btn.className = f === type ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all' : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
