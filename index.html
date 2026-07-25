@@ -51,26 +51,12 @@
     ::-webkit-scrollbar-track { background: #030712; }
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
   </style>
-</head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
-
-  <!-- Embedded Logo SVG -->
-  <svg style="display: none;">
-    <defs>
-      <g id="eugene-logo-mark">
-        <circle cx="50" cy="50" r="42" fill="none" stroke="#4f46e5" stroke-width="5" stroke-dasharray="210 50" transform="rotate(-45 50 50)"/>
-        <polygon points="50,18 80,35 80,68 50,85 20,68 20,35" fill="#6366f1"/>
-        <path d="M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
-      </g>
-    </defs>
-  </svg>
-
-  <!-- Header -->
+<!-- Header -->
   <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
       
       <!-- Brand Logo -->
-      <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('catalog')">
+      <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="switchTab('catalog')">
         <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-indigo-500/30 p-1 flex items-center justify-center shadow-lg shadow-indigo-500/10">
           <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
         </div>
@@ -122,6 +108,26 @@
           <i class="fa-solid fa-shield-halved"></i> Admin Hub
         </button>
       </nav>
+
+      <!-- Cart, Notifications & Auth Header -->
+      <div class="flex items-center gap-2 shrink-0">
+        
+        <!-- NOTIFICATION BUTTON -->
+        <button id="notif-toggle-btn" onclick="toggleNotificationMenu()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-bell text-sm text-amber-400"></i>
+          <span id="notification-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-indigo-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
+        </button>
+
+        <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-cart-shopping text-sm text-amber-400"></i>
+          <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
+        </button>
+
+        <div id="auth-header-container"></div>
+      </div>
+
+    </div>
+  </header>      </nav>
 
       <!-- Cart, Notifications & Auth Header -->
       <div class="flex items-center gap-2">
