@@ -161,7 +161,9 @@
   <div id="chat-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 z-[9995] transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-4">
     <div class="flex items-center justify-between pb-3 border-b border-slate-800">
       <div class="flex items-center gap-2">
-        <i class="fa-solid fa-comments text-amber-400 text-sm"></i>
+        <div id="chat-target-avatar-container" class="w-8 h-8 rounded-full bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-user text-xs text-slate-400"></i>
+        </div>
         <div>
           <div class="flex items-center gap-1.5">
             <h3 id="chat-target-user-name" class="text-xs font-extrabold text-white">Direct Trade Chat</h3>
@@ -709,7 +711,7 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Username (@handle)</label>
+          <label class="block font-bold text-slate-400 mb-1">Username (@handle - Unique)</label>
           <div class="relative">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 font-bold">@</span>
             <input type="text" id="profile-edit-username-input" placeholder="e.g. eugenecards" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-7 pr-3 py-2 text-white focus:border-amber-500 focus:outline-none">
@@ -1023,6 +1025,7 @@
     let activeAuction = null;
     let tradeRequestsList = [];
     let viewedCollectorFilter = null;
+    let globalCollectorProfiles = {};
 
     let currentChatTargetUser = null;
     let currentChatContextId = null;
@@ -1206,16 +1209,84 @@
       return ADMIN_EMAILS.some(e => e.toLowerCase() === lower || e.split('@')[0].toLowerCase() === lower);
     }
 
-    function switchAccountPersona(personaName) {
+    async function loadCollectorProfiles() {
+      try {
+        const snapshot = await db.collection("profiles").get();
+        globalCollectorProfiles = {};
+        snapshot.forEach(doc => {
+          globalCollectorProfiles[doc.id] = doc.data();
+        });
+      } catch (e) {
+        console.warn('Error loading collector profiles:', e);
+      }
+    }
+
+    function getCollectorAvatar(nameOrUsername) {
+      if (!nameOrUsername) return null;
+      const key = nameOrUsername.toLowerCase().trim();
+      
+      // Check global profiles cache
+      for (let emailKey in globalCollectorProfiles) {
+        const p = globalCollectorProfiles[emailKey];
+        if (p.name?.toLowerCase() === key || p.username?.toLowerCase() === key) {
+          if (p.avatarUrl) return p.avatarUrl;
+        }
+      }
+
+      // Check localStorage/cookie cache
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k.startsWith('profile_')) {
+            const val = JSON.parse(localStorage.getItem(k));
+            if (val.name?.toLowerCase() === key || val.username?.toLowerCase() === key) {
+              if (val.avatarUrl) return val.avatarUrl;
+            }
+          }
+        }
+      } catch (e) {}
+
+      if (isUserAdmin(nameOrUsername)) {
+        return `https://api.dicebear.com/7.x/identicon/svg?seed=admin_${key}`;
+      }
+
+      return `https://api.dicebear.com/7.x/identicon/svg?seed=${key}`;
+    }
+
+    async function switchAccountPersona(personaName) {
       if (!currentUser) return;
+      
+      const newUsername = personaName.toLowerCase().replace(/\s+/g, '_');
+      
+      // Verify username uniqueness against other accounts
+      let isTaken = false;
+      for (let emailKey in globalCollectorProfiles) {
+        if (emailKey !== currentUser.email) {
+          const p = globalCollectorProfiles[emailKey];
+          if (p.username?.toLowerCase() === newUsername) {
+            isTaken = true;
+            break;
+          }
+        }
+      }
+
+      if (isTaken) {
+        return showToast(`Username @${newUsername} is already taken by another account.`);
+      }
+
       currentUser.name = personaName;
-      currentUser.username = personaName.toLowerCase().replace(/\s+/g, '_');
+      currentUser.username = newUsername;
       currentUser.isAdmin = isUserAdmin(personaName) || isUserAdmin(currentUser.email);
       currentUser.isPlusMember = false;
 
       const profilePayload = { name: personaName, username: currentUser.username, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio, isPlusMember: false, socialIg: currentUser.socialIg, socialX: currentUser.socialX, socialWeb: currentUser.socialWeb };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
+
+      try {
+        await db.collection("profiles").doc(currentUser.email).set(profilePayload, { merge: true });
+        await loadCollectorProfiles();
+      } catch (e) {}
 
       renderAuthHeader();
       updateAllViews();
@@ -1358,25 +1429,26 @@
       }
 
       resultsContainer.classList.remove('hidden');
-      resultsContainer.innerHTML = Array.from(foundUsersMap.entries()).map(([userName, isAdmin]) => `
-        <div onclick="openDirectChat('${userName}', 'Direct Collector Chat'); document.getElementById('user-chat-search-results').classList.add('hidden');" class="p-3 bg-slate-950 hover:bg-slate-800 border ${isAdmin ? 'border-rose-500/40 bg-rose-950/10' : 'border-slate-800'} rounded-xl flex items-center justify-between cursor-pointer transition-all">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-full ${isAdmin ? 'bg-rose-950 text-rose-400 border border-rose-500/40' : 'bg-slate-900 text-amber-400 border border-slate-700'} flex items-center justify-center font-bold text-xs">
-              <i class="fa-solid ${isAdmin ? 'fa-shield-halved' : 'fa-user'}"></i>
-            </div>
-            <div>
-              <div class="flex items-center gap-1.5">
-                <p class="font-extrabold text-white text-xs">${userName}</p>
-                ${isAdmin ? `<span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN</span>` : ''}
+      resultsContainer.innerHTML = Array.from(foundUsersMap.entries()).map(([userName, isAdmin]) => {
+        const avatarUrl = getCollectorAvatar(userName);
+        return `
+          <div onclick="openDirectChat('${userName}', 'Direct Collector Chat'); document.getElementById('user-chat-search-results').classList.add('hidden');" class="p-3 bg-slate-950 hover:bg-slate-800 border ${isAdmin ? 'border-rose-500/40 bg-rose-950/10' : 'border-slate-800'} rounded-xl flex items-center justify-between cursor-pointer transition-all">
+            <div class="flex items-center gap-2.5">
+              <img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-slate-700 bg-slate-900">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <p class="font-extrabold text-white text-xs">${userName}</p>
+                  ${isAdmin ? `<span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN</span>` : ''}
+                </div>
+                <p class="text-[10px] text-slate-400">${isAdmin ? 'Official Platform Support' : 'Registered Collector'}</p>
               </div>
-              <p class="text-[10px] text-slate-400">${isAdmin ? 'Official Platform Support' : 'Registered Collector'}</p>
             </div>
+            <button class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] rounded-lg flex items-center gap-1 shadow">
+              <i class="fa-solid fa-comments"></i> Start Chat
+            </button>
           </div>
-          <button class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] rounded-lg flex items-center gap-1 shadow">
-            <i class="fa-solid fa-comments"></i> Start Chat
-          </button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function openDirectChat(targetUserName, contextInfo = 'Trade Chat') {
@@ -1392,6 +1464,12 @@
 
       document.getElementById('chat-target-user-name').innerText = targetUserName;
       document.getElementById('chat-target-context').innerText = contextInfo;
+
+      const targetAvatarUrl = getCollectorAvatar(targetUserName);
+      const avatarContainer = document.getElementById('chat-target-avatar-container');
+      if (avatarContainer) {
+        avatarContainer.innerHTML = `<img src="${targetAvatarUrl}" class="w-full h-full object-cover">`;
+      }
 
       const adminBadgeEl = document.getElementById('chat-target-admin-badge');
       if (adminBadgeEl) {
@@ -1457,11 +1535,13 @@
           const msg = doc.data();
           const isMe = currentUser && (msg.sender === currentUser.name || msg.sender === currentUser.username);
           const isSenderAdmin = isUserAdmin(msg.sender);
+          const senderAvatar = getCollectorAvatar(msg.sender);
 
           return `
             <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1">
-              <div class="flex items-center gap-1">
-                <span class="text-[9px] font-bold text-slate-500">${msg.sender}</span>
+              <div class="flex items-center gap-1.5">
+                <img src="${senderAvatar}" class="w-4 h-4 rounded-full object-cover">
+                <span class="text-[9px] font-bold text-slate-400">${msg.sender}</span>
                 ${isSenderAdmin ? `<span class="text-[8px] font-black px-1 py-0 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">ADMIN</span>` : ''}
               </div>
               <div class="max-w-[80%] px-3 py-2 rounded-2xl text-xs ${isMe ? 'bg-amber-500 text-slate-950 font-medium rounded-tr-none' : 'bg-slate-950 border border-slate-800 text-white rounded-tl-none'}">
@@ -1549,13 +1629,12 @@
           const otherUser = rawNames.find(name => name !== myIdent) || (rawNames[0] || 'Collector');
           const lastMsg = c.lastMessage || 'Click to view conversation';
           const isOtherAdmin = isUserAdmin(otherUser);
+          const otherUserAvatar = getCollectorAvatar(otherUser);
 
           return `
             <div class="bg-slate-900 border ${isOtherAdmin ? 'border-rose-500/30' : 'border-slate-800'} p-4 rounded-2xl flex justify-between items-center text-xs hover:border-indigo-500/40 transition-all">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full ${isOtherAdmin ? 'bg-rose-950 text-rose-400 border border-rose-500/40' : 'bg-slate-950 text-amber-400 border border-slate-800'} flex items-center justify-center font-bold text-sm shrink-0">
-                  <i class="fa-solid ${isOtherAdmin ? 'fa-shield-halved' : 'fa-user'}"></i>
-                </div>
+                <img src="${otherUserAvatar}" class="w-10 h-10 rounded-full object-cover border border-slate-700 bg-slate-950 shrink-0">
                 <div>
                   <div class="flex items-center gap-1.5">
                     <p class="font-extrabold text-white text-sm">${otherUser}</p>
@@ -1829,6 +1908,8 @@
 
     async function loadAppState() {
       let loadedFromDb = false;
+
+      await loadCollectorProfiles();
 
       try {
         const snapshot = await db.collection("cards").get();
@@ -2153,10 +2234,11 @@
       }
     }
 
-    function handleUserSession(user) {
+    async function handleUserSession(user) {
       const email = user.email ? user.email.toLowerCase() : '';
 
-      const savedCustomProfile = localStorage.getItem(`profile_${email}`) || getCookie(`profile_${email}`);
+      await loadCollectorProfiles();
+      const savedCustomProfile = globalCollectorProfiles[email] || localStorage.getItem(`profile_${email}`) || getCookie(`profile_${email}`);
       let customData = {};
       if (savedCustomProfile) {
         try { customData = typeof savedCustomProfile === 'object' ? savedCustomProfile : JSON.parse(savedCustomProfile); } catch (e) {}
@@ -2164,7 +2246,23 @@
 
       const resolvedName = user.displayName || (email ? email.split('@')[0] : "Eugene");
       const name = customData.name || resolvedName;
-      const username = customData.username || name.toLowerCase().replace(/\s+/g, '_');
+      let username = customData.username || name.toLowerCase().replace(/\s+/g, '_');
+
+      // Ensure username uniqueness
+      let isTaken = false;
+      for (let emailKey in globalCollectorProfiles) {
+        if (emailKey !== email) {
+          const p = globalCollectorProfiles[emailKey];
+          if (p.username?.toLowerCase() === username) {
+            isTaken = true;
+            break;
+          }
+        }
+      }
+      if (isTaken) {
+        username = `${username}_${Math.floor(100 + Math.random() * 900)}`;
+      }
+
       const isAdmin = isUserAdmin(name) || isUserAdmin(email) || isUserAdmin(username);
       const isPlusMember = false;
       const avatarUrl = customData.avatarUrl || user.photoURL || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
@@ -2174,6 +2272,13 @@
       const socialWeb = customData.socialWeb || '';
 
       currentUser = { name, username, email, isAdmin, isPlusMember, avatarUrl, bio, socialIg, socialX, socialWeb };
+
+      const profilePayload = { name, username, avatarUrl, bio, isPlusMember, socialIg, socialX, socialWeb };
+      localStorage.setItem(`profile_${email}`, JSON.stringify(profilePayload));
+      setCookie(`profile_${email}`, profilePayload, 30);
+      try {
+        await db.collection("profiles").doc(email).set(profilePayload, { merge: true });
+      } catch (e) {}
 
       closeAuthModal();
       renderAuthHeader();
@@ -2217,11 +2322,29 @@
       reader.readAsDataURL(file);
     }
 
-    function saveProfileChanges() {
+    async function saveProfileChanges() {
       if (!currentUser) return;
       const newName = document.getElementById('profile-edit-name-input').value.trim() || currentUser.name;
       const rawUsername = document.getElementById('profile-edit-username-input').value.trim();
       const newUsername = rawUsername ? rawUsername.replace(/^@/, '').toLowerCase().replace(/\s+/g, '_') : (currentUser.username || newName.toLowerCase().replace(/\s+/g, '_'));
+
+      // Verify global username uniqueness
+      await loadCollectorProfiles();
+      let isTaken = false;
+      for (let emailKey in globalCollectorProfiles) {
+        if (emailKey !== currentUser.email) {
+          const p = globalCollectorProfiles[emailKey];
+          if (p.username?.toLowerCase() === newUsername) {
+            isTaken = true;
+            break;
+          }
+        }
+      }
+
+      if (isTaken) {
+        return showToast(`Username @${newUsername} is already taken by another account. Please choose a different username.`);
+      }
+
       const newAvatar = document.getElementById('profile-edit-avatar-input').value.trim() || currentUser.avatarUrl;
       const newBio = document.getElementById('profile-edit-bio-input').value.trim();
       const newIg = document.getElementById('profile-edit-ig-input').value.trim();
@@ -2241,11 +2364,16 @@
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
       setCookie(`profile_${currentUser.email}`, profilePayload, 30);
 
+      try {
+        await db.collection("profiles").doc(currentUser.email).set(profilePayload, { merge: true });
+        await loadCollectorProfiles();
+      } catch (e) {}
+
       closeProfileManagerModal();
       renderAuthHeader();
       updateAllViews();
-      showToast('Profile and username updated!');
-      addNotification('Profile Updated', `Your username (@${newUsername}) and profile details were saved.`, 'fa-user-gear text-amber-400');
+      showToast('Profile and unique username updated!');
+      addNotification('Profile Updated', `Your unique username (@${newUsername}) and profile details were saved.`, 'fa-user-gear text-amber-400');
     }
 
     function renderCardGrid() {
@@ -3336,7 +3464,8 @@
       }
 
       if (heading) {
-        heading.innerHTML = `<i class="fa-solid fa-vault text-amber-400 mr-2"></i> ${targetUser}'s Binder`;
+        const targetAvatarUrl = getCollectorAvatar(targetUser);
+        heading.innerHTML = `<div class="flex items-center gap-3"><img src="${targetAvatarUrl}" class="w-8 h-8 rounded-full object-cover border border-slate-700 bg-slate-950"> <span>${targetUser}'s Binder</span></div>`;
       }
       if (subheading) {
         subheading.innerText = viewedCollectorFilter ? `Viewing collector inventory directory.` : `Manage owned cards, sell back instantly to Admin via QRIS, or place them into Auction/Trade.`;
@@ -3423,18 +3552,24 @@
         return;
       }
 
-      tbody.innerHTML = Object.keys(ownersMap).map(k => `
-        <tr class="hover:bg-slate-950/80 text-xs transition-all">
-          <td class="p-3 font-bold text-white cursor-pointer hover:text-amber-400" onclick="viewedCollectorVault('${k}')">
-            <i class="fa-solid fa-user-circle text-teal-400 mr-2"></i> <u>${k.startsWith('@') ? k : '@' + k}</u>
-          </td>
-          <td class="p-3 font-mono text-amber-400 font-bold">${ownersMap[k].cards}</td>
-          <td class="p-3 font-mono text-slate-400">${ownersMap[k].serials.join(', ')}</td>
-          <td class="p-3 text-right">
-            <button onclick="viewedCollectorVault('${k}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-700">View Binder</button>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = Object.keys(ownersMap).map(k => {
+        const collectorAvatar = getCollectorAvatar(k);
+        return `
+          <tr class="hover:bg-slate-950/80 text-xs transition-all">
+            <td class="p-3 font-bold text-white cursor-pointer hover:text-amber-400" onclick="viewedCollectorVault('${k}')">
+              <div class="flex items-center gap-2.5">
+                <img src="${collectorAvatar}" class="w-7 h-7 rounded-full object-cover border border-slate-700 bg-slate-950">
+                <u>${k.startsWith('@') ? k : '@' + k}</u>
+              </div>
+            </td>
+            <td class="p-3 font-mono text-amber-400 font-bold">${ownersMap[k].cards}</td>
+            <td class="p-3 font-mono text-slate-400">${ownersMap[k].serials.join(', ')}</td>
+            <td class="p-3 text-right">
+              <button onclick="viewedCollectorVault('${k}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-700">View Binder</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     async function loadPendingTransactions() {
@@ -3465,6 +3600,8 @@
             ? `<div class="mt-2"><a href="${order.qrisProofUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 text-[10px] font-bold rounded-lg"><i class="fa-solid fa-receipt text-amber-400"></i> View QRIS Receipt Screenshot</a></div>`
             : `<div class="mt-1 text-[10px] text-slate-500 italic">No receipt screenshot attached.</div>`;
 
+          const buyerAvatar = getCollectorAvatar(order.user_name);
+
           return `
             <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
               <div class="space-y-1">
@@ -3472,7 +3609,7 @@
                   <span class="font-mono font-black text-indigo-400">${order.id}</span>
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">PENDING QRIS</span>
                 </div>
-                <p class="text-white font-bold">Buyer: <span class="text-amber-300">${order.user_name}</span></p>
+                <p class="text-white font-bold flex items-center gap-2">Buyer: <img src="${buyerAvatar}" class="w-5 h-5 rounded-full object-cover"> <span class="text-amber-300">${order.user_name}</span></p>
                 <p class="text-slate-400 text-[11px]">Items: <strong class="text-slate-200">${itemsListStr || 'N/A'}</strong></p>
                 <p class="text-emerald-400 font-mono font-black">${formatIDR(order.total_amount || 0)} <span class="text-[9px] text-amber-400 font-normal">(Includes 2% Tax)</span></p>
                 ${proofPreview}
