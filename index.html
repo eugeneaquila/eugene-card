@@ -620,7 +620,7 @@
     </div>
   </div>
 
-  <!-- PROFILE MANAGER MODAL -->
+  <!-- PROFILE MANAGER & PERSONA SWITCHER MODAL -->
   <div id="profile-manager-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeProfileManagerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
@@ -633,6 +633,20 @@
         </div>
         <h3 class="text-lg font-black text-white">Collector Profile Settings</h3>
         <p class="text-xs text-slate-400">Customize how your profile appears on the marketplace</p>
+      </div>
+
+      <!-- PERSONA SWITCHER FOR MULTI-ACCOUNT TESTING -->
+      <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2">
+        <label class="block text-[11px] font-bold text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-users-gear mr-1"></i> Account Persona Switcher</label>
+        <p class="text-[10px] text-slate-400">Switch between your Admin profile or Collector handle under this email:</p>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="switchAccountPersona('eugene.aquila06')" class="py-2 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 font-extrabold text-[11px] rounded-xl border border-rose-500/30 flex items-center justify-center gap-1.5 transition-all">
+            <i class="fa-solid fa-shield-halved text-xs"></i> Admin Persona
+          </button>
+          <button onclick="switchAccountPersona('Eugene')" class="py-2 bg-amber-950/40 hover:bg-amber-900/40 text-amber-300 font-extrabold text-[11px] rounded-xl border border-amber-500/30 flex items-center justify-center gap-1.5 transition-all">
+            <i class="fa-solid fa-user text-xs"></i> Collector Persona
+          </button>
+        </div>
       </div>
 
       <div class="space-y-3 text-xs">
@@ -913,7 +927,7 @@
 
     const TRADE_FEE_PERCENT = 0.02;
     const OFFICIAL_QRIS_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
-    const ADMIN_EMAILS = ['eugene.aquila06@gmail.com', 'yujinybwork@gmail.com'];
+    const ADMIN_EMAILS = ['eugene.aquila06@gmail.com', 'yujinybwork@gmail.com', 'eugene.aquila06', 'admin house'];
 
     let currentUser = null;
     let cart = [];
@@ -944,6 +958,21 @@
       if (!identifier) return false;
       const lower = identifier.toLowerCase().trim();
       return ADMIN_EMAILS.some(e => e.toLowerCase() === lower || e.split('@')[0].toLowerCase() === lower);
+    }
+
+    function switchAccountPersona(personaName) {
+      if (!currentUser) return;
+      currentUser.name = personaName;
+      currentUser.isAdmin = isUserAdmin(personaName) || isUserAdmin(currentUser.email);
+      
+      const profilePayload = { name: personaName, avatarUrl: currentUser.avatarUrl, bio: currentUser.bio };
+      localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
+      setCookie(`profile_${currentUser.email}`, profilePayload, 30);
+
+      renderAuthHeader();
+      updateAllViews();
+      closeProfileManagerModal();
+      showToast(`Switched active persona to: ${personaName}`);
     }
 
     function setCookie(name, value, days = 30) {
@@ -1829,7 +1858,6 @@
 
     function handleUserSession(user) {
       const email = user.email ? user.email.toLowerCase() : '';
-      const isAdmin = ADMIN_EMAILS.some(a => a.toLowerCase() === email);
 
       const savedCustomProfile = localStorage.getItem(`profile_${email}`) || getCookie(`profile_${email}`);
       let customData = {};
@@ -1839,6 +1867,7 @@
 
       const resolvedName = user.displayName || (email ? email.split('@')[0] : "Eugene");
       const name = customData.name || resolvedName;
+      const isAdmin = isUserAdmin(name) || isUserAdmin(email);
       const avatarUrl = customData.avatarUrl || user.photoURL || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
       const bio = customData.bio || (isAdmin ? "Official Platform Admin" : "Beta Collector");
 
@@ -1890,6 +1919,7 @@
       currentUser.name = newName;
       currentUser.avatarUrl = newAvatar;
       currentUser.bio = newBio;
+      currentUser.isAdmin = isUserAdmin(newName) || isUserAdmin(currentUser.email);
 
       const profilePayload = { name: newName, avatarUrl: newAvatar, bio: newBio };
       localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
@@ -2503,11 +2533,12 @@
       const req = tradeRequestsList.find(r => r.id === reqId);
       if (!req) return showToast('Proposal not found.');
 
-      if (req.targetOwner !== currentUser.name && !currentUser.isAdmin) {
-        return showToast('Only the card owner can accept this trade proposal.');
+      const canAccept = (req.targetOwner === currentUser.name) || currentUser.isAdmin;
+      if (!canAccept) {
+        return showToast('Only the target card owner or Admin can accept this proposal.');
       }
 
-      if (!confirm(`Accept trade request from ${req.proposer} for card ${req.serial}? Ownership will transfer to ${req.proposer}.`)) return;
+      if (!confirm(`Accept offer from ${req.proposer} for ${req.serial}? Ownership will transfer to ${req.proposer}.`)) return;
 
       try {
         const batch = db.batch();
@@ -2519,8 +2550,8 @@
 
         await batch.commit();
 
-        showToast(`Trade accepted! ${req.serial} has been transferred to ${req.proposer}.`);
-        addNotification('Trade Offer Accepted', `Transferred card ${req.serial} to ${req.proposer}.`, 'fa-check text-emerald-400');
+        showToast(`Trade accepted! Card ${req.serial} transferred to ${req.proposer}.`);
+        addNotification('Trade Accepted', `Card ${req.serial} transferred to ${req.proposer}.`, 'fa-check text-emerald-400');
 
         await loadAppState();
       } catch (e) {
@@ -2612,6 +2643,7 @@
 
       grid.innerHTML = tradeRequestsList.map(req => {
         const isProposer = currentUser && currentUser.name === req.proposer;
+        const isTargetOwner = currentUser && (currentUser.name === req.targetOwner || currentUser.isAdmin);
         const canCancel = currentUser && (currentUser.isAdmin || isProposer || currentUser.name === req.targetOwner);
 
         return `
@@ -2629,14 +2661,19 @@
               <p class="text-[11px] text-slate-400">Proposed by: <strong class="text-indigo-400">${req.proposer}</strong></p>
               <p class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800/80">Offer: ${req.notes}</p>
               
-              <div class="flex items-center gap-2 pt-2">
+              <div class="flex items-center gap-2 pt-2 flex-wrap">
+                ${isTargetOwner && req.status !== 'ACCEPTED' ? `
+                  <button onclick="acceptTradeRequest('${req.id}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-check"></i> Accept Offer</button>
+                  <button onclick="openCounterOfferModal('${req.id}')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-pen-to-square"></i> Counter Offer</button>
+                ` : ''}
+
                 ${isProposer ? `
                   <button onclick="withdrawTradeRequest('${req.id}')" class="px-3 py-1 bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 font-bold text-[10px] rounded-lg border border-amber-500/30 transition-all"><i class="fa-solid fa-rotate-left mr-1"></i> Withdraw Request</button>
                 ` : ''}
                 
                 <button onclick="openDirectChat('${isProposer ? req.targetOwner : req.proposer}', 'Trade Offer for ${req.serial}')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] rounded-lg transition-all"><i class="fa-solid fa-comments mr-1"></i> Chat</button>
                 
-                ${canCancel && !isProposer ? `
+                ${canCancel && !isProposer && !isTargetOwner ? `
                   <button onclick="cancelTradeRequest('${req.id}', '${req.proposer}')" class="px-3 py-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-bold text-[10px] rounded-lg border border-rose-500/30 transition-all">Cancel Request</button>
                 ` : ''}
               </div>
