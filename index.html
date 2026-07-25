@@ -341,7 +341,7 @@
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub & Transaction Approvals</h2>
-          <p class="text-xs text-slate-400 mt-1">Review pending customer purchases and transfer card ownership upon QRIS payment verification.</p>
+          <p class="text-xs text-slate-400 mt-1">Review pending customer purchases and approve or reject card ownership upon QRIS payment verification.</p>
         </div>
         <button onclick="loadPendingTransactions()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
           <i class="fa-solid fa-rotate"></i> Refresh Queue
@@ -349,7 +349,7 @@
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending Orders Requiring Approval</h4>
+        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending Orders Requiring Action</h4>
         <div id="admin-pending-orders-list" class="space-y-3">
           <p class="text-xs text-slate-500">No pending transactions requiring approval.</p>
         </div>
@@ -358,9 +358,25 @@
 
     <!-- INVENTORY MANAGEMENT VIEW (ADMIN) -->
     <section id="view-inventory" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center justify-between">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-boxes-stacked text-rose-400 mr-2"></i> Inventory Mgmt</h2>
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-boxes-stacked text-rose-400 mr-2"></i> Inventory Mgmt</h2>
+          <p class="text-xs text-slate-400 mt-1">Manage, edit, export, or import complete inventory backup state JSON.</p>
+        </div>
+        
+        <!-- BACKUP & IMPORT CONTROLS -->
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button onclick="exportInventoryBackup()" class="flex-1 sm:flex-initial px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-extrabold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm">
+            <i class="fa-solid fa-download"></i> Backup JSON
+          </button>
+          
+          <label class="flex-1 sm:flex-initial px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold rounded-xl cursor-pointer transition-all flex items-center justify-center gap-2 shadow-sm">
+            <i class="fa-solid fa-upload"></i> Import Backup
+            <input type="file" id="backup-file-input" accept=".json" onchange="importInventoryBackup(event)" class="hidden">
+          </label>
+        </div>
       </div>
+
       <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center">
           <input type="text" id="inventory-search" oninput="renderInventoryTable()" placeholder="Search serial / name / owner..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white w-64">
@@ -708,7 +724,10 @@
         
         const cardId = `card-${paddedNum}`;
         const serialStr = `*${paddedNum}`;
-        const snFormatted = String(i).padStart(4, '0');
+        
+        // FIXED: Uses cardNum so SN matches the card number (0001 to 0025)
+        const snFormatted = String(cardNum).padStart(4, '0');
+        
         const price = isPremium ? 500000 : 100000;
         const tierVal = isPremium ? "500" : "100";
 
@@ -729,6 +748,109 @@
         });
       }
       inventory = applyCardOverrides(inventory);
+    }
+
+    /* BACKUP EXPORT & IMPORT FUNCTIONALITY */
+    function exportInventoryBackup() {
+      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+
+      const backupData = {
+        exportedAt: new Date().toISOString(),
+        exportedBy: currentUser.email || currentUser.name,
+        inventoryCount: inventory.length,
+        cards: inventory,
+        overrides: getCardOverrides()
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const filename = `eugene_inventory_backup_${new Date().toISOString().slice(0,10)}.json`;
+
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", filename);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToast('Inventory backup downloaded!');
+    }
+
+    async function importInventoryBackup(event) {
+      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const importedCards = Array.isArray(parsed) ? parsed : (parsed.cards || []);
+
+          if (!Array.isArray(importedCards) || importedCards.length === 0) {
+            showToast('Invalid backup file format.');
+            return;
+          }
+
+          if (!confirm(`Are you sure you want to import ${importedCards.length} cards? This will update local storage and Supabase database.`)) {
+            event.target.value = '';
+            return;
+          }
+
+          // 1. Save Overrides locally
+          const overrides = {};
+          importedCards.forEach(c => {
+            overrides[c.id] = {
+              name: c.name,
+              serial: c.serial,
+              type: c.type,
+              price: c.price,
+              status: c.status,
+              owner: c.owner || null,
+              imgUrl: c.imgUrl || c.img_url,
+              edition: c.edition,
+              sn: c.sn,
+              tier: c.tier,
+              printing: c.printing
+            };
+          });
+          saveCardOverrides(overrides);
+
+          // 2. Sync to Supabase DB if connected
+          if (supabaseClient) {
+            const dbPayload = importedCards.map(c => ({
+              id: c.id,
+              serial: c.serial,
+              name: c.name,
+              type: c.type,
+              price: c.price,
+              base_floor_price: c.baseFloorPrice || c.base_floor_price || c.price,
+              owner: c.owner || null,
+              status: c.status || 'AVAILABLE',
+              img_url: c.imgUrl || c.img_url,
+              edition: c.edition || 'Beta Edition: #0',
+              sn: c.sn || '0001',
+              tier: c.tier || (c.type === 'PREMIUM' ? '500' : '100'),
+              printing: c.printing || '1x'
+            }));
+
+            const { error } = await supabaseClient.from('cards').upsert(dbPayload, { onConflict: 'id' });
+            if (error) {
+              console.warn('Supabase backup import sync warning:', error);
+            }
+          }
+
+          // 3. Reload App State
+          await loadAppState();
+          showToast(`Successfully imported ${importedCards.length} cards!`);
+        } catch (err) {
+          console.error('Import parse error:', err);
+          showToast('Failed to parse JSON backup file.');
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
     }
 
     function loadSavedWishlist() {
@@ -825,6 +947,14 @@
       supabaseClient
         .channel('public:cards')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => loadAppState())
+        .subscribe();
+      
+      supabaseClient
+        .channel('public:transactions')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
+          fetchTransactionHistory();
+          loadPendingTransactions();
+        })
         .subscribe();
     }
 
@@ -1550,27 +1680,73 @@
       const container = document.getElementById('admin-pending-orders-list');
       if (!container || !supabaseClient) return;
 
-      let { data } = await supabaseClient.from('transactions').select('*').eq('status', 'PENDING');
+      let { data } = await supabaseClient.from('transactions').select('*').eq('status', 'PENDING').order('created_at', { ascending: false });
       if (!data || data.length === 0) {
         container.innerHTML = `<p class="text-xs text-slate-500">No pending transactions requiring approval.</p>`;
         return;
       }
 
-      container.innerHTML = data.map(order => `
-        <div class="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 flex justify-between items-center text-xs">
-          <div>
-            <span class="font-mono font-bold text-amber-400">${order.id}</span>
-            <p class="text-white font-bold">Buyer: ${order.user_name}</p>
+      container.innerHTML = data.map(order => {
+        let items = Array.isArray(order.items) ? order.items : [];
+        const itemsListStr = items.map(i => i.serial || 'Card').join(', ');
+
+        return `
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-black text-indigo-400">${order.id}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">PENDING</span>
+              </div>
+              <p class="text-white font-bold">Buyer: <span class="text-amber-300">${order.user_name}</span></p>
+              <p class="text-slate-400 text-[11px]">Items: <strong class="text-slate-200">${itemsListStr || 'N/A'}</strong></p>
+              <p class="text-emerald-400 font-mono font-black">${formatIDR(order.total_amount || 0)}</p>
+            </div>
+            
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button onclick="approveTransaction('${order.id}')" class="flex-1 sm:flex-initial px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-check"></i> Approve
+              </button>
+              <button onclick="rejectTransaction('${order.id}')" class="flex-1 sm:flex-initial px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-xmark"></i> Reject
+              </button>
+            </div>
           </div>
-          <button onclick="approveTransaction('${order.id}')" class="px-4 py-2 bg-emerald-500 text-slate-950 font-extrabold rounded-xl">Approve</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function approveTransaction(orderId) {
+      if (!currentUser?.isAdmin) return showToast('Admin access required.');
       if (!supabaseClient) return;
+
+      // 1. Fetch order details to transfer cards
+      const { data: order } = await supabaseClient.from('transactions').select('*').eq('id', orderId).single();
+      if (order && Array.isArray(order.items)) {
+        for (const item of order.items) {
+          if (item.id) {
+            await supabaseClient.from('cards').update({ owner: order.user_name, status: 'SOLD' }).eq('id', item.id);
+          }
+        }
+      }
+
+      // 2. Mark order status APPROVED
       await supabaseClient.from('transactions').update({ status: 'APPROVED' }).eq('id', orderId);
-      showToast(`Transaction ${orderId} approved!`);
+      
+      showToast(`Transaction ${orderId} approved and items transferred!`);
+      await loadAppState();
+      loadPendingTransactions();
+    }
+
+    async function rejectTransaction(orderId) {
+      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+      if (!supabaseClient) return;
+
+      if (!confirm(`Are you sure you want to REJECT order ${orderId}?`)) return;
+
+      await supabaseClient.from('transactions').update({ status: 'REJECTED' }).eq('id', orderId);
+      
+      showToast(`Transaction ${orderId} has been rejected.`);
+      fetchTransactionHistory();
       loadPendingTransactions();
     }
 
