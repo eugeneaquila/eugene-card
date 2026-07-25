@@ -100,8 +100,8 @@
         <button id="nav-trade-req" onclick="switchTab('trade-req')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-handshake text-purple-400"></i> Trade Requests
         </button>
-        <button id="nav-trade-offers" onclick="switchTab('trade-offers')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-envelope-open-text text-indigo-400"></i> Trade Offers
+        <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+          <i class="fa-solid fa-comments text-indigo-400"></i> Inbox / Chat
         </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-users text-teal-400"></i> Holders
@@ -129,12 +129,8 @@
         </button>
       </nav>
 
-      <!-- Cart, Chat to Admin, Notifications & Auth Header -->
+      <!-- Cart, Notifications & Auth Header -->
       <div class="flex items-center gap-2 shrink-0">
-        <button onclick="chatToAdmin()" class="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white text-xs font-bold rounded-xl border border-indigo-500/40 flex items-center gap-1.5 transition-all shadow-sm">
-          <i class="fa-solid fa-headset text-amber-400"></i> Chat to Admin
-        </button>
-
         <button id="notif-toggle-btn" onclick="toggleNotificationMenu()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
           <i class="fa-solid fa-bell text-sm text-amber-400"></i>
           <span id="notification-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-indigo-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
@@ -170,20 +166,20 @@
       <div class="text-center py-10 text-slate-500 text-xs">No chat messages yet. Start the conversation!</div>
     </div>
 
-    <!-- Send Chat & Image Attachment Input -->
+    <!-- Send Chat & Image/Screenshot Attachment Input -->
     <div class="pt-3 border-t border-slate-800 space-y-2">
       <div id="chat-image-preview-box" class="hidden p-2 bg-slate-950 border border-slate-800 rounded-xl relative">
         <button onclick="clearChatImageAttachment()" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-slate-800 text-slate-400 text-[10px] flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-        <img id="chat-image-preview-img" src="" class="h-16 rounded object-contain mx-auto">
+        <img id="chat-image-preview-img" src="" class="h-20 rounded object-contain mx-auto border border-slate-800">
       </div>
 
       <div class="flex items-center gap-2">
-        <label class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl text-slate-400 hover:text-amber-400 cursor-pointer text-xs" title="Upload QRIS Payment Screenshot">
-          <i class="fa-solid fa-paperclip"></i>
-          <input type="file" accept="image/*" onchange="handleChatImageUpload(event)" class="hidden">
+        <label class="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl text-slate-400 hover:text-amber-400 cursor-pointer text-xs flex items-center gap-1 transition-all" title="Upload Screenshot or Photo">
+          <i class="fa-solid fa-image text-amber-400"></i>
+          <input type="file" id="chat-file-input" accept="image/*" onchange="handleChatImageUpload(event)" class="hidden">
         </label>
-        <input type="text" id="chat-text-input" placeholder="Type message or QRIS details..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-        <button onclick="sendChatMessage()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow">Send</button>
+        <input type="text" id="chat-text-input" placeholder="Type message or attach screenshot..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+        <button onclick="sendChatMessage()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow transition-all">Send</button>
       </div>
     </div>
   </div>
@@ -331,19 +327,21 @@
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
-    <!-- TRADE OFFERS VIEW (FOR CARD OWNERS) -->
-    <section id="view-trade-offers" class="hidden space-y-6">
+    <!-- INBOX / CHAT VIEW -->
+    <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-envelope-open-text text-indigo-400 mr-2"></i> Trade Offers Inbox</h2>
-          <p class="text-xs text-slate-400 mt-1">Review incoming buy and trade requests for your cards. Accept, reject, or send a counter offer.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Direct Messages & Support Inbox</h2>
+          <p class="text-xs text-slate-400 mt-1">View ongoing direct conversations with other collectors and support threads.</p>
         </div>
-        <button onclick="renderTradeOffersInbox()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-indigo-400 rounded-xl border border-slate-700 flex items-center gap-2">
+        <button onclick="loadUserInboxThreads()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-indigo-400 rounded-xl border border-slate-700 flex items-center gap-2">
           <i class="fa-solid fa-rotate"></i> Refresh Inbox
         </button>
       </div>
 
-      <div id="trade-offers-inbox-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      <div id="inbox-threads-list" class="space-y-3">
+        <p class="text-xs text-slate-500 text-center py-10">Loading messages...</p>
+      </div>
     </section>
 
     <!-- TRANSACTION HISTORY VIEW -->
@@ -432,24 +430,11 @@
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub & Revenue Dashboard</h2>
-          <p class="text-xs text-slate-400 mt-1">Review customer QRIS payments, verify earnings, and manage support chats.</p>
+          <p class="text-xs text-slate-400 mt-1">Review customer QRIS payments and verify order requests.</p>
         </div>
         <button onclick="refreshAdminHub()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
           <i class="fa-solid fa-rotate"></i> Refresh Hub
         </button>
-      </div>
-
-      <!-- ADMIN CHAT INBOX -->
-      <div class="bg-slate-900 border border-indigo-500/30 rounded-3xl p-6 space-y-4">
-        <div class="flex justify-between items-center">
-          <h4 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-headset text-amber-400"></i> Incoming Admin Support & Income Chats
-          </h4>
-          <span class="text-[10px] text-slate-400 font-mono">Live Firestore Threads</span>
-        </div>
-        <div id="admin-chat-inbox-list" class="space-y-2 max-h-60 overflow-y-auto">
-          <p class="text-xs text-slate-500">Loading support chat threads...</p>
-        </div>
       </div>
 
       <!-- PENDING ORDERS -->
@@ -933,7 +918,7 @@
     let currentChatContextId = null;
     let chatUnsubscribe = null;
     let chatAttachedImage = null;
-    let adminChatUnsubscribe = null;
+    let inboxUnsubscribe = null;
 
     let visibleCardCount = 10;
     const CARDS_PER_BATCH = 10;
@@ -1030,17 +1015,6 @@
       showToast('Notifications cleared.');
     }
 
-    function chatToAdmin() {
-      if (!currentUser) return showToast('Please log in first.');
-      
-      if (currentUser.isAdmin) {
-        switchTab('admin');
-        showToast('Viewing Admin Support Inbox.');
-      } else {
-        openDirectChat('Admin Support', 'Platform Settlement & Admin Support');
-      }
-    }
-
     function openDirectChat(targetUserName, contextInfo = 'Trade Chat') {
       if (!currentUser) return showToast('Please log in to start a chat.');
       if (currentUser.name === targetUserName && !currentUser.isAdmin) {
@@ -1049,19 +1023,7 @@
 
       currentChatTargetUser = targetUserName;
 
-      let participants;
-      if (targetUserName === 'Admin Support' || (currentUser.isAdmin && targetUserName !== currentUser.name)) {
-        if (!currentUser.isAdmin && targetUserName === 'Admin Support') {
-          participants = ['Admin Support', currentUser.name].sort();
-        } else if (currentUser.isAdmin) {
-          participants = ['Admin Support', targetUserName].sort();
-        } else {
-          participants = [currentUser.name, targetUserName].sort();
-        }
-      } else {
-        participants = [currentUser.name, targetUserName].sort();
-      }
-
+      const participants = [currentUser.name, targetUserName].sort();
       currentChatContextId = `chat-${participants.join('-vs-')}`;
 
       document.getElementById('chat-target-user-name').innerText = targetUserName;
@@ -1086,6 +1048,12 @@
     function handleChatImageUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
+      
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('Image screenshot must be smaller than 2MB.');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = function(e) {
         chatAttachedImage = e.target.result;
@@ -1097,6 +1065,8 @@
 
     function clearChatImageAttachment() {
       chatAttachedImage = null;
+      const fileInput = document.getElementById('chat-file-input');
+      if (fileInput) fileInput.value = '';
       document.getElementById('chat-image-preview-img').src = '';
       document.getElementById('chat-image-preview-box').classList.add('hidden');
     }
@@ -1109,7 +1079,7 @@
 
       chatUnsubscribe = db.collection("chats").doc(chatId).collection("messages").orderBy("timestamp", "asc").onSnapshot(snapshot => {
         if (snapshot.empty) {
-          container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">No chat messages yet. Send a message to discuss!</div>`;
+          container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">No chat messages yet. Send a message or screenshot to discuss!</div>`;
           return;
         }
 
@@ -1121,7 +1091,7 @@
             <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1">
               <span class="text-[9px] font-bold text-slate-500">${msg.sender}</span>
               <div class="max-w-[80%] px-3 py-2 rounded-2xl text-xs ${isMe ? 'bg-amber-500 text-slate-950 font-medium rounded-tr-none' : 'bg-slate-950 border border-slate-800 text-white rounded-tl-none'}">
-                ${msg.imgUrl ? `<img src="${msg.imgUrl}" class="max-w-full rounded-lg mb-1 border border-slate-800">` : ''}
+                ${msg.imgUrl ? `<a href="${msg.imgUrl}" target="_blank"><img src="${msg.imgUrl}" class="max-w-full max-h-48 rounded-lg mb-1 border border-slate-800 hover:opacity-90 transition-opacity"></a>` : ''}
                 ${msg.text ? `<div>${msg.text}</div>` : ''}
               </div>
             </div>
@@ -1143,8 +1113,9 @@
 
         const chatDocRef = db.collection("chats").doc(currentChatContextId);
         batch.set(chatDocRef, {
-          lastMessage: text || (chatAttachedImage ? '[Image Attachment]' : ''),
+          lastMessage: text || (chatAttachedImage ? '[Screenshot / Image]' : ''),
           lastSender: currentUser.name,
+          participants: currentChatContextId.replace('chat-', '').split('-vs-'),
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
@@ -1165,6 +1136,64 @@
       } catch (e) {
         showToast('Error sending chat message: ' + e.message);
       }
+    }
+
+    function loadUserInboxThreads() {
+      const container = document.getElementById('inbox-threads-list');
+      if (!container) return;
+
+      if (!currentUser) {
+        container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">Please log in to view your inbox.</div>`;
+        return;
+      }
+
+      if (inboxUnsubscribe) inboxUnsubscribe();
+
+      inboxUnsubscribe = db.collection("chats").onSnapshot(snapshot => {
+        if (snapshot.empty) {
+          container.innerHTML = `<p class="text-xs text-slate-500 text-center py-10">No active chat threads found.</p>`;
+          return;
+        }
+
+        const myThreads = [];
+        snapshot.forEach(doc => {
+          const chatId = doc.id;
+          if (chatId.includes(currentUser.name) || currentUser.isAdmin) {
+            myThreads.push({ id: chatId, ...doc.data() });
+          }
+        });
+
+        if (myThreads.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-500 text-center py-10">No chat messages in your inbox.</p>`;
+          return;
+        }
+
+        container.innerHTML = myThreads.map(c => {
+          const rawNames = c.id.replace('chat-', '').split('-vs-');
+          const otherUser = rawNames.find(name => name !== currentUser.name) || (rawNames[0] || 'Collector');
+          const lastMsg = c.lastMessage || 'Click to view conversation';
+
+          return `
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex justify-between items-center text-xs hover:border-indigo-500/40 transition-all">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+                <div>
+                  <p class="font-extrabold text-white text-sm">${otherUser}</p>
+                  <p class="text-xs text-slate-400 truncate max-w-xs sm:max-w-md mt-0.5">${lastMsg}</p>
+                </div>
+              </div>
+              <button onclick="openDirectChat('${otherUser}', 'Direct Chat')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl transition-all shadow shrink-0 flex items-center gap-1.5">
+                <i class="fa-solid fa-comments"></i> Chat
+              </button>
+            </div>
+          `;
+        }).join('');
+      }, err => {
+        console.warn('Inbox snapshot error:', err);
+        container.innerHTML = `<p class="text-xs text-rose-400 text-center py-10">Error fetching inbox messages.</p>`;
+      });
     }
 
     function handleQrisScreenshotUpload(event) {
@@ -1493,7 +1522,6 @@
         tradeRequestsList = [];
         snapshot.forEach(doc => tradeRequestsList.push({ id: doc.id, ...doc.data() }));
         renderTradeRequests();
-        renderTradeOffersInbox();
       } catch (e) {
         console.warn('Fetch trade requests error:', e);
       }
@@ -1546,7 +1574,6 @@
         fetchTransactionHistory();
         if (currentUser?.isAdmin) {
           loadPendingTransactions();
-          loadAdminChatInbox();
         }
       });
     }
@@ -1561,7 +1588,6 @@
       updateCartTotals();
       renderAuctionView();
       renderTradeRequests();
-      renderTradeOffersInbox();
     }
 
     function renderAuctionView() {
@@ -2452,57 +2478,6 @@
       }
     }
 
-    function renderTradeOffersInbox() {
-      const grid = document.getElementById('trade-offers-inbox-grid');
-      if (!grid) return;
-
-      if (!currentUser) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Please log in to view incoming trade offers.</div>`;
-        return;
-      }
-
-      const myIncomingOffers = tradeRequestsList.filter(r => {
-        const isTargetedToMe = r.targetOwner === currentUser.name;
-        const isAdminTarget = currentUser.isAdmin && (
-          !r.targetOwner || 
-          r.targetOwner === 'Admin' || 
-          r.targetOwner === 'Admin House' || 
-          r.targetOwner === 'Admin Support' || 
-          r.targetOwner === 'Unowned'
-        );
-        return (isTargetedToMe || isAdminTarget) && (r.status === 'PENDING' || r.status === 'COUNTERED');
-      });
-
-      if (myIncomingOffers.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No pending incoming trade offers for your cards right now.</div>`;
-        return;
-      }
-
-      grid.innerHTML = myIncomingOffers.map(req => `
-        <div class="bg-slate-900 border border-indigo-500/30 rounded-2xl p-4 flex gap-4 items-center">
-          <div class="w-20 h-24 bg-slate-950 rounded-xl p-1 border border-slate-800 shrink-0 flex items-center justify-center overflow-hidden">
-            <img src="${req.cardImg}" class="w-full h-full object-contain">
-          </div>
-          <div class="flex-1 space-y-1 text-xs">
-            <div class="flex justify-between items-center">
-              <span class="font-black text-amber-400 font-mono">${req.serial}</span>
-              <span class="text-[9px] font-extrabold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">${req.status || 'PENDING'}</span>
-            </div>
-            <p class="font-bold text-white">${req.cardName}</p>
-            <p class="text-[11px] text-slate-400">Proposer: <strong class="text-indigo-400">${req.proposer}</strong></p>
-            <p class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800/80">Offer Details: ${req.notes}</p>
-            
-            <div class="flex items-center gap-2 pt-2">
-              <button onclick="acceptTradeRequest('${req.id}')" class="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all shadow">Accept Offer</button>
-              <button onclick="openCounterOfferModal('${req.id}')" class="flex-1 py-1.5 bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 font-extrabold text-[10px] rounded-xl border border-amber-500/30 transition-all">Counter</button>
-              <button onclick="openDirectChat('${req.proposer}', 'Trade for ${req.serial}')" class="py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-xl transition-all"><i class="fa-solid fa-comments"></i> Chat</button>
-              <button onclick="rejectTradeRequest('${req.id}')" class="py-1.5 px-3 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-extrabold text-[10px] rounded-xl border border-rose-500/30 transition-all">Reject</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
     async function cancelTradeRequest(reqId, proposerName) {
       if (!currentUser) return;
       if (!currentUser.isAdmin && currentUser.name !== proposerName) {
@@ -2756,7 +2731,6 @@
 
     function refreshAdminHub() {
       loadPendingTransactions();
-      loadAdminChatInbox();
       showToast('Admin Hub refreshed.');
     }
 
@@ -2766,7 +2740,7 @@
         return showToast('Admin access required.');
       }
 
-      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'trade-offers', 'holders', 'history'].forEach(t => {
+      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const nav = document.getElementById(`nav-${t}`);
         if (view) view.classList.add('hidden');
@@ -2786,16 +2760,13 @@
       if (tabName === 'dashboard') renderOwnedCards();
       if (tabName === 'wishlist') renderWishlistPage();
       if (tabName === 'inventory') renderInventoryTable();
-      if (tabName === 'admin') {
-        loadPendingTransactions();
-        loadAdminChatInbox();
-      }
+      if (tabName === 'admin') loadPendingTransactions();
+      if (tabName === 'inbox') loadUserInboxThreads();
       if (tabName === 'holders') renderHoldersTable();
       if (tabName === 'history') fetchTransactionHistory();
       if (tabName === 'trade') fetchListings();
       if (tabName === 'auction') fetchActiveAuction();
       if (tabName === 'trade-req') fetchTradeRequests();
-      if (tabName === 'trade-offers') renderTradeOffersInbox();
       if (tabName === 'catalog') {
         visibleCardCount = 10;
         renderCardGrid();
@@ -2920,57 +2891,6 @@
           </td>
         </tr>
       `).join('');
-    }
-
-    function loadAdminChatInbox() {
-      const container = document.getElementById('admin-chat-inbox-list');
-      if (!container || !currentUser?.isAdmin) return;
-
-      if (adminChatUnsubscribe) adminChatUnsubscribe();
-
-      adminChatUnsubscribe = db.collection("chats").onSnapshot(snapshot => {
-        if (snapshot.empty) {
-          container.innerHTML = `<p class="text-xs text-slate-500">No active support chat threads.</p>`;
-          return;
-        }
-
-        const chats = [];
-        snapshot.forEach(doc => {
-          const chatId = doc.id;
-          if (chatId.includes('Admin Support') || chatId.includes(currentUser.name)) {
-            chats.push({ id: chatId, ...doc.data() });
-          }
-        });
-
-        if (chats.length === 0) {
-          container.innerHTML = `<p class="text-xs text-slate-500">No active support chat threads found.</p>`;
-          return;
-        }
-
-        container.innerHTML = chats.map(c => {
-          const rawNames = c.id.replace('chat-', '').split('-vs-');
-          const otherUser = rawNames.find(name => name !== 'Admin Support' && name !== currentUser.name) || 'Collector';
-          const lastMsg = c.lastMessage || 'Click to open thread';
-
-          return `
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
-              <div class="flex items-center gap-2.5">
-                <i class="fa-solid fa-user-circle text-amber-400 text-base"></i>
-                <div>
-                  <p class="font-bold text-white">${otherUser}</p>
-                  <p class="text-[10px] text-slate-400 truncate max-w-[180px]">${lastMsg}</p>
-                </div>
-              </div>
-              <button onclick="openDirectChat('${otherUser}', 'Admin Support Thread')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-lg transition-all flex items-center gap-1.5 shrink-0">
-                <i class="fa-solid fa-comments"></i> Open Chat
-              </button>
-            </div>
-          `;
-        }).join('');
-      }, err => {
-        console.warn('Admin chat snapshot error:', err);
-        container.innerHTML = `<p class="text-xs text-rose-400">Error loading chats. Check Firestore security rules.</p>`;
-      });
     }
 
     async function loadPendingTransactions() {
