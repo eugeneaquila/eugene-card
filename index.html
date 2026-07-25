@@ -327,18 +327,29 @@
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
-    <!-- INBOX / CHAT VIEW -->
+    <!-- INBOX / CHAT VIEW (WITH USER SEARCH & DIRECT CHAT) -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Direct Messages & Support Inbox</h2>
-          <p class="text-xs text-slate-400 mt-1">View ongoing direct conversations with other collectors and support threads.</p>
+          <p class="text-xs text-slate-400 mt-1">Search collectors to start a chat or view ongoing direct conversations.</p>
         </div>
         <button onclick="loadUserInboxThreads()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-indigo-400 rounded-xl border border-slate-700 flex items-center gap-2">
           <i class="fa-solid fa-rotate"></i> Refresh Inbox
         </button>
       </div>
 
+      <!-- SEARCH & START CHAT WITH OTHER USERS -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
+        <h3 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-user-plus text-amber-400 mr-1.5"></i> Find & Chat Collector</h3>
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="user-chat-search-input" oninput="searchUsersForChat()" placeholder="Type collector name or email to start a chat..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div id="user-chat-search-results" class="space-y-2 hidden max-h-48 overflow-y-auto"></div>
+      </div>
+
+      <!-- EXISTING CHAT THREADS -->
       <div id="inbox-threads-list" class="space-y-3">
         <p class="text-xs text-slate-500 text-center py-10">Loading messages...</p>
       </div>
@@ -1013,6 +1024,72 @@
       deleteCookie('eugene_notifications');
       renderNotifications();
       showToast('Notifications cleared.');
+    }
+
+    function searchUsersForChat() {
+      const query = (document.getElementById('user-chat-search-input')?.value || '').toLowerCase().trim();
+      const resultsContainer = document.getElementById('user-chat-search-results');
+      if (!resultsContainer) return;
+
+      if (!query) {
+        resultsContainer.classList.add('hidden');
+        resultsContainer.innerHTML = '';
+        return;
+      }
+
+      const foundUsers = new Set();
+      
+      // Known Admins
+      ADMIN_EMAILS.forEach(email => {
+        const name = email.split('@')[0];
+        if (name.toLowerCase().includes(query) || email.toLowerCase().includes(query)) {
+          foundUsers.add(name);
+        }
+      });
+
+      // Owners from inventory
+      inventory.forEach(c => {
+        if (c.owner && c.owner.toLowerCase().includes(query)) {
+          foundUsers.add(c.owner);
+        }
+      });
+
+      // Buyers from transaction history
+      transactionsList.forEach(t => {
+        if (t.user_name && t.user_name.toLowerCase().includes(query)) {
+          foundUsers.add(t.user_name);
+        }
+      });
+
+      if (currentUser) {
+        foundUsers.delete(currentUser.name);
+      }
+
+      const usersList = Array.from(foundUsers);
+
+      if (usersList.length === 0) {
+        resultsContainer.classList.remove('hidden');
+        resultsContainer.innerHTML = `<div class="p-3 text-center text-slate-500 text-xs bg-slate-950 rounded-xl border border-slate-800">No matching collectors found for "${query}"</div>`;
+        return;
+      }
+
+      resultsContainer.classList.remove('hidden');
+      resultsContainer.innerHTML = usersList.map(userName => `
+        <div onclick="openDirectChat('${userName}', 'Direct Collector Chat'); document.getElementById('user-chat-search-results').classList.add('hidden');" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center justify-between cursor-pointer transition-all">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-amber-400 font-bold text-xs">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div>
+              <p class="font-extrabold text-white text-xs">${userName}</p>
+              <p class="text-[10px] text-slate-400">Registered Collector</p>
+            </div>
+          </div>
+          <button class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] rounded-lg flex items-center gap-1 shadow">
+            <i class="fa-solid fa-comments"></i> Start Chat
+          </button>
+        </div>
+      `).join('');
     }
 
     function openDirectChat(targetUserName, contextInfo = 'Trade Chat') {
