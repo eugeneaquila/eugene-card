@@ -1679,9 +1679,12 @@
       overrides[cardId] = updatedObj;
       saveCardOverrides(overrides);
 
+      let dbSyncFailed = false;
+      let dbSyncErrorMsg = '';
+
       if (supabaseClient) {
         try {
-          await supabaseClient
+          const { error } = await supabaseClient
             .from('cards')
             .upsert({
               id: cardId,
@@ -1697,17 +1700,41 @@
               tier: updatedTier,
               printing: updatedPrinting
             });
+
+          // IMPORTANT: Supabase does not throw on a permissions-blocked write —
+          // it returns { error } quietly. Checking this explicitly is what
+          // actually tells us whether the edit reached the shared database
+          // or only landed in this browser's local override cache.
+          if (error) {
+            dbSyncFailed = true;
+            dbSyncErrorMsg = error.message;
+            console.error('Supabase card upsert was rejected:', error);
+          }
         } catch (e) {
-          console.warn('Supabase DB sync exception, persisted locally:', e);
+          dbSyncFailed = true;
+          dbSyncErrorMsg = e.message || 'network/exception error';
+          console.warn('Supabase DB sync exception:', e);
         }
+      } else {
+        dbSyncFailed = true;
+        dbSyncErrorMsg = 'Supabase client not connected';
       }
 
       Object.assign(card, updatedObj);
-
       closeInventoryModal();
       updateAllViews();
-      showToast(`Updated ${updatedSerial}!`);
-      addNotification('Card Updated', `Modified specifications for ${updatedSerial} (${updatedName}).`, 'fa-pen-to-square text-amber-400');
+
+      if (dbSyncFailed) {
+        showToast(`Saved on THIS device only — database sync failed. Other users won't see this edit.`);
+        addNotification(
+          'Sync Failed — Local Only',
+          `${updatedSerial} was saved locally but NOT written to the shared database (${dbSyncErrorMsg}). Other users will not see this change. Check your Supabase RLS UPDATE/INSERT policies on "cards".`,
+          'fa-triangle-exclamation text-rose-400'
+        );
+      } else {
+        showToast(`Updated ${updatedSerial}!`);
+        addNotification('Card Updated', `Modified specifications for ${updatedSerial} (${updatedName}).`, 'fa-pen-to-square text-amber-400');
+      }
     }
 
     function openCardDetailModal(cardId) {
