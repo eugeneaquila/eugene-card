@@ -147,6 +147,34 @@
     </div>
   </header>
 
+  <!-- DIRECT CHAT DRAWER OVERLAY -->
+  <div id="chat-drawer-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[9990] hidden" onclick="closeChatDrawer()"></div>
+  <div id="chat-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 z-[9995] transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-4">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-comments text-amber-400 text-sm"></i>
+        <div>
+          <h3 id="chat-target-user-name" class="text-xs font-extrabold text-white">Direct Trade Chat</h3>
+          <p id="chat-target-context" class="text-[10px] text-slate-400">Negotiate trade terms directly</p>
+        </div>
+      </div>
+      <button onclick="closeChatDrawer()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Messages List Container -->
+    <div id="chat-messages-container" class="flex-1 py-4 space-y-3 overflow-y-auto max-h-[70vh]">
+      <div class="text-center py-10 text-slate-500 text-xs">No chat messages yet. Start the conversation!</div>
+    </div>
+
+    <!-- Send Chat Input -->
+    <div class="pt-3 border-t border-slate-800 space-y-2">
+      <div class="flex items-center gap-2">
+        <input type="text" id="chat-text-input" placeholder="Type message or counter terms..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+        <button onclick="sendChatMessage()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow">Send</button>
+      </div>
+    </div>
+  </div>
+
   <!-- FIXED FLOATING NOTIFICATION OVERLAY PANEL -->
   <div id="notification-dropdown" class="fixed top-16 right-4 sm:right-8 w-80 sm:w-96 bg-slate-900/95 border border-amber-500/40 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-[9999] hidden overflow-hidden backdrop-blur-xl">
     <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
@@ -862,6 +890,10 @@
     let tradeRequestsList = [];
     let viewedCollectorFilter = null;
 
+    let currentChatTargetUser = null;
+    let currentChatContextId = null;
+    let chatUnsubscribe = null;
+
     let visibleCardCount = 10;
     const CARDS_PER_BATCH = 10;
     let scrollObserver = null;
@@ -955,6 +987,80 @@
       deleteCookie('eugene_notifications');
       renderNotifications();
       showToast('Notifications cleared.');
+    }
+
+    function openDirectChat(targetUserName, contextInfo = 'Trade Chat') {
+      if (!currentUser) return showToast('Please log in to start a chat.');
+      if (currentUser.name === targetUserName) return showToast('Cannot chat with yourself.');
+
+      currentChatTargetUser = targetUserName;
+      const participants = [currentUser.name, targetUserName].sort();
+      currentChatContextId = `chat-${participants.join('-vs-')}`;
+
+      document.getElementById('chat-target-user-name').innerText = targetUserName;
+      document.getElementById('chat-target-context').innerText = contextInfo;
+
+      document.getElementById('chat-drawer').classList.remove('translate-x-full');
+      document.getElementById('chat-drawer-overlay').classList.remove('hidden');
+
+      listenToChatMessages(currentChatContextId);
+    }
+
+    function closeChatDrawer() {
+      document.getElementById('chat-drawer').classList.add('translate-x-full');
+      document.getElementById('chat-drawer-overlay').classList.add('hidden');
+      if (chatUnsubscribe) {
+        chatUnsubscribe();
+        chatUnsubscribe = null;
+      }
+    }
+
+    function listenToChatMessages(chatId) {
+      const container = document.getElementById('chat-messages-container');
+      if (!container) return;
+
+      if (chatUnsubscribe) chatUnsubscribe();
+
+      chatUnsubscribe = db.collection("chats").doc(chatId).collection("messages").orderBy("timestamp", "asc").onSnapshot(snapshot => {
+        if (snapshot.empty) {
+          container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">No chat messages yet. Send a message to discuss!</div>`;
+          return;
+        }
+
+        container.innerHTML = snapshot.docs.map(doc => {
+          const msg = doc.data();
+          const isMe = currentUser && msg.sender === currentUser.name;
+
+          return `
+            <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1">
+              <span class="text-[9px] font-bold text-slate-500">${msg.sender}</span>
+              <div class="max-w-[80%] px-3 py-2 rounded-2xl text-xs ${isMe ? 'bg-amber-500 text-slate-950 font-medium rounded-tr-none' : 'bg-slate-950 border border-slate-800 text-white rounded-tl-none'}">
+                ${msg.text}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.scrollTop = container.scrollHeight;
+      });
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chat-text-input');
+      const text = input ? input.value.trim() : '';
+
+      if (!text || !currentChatContextId || !currentUser) return;
+
+      try {
+        await db.collection("chats").doc(currentChatContextId).collection("messages").add({
+          sender: currentUser.name,
+          text: text,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        input.value = '';
+      } catch (e) {
+        showToast('Error sending chat message: ' + e.message);
+      }
     }
 
     function initDefaultInventory() {
@@ -2115,6 +2221,27 @@
       }
     }
 
+    async function withdrawTradeRequest(reqId) {
+      if (!currentUser) return showToast('Please log in.');
+      const req = tradeRequestsList.find(r => r.id === reqId);
+      if (!req) return;
+
+      if (req.proposer !== currentUser.name && !currentUser.isAdmin) {
+        return showToast('You can only withdraw your own proposed trade requests.');
+      }
+
+      if (!confirm('Are you sure you want to withdraw this trade request?')) return;
+
+      try {
+        await db.collection("tradeRequests").doc(reqId).delete();
+        showToast('Trade request withdrawn.');
+        addNotification('Trade Withdrawn', `Withdrew proposed trade offer for ${req.serial}.`, 'fa-rotate-left text-amber-400');
+        await fetchTradeRequests();
+      } catch (e) {
+        showToast('Error withdrawing trade: ' + e.message);
+      }
+    }
+
     async function acceptTradeRequest(reqId) {
       if (!currentUser) return showToast('Please log in.');
       const req = tradeRequestsList.find(r => r.id === reqId);
@@ -2234,6 +2361,7 @@
             <div class="flex items-center gap-2 pt-2">
               <button onclick="acceptTradeRequest('${req.id}')" class="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all shadow">Accept Offer</button>
               <button onclick="openCounterOfferModal('${req.id}')" class="flex-1 py-1.5 bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 font-extrabold text-[10px] rounded-xl border border-amber-500/30 transition-all">Counter</button>
+              <button onclick="openDirectChat('${req.proposer}', 'Trade for ${req.serial}')" class="py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-xl transition-all"><i class="fa-solid fa-comments"></i> Chat</button>
               <button onclick="rejectTradeRequest('${req.id}')" class="py-1.5 px-3 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-extrabold text-[10px] rounded-xl border border-rose-500/30 transition-all">Reject</button>
             </div>
           </div>
@@ -2268,7 +2396,8 @@
       }
 
       grid.innerHTML = tradeRequestsList.map(req => {
-        const canCancel = currentUser && (currentUser.isAdmin || currentUser.name === req.proposer || currentUser.name === req.targetOwner);
+        const isProposer = currentUser && currentUser.name === req.proposer;
+        const canCancel = currentUser && (currentUser.isAdmin || isProposer || currentUser.name === req.targetOwner);
 
         return `
           <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex gap-4 items-center">
@@ -2285,9 +2414,17 @@
               <p class="text-[11px] text-slate-400">Proposed by: <strong class="text-indigo-400">${req.proposer}</strong></p>
               <p class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800/80">Offer: ${req.notes}</p>
               
-              ${canCancel ? `
-                <button onclick="cancelTradeRequest('${req.id}', '${req.proposer}')" class="mt-2 px-3 py-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-bold text-[10px] rounded-lg border border-rose-500/30 transition-all">Cancel Request</button>
-              ` : ''}
+              <div class="flex items-center gap-2 pt-2">
+                ${isProposer ? `
+                  <button onclick="withdrawTradeRequest('${req.id}')" class="px-3 py-1 bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 font-bold text-[10px] rounded-lg border border-amber-500/30 transition-all"><i class="fa-solid fa-rotate-left mr-1"></i> Withdraw Request</button>
+                ` : ''}
+                
+                <button onclick="openDirectChat('${isProposer ? req.targetOwner : req.proposer}', 'Trade Offer for ${req.serial}')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] rounded-lg transition-all"><i class="fa-solid fa-comments mr-1"></i> Chat</button>
+                
+                ${canCancel && !isProposer ? `
+                  <button onclick="cancelTradeRequest('${req.id}', '${req.proposer}')" class="px-3 py-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-bold text-[10px] rounded-lg border border-rose-500/30 transition-all">Cancel Request</button>
+                ` : ''}
+              </div>
             </div>
           </div>
         `;
@@ -2360,7 +2497,10 @@
               <p class="font-mono text-emerald-400 text-xs font-extrabold mt-1">${formatIDR(item.price)}</p>
             </div>
             <div class="space-y-1.5">
-              <button onclick="addToCart('${item.cardId}')" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all">Buy Listing</button>
+              <div class="grid grid-cols-2 gap-1.5">
+                <button onclick="addToCart('${item.cardId}')" class="py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all">Buy</button>
+                <button onclick="openDirectChat('${item.seller}', 'Listing ${item.serial}')" class="py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-xl transition-all"><i class="fa-solid fa-comments"></i> Chat</button>
+              </div>
               ${canCancel ? `
                 <button onclick="cancelTradeListing('${item.id}', '${item.seller}')" class="w-full py-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-bold text-[10px] rounded-xl border border-rose-500/30 transition-all">Cancel Listing</button>
               ` : ''}
