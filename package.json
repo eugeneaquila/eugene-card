@@ -1,17 +1,12 @@
 {
   "name": "eugene-card-marketplace",
   "version": "1.0.0",
-  "lockfileVersion": 3,
-  "requires": true,
-  "packages": {
-    "": {
-      "name": "eugene-card-marketplace",
-      "version": "1.0.0",
-      "license": "MIT",
-      "devDependencies": {
-        "npm-package-json-lint": "^8.0.0",
-        "typescript": "^5.0.0"
-      }
-    }
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
+  },
+  "devDependencies": {
+    "npm-package-json-lint": "^8.0.0",
+    "typescript": "^5.0.0"
   }
 }
