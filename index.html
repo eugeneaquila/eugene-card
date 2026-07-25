@@ -897,35 +897,51 @@
       inventory = applyCardOverrides(inventory);
     }
 
-    /* BACKUP EXPORT & IMPORT WITH ANIMATION AND NOTIFICATIONS */
+    /* HIGH-PERFORMANCE OPTIMIZED BACKUP & BULK IMPORT */
     function exportInventoryBackup() {
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
 
-      showLoadingModal('Generating Backup...', 'Compiling JSON schema state...', false);
+      showLoadingModal('Generating Fast Backup...', 'Formatting inventory array...', false);
 
       setTimeout(() => {
         const backupData = {
           exportedAt: new Date().toISOString(),
           exportedBy: currentUser.email || currentUser.name,
           inventoryCount: inventory.length,
-          cards: inventory,
+          cards: inventory.map(c => ({
+            id: c.id,
+            serial: c.serial,
+            name: c.name,
+            type: c.type,
+            price: c.price,
+            baseFloorPrice: c.baseFloorPrice || c.price,
+            owner: c.owner || null,
+            status: c.status || 'AVAILABLE',
+            imgUrl: c.imgUrl,
+            edition: c.edition,
+            sn: c.sn,
+            tier: c.tier,
+            printing: c.printing
+          })),
           overrides: getCardOverrides()
         };
 
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const blob = new Blob([JSON.stringify(backupData, null, 0)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
         const downloadAnchor = document.createElement('a');
         const filename = `eugene_inventory_backup_${new Date().toISOString().slice(0,10)}.json`;
 
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", filename);
+        downloadAnchor.href = url;
+        downloadAnchor.download = filename;
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
+        URL.revokeObjectURL(url);
 
         hideLoadingModal();
-        showToast('Inventory backup downloaded!');
-        addNotification('Backup Downloaded', `Successfully exported state containing ${inventory.length} cards.`, 'fa-download text-amber-400');
-      }, 600);
+        showToast('Backup JSON downloaded instantly!');
+        addNotification('Backup Downloaded', `Exported state containing ${inventory.length} cards.`, 'fa-download text-amber-400');
+      }, 50);
     }
 
     async function importInventoryBackup(event) {
@@ -937,22 +953,27 @@
       const reader = new FileReader();
       reader.onload = async function(e) {
         try {
+          showLoadingModal('Parsing Backup File...', 'Reading data structure...', true);
+          await new Promise(r => setTimeout(r, 20));
+
           const parsed = JSON.parse(e.target.result);
           const importedCards = Array.isArray(parsed) ? parsed : (parsed.cards || []);
 
           if (!Array.isArray(importedCards) || importedCards.length === 0) {
-            showToast('Invalid backup file format.');
+            hideLoadingModal();
+            showToast('Invalid backup file structure.');
             return;
           }
 
-          if (!confirm(`Import ${importedCards.length} cards sequentially into database?`)) {
+          if (!confirm(`Import ${importedCards.length} cards instantly in high-speed batches?`)) {
+            hideLoadingModal();
             event.target.value = '';
             return;
           }
 
-          showLoadingModal('Importing Inventory Backup', 'Updating inventory database sequential records...', true);
-
           const overrides = getCardOverrides();
+          const bulkDatabasePayload = [];
+
           importedCards.forEach(c => {
             overrides[c.id] = {
               name: c.name,
@@ -967,67 +988,72 @@
               tier: c.tier,
               printing: c.printing
             };
+
+            bulkDatabasePayload.push({
+              id: c.id,
+              serial: c.serial,
+              name: c.name,
+              type: c.type,
+              price: c.price,
+              base_floor_price: c.baseFloorPrice || c.base_floor_price || c.price,
+              owner: c.owner || null,
+              status: c.status || 'AVAILABLE',
+              img_url: c.imgUrl || c.img_url,
+              edition: c.edition || 'Beta Edition: #0',
+              sn: c.sn || '0001',
+              tier: c.tier || (c.type === 'PREMIUM' ? '500' : '100'),
+              printing: c.printing || '1x'
+            });
           });
+
+          // Save to local cache first for instant feedback
           saveCardOverrides(overrides);
 
-          let successCount = 0;
-          let errorCount = 0;
-          const total = importedCards.length;
+          // Fast Bulk Upsert in Chunks of 25 items
+          const BATCH_SIZE = 25;
+          let processed = 0;
+          let errors = 0;
 
           if (supabaseClient) {
-            for (let i = 0; i < total; i++) {
-              const c = importedCards[i];
-              updateImportProgress(i + 1, total, `Processing ${c.serial || c.id}...`);
-
-              const singlePayload = {
-                id: c.id,
-                serial: c.serial,
-                name: c.name,
-                type: c.type,
-                price: c.price,
-                base_floor_price: c.baseFloorPrice || c.base_floor_price || c.price,
-                owner: c.owner || null,
-                status: c.status || 'AVAILABLE',
-                img_url: c.imgUrl || c.img_url,
-                edition: c.edition || 'Beta Edition: #0',
-                sn: c.sn || '0001',
-                tier: c.tier || (c.type === 'PREMIUM' ? '500' : '100'),
-                printing: c.printing || '1x'
-              };
+            for (let i = 0; i < bulkDatabasePayload.length; i += BATCH_SIZE) {
+              const chunk = bulkDatabasePayload.slice(i, i + BATCH_SIZE);
+              updateImportProgress(processed, bulkDatabasePayload.length, `Upserting batch ${Math.floor(i / BATCH_SIZE) + 1}...`);
 
               try {
                 const { error } = await supabaseClient
                   .from('cards')
-                  .upsert([singlePayload], { onConflict: 'id' });
+                  .upsert(chunk, { onConflict: 'id' });
 
                 if (error) {
-                  console.error(`Failed to import card ID ${c.id}:`, error.message);
-                  errorCount++;
-                } else {
-                  successCount++;
+                  console.error('Batch upsert error:', error);
+                  errors += chunk.length;
                 }
               } catch (err) {
-                console.error(`Exception during single import ${c.id}:`, err);
-                errorCount++;
+                console.error('Batch network exception:', err);
+                errors += chunk.length;
               }
+
+              processed += chunk.length;
+              updateImportProgress(processed, bulkDatabasePayload.length, `Batch complete (${processed}/${bulkDatabasePayload.length})`);
+              await new Promise(r => setTimeout(r, 10)); // Yield thread for smooth UI progress
             }
           }
 
           await loadAppState();
           hideLoadingModal();
 
-          if (errorCount > 0) {
-            showToast(`Imported ${successCount} cards (${errorCount} failed).`);
-            addNotification('Import Completed with Warnings', `Imported ${successCount} items; ${errorCount} records encountered errors.`, 'fa-triangle-exclamation text-amber-400');
+          if (errors > 0) {
+            showToast(`Imported with ${errors} batch warnings.`);
+            addNotification('Import Finished', `Imported ${bulkDatabasePayload.length - errors} cards cleanly.`, 'fa-triangle-exclamation text-amber-400');
           } else {
-            showToast(`Successfully imported all ${successCount} cards!`);
-            addNotification('Backup Import Complete', `Successfully imported ${successCount} cards into the live stock catalog.`, 'fa-circle-check text-emerald-400');
+            showToast(`Bulk imported ${bulkDatabasePayload.length} cards successfully!`);
+            addNotification('Fast Import Success', `Imported ${bulkDatabasePayload.length} records in bulk batches.`, 'fa-circle-check text-emerald-400');
           }
 
         } catch (err) {
           console.error('Import parse error:', err);
           hideLoadingModal();
-          showToast('Failed to parse JSON backup file.');
+          showToast('Failed to parse backup JSON.');
         } finally {
           event.target.value = '';
         }
@@ -1051,7 +1077,7 @@
     }
 
     function updateImportProgress(current, total, label) {
-      const pct = Math.round((current / total) * 100);
+      const pct = Math.round((current / total) * 100) || 0;
       document.getElementById('import-progress-bar').style.width = `${pct}%`;
       document.getElementById('import-progress-status').innerText = `${current} / ${total}`;
       document.getElementById('import-progress-percent').innerText = `${pct}%`;
