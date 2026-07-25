@@ -217,9 +217,14 @@
 
     <!-- AUCTION ROOM VIEW -->
     <section id="view-auction" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide">AUCTION ROOM</h2>
-        <p class="text-xs text-slate-400 mt-1">Place competitive bids on rare serial cards before timer expires.</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide">AUCTION ROOM</h2>
+          <p class="text-xs text-slate-400 mt-1">Place competitive bids on rare serial cards before timer expires.</p>
+        </div>
+        <button id="admin-cancel-auction-btn" onclick="cancelActiveAuction()" class="hidden px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs rounded-xl shadow-lg items-center gap-2">
+          <i class="fa-solid fa-ban"></i> Cancel Auction (Admin)
+        </button>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -322,7 +327,7 @@
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Vault / Binder</h2>
-          <p class="text-xs text-slate-400 mt-1">Manage owned cards, adjust listing prices, or sell back instantly to Admin at floor price.</p>
+          <p class="text-xs text-slate-400 mt-1">Manage owned cards, sell back instantly to Admin, or place them into Auction/Trade.</p>
         </div>
         <button onclick="openProfileManagerModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl border border-slate-700 flex items-center gap-2">
           <i class="fa-solid fa-user-gear text-amber-400"></i> Profile Settings
@@ -428,6 +433,22 @@
     </section>
 
   </main>
+
+  <!-- LIST CARD FOR TRADE / AUCTION MODAL -->
+  <div id="list-card-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeListCardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      <h3 id="list-modal-title" class="text-base font-extrabold text-white">List Card for Trade</h3>
+      <input type="hidden" id="list-card-id-target">
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Asking Price (IDR)</label>
+          <input type="number" id="list-card-price-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <button onclick="submitCardListing()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl hover:bg-amber-400 transition-all">Publish Listing</button>
+      </div>
+    </div>
+  </div>
 
   <!-- NON-BLOCKING FLOATING IMPORT PROGRESS WIDGET -->
   <div id="loading-modal" class="fixed bottom-6 right-6 z-[9999] hidden pointer-events-auto">
@@ -749,6 +770,7 @@
     let transactionsList = [];
     let ownerOptionsList = [];
     let systemNotifications = [];
+    let activeListings = [];
 
     let visibleCardCount = 10;
     const CARDS_PER_BATCH = 10;
@@ -882,7 +904,7 @@
       return defaultList;
     }
 
-    /* BACKUP & BULK IMPORT (FIREBASE FIRESTORE BATCH) */
+    /* BACKUP & BULK IMPORT */
     function exportInventoryBackup() {
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
 
@@ -949,7 +971,7 @@
             return;
           }
 
-          const BATCH_LIMIT = 400; // Firestore maximum batch write is 500
+          const BATCH_LIMIT = 400;
           let processed = 0;
 
           for (let i = 0; i < importedCards.length; i += BATCH_LIMIT) {
@@ -1087,7 +1109,7 @@
       }, 150);
     }
 
-    /* FIREBASE FIRESTORE DATA LOAD (RELIABLE CLOUD SOURCE OF TRUTH) */
+    /* FIREBASE FIRESTORE DATA LOAD */
     async function loadAppState() {
       let loadedFromDb = false;
 
@@ -1114,12 +1136,11 @@
             });
           });
 
-          // Natural ID sort directly from database
           inventory = fetchedCards.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
           loadedFromDb = true;
         }
       } catch (err) {
-        console.warn('Firestore fetch exception, falling back to local stock structure:', err);
+        console.warn('Firestore fetch exception:', err);
       }
 
       if (!loadedFromDb || inventory.length === 0) {
@@ -1127,7 +1148,19 @@
       }
 
       loadSavedCart();
+      await fetchListings();
       updateAllViews();
+    }
+
+    async function fetchListings() {
+      try {
+        const snapshot = await db.collection("listings").get();
+        activeListings = [];
+        snapshot.forEach(doc => activeListings.push({ id: doc.id, ...doc.data() }));
+        renderP2PListings();
+      } catch (e) {
+        console.warn('Fetch listings error:', e);
+      }
     }
 
     /* FIREBASE REALTIME LISTENERS */
@@ -1157,6 +1190,10 @@
         updateAllViews();
       });
 
+      db.collection("listings").onSnapshot((snapshot) => {
+        fetchListings();
+      });
+
       db.collection("transactions").onSnapshot((snapshot) => {
         fetchTransactionHistory();
         if (currentUser?.isAdmin) loadPendingTransactions();
@@ -1171,6 +1208,20 @@
       renderInventoryTable();
       updateRemainingCardsCounter();
       updateCartTotals();
+      renderAdminCancelAuctionButton();
+    }
+
+    function renderAdminCancelAuctionButton() {
+      const btn = document.getElementById('admin-cancel-auction-btn');
+      if (btn) {
+        if (currentUser && currentUser.isAdmin) {
+          btn.classList.remove('hidden');
+          btn.classList.add('flex');
+        } else {
+          btn.classList.add('hidden');
+          btn.classList.remove('flex');
+        }
+      }
     }
 
     function updateRemainingCardsCounter() {
@@ -1180,7 +1231,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      // Clear legacy Supabase card overrides from browser storage
       localStorage.removeItem('eugene_cards_override');
       deleteCookie('eugene_cards_override');
 
@@ -1200,6 +1250,7 @@
         } else {
           currentUser = null;
           renderAuthHeader();
+          updateAllViews();
         }
       });
 
@@ -1252,6 +1303,7 @@
         if (adminSep) adminSep.classList.add('hidden');
         container.innerHTML = `<button onclick="openAuthModal()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Log In</button>`;
       }
+      renderAdminCancelAuctionButton();
     }
 
     function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
@@ -1605,7 +1657,6 @@
       reader.readAsDataURL(file);
     }
 
-    /* SAVE CARD CHANGES TO FIRESTORE DIRECTLY */
     async function saveInventoryCardChanges() {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
 
@@ -1689,6 +1740,133 @@
     }
 
     function closeCardDetailModal() { document.getElementById('card-detail-modal').classList.add('hidden'); }
+
+    /* SELL BACK TO ADMIN / LISTING ACTIONS */
+    async function sellBackToAdmin(cardId) {
+      if (!currentUser) return showToast('Please log in.');
+      const card = inventory.find(c => c.id === cardId);
+      if (!card || card.owner !== currentUser.name) return showToast('You do not own this card.');
+
+      if (!confirm(`Are you sure you want to sell ${card.serial} back to Admin at floor price (${formatIDR(card.price)})?`)) return;
+
+      try {
+        await db.collection("cards").doc(cardId).update({ owner: null, status: 'AVAILABLE' });
+        showToast(`Successfully sold ${card.serial} back to Admin!`);
+        addNotification('Card Sold Back', `Returned ${card.serial} to house stock.`, 'fa-rotate-left text-amber-400');
+        await loadAppState();
+      } catch (e) {
+        showToast('Error selling back: ' + e.message);
+      }
+    }
+
+    function openListCardModal(cardId) {
+      if (!currentUser) return showToast('Please log in first.');
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+
+      document.getElementById('list-card-id-target').value = cardId;
+      document.getElementById('list-card-price-input').value = card.price;
+      document.getElementById('list-card-modal').classList.remove('hidden');
+    }
+
+    function closeListCardModal() {
+      document.getElementById('list-card-modal').classList.add('hidden');
+    }
+
+    async function submitCardListing() {
+      const cardId = document.getElementById('list-card-id-target').value;
+      const price = parseFloat(document.getElementById('list-card-price-input').value);
+      const card = inventory.find(c => c.id === cardId);
+      if (!card || !price) return showToast('Invalid details.');
+
+      const listingId = 'list-' + cardId;
+      const listingData = {
+        cardId: cardId,
+        serial: card.serial,
+        name: card.name,
+        type: card.type,
+        imgUrl: card.imgUrl,
+        price: price,
+        seller: currentUser.name,
+        created_at: new Date().toISOString()
+      };
+
+      try {
+        await db.collection("listings").doc(listingId).set(listingData);
+        closeListCardModal();
+        showToast(`Listed ${card.serial} in the Trading Room!`);
+        addNotification('Card Listed', `Published ${card.serial} for trade/sale.`, 'fa-tag text-amber-400');
+        await fetchListings();
+        switchTab('trade');
+      } catch (e) {
+        showToast('Listing error: ' + e.message);
+      }
+    }
+
+    async function cancelTradeListing(listingId, sellerName) {
+      if (!currentUser) return;
+      if (!currentUser.isAdmin && currentUser.name !== sellerName) {
+        return showToast('Only the card owner or Admin can cancel this listing.');
+      }
+
+      if (!confirm('Are you sure you want to cancel this trade listing?')) return;
+
+      try {
+        await db.collection("listings").doc(listingId).delete();
+        showToast('Trade listing canceled.');
+        addNotification('Listing Canceled', 'Trade listing has been removed.', 'fa-ban text-rose-400');
+        await fetchListings();
+      } catch (e) {
+        showToast('Error canceling listing: ' + e.message);
+      }
+    }
+
+    async function cancelActiveAuction() {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+      if (!confirm('Are you sure you want to cancel the active auction?')) return;
+
+      try {
+        showToast('Featured auction canceled by Admin.');
+        addNotification('Auction Canceled', 'Active auction was terminated by Admin.', 'fa-gavel text-rose-400');
+        auctionSecondsLeft = 3 * 3600;
+      } catch (e) {
+        showToast('Error canceling auction: ' + e.message);
+      }
+    }
+
+    function renderP2PListings() {
+      const grid = document.getElementById('p2p-listings-grid');
+      if (!grid) return;
+
+      if (activeListings.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No active trade listings in the room right now.</div>`;
+        return;
+      }
+
+      grid.innerHTML = activeListings.map(item => {
+        const canCancel = currentUser && (currentUser.isAdmin || currentUser.name === item.seller);
+
+        return `
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between space-y-2">
+            <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 overflow-hidden flex items-center justify-center">
+              <img src="${item.imgUrl}" loading="lazy" class="w-full h-full object-contain rounded-lg">
+            </div>
+            <div>
+              <p class="font-bold text-xs text-white truncate">${item.name}</p>
+              <p class="font-mono text-amber-400 text-xs font-black">${item.serial}</p>
+              <p class="text-[10px] text-slate-400">Seller: <strong class="text-white">${item.seller}</strong></p>
+              <p class="font-mono text-emerald-400 text-xs font-extrabold mt-1">${formatIDR(item.price)}</p>
+            </div>
+            <div class="space-y-1.5">
+              <button onclick="addToCart('${item.cardId}')" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all">Buy Listing</button>
+              ${canCancel ? `
+                <button onclick="cancelTradeListing('${item.id}', '${item.seller}')" class="w-full py-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-bold text-[10px] rounded-xl border border-rose-500/30 transition-all">Cancel Listing</button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
 
     function addToCart(cardId) {
       if (!currentUser) return showToast('Please log in first.');
@@ -1818,6 +1996,7 @@
       if (tabName === 'admin') loadPendingTransactions();
       if (tabName === 'holders') renderHoldersTable();
       if (tabName === 'history') fetchTransactionHistory();
+      if (tabName === 'trade') fetchListings();
       if (tabName === 'catalog') {
         visibleCardCount = 10;
         renderCardGrid();
@@ -1840,7 +2019,7 @@
       }
 
       grid.innerHTML = owned.map(card => `
-        <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-between space-y-2 cursor-pointer" onclick="openCardDetailModal('${card.id}')">
+        <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-between space-y-3 cursor-pointer" onclick="openCardDetailModal('${card.id}')">
           <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1.5 border border-slate-800 overflow-hidden flex items-center justify-center">
             <img src="${card.imgUrl}" loading="lazy" class="w-full h-full object-contain rounded-lg">
           </div>
@@ -1848,8 +2027,37 @@
             <p class="font-bold text-xs text-white truncate">${card.name}</p>
             <p class="font-mono text-amber-400 text-xs font-black">${card.serial}</p>
           </div>
+          <div class="space-y-1.5 pt-1 border-t border-slate-800/80" onclick="event.stopPropagation()">
+            <button onclick="sellBackToAdmin('${card.id}')" class="w-full py-1.5 bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 font-extrabold text-[10px] rounded-xl border border-rose-500/30 transition-all flex items-center justify-center gap-1">
+              <i class="fa-solid fa-rotate-left"></i> Sell Back to Admin
+            </button>
+            <div class="grid grid-cols-2 gap-1">
+              <button onclick="openListCardForAuctionModal('${card.id}')" class="py-1.5 bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-400 font-extrabold text-[10px] rounded-xl border border-emerald-500/30 transition-all flex items-center justify-center gap-1">
+                <i class="fa-solid fa-gavel"></i> Auction
+              </button>
+              <button onclick="openListCardModal('${card.id}')" class="py-1.5 bg-purple-950/40 hover:bg-purple-900/40 text-purple-400 font-extrabold text-[10px] rounded-xl border border-purple-500/30 transition-all flex items-center justify-center gap-1">
+                <i class="fa-solid fa-right-left"></i> Trade
+              </button>
+            </div>
+          </div>
         </div>
       `).join('');
+    }
+
+    function openListCardForAuctionModal(cardId) {
+      if (!currentUser) return showToast('Please log in.');
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+      document.getElementById('list-card-id-target').value = cardId;
+      document.getElementById('list-modal-title').innerText = 'List Card for Auction';
+      document.getElementById('list-card-price-input').value = card.price;
+      document.getElementById('list-card-modal').classList.remove('hidden');
+    }
+
+    function openListCardForTradeModal() {
+      const owned = inventory.filter(c => currentUser && c.owner === currentUser.name);
+      if (owned.length === 0) return showToast('You must own at least one card in your binder to list for trade.');
+      openListCardModal(owned[0].id);
     }
 
     function renderWishlistPage() {
