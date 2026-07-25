@@ -154,7 +154,12 @@
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-comments text-amber-400 text-sm"></i>
         <div>
-          <h3 id="chat-target-user-name" class="text-xs font-extrabold text-white">Direct Trade Chat</h3>
+          <div class="flex items-center gap-1.5">
+            <h3 id="chat-target-user-name" class="text-xs font-extrabold text-white">Direct Trade Chat</h3>
+            <span id="chat-target-admin-badge" class="hidden text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/40">
+              <i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN
+            </span>
+          </div>
           <p id="chat-target-context" class="text-[10px] text-slate-400">Negotiate trade terms directly</p>
         </div>
       </div>
@@ -327,7 +332,7 @@
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
-    <!-- INBOX / CHAT VIEW (WITH USER SEARCH & DIRECT CHAT) -->
+    <!-- INBOX / CHAT VIEW (WITH USER SEARCH & ADMIN BADGES) -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -935,6 +940,12 @@
     const CARDS_PER_BATCH = 10;
     let scrollObserver = null;
 
+    function isUserAdmin(identifier) {
+      if (!identifier) return false;
+      const lower = identifier.toLowerCase().trim();
+      return ADMIN_EMAILS.some(e => e.toLowerCase() === lower || e.split('@')[0].toLowerCase() === lower);
+    }
+
     function setCookie(name, value, days = 30) {
       try {
         const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
@@ -1037,52 +1048,50 @@
         return;
       }
 
-      const foundUsers = new Set();
+      const foundUsersMap = new Map();
       
-      // Known Admins
       ADMIN_EMAILS.forEach(email => {
         const name = email.split('@')[0];
         if (name.toLowerCase().includes(query) || email.toLowerCase().includes(query)) {
-          foundUsers.add(name);
+          foundUsersMap.set(name, true);
         }
       });
 
-      // Owners from inventory
       inventory.forEach(c => {
-        if (c.owner && c.owner.toLowerCase().includes(query)) {
-          foundUsers.add(c.owner);
+        if (c.owner && c.owner.toLowerCase().includes(query) && !foundUsersMap.has(c.owner)) {
+          foundUsersMap.set(c.owner, isUserAdmin(c.owner));
         }
       });
 
-      // Buyers from transaction history
       transactionsList.forEach(t => {
-        if (t.user_name && t.user_name.toLowerCase().includes(query)) {
-          foundUsers.add(t.user_name);
+        if (t.user_name && t.user_name.toLowerCase().includes(query) && !foundUsersMap.has(t.user_name)) {
+          foundUsersMap.set(t.user_name, isUserAdmin(t.user_name));
         }
       });
 
       if (currentUser) {
-        foundUsers.delete(currentUser.name);
+        foundUsersMap.delete(currentUser.name);
       }
 
-      const usersList = Array.from(foundUsers);
-
-      if (usersList.length === 0) {
+      if (foundUsersMap.size === 0) {
         resultsContainer.classList.remove('hidden');
         resultsContainer.innerHTML = `<div class="p-3 text-center text-slate-500 text-xs bg-slate-950 rounded-xl border border-slate-800">No matching collectors found for "${query}"</div>`;
         return;
       }
 
       resultsContainer.classList.remove('hidden');
-      resultsContainer.innerHTML = usersList.map(userName => `
-        <div onclick="openDirectChat('${userName}', 'Direct Collector Chat'); document.getElementById('user-chat-search-results').classList.add('hidden');" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl flex items-center justify-between cursor-pointer transition-all">
+      resultsContainer.innerHTML = Array.from(foundUsersMap.entries()).map(([userName, isAdmin]) => `
+        <div onclick="openDirectChat('${userName}', 'Direct Collector Chat'); document.getElementById('user-chat-search-results').classList.add('hidden');" class="p-3 bg-slate-950 hover:bg-slate-800 border ${isAdmin ? 'border-rose-500/40 bg-rose-950/10' : 'border-slate-800'} rounded-xl flex items-center justify-between cursor-pointer transition-all">
           <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-amber-400 font-bold text-xs">
-              <i class="fa-solid fa-user"></i>
+            <div class="w-8 h-8 rounded-full ${isAdmin ? 'bg-rose-950 text-rose-400 border border-rose-500/40' : 'bg-slate-900 text-amber-400 border border-slate-700'} flex items-center justify-center font-bold text-xs">
+              <i class="fa-solid ${isAdmin ? 'fa-shield-halved' : 'fa-user'}"></i>
             </div>
             <div>
-              <p class="font-extrabold text-white text-xs">${userName}</p>
-              <p class="text-[10px] text-slate-400">Registered Collector</p>
+              <div class="flex items-center gap-1.5">
+                <p class="font-extrabold text-white text-xs">${userName}</p>
+                ${isAdmin ? `<span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN</span>` : ''}
+              </div>
+              <p class="text-[10px] text-slate-400">${isAdmin ? 'Official Platform Support' : 'Registered Collector'}</p>
             </div>
           </div>
           <button class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] rounded-lg flex items-center gap-1 shadow">
@@ -1105,6 +1114,12 @@
 
       document.getElementById('chat-target-user-name').innerText = targetUserName;
       document.getElementById('chat-target-context').innerText = contextInfo;
+
+      const adminBadgeEl = document.getElementById('chat-target-admin-badge');
+      if (adminBadgeEl) {
+        if (isUserAdmin(targetUserName)) adminBadgeEl.classList.remove('hidden');
+        else adminBadgeEl.classList.add('hidden');
+      }
 
       document.getElementById('chat-drawer').classList.remove('translate-x-full');
       document.getElementById('chat-drawer-overlay').classList.remove('hidden');
@@ -1163,10 +1178,14 @@
         container.innerHTML = snapshot.docs.map(doc => {
           const msg = doc.data();
           const isMe = currentUser && msg.sender === currentUser.name;
+          const isSenderAdmin = isUserAdmin(msg.sender);
 
           return `
             <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1">
-              <span class="text-[9px] font-bold text-slate-500">${msg.sender}</span>
+              <div class="flex items-center gap-1">
+                <span class="text-[9px] font-bold text-slate-500">${msg.sender}</span>
+                ${isSenderAdmin ? `<span class="text-[8px] font-black px-1 py-0 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">ADMIN</span>` : ''}
+              </div>
               <div class="max-w-[80%] px-3 py-2 rounded-2xl text-xs ${isMe ? 'bg-amber-500 text-slate-950 font-medium rounded-tr-none' : 'bg-slate-950 border border-slate-800 text-white rounded-tl-none'}">
                 ${msg.imgUrl ? `<a href="${msg.imgUrl}" target="_blank"><img src="${msg.imgUrl}" class="max-w-full max-h-48 rounded-lg mb-1 border border-slate-800 hover:opacity-90 transition-opacity"></a>` : ''}
                 ${msg.text ? `<div>${msg.text}</div>` : ''}
@@ -1249,15 +1268,19 @@
           const rawNames = c.id.replace('chat-', '').split('-vs-');
           const otherUser = rawNames.find(name => name !== currentUser.name) || (rawNames[0] || 'Collector');
           const lastMsg = c.lastMessage || 'Click to view conversation';
+          const isOtherAdmin = isUserAdmin(otherUser);
 
           return `
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex justify-between items-center text-xs hover:border-indigo-500/40 transition-all">
+            <div class="bg-slate-900 border ${isOtherAdmin ? 'border-rose-500/30' : 'border-slate-800'} p-4 rounded-2xl flex justify-between items-center text-xs hover:border-indigo-500/40 transition-all">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0">
-                  <i class="fa-solid fa-user"></i>
+                <div class="w-10 h-10 rounded-full ${isOtherAdmin ? 'bg-rose-950 text-rose-400 border border-rose-500/40' : 'bg-slate-950 text-amber-400 border border-slate-800'} flex items-center justify-center font-bold text-sm shrink-0">
+                  <i class="fa-solid ${isOtherAdmin ? 'fa-shield-halved' : 'fa-user'}"></i>
                 </div>
                 <div>
-                  <p class="font-extrabold text-white text-sm">${otherUser}</p>
+                  <div class="flex items-center gap-1.5">
+                    <p class="font-extrabold text-white text-sm">${otherUser}</p>
+                    ${isOtherAdmin ? `<span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN</span>` : ''}
+                  </div>
                   <p class="text-xs text-slate-400 truncate max-w-xs sm:max-w-md mt-0.5">${lastMsg}</p>
                 </div>
               </div>
@@ -1996,7 +2019,13 @@
       if (!tbody) return;
 
       const filtered = transactionsList.filter(tx => {
-        if (historyFilter === 'MINE') return currentUser && tx.user_name?.toLowerCase() === currentUser.name.toLowerCase();
+        if (historyFilter === 'MINE') {
+          if (!currentUser) return false;
+          const myName = (currentUser.name || '').trim().toLowerCase();
+          const myEmailName = (currentUser.email ? currentUser.email.split('@')[0] : '').trim().toLowerCase();
+          const txUser = (tx.user_name || '').trim().toLowerCase();
+          return txUser === myName || (myEmailName && txUser === myEmailName);
+        }
         if (historyFilter === 'APPROVED') return tx.status === 'APPROVED';
         return true;
       });
@@ -2853,6 +2882,7 @@
     function viewedCollectorVault(collectorName) {
       viewedCollectorFilter = collectorName;
       switchTab('dashboard');
+      renderOwnedCards();
     }
 
     function renderOwnedCards() {
@@ -2958,13 +2988,13 @@
 
       tbody.innerHTML = Object.keys(ownersMap).map(k => `
         <tr class="hover:bg-slate-950/80 text-xs transition-all">
-          <td class="p-3 font-bold text-white cursor-pointer hover:text-amber-400" onclick="viewCollectorVault('${k}')">
+          <td class="p-3 font-bold text-white cursor-pointer hover:text-amber-400" onclick="viewedCollectorVault('${k}')">
             <i class="fa-solid fa-user-circle text-teal-400 mr-2"></i> <u>${k}</u>
           </td>
           <td class="p-3 font-mono text-amber-400 font-bold">${ownersMap[k].cards}</td>
           <td class="p-3 font-mono text-slate-400">${ownersMap[k].serials.join(', ')}</td>
           <td class="p-3 text-right">
-            <button onclick="viewCollectorVault('${k}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-700">View Binder</button>
+            <button onclick="viewedCollectorVault('${k}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-700">View Binder</button>
           </td>
         </tr>
       `).join('');
