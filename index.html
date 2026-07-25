@@ -332,7 +332,7 @@
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
-    <!-- INBOX / CHAT VIEW (WITH USER SEARCH & ADMIN BADGES) -->
+    <!-- INBOX / CHAT VIEW -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -2513,15 +2513,15 @@
       if (!req) return;
 
       if (req.proposer !== currentUser.name && !currentUser.isAdmin) {
-        return showToast('You can only withdraw your own proposed trade requests.');
+        return showToast('You can only cancel/withdraw your own proposed trade requests.');
       }
 
-      if (!confirm('Are you sure you want to withdraw this trade request?')) return;
+      if (!confirm('Are you sure you want to cancel/withdraw this trade offer?')) return;
 
       try {
         await db.collection("tradeRequests").doc(reqId).delete();
-        showToast('Trade request withdrawn.');
-        addNotification('Trade Withdrawn', `Withdrew proposed trade offer for ${req.serial}.`, 'fa-rotate-left text-amber-400');
+        showToast('Trade request canceled/withdrawn.');
+        addNotification('Trade Withdrawn', `Canceled trade offer for ${req.serial}.`, 'fa-rotate-left text-amber-400');
         await fetchTradeRequests();
       } catch (e) {
         showToast('Error withdrawing trade: ' + e.message);
@@ -2556,6 +2556,57 @@
         await loadAppState();
       } catch (e) {
         showToast('Error accepting trade: ' + e.message);
+      }
+    }
+
+    async function acceptCounterOffer(reqId) {
+      if (!currentUser) return showToast('Please log in.');
+      const req = tradeRequestsList.find(r => r.id === reqId);
+      if (!req) return showToast('Proposal not found.');
+
+      if (req.proposer !== currentUser.name && !currentUser.isAdmin) {
+        return showToast('Only the original offer proposer or Admin can accept this counter offer.');
+      }
+
+      if (!confirm(`Accept counter-offer for ${req.serial}? Ownership will be updated to ${req.proposer}.`)) return;
+
+      try {
+        const batch = db.batch();
+        const cardRef = db.collection("cards").doc(req.cardId);
+        batch.update(cardRef, { owner: req.proposer, status: 'SOLD' });
+
+        const reqRef = db.collection("tradeRequests").doc(reqId);
+        batch.update(reqRef, { status: 'ACCEPTED' });
+
+        await batch.commit();
+
+        showToast(`Counter offer accepted! Card ${req.serial} transferred to ${req.proposer}.`);
+        addNotification('Counter Offer Accepted', `Card ${req.serial} transferred to ${req.proposer}.`, 'fa-circle-check text-emerald-400');
+
+        await loadAppState();
+      } catch (e) {
+        showToast('Error accepting counter offer: ' + e.message);
+      }
+    }
+
+    async function rejectCounterOffer(reqId) {
+      if (!currentUser) return showToast('Please log in.');
+      const req = tradeRequestsList.find(r => r.id === reqId);
+      if (!req) return;
+
+      if (req.proposer !== currentUser.name && !currentUser.isAdmin) {
+        return showToast('Only the proposer can reject this counter offer.');
+      }
+
+      if (!confirm('Reject this counter offer?')) return;
+
+      try {
+        await db.collection("tradeRequests").doc(reqId).update({ status: 'REJECTED' });
+        showToast('Counter offer rejected.');
+        addNotification('Counter Offer Rejected', `Rejected counter offer for ${req.serial}.`, 'fa-xmark text-rose-400');
+        await fetchTradeRequests();
+      } catch (e) {
+        showToast('Error rejecting counter offer: ' + e.message);
       }
     }
 
@@ -2644,38 +2695,52 @@
       grid.innerHTML = tradeRequestsList.map(req => {
         const isProposer = currentUser && currentUser.name === req.proposer;
         const isTargetOwner = currentUser && (currentUser.name === req.targetOwner || currentUser.isAdmin);
-        const canCancel = currentUser && (currentUser.isAdmin || isProposer || currentUser.name === req.targetOwner);
+        const isCountered = req.status === 'COUNTERED';
+        const isAccepted = req.status === 'ACCEPTED';
+        const isRejected = req.status === 'REJECTED';
+
+        let statusBadge = `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded ${req.offerType === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-purple-500/20 text-purple-400'}">${req.offerType}</span>`;
+        if (isCountered) statusBadge = `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30"><i class="fa-solid fa-arrows-rotate mr-1"></i>COUNTERED</span>`;
+        if (isAccepted) statusBadge = `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ACCEPTED</span>`;
+        if (isRejected) statusBadge = `<span class="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">REJECTED</span>`;
 
         return `
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex gap-4 items-center">
+          <div class="bg-slate-900 border ${isCountered ? 'border-amber-500/40 bg-amber-950/10' : 'border-slate-800'} rounded-2xl p-4 flex gap-4 items-center">
             <div class="w-20 h-24 bg-slate-950 rounded-xl p-1 border border-slate-800 shrink-0 flex items-center justify-center overflow-hidden">
               <img src="${req.cardImg}" class="w-full h-full object-contain">
             </div>
             <div class="flex-1 space-y-1 text-xs">
               <div class="flex justify-between items-center">
                 <span class="font-black text-amber-400 font-mono">${req.serial}</span>
-                <span class="text-[9px] font-extrabold px-2 py-0.5 rounded ${req.offerType === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-purple-500/20 text-purple-400'}">${req.offerType}</span>
+                ${statusBadge}
               </div>
               <p class="font-bold text-white">${req.cardName}</p>
               <p class="text-[11px] text-slate-400">Owner: <strong class="text-white">${req.targetOwner}</strong></p>
               <p class="text-[11px] text-slate-400">Proposed by: <strong class="text-indigo-400">${req.proposer}</strong></p>
-              <p class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800/80">Offer: ${req.notes}</p>
+              <p class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800/80">Offer Details: ${req.notes}</p>
               
               <div class="flex items-center gap-2 pt-2 flex-wrap">
-                ${isTargetOwner && req.status !== 'ACCEPTED' ? `
+                <!-- ACTION FOR TARGET OWNER -->
+                ${isTargetOwner && req.status === 'PENDING' ? `
                   <button onclick="acceptTradeRequest('${req.id}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-check"></i> Accept Offer</button>
                   <button onclick="openCounterOfferModal('${req.id}')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-pen-to-square"></i> Counter Offer</button>
+                  <button onclick="rejectTradeRequest('${req.id}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] rounded-lg shadow transition-all">Reject Offer</button>
                 ` : ''}
 
-                ${isProposer ? `
-                  <button onclick="withdrawTradeRequest('${req.id}')" class="px-3 py-1 bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 font-bold text-[10px] rounded-lg border border-amber-500/30 transition-all"><i class="fa-solid fa-rotate-left mr-1"></i> Withdraw Request</button>
+                <!-- ACTIONS FOR PROPOSER RECEIVING COUNTER OFFER -->
+                ${isProposer && isCountered ? `
+                  <button onclick="acceptCounterOffer('${req.id}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Accept Counter</button>
+                  <button onclick="rejectCounterOffer('${req.id}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-xmark"></i> Reject Counter</button>
                 ` : ''}
-                
+
+                <!-- CANCEL / WITHDRAW OFFER BUTTON FOR PROPOSER OR ADMIN -->
+                ${(isProposer || currentUser?.isAdmin) && !isAccepted && !isRejected ? `
+                  <button onclick="withdrawTradeRequest('${req.id}')" class="px-3 py-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-bold text-[10px] rounded-lg border border-rose-500/30 transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-ban"></i> Cancel Offer
+                  </button>
+                ` : ''}
+
                 <button onclick="openDirectChat('${isProposer ? req.targetOwner : req.proposer}', 'Trade Offer for ${req.serial}')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] rounded-lg transition-all"><i class="fa-solid fa-comments mr-1"></i> Chat</button>
-                
-                ${canCancel && !isProposer && !isTargetOwner ? `
-                  <button onclick="cancelTradeRequest('${req.id}', '${req.proposer}')" class="px-3 py-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-bold text-[10px] rounded-lg border border-rose-500/30 transition-all">Cancel Request</button>
-                ` : ''}
               </div>
             </div>
           </div>
