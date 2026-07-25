@@ -933,6 +933,7 @@
     let currentChatContextId = null;
     let chatUnsubscribe = null;
     let chatAttachedImage = null;
+    let adminChatUnsubscribe = null;
 
     let visibleCardCount = 10;
     const CARDS_PER_BATCH = 10;
@@ -1138,6 +1139,16 @@
       if ((!text && !chatAttachedImage) || !currentChatContextId || !currentUser) return;
 
       try {
+        const batch = db.batch();
+
+        const chatDocRef = db.collection("chats").doc(currentChatContextId);
+        batch.set(chatDocRef, {
+          lastMessage: text || (chatAttachedImage ? '[Image Attachment]' : ''),
+          lastSender: currentUser.name,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        const msgDocRef = chatDocRef.collection("messages").doc();
         const payload = {
           sender: currentUser.name,
           text: text,
@@ -1145,7 +1156,10 @@
         };
         if (chatAttachedImage) payload.imgUrl = chatAttachedImage;
 
-        await db.collection("chats").doc(currentChatContextId).collection("messages").add(payload);
+        batch.set(msgDocRef, payload);
+
+        await batch.commit();
+
         input.value = '';
         clearChatImageAttachment();
       } catch (e) {
@@ -2788,7 +2802,7 @@
       }
     }
 
-    function viewCollectorVault(collectorName) {
+    function viewedCollectorVault(collectorName) {
       viewedCollectorFilter = collectorName;
       switchTab('dashboard');
     }
@@ -2908,12 +2922,13 @@
       `).join('');
     }
 
-    async function loadAdminChatInbox() {
+    function loadAdminChatInbox() {
       const container = document.getElementById('admin-chat-inbox-list');
       if (!container || !currentUser?.isAdmin) return;
 
-      try {
-        const snapshot = await db.collection("chats").get();
+      if (adminChatUnsubscribe) adminChatUnsubscribe();
+
+      adminChatUnsubscribe = db.collection("chats").onSnapshot(snapshot => {
         if (snapshot.empty) {
           container.innerHTML = `<p class="text-xs text-slate-500">No active support chat threads.</p>`;
           return;
@@ -2921,8 +2936,9 @@
 
         const chats = [];
         snapshot.forEach(doc => {
-          if (doc.id.includes('Admin Support') || doc.id.includes(currentUser.name)) {
-            chats.push({ id: doc.id });
+          const chatId = doc.id;
+          if (chatId.includes('Admin Support') || chatId.includes(currentUser.name)) {
+            chats.push({ id: chatId, ...doc.data() });
           }
         });
 
@@ -2932,8 +2948,9 @@
         }
 
         container.innerHTML = chats.map(c => {
-          const parts = c.id.replace('chat-', '').split('-vs-');
-          const otherUser = parts.find(p => p !== 'Admin Support' && p !== currentUser.name) || 'Collector';
+          const rawNames = c.id.replace('chat-', '').split('-vs-');
+          const otherUser = rawNames.find(name => name !== 'Admin Support' && name !== currentUser.name) || 'Collector';
+          const lastMsg = c.lastMessage || 'Click to open thread';
 
           return `
             <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
@@ -2941,18 +2958,19 @@
                 <i class="fa-solid fa-user-circle text-amber-400 text-base"></i>
                 <div>
                   <p class="font-bold text-white">${otherUser}</p>
-                  <p class="text-[10px] text-slate-500 font-mono">${c.id}</p>
+                  <p class="text-[10px] text-slate-400 truncate max-w-[180px]">${lastMsg}</p>
                 </div>
               </div>
-              <button onclick="openDirectChat('${otherUser}', 'Admin Support Thread')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-lg transition-all flex items-center gap-1.5">
+              <button onclick="openDirectChat('${otherUser}', 'Admin Support Thread')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[10px] rounded-lg transition-all flex items-center gap-1.5 shrink-0">
                 <i class="fa-solid fa-comments"></i> Open Chat
               </button>
             </div>
           `;
         }).join('');
-      } catch (e) {
-        console.warn('Error loading admin chat inbox:', e);
-      }
+      }, err => {
+        console.warn('Admin chat snapshot error:', err);
+        container.innerHTML = `<p class="text-xs text-rose-400">Error loading chats. Check Firestore security rules.</p>`;
+      });
     }
 
     async function loadPendingTransactions() {
