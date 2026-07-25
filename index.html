@@ -717,7 +717,7 @@
     <span id="toast-msg">Action completed.</span>
   </div>
 
-  <!-- JAVASCRIPT LOGIC WITH YOUR FIREBASE CONFIG -->
+  <!-- JAVASCRIPT LOGIC WITH FIREBASE CONFIG -->
   <script>
     // YOUR FIREBASE CONFIGURATION
     const firebaseConfig = {
@@ -779,33 +779,6 @@
 
     function deleteCookie(name) {
       document.cookie = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-    }
-
-    function getCardOverrides() {
-      try {
-        const savedLocal = localStorage.getItem('eugene_cards_override');
-        if (savedLocal) return JSON.parse(savedLocal);
-        const savedCookie = getCookie('eugene_cards_override');
-        if (savedCookie) return savedCookie;
-      } catch (e) {}
-      return {};
-    }
-
-    function saveCardOverrides(overrides) {
-      try {
-        localStorage.setItem('eugene_cards_override', JSON.stringify(overrides));
-        setCookie('eugene_cards_override', overrides, 30);
-      } catch (e) {}
-    }
-
-    function applyCardOverrides(cardsList) {
-      const overrides = getCardOverrides();
-      return cardsList.map(card => {
-        if (overrides[card.id]) {
-          return { ...card, ...overrides[card.id] };
-        }
-        return card;
-      });
     }
 
     /* NOTIFICATION LOGIC */
@@ -906,7 +879,7 @@
           printing: "1x"
         });
       }
-      return applyCardOverrides(defaultList);
+      return defaultList;
     }
 
     /* BACKUP & BULK IMPORT (FIREBASE FIRESTORE BATCH) */
@@ -934,8 +907,7 @@
             sn: c.sn,
             tier: c.tier,
             printing: c.printing
-          })),
-          overrides: getCardOverrides()
+          }))
         };
 
         const blob = new Blob([JSON.stringify(backupData, null, 0)], { type: 'application/json' });
@@ -977,7 +949,6 @@
             return;
           }
 
-          const overrides = getCardOverrides();
           const BATCH_LIMIT = 400; // Firestore maximum batch write is 500
           let processed = 0;
 
@@ -1003,7 +974,6 @@
                 printing: c.printing || '1x'
               };
 
-              overrides[cardId] = cardData;
               const docRef = db.collection("cards").doc(cardId);
               batch.set(docRef, cardData, { merge: true });
             });
@@ -1013,7 +983,6 @@
             updateImportProgress(processed, importedCards.length, `Batch saved to Firestore (${processed}/${importedCards.length})`);
           }
 
-          saveCardOverrides(overrides);
           await loadAppState();
           hideLoadingModal();
 
@@ -1118,7 +1087,7 @@
       }, 150);
     }
 
-    /* FIREBASE FIRESTORE DATA LOAD */
+    /* FIREBASE FIRESTORE DATA LOAD (RELIABLE CLOUD SOURCE OF TRUTH) */
     async function loadAppState() {
       let loadedFromDb = false;
 
@@ -1145,17 +1114,16 @@
             });
           });
 
+          // Natural ID sort directly from database
           inventory = fetchedCards.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
           loadedFromDb = true;
         }
       } catch (err) {
-        console.warn('Firestore fetch exception, using local state:', err);
+        console.warn('Firestore fetch exception, falling back to local stock structure:', err);
       }
 
       if (!loadedFromDb || inventory.length === 0) {
         inventory = initDefaultInventory();
-      } else {
-        inventory = applyCardOverrides(inventory);
       }
 
       loadSavedCart();
@@ -1164,6 +1132,31 @@
 
     /* FIREBASE REALTIME LISTENERS */
     function setupRealtimeSync() {
+      db.collection("cards").onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "modified" || change.type === "added") {
+            const c = change.doc.data();
+            const existingCard = inventory.find(i => i.id === change.doc.id);
+            if (existingCard) {
+              Object.assign(existingCard, {
+                name: c.name,
+                serial: c.serial,
+                type: c.type,
+                price: parseFloat(c.price || 0),
+                owner: c.owner || null,
+                status: c.status || 'AVAILABLE',
+                imgUrl: c.imgUrl,
+                edition: c.edition,
+                sn: c.sn,
+                tier: c.tier,
+                printing: c.printing
+              });
+            }
+          }
+        });
+        updateAllViews();
+      });
+
       db.collection("transactions").onSnapshot((snapshot) => {
         fetchTransactionHistory();
         if (currentUser?.isAdmin) loadPendingTransactions();
@@ -1187,6 +1180,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      // Clear legacy Supabase card overrides from browser storage
+      localStorage.removeItem('eugene_cards_override');
+      deleteCookie('eugene_cards_override');
+
       loadSavedWishlist();
       loadNotifications();
       inventory = initDefaultInventory(); 
@@ -1608,7 +1605,7 @@
       reader.readAsDataURL(file);
     }
 
-    /* SAVE CARD CHANGES TO FIRESTORE */
+    /* SAVE CARD CHANGES TO FIRESTORE DIRECTLY */
     async function saveInventoryCardChanges() {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
 
@@ -1633,6 +1630,7 @@
       const updatedImgUrl = document.getElementById('edit-card-img').value;
 
       const updatedObj = {
+        id: cardId,
         name: updatedName,
         serial: updatedSerial,
         type: updatedType,
@@ -1646,21 +1644,17 @@
         printing: updatedPrinting
       };
 
-      const overrides = getCardOverrides();
-      overrides[cardId] = updatedObj;
-      saveCardOverrides(overrides);
-
       try {
         await db.collection("cards").doc(cardId).set(updatedObj, { merge: true });
+        Object.assign(card, updatedObj);
+        showToast(`Saved ${updatedSerial} to Firestore!`);
       } catch (e) {
-        console.warn('Firestore DB write exception:', e);
+        console.error('Firestore DB write error:', e);
+        showToast('Error saving to Firestore: ' + e.message);
       }
-
-      Object.assign(card, updatedObj);
 
       closeInventoryModal();
       updateAllViews();
-      showToast(`Updated ${updatedSerial} in Firestore!`);
       addNotification('Card Updated', `Modified specifications for ${updatedSerial} (${updatedName}).`, 'fa-pen-to-square text-amber-400');
     }
 
