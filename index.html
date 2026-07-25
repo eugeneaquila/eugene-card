@@ -129,8 +129,12 @@
         </button>
       </nav>
 
-      <!-- Cart, Notifications & Auth Header -->
+      <!-- Cart, Chat to Admin, Notifications & Auth Header -->
       <div class="flex items-center gap-2 shrink-0">
+        <button onclick="chatToAdmin()" class="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white text-xs font-bold rounded-xl border border-indigo-500/40 flex items-center gap-1.5 transition-all shadow-sm">
+          <i class="fa-solid fa-headset text-amber-400"></i> Chat to Admin
+        </button>
+
         <button id="notif-toggle-btn" onclick="toggleNotificationMenu()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
           <i class="fa-solid fa-bell text-sm text-amber-400"></i>
           <span id="notification-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-indigo-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
@@ -162,14 +166,23 @@
     </div>
 
     <!-- Messages List Container -->
-    <div id="chat-messages-container" class="flex-1 py-4 space-y-3 overflow-y-auto max-h-[70vh]">
+    <div id="chat-messages-container" class="flex-1 py-4 space-y-3 overflow-y-auto max-h-[65vh]">
       <div class="text-center py-10 text-slate-500 text-xs">No chat messages yet. Start the conversation!</div>
     </div>
 
-    <!-- Send Chat Input -->
+    <!-- Send Chat & Image Attachment Input -->
     <div class="pt-3 border-t border-slate-800 space-y-2">
+      <div id="chat-image-preview-box" class="hidden p-2 bg-slate-950 border border-slate-800 rounded-xl relative">
+        <button onclick="clearChatImageAttachment()" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-slate-800 text-slate-400 text-[10px] flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+        <img id="chat-image-preview-img" src="" class="h-16 rounded object-contain mx-auto">
+      </div>
+
       <div class="flex items-center gap-2">
-        <input type="text" id="chat-text-input" placeholder="Type message or counter terms..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+        <label class="p-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl text-slate-400 hover:text-amber-400 cursor-pointer text-xs" title="Upload QRIS Payment Screenshot">
+          <i class="fa-solid fa-paperclip"></i>
+          <input type="file" accept="image/*" onchange="handleChatImageUpload(event)" class="hidden">
+        </label>
+        <input type="text" id="chat-text-input" placeholder="Type message or QRIS details..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
         <button onclick="sendChatMessage()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow">Send</button>
       </div>
     </div>
@@ -357,6 +370,7 @@
                 <th class="p-3.5">Buyer</th>
                 <th class="p-3.5">Items Acquired</th>
                 <th class="p-3.5">Amount (IDR)</th>
+                <th class="p-3.5">Proof / QRIS</th>
                 <th class="p-3.5">Status</th>
                 <th class="p-3.5 text-right">Date / Time</th>
               </tr>
@@ -417,8 +431,8 @@
     <section id="view-admin" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub & Transaction Approvals</h2>
-          <p class="text-xs text-slate-400 mt-1">Review pending customer purchases and approve or reject card ownership upon QRIS payment verification.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub & Revenue Dashboard</h2>
+          <p class="text-xs text-slate-400 mt-1">Review customer QRIS payments, verify earnings, and approve transactions.</p>
         </div>
         <button onclick="loadPendingTransactions()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
           <i class="fa-solid fa-rotate"></i> Refresh Queue
@@ -833,18 +847,29 @@
     </div>
   </div>
 
+  <!-- CHECKOUT MODAL WITH QRIS PROOF UPLOAD -->
   <div id="checkout-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl text-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl text-center max-h-[90vh] overflow-y-auto">
       <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
       <h3 class="text-lg font-black text-white">Scan & Pay via Official QRIS</h3>
       <p class="text-[10px] text-slate-400">Merchant: <strong class="text-white">Eugene Card, Toko Kartu</strong></p>
       
-      <img id="qris-img-element" src="" class="w-52 h-52 mx-auto bg-white p-2 rounded-2xl shadow-inner border border-slate-800">
+      <img id="qris-img-element" src="" class="w-48 h-48 mx-auto bg-white p-2 rounded-2xl shadow-inner border border-slate-800">
       
       <div>
         <p class="text-[10px] text-slate-500 font-bold uppercase">Total Payment Amount (Inc. 2% Fee)</p>
         <p id="qris-amount-display" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
       </div>
+
+      <div class="text-left space-y-2 bg-slate-950 p-3 rounded-2xl border border-slate-800 text-xs">
+        <label class="block font-bold text-slate-300">Upload QRIS Transfer Receipt Screenshot</label>
+        <input type="file" id="qris-proof-file-input" accept="image/*" onchange="handleQrisScreenshotUpload(event)" class="w-full text-[11px] text-slate-400 bg-slate-900 border border-slate-800 rounded-xl p-2 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-amber-500 file:text-slate-950">
+        <input type="hidden" id="qris-proof-img-data" value="">
+        <div id="qris-proof-preview-container" class="hidden text-center pt-2">
+          <img id="qris-proof-preview-img" src="" class="h-24 mx-auto rounded border border-slate-700">
+        </div>
+      </div>
+
       <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all">Submit Order for Admin Approval</button>
     </div>
   </div>
@@ -893,6 +918,7 @@
     let currentChatTargetUser = null;
     let currentChatContextId = null;
     let chatUnsubscribe = null;
+    let chatAttachedImage = null;
 
     let visibleCardCount = 10;
     const CARDS_PER_BATCH = 10;
@@ -989,6 +1015,11 @@
       showToast('Notifications cleared.');
     }
 
+    function chatToAdmin() {
+      if (!currentUser) return showToast('Please log in first.');
+      openDirectChat('Admin Support', 'Platform Settlement & Admin Support');
+    }
+
     function openDirectChat(targetUserName, contextInfo = 'Trade Chat') {
       if (!currentUser) return showToast('Please log in to start a chat.');
       if (currentUser.name === targetUserName) return showToast('Cannot chat with yourself.');
@@ -1013,6 +1044,25 @@
         chatUnsubscribe();
         chatUnsubscribe = null;
       }
+      clearChatImageAttachment();
+    }
+
+    function handleChatImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        chatAttachedImage = e.target.result;
+        document.getElementById('chat-image-preview-img').src = e.target.result;
+        document.getElementById('chat-image-preview-box').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearChatImageAttachment() {
+      chatAttachedImage = null;
+      document.getElementById('chat-image-preview-img').src = '';
+      document.getElementById('chat-image-preview-box').classList.add('hidden');
     }
 
     function listenToChatMessages(chatId) {
@@ -1035,7 +1085,8 @@
             <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1">
               <span class="text-[9px] font-bold text-slate-500">${msg.sender}</span>
               <div class="max-w-[80%] px-3 py-2 rounded-2xl text-xs ${isMe ? 'bg-amber-500 text-slate-950 font-medium rounded-tr-none' : 'bg-slate-950 border border-slate-800 text-white rounded-tl-none'}">
-                ${msg.text}
+                ${msg.imgUrl ? `<img src="${msg.imgUrl}" class="max-w-full rounded-lg mb-1 border border-slate-800">` : ''}
+                ${msg.text ? `<div>${msg.text}</div>` : ''}
               </div>
             </div>
           `;
@@ -1049,18 +1100,34 @@
       const input = document.getElementById('chat-text-input');
       const text = input ? input.value.trim() : '';
 
-      if (!text || !currentChatContextId || !currentUser) return;
+      if ((!text && !chatAttachedImage) || !currentChatContextId || !currentUser) return;
 
       try {
-        await db.collection("chats").doc(currentChatContextId).collection("messages").add({
+        const payload = {
           sender: currentUser.name,
           text: text,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        };
+        if (chatAttachedImage) payload.imgUrl = chatAttachedImage;
+
+        await db.collection("chats").doc(currentChatContextId).collection("messages").add(payload);
         input.value = '';
+        clearChatImageAttachment();
       } catch (e) {
         showToast('Error sending chat message: ' + e.message);
       }
+    }
+
+    function handleQrisScreenshotUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('qris-proof-img-data').value = e.target.result;
+        document.getElementById('qris-proof-preview-img').src = e.target.result;
+        document.getElementById('qris-proof-preview-container').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
     }
 
     function initDefaultInventory() {
@@ -1780,7 +1847,7 @@
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">No transaction records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500">No transaction records found.</td></tr>`;
         return;
       }
 
@@ -1794,12 +1861,17 @@
         if (tx.status === 'APPROVED') badgeClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
         if (tx.status === 'REJECTED') badgeClass = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
 
+        const proofBtn = tx.qrisProofUrl 
+          ? `<a href="${tx.qrisProofUrl}" target="_blank" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 text-[10px] font-bold rounded-lg border border-slate-700 inline-flex items-center gap-1"><i class="fa-solid fa-image"></i> View Receipt</a>`
+          : `<span class="text-slate-600 text-[10px]">No File</span>`;
+
         return `
           <tr class="hover:bg-slate-950/60 transition-colors">
             <td class="p-3.5 font-mono font-extrabold text-indigo-400">${tx.id || 'ORD-000'}</td>
             <td class="p-3.5 font-bold text-white">${tx.user_name || 'Guest'}</td>
             <td class="p-3.5">${itemsFormatted}</td>
             <td class="p-3.5 font-mono text-emerald-400 font-extrabold">${formatIDR(tx.total_amount || 0)}</td>
+            <td class="p-3.5">${proofBtn}</td>
             <td class="p-3.5"><span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${badgeClass}">${tx.status || 'PENDING'}</span></td>
             <td class="p-3.5 text-right font-mono text-[10px] text-slate-400">${tx.created_at ? new Date(tx.created_at).toLocaleDateString() : 'Recently'}</td>
           </tr>
@@ -2577,6 +2649,8 @@
       
       document.getElementById('qris-amount-display').innerText = formatIDR(total);
       document.getElementById('qris-img-element').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(OFFICIAL_QRIS_STRING)}`;
+      document.getElementById('qris-proof-img-data').value = '';
+      document.getElementById('qris-proof-preview-container').classList.add('hidden');
 
       toggleCartDrawer();
       document.getElementById('checkout-modal').classList.remove('hidden');
@@ -2587,6 +2661,7 @@
     async function submitOrderWithProof() {
       if (cart.length === 0) return showToast('Cart is empty.');
 
+      const proofImgData = document.getElementById('qris-proof-img-data').value;
       const orderRef = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
       const totalAmount = cart.reduce((s, i) => s + i.price, 0) * (1 + TRADE_FEE_PERCENT);
 
@@ -2598,6 +2673,10 @@
         status: 'PENDING',
         created_at: new Date().toISOString()
       };
+
+      if (proofImgData) {
+        baseOrder.qrisProofUrl = proofImgData;
+      }
 
       try {
         await db.collection("transactions").doc(orderRef).set(baseOrder);
@@ -2790,6 +2869,10 @@
           let items = Array.isArray(order.items) ? order.items : [];
           const itemsListStr = items.map(i => i.serial || 'Card').join(', ');
 
+          const proofPreview = order.qrisProofUrl 
+            ? `<div class="mt-2"><a href="${order.qrisProofUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 text-[10px] font-bold rounded-lg"><i class="fa-solid fa-receipt text-amber-400"></i> View QRIS Receipt Screenshot</a></div>`
+            : `<div class="mt-1 text-[10px] text-slate-500 italic">No receipt screenshot attached.</div>`;
+
           return `
             <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
               <div class="space-y-1">
@@ -2800,6 +2883,7 @@
                 <p class="text-white font-bold">Buyer: <span class="text-amber-300">${order.user_name}</span></p>
                 <p class="text-slate-400 text-[11px]">Items: <strong class="text-slate-200">${itemsListStr || 'N/A'}</strong></p>
                 <p class="text-emerald-400 font-mono font-black">${formatIDR(order.total_amount || 0)}</p>
+                ${proofPreview}
               </div>
               
               <div class="flex items-center gap-2 w-full sm:w-auto">
