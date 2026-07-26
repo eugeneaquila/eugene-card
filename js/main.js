@@ -4,7 +4,6 @@ let currentTab = 'catalog';
 let currentFilter = 'ALL';
 let historyFilter = 'ALL';
 
-// Persisted Cart in LocalStorage
 let cart = JSON.parse(localStorage.getItem('eugene_cart') || '[]');
 
 let cardsData = [];
@@ -12,7 +11,7 @@ let tradeListings = [];
 let tradeRequests = [];
 let orderHistory = [];
 let userWishlist = JSON.parse(localStorage.getItem('eugene_wishlist') || '[]');
-let userProfile = JSON.parse(localStorage.getItem('eugene_profile') || '{"name":"Collector","username":"collector","bio":"Genesis Card Enthusiast","avatar":""}');
+let userProfile = JSON.parse(localStorage.getItem('eugene_profile') || '{"name":"Collector","username":"collector","bio":"Genesis Card Enthusiast","avatar":"","instagram":"","tiktok":"","website":""}');
 let searchDebounceTimer = null;
 
 const DEFAULT_QRIS_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23ffffff'/><rect x='20' y='20' width='60' height='60' fill='%23000000'/><rect x='30' y='30' width='40' height='40' fill='%23ffffff'/><rect x='40' y='40' width='20' height='20' fill='%23000000'/><rect x='120' y='20' width='60' height='60' fill='%23000000'/><rect x='130' y='30' width='40' height='40' fill='%23ffffff'/><rect x='140' y='40' width='20' height='20' fill='%23000000'/><rect x='20' y='120' width='60' height='60' fill='%23000000'/><rect x='30' y='130' width='40' height='40' fill='%23ffffff'/><rect x='40' y='140' width='20' height='20' fill='%23000000'/><text x='100' y='110' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='%23000000'>OFFICIAL QRIS</text></svg>";
@@ -36,7 +35,6 @@ function onAuthResolved(user) {
   updateAdminAuctionControls();
 }
 
-// 1. TAB SWITCHER
 function switchTab(tabName) {
   const adminTabs = ['admin', 'inventory'];
 
@@ -85,7 +83,6 @@ function switchTab(tabName) {
   }
 }
 
-// 2. FIRESTORE REALTIME SNAPSHOTS
 function fetchInventoryData() {
   db.collection("cards").onSnapshot(snapshot => {
     cardsData = [];
@@ -126,7 +123,6 @@ function fetchOrderHistory() {
   }, err => console.error("Error fetching order history:", err));
 }
 
-// 3. CATALOG GRID WITH FALLBACK PROTECTION
 function renderCardGrid() {
   const container = document.getElementById('card-grid');
   if (!container) return;
@@ -225,7 +221,6 @@ function updateRemainingCardsCount() {
   }
 }
 
-// 4. TRADE ROOM
 function renderTradeRoom() {
   const container = document.getElementById('p2p-listings-grid');
   if (!container) return;
@@ -255,7 +250,6 @@ function renderTradeRoom() {
   `).join('');
 }
 
-// 5. HOLDERS DIRECTORY WITH CLICKABLE VAULT BINDER & OFFER ACTIONS
 function renderHoldersTable() {
   const tbody = document.getElementById('holders-table-body');
   if (!tbody) return;
@@ -324,10 +318,56 @@ function openOfferModalForCard(cardId) {
 
   document.getElementById('trade-target-serial-input').value = card.serial || '';
   document.getElementById('trade-notes-input').value = `Offer for ${card.name}`;
+  
+  const modal = document.getElementById('propose-trade-modal');
+  if (modal) {
+    modal.setAttribute('data-target-card-id', card.id);
+    modal.setAttribute('data-target-owner', card.owner || 'Admin House');
+  }
+
   openProposeTradeModal();
 }
 
-// 6. TRADE REQUESTS WITH INTERACTIVE OFFERS
+function openProposeTradeModal() {
+  document.getElementById('propose-trade-modal').classList.remove('hidden');
+}
+
+function closeProposeTradeModal() {
+  document.getElementById('propose-trade-modal').classList.add('hidden');
+}
+
+async function submitTradeProposal() {
+  const modal = document.getElementById('propose-trade-modal');
+  const targetSerial = document.getElementById('trade-target-serial-input').value;
+  const notes = document.getElementById('trade-notes-input').value;
+  const offerAmount = parseFloat(document.getElementById('trade-offer-amount-input')?.value || 100000);
+
+  const card = cardsData.find(c => c.serial === targetSerial || c.id === modal.getAttribute('data-target-card-id'));
+  const cardOwner = card ? card.owner : (modal.getAttribute('data-target-owner') || 'Admin House');
+
+  const tradePayload = {
+    targetCard: targetSerial || (card ? card.name : 'Card'),
+    targetCardId: card ? card.id : '',
+    targetOwner: cardOwner,
+    proposer: userProfile.name || (currentUser ? currentUser.displayName : 'Collector'),
+    proposerEmail: currentUser ? currentUser.email : 'collector@eugene.com',
+    notes: notes || 'Direct offer on card',
+    offerAmount: offerAmount,
+    status: 'BUY OFFER',
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await db.collection("trade_requests").add(tradePayload);
+    closeProposeTradeModal();
+    showToast(`Trade offer sent to ${cardOwner}!`);
+    switchTab('trade-req');
+  } catch (err) {
+    console.error("Proposal Submission Error:", err);
+    showToast("Failed to submit trade offer.");
+  }
+}
+
 function renderTradeRequests() {
   const container = document.getElementById('trade-requests-grid');
   if (!container) return;
@@ -428,7 +468,6 @@ async function acceptCounterOffer(reqId) {
   }
 }
 
-// 7. INVENTORY MANAGEMENT (ADMIN)
 function renderInventoryTable() {
   const tbody = document.getElementById('inventory-table-body');
   if (!tbody) return;
@@ -584,7 +623,6 @@ function closeInventoryModal() {
   document.getElementById('inventory-edit-modal').classList.add('hidden');
 }
 
-// 8. PROFILE & VAULT
 function loadProfileBanner() {
   document.getElementById('dashboard-banner-name').textContent = userProfile.name || 'Collector';
   document.getElementById('dashboard-banner-username').textContent = `@${userProfile.username || 'collector'}`;
@@ -593,6 +631,47 @@ function loadProfileBanner() {
   if (userProfile.avatar) {
     document.getElementById('dashboard-banner-avatar').src = userProfile.avatar;
   }
+
+  const igLink = document.getElementById('banner-link-instagram');
+  const igHandle = document.getElementById('banner-ig-handle');
+  if (userProfile.instagram) {
+    const cleanedIg = userProfile.instagram.replace('@', '');
+    igLink.href = `https://instagram.com/${cleanedIg}`;
+    igHandle.textContent = `@${cleanedIg}`;
+    igLink.classList.remove('hidden');
+  } else {
+    igLink.classList.add('hidden');
+  }
+
+  const ttLink = document.getElementById('banner-link-tiktok');
+  const ttHandle = document.getElementById('banner-tt-handle');
+  if (userProfile.tiktok) {
+    const cleanedTt = userProfile.tiktok.startsWith('@') ? userProfile.tiktok : `@${userProfile.tiktok}`;
+    ttLink.href = `https://tiktok.com/${cleanedTt}`;
+    ttHandle.textContent = cleanedTt;
+    ttLink.classList.remove('hidden');
+  } else {
+    ttLink.classList.add('hidden');
+  }
+
+  const webLink = document.getElementById('banner-link-website');
+  const webUrlSpan = document.getElementById('banner-web-url');
+  if (userProfile.website) {
+    let formattedUrl = userProfile.website;
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+    webLink.href = formattedUrl;
+    try {
+      const parsed = new URL(formattedUrl);
+      webUrlSpan.textContent = parsed.hostname;
+    } catch (e) {
+      webUrlSpan.textContent = "Website";
+    }
+    webLink.classList.remove('hidden');
+  } else {
+    webLink.classList.add('hidden');
+  }
 }
 
 function openProfileManagerModal() {
@@ -600,6 +679,10 @@ function openProfileManagerModal() {
   document.getElementById('profile-edit-username-input').value = userProfile.username || '';
   document.getElementById('profile-edit-bio-input').value = userProfile.bio || '';
   document.getElementById('profile-edit-avatar-input').value = userProfile.avatar || '';
+  document.getElementById('profile-edit-instagram-input').value = userProfile.instagram || '';
+  document.getElementById('profile-edit-tiktok-input').value = userProfile.tiktok || '';
+  document.getElementById('profile-edit-website-input').value = userProfile.website || '';
+  
   document.getElementById('profile-manager-modal').classList.remove('hidden');
 }
 
@@ -607,18 +690,38 @@ function closeProfileManagerModal() {
   document.getElementById('profile-manager-modal').classList.add('hidden');
 }
 
-function saveProfileChanges() {
+async function saveProfileChanges() {
   userProfile = {
     name: document.getElementById('profile-edit-name-input').value || 'Collector',
     username: document.getElementById('profile-edit-username-input').value || 'collector',
     bio: document.getElementById('profile-edit-bio-input').value || 'Collector Bio',
-    avatar: document.getElementById('profile-edit-avatar-input').value || ''
+    avatar: document.getElementById('profile-edit-avatar-input').value || '',
+    instagram: document.getElementById('profile-edit-instagram-input').value || '',
+    tiktok: document.getElementById('profile-edit-tiktok-input').value || '',
+    website: document.getElementById('profile-edit-website-input').value || ''
   };
 
   localStorage.setItem('eugene_profile', JSON.stringify(userProfile));
+
+  if (currentUser) {
+    try {
+      await db.collection("users").doc(currentUser.uid).set({
+        displayName: userProfile.name,
+        username: userProfile.username,
+        bio: userProfile.bio,
+        avatar: userProfile.avatar,
+        instagram: userProfile.instagram,
+        tiktok: userProfile.tiktok,
+        website: userProfile.website
+      }, { merge: true });
+    } catch (err) {
+      console.error("Profile sync error:", err);
+    }
+  }
+
   loadProfileBanner();
   closeProfileManagerModal();
-  showToast("Profile settings saved!");
+  showToast("Profile settings saved successfully!");
 }
 
 function renderMyVault() {
@@ -647,7 +750,6 @@ function renderMyVault() {
   `).join('');
 }
 
-// 9. WISHLIST & CART PERSISTENCE
 function toggleWishlist(cardId) {
   if (userWishlist.includes(cardId)) {
     userWishlist = userWishlist.filter(id => id !== cardId);
@@ -815,7 +917,6 @@ async function submitOrderWithProof() {
   }
 }
 
-// 10. ADMIN & UTILITIES
 function renderAdminHub() {
   const container = document.getElementById('admin-pending-orders-list');
   if (!container) return;
