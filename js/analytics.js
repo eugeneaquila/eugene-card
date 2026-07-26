@@ -4,7 +4,7 @@ let cardsData = [];
 let ordersData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  auth.onAuthStateChanged(async (user) => {
+  firebase.auth().onAuthStateChanged(async (user) => {
     if (!user) {
       showPaywall();
       return;
@@ -21,19 +21,38 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+async function checkUserAnalyticsAccess(user) {
+  try {
+    const doc = await db.collection("users").doc(user.uid).get();
+    if (doc.exists) {
+      const data = doc.data();
+      const adminEmails = ["eugene.aquila06@gmail.com", "yujinybwork@gmail.com"];
+      if (adminEmails.includes((user.email || "").toLowerCase().trim())) return true;
+      if (data.role === 'PLUS' || data.role === 'ADMIN') return true;
+    }
+    return false;
+  } catch (err) {
+    console.error("Analytics Access Check Error:", err);
+    return false;
+  }
+}
+
 function showPaywall() {
-  document.getElementById('analytics-paywall').classList.remove('hidden');
+  const paywallEl = document.getElementById('analytics-paywall');
+  if (paywallEl) paywallEl.classList.remove('hidden');
 }
 
 function hidePaywall() {
-  document.getElementById('analytics-paywall').classList.add('hidden');
+  const paywallEl = document.getElementById('analytics-paywall');
+  if (paywallEl) paywallEl.classList.add('hidden');
 }
 
 async function upgradeFromPaywall() {
-  if (!auth.currentUser) return;
+  const currentUser = firebase.auth().currentUser;
+  if (!currentUser) return;
   try {
-    await db.collection("users").doc(auth.currentUser.uid).set({
-      email: auth.currentUser.email,
+    await db.collection("users").doc(currentUser.uid).set({
+      email: currentUser.email,
       role: 'PLUS',
       upgradedAt: new Date().toISOString()
     }, { merge: true });
@@ -65,17 +84,21 @@ async function initAnalyticsData() {
 
 function renderAnalyticsMetrics() {
   const totalVolume = ordersData.filter(o => o.status === 'APPROVED').reduce((sum, o) => sum + (o.totalAmount || 0), 0);
-  const avgFloor = cardsData.length > 0 ? cardsData.reduce((sum, c) => sum + (c.price || 0), 0) / cardsData.length : 0;
-  const ownedCount = cardsData.filter(c => c.owner && c.owner !== 'House').length;
+  const avgFloor = cardsData.length > 0 ? cardsData.reduce((sum, c) => sum + (c.price || c.baseFloorPrice || 0), 0) / cardsData.length : 0;
+  const ownedCount = cardsData.filter(c => c.owner && c.owner !== 'House' && c.owner !== 'Admin House').length;
 
-  document.getElementById('analytics-total-volume').textContent = `Rp ${totalVolume.toLocaleString('id-ID')}`;
-  document.getElementById('analytics-avg-floor').textContent = `Rp ${Math.round(avgFloor).toLocaleString('id-ID')}`;
-  document.getElementById('analytics-collected-count').textContent = `${ownedCount} / ${cardsData.length}`;
+  const volEl = document.getElementById('analytics-total-volume');
+  const avgEl = document.getElementById('analytics-avg-floor');
+  const countEl = document.getElementById('analytics-collected-count');
+
+  if (volEl) volEl.textContent = `Rp ${totalVolume.toLocaleString('id-ID')}`;
+  if (avgEl) avgEl.textContent = `Rp ${Math.round(avgFloor).toLocaleString('id-ID')}`;
+  if (countEl) countEl.textContent = `${ownedCount} / ${cardsData.length}`;
 }
 
 function renderMarketTrendChart() {
   const ctx = document.getElementById('marketTrendChart');
-  if (!ctx) return;
+  if (!ctx || typeof Chart === 'undefined') return;
 
   new Chart(ctx, {
     type: 'line',
@@ -113,7 +136,7 @@ function renderMarketTrendChart() {
 }
 
 function calculateValuation(card) {
-  const baseFloor = card.price || 100000;
+  const baseFloor = card.price || card.baseFloorPrice || 100000;
   const isPremium = card.type === 'PREMIUM';
   const rarityMultiplier = isPremium ? 1.45 : 1.0;
   const tierWeight = 1 + ((parseFloat(card.tier) || 100) / 2000);
@@ -144,11 +167,12 @@ function renderValuationTable() {
 
   tbody.innerHTML = filtered.map(c => {
     const { estimatedPrice, projectedPrice, volatility } = calculateValuation(c);
+    const cardPrice = c.price || c.baseFloorPrice || 0;
     return `
       <tr class="hover:bg-slate-950 transition-colors">
         <td class="p-3 font-bold text-white">${c.name || 'Unnamed'} <span class="text-amber-400 font-mono">(${c.serial || '*00'})</span></td>
         <td class="p-3 font-mono text-slate-300">${c.type || 'STANDARD'}</td>
-        <td class="p-3 font-mono text-slate-400">Rp ${(c.price || 0).toLocaleString('id-ID')}</td>
+        <td class="p-3 font-mono text-slate-400">Rp ${cardPrice.toLocaleString('id-ID')}</td>
         <td class="p-3 font-mono text-amber-400 font-bold">Rp ${estimatedPrice.toLocaleString('id-ID')}</td>
         <td class="p-3 font-mono text-emerald-400 font-extrabold">Rp ${projectedPrice.toLocaleString('id-ID')}</td>
         <td class="p-3 font-mono text-xs text-slate-400">${volatility}</td>
