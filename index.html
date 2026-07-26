@@ -645,10 +645,23 @@
 
         <div>
           <label class="block font-bold text-slate-400 mb-1" data-i18n="offerTypeLabel">Offer Type</label>
-          <select id="trade-req-type-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+          <select id="trade-req-type-select" onchange="toggleTradeOfferTypeFields()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
             <option value="BUY" data-i18n="optDirectBuy">Direct QRIS Buy Offer</option>
             <option value="TRADE" data-i18n="optCardTrade">Card-for-Card Trade</option>
           </select>
+        </div>
+
+        <!-- DYNAMIC FIELD FOR OFFERED CARD (OWNED BY USER) -->
+        <div id="trade-my-card-container" class="hidden">
+          <label class="block font-bold text-purple-400 mb-1" data-i18n="selectMyCardOffer">Select Your Card to Offer in Trade</label>
+          <select id="trade-my-card-select" class="w-full bg-slate-950 border border-purple-500/50 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+          </select>
+        </div>
+
+        <!-- DYNAMIC FIELD FOR PLUS AMOUNT (TOP UP IDR) -->
+        <div id="trade-plus-amount-container" class="hidden">
+          <label class="block font-bold text-amber-400 mb-1" data-i18n="plusAmountLabel">Plus Cash / Top-up Amount (IDR - Optional)</label>
+          <input type="number" id="trade-plus-amount-input" placeholder="e.g. 50000" class="w-full bg-slate-950 border border-amber-500/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-400">
         </div>
 
         <div>
@@ -1180,6 +1193,8 @@
         offerTypeLabel: "Offer Type",
         optDirectBuy: "Direct QRIS Buy Offer",
         optCardTrade: "Card-for-Card Trade",
+        selectMyCardOffer: "Select Your Card to Offer in Trade",
+        plusAmountLabel: "Plus Cash / Top-up Amount (IDR - Optional)",
         proposedNotesLabel: "Proposed Offer Amount / Notes (IDR or Details)",
         tradeNotesPlaceholder: "e.g. Offering Rp 150.000 or trade with *02",
         submitProposalBtn: "Submit QRIS Proposal",
@@ -1362,6 +1377,8 @@
         offerTypeLabel: "Jenis Penawaran",
         optDirectBuy: "Penawaran Beli Langsung QRIS",
         optCardTrade: "Pertukaran Kartu-dengan-Kartu",
+        selectMyCardOffer: "Pilih Kartu Anda untuk Ditawarkan",
+        plusAmountLabel: "Jumlah Uang Tambahan (IDR - Opsional)",
         proposedNotesLabel: "Jumlah Penawaran / Catatan (IDR atau Rincian)",
         tradeNotesPlaceholder: "misal: Menawarkan Rp 150.000 atau tukar dengan *02",
         submitProposalBtn: "Kirim Proposal QRIS",
@@ -3164,6 +3181,33 @@
       }
     }
 
+    function toggleTradeOfferTypeFields() {
+      const typeSelect = document.getElementById('trade-req-type-select');
+      const myCardContainer = document.getElementById('trade-my-card-container');
+      const plusAmountContainer = document.getElementById('trade-plus-amount-container');
+
+      if (!typeSelect || !myCardContainer || !plusAmountContainer) return;
+
+      if (typeSelect.value === 'TRADE') {
+        myCardContainer.classList.remove('hidden');
+        plusAmountContainer.classList.remove('hidden');
+
+        // Populate dropdown with user's owned cards from Vault
+        const myCardSelect = document.getElementById('trade-my-card-select');
+        if (myCardSelect && currentUser) {
+          const myCards = inventory.filter(c => c.owner === currentUser.name || c.owner === currentUser.username);
+          if (myCards.length > 0) {
+            myCardSelect.innerHTML = myCards.map(c => `<option value="${c.id}">${c.serial} - ${c.name} (${formatIDR(c.price)})</option>`).join('');
+          } else {
+            myCardSelect.innerHTML = `<option value="">-- No Cards in Your Vault --</option>`;
+          }
+        }
+      } else {
+        myCardContainer.classList.add('hidden');
+        plusAmountContainer.classList.add('hidden');
+      }
+    }
+
     function openProposeTradeModal() {
       if (!currentUser) return showToast('Please log in first.');
       const myIdent = currentUser.username || currentUser.name;
@@ -3180,6 +3224,7 @@
       }));
 
       selectTradeCardOption('', i18nDict[currentLanguage].selectCardPlaceholder);
+      toggleTradeOfferTypeFields();
       document.getElementById('propose-trade-modal').classList.remove('hidden');
     }
 
@@ -3192,12 +3237,40 @@
       if (!currentUser) return showToast('Please log in.');
       const cardId = document.getElementById('trade-req-card-id').value;
       const type = document.getElementById('trade-req-type-select').value;
-      const notes = document.getElementById('trade-req-notes-input').value.trim() || 'Direct QRIS offer';
+      let notes = document.getElementById('trade-req-notes-input').value.trim();
 
       if (!cardId) return showToast('Please select a target card from the dropdown.');
 
       const card = inventory.find(c => c.id === cardId);
       if (!card || !card.owner) return showToast('Invalid card target.');
+
+      let offeredCardId = null;
+      let offeredCardSerial = null;
+      let offeredCardName = null;
+      let plusAmount = 0;
+
+      if (type === 'TRADE') {
+        const myCardSelect = document.getElementById('trade-my-card-select');
+        offeredCardId = myCardSelect ? myCardSelect.value : null;
+
+        if (!offeredCardId) {
+          return showToast('Please select a card from your Vault to offer in trade.');
+        }
+
+        const offeredCardObj = inventory.find(c => c.id === offeredCardId);
+        if (offeredCardObj) {
+          offeredCardSerial = offeredCardObj.serial;
+          offeredCardName = offeredCardObj.name;
+        }
+
+        const rawPlus = parseFloat(document.getElementById('trade-plus-amount-input')?.value || 0);
+        plusAmount = isNaN(rawPlus) ? 0 : rawPlus;
+
+        const tradeSummaryStr = `Trade Card: ${offeredCardSerial || 'Card'} ${plusAmount > 0 ? '+ ' + formatIDR(plusAmount) : ''}`;
+        notes = notes ? `${tradeSummaryStr} | ${notes}` : tradeSummaryStr;
+      } else {
+        if (!notes) notes = 'Direct QRIS offer';
+      }
 
       const activeUserIdent = currentUser.username || currentUser.name;
       const reqId = 'treq-' + Date.now();
@@ -3214,6 +3287,13 @@
         status: 'PENDING',
         created_at: new Date().toISOString()
       };
+
+      if (type === 'TRADE') {
+        requestData.offeredCardId = offeredCardId;
+        requestData.offeredCardSerial = offeredCardSerial;
+        requestData.offeredCardName = offeredCardName;
+        requestData.plusAmount = plusAmount;
+      }
 
       try {
         await db.collection("tradeRequests").doc(reqId).set(requestData);
@@ -3267,6 +3347,11 @@
         const cardRef = db.collection("cards").doc(req.cardId);
         batch.update(cardRef, { owner: req.proposer, status: 'SOLD' });
 
+        if (req.offerType === 'TRADE' && req.offeredCardId) {
+          const offeredCardRef = db.collection("cards").doc(req.offeredCardId);
+          batch.update(offeredCardRef, { owner: req.targetOwner, status: 'SOLD' });
+        }
+
         const reqRef = db.collection("tradeRequests").doc(reqId);
         batch.update(reqRef, { status: 'ACCEPTED' });
 
@@ -3297,6 +3382,11 @@
         const batch = db.batch();
         const cardRef = db.collection("cards").doc(req.cardId);
         batch.update(cardRef, { owner: req.proposer, status: 'SOLD' });
+
+        if (req.offerType === 'TRADE' && req.offeredCardId) {
+          const offeredCardRef = db.collection("cards").doc(req.offeredCardId);
+          batch.update(offeredCardRef, { owner: req.targetOwner, status: 'SOLD' });
+        }
 
         const reqRef = db.collection("tradeRequests").doc(reqId);
         batch.update(reqRef, { status: 'ACCEPTED' });
