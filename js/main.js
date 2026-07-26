@@ -1,6 +1,5 @@
 // js/main.js
 
-// Global Application State
 let currentTab = 'catalog';
 let currentFilter = 'ALL';
 let historyFilter = 'ALL';
@@ -12,52 +11,57 @@ let orderHistory = [];
 let userWishlist = JSON.parse(localStorage.getItem('eugene_wishlist') || '[]');
 let searchDebounceTimer = null;
 
-// Default Placeholder QRIS Image
 const DEFAULT_QRIS_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23ffffff'/><rect x='20' y='20' width='60' height='60' fill='%23000000'/><rect x='30' y='30' width='40' height='40' fill='%23ffffff'/><rect x='40' y='40' width='20' height='20' fill='%23000000'/><rect x='120' y='20' width='60' height='60' fill='%23000000'/><rect x='130' y='30' width='40' height='40' fill='%23ffffff'/><rect x='140' y='40' width='20' height='20' fill='%23000000'/><rect x='20' y='120' width='60' height='60' fill='%23000000'/><rect x='30' y='130' width='40' height='40' fill='%23ffffff'/><rect x='40' y='140' width='20' height='20' fill='%23000000'/><text x='100' y='110' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='%23000000'>OFFICIAL QRIS</text></svg>";
 
-// Initialization
 document.addEventListener('DOMContentLoaded', () => {
   setupQrisImage();
   fetchInventoryData();
   fetchTradeListings();
   fetchTradeRequests();
   fetchOrderHistory();
-  
-  // Default to Catalog
   switchTab('catalog');
 });
 
-// ==========================================================================
-// 1. TAB SWITCHER & NAVIGATION ENGINE
-// ==========================================================================
+function onAuthResolved(user) {
+  if (['admin', 'inventory'].includes(currentTab) && (!user || !isUserAdmin(user.email))) {
+    switchTab('catalog');
+  }
+}
+
+// 1. SECURE TAB SWITCHER WITH GUARD
 function switchTab(tabName) {
+  const adminTabs = ['admin', 'inventory'];
+
+  if (adminTabs.includes(tabName)) {
+    const userEmail = currentUser ? currentUser.email : null;
+    if (!userEmail || !isUserAdmin(userEmail)) {
+      showToast("Access Denied: Admin privileges required.");
+      tabName = 'catalog';
+    }
+  }
+
   currentTab = tabName;
   
-  // Hide all sections
   const sections = ['catalog', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'admin', 'inventory'];
   sections.forEach(sec => {
     const el = document.getElementById(`view-${sec}`);
     if (el) el.classList.add('hidden');
   });
 
-  // Show active view
   const activeEl = document.getElementById(`view-${tabName}`);
   if (activeEl) activeEl.classList.remove('hidden');
 
-  // Reset navbar button highlight styles
   document.querySelectorAll('nav button').forEach(btn => {
     btn.classList.remove('bg-slate-800', 'text-white');
     btn.classList.add('text-slate-400');
   });
 
-  // Highlight active nav button
   const activeBtn = document.getElementById(`nav-${tabName}`);
   if (activeBtn) {
     activeBtn.classList.remove('text-slate-400');
     activeBtn.classList.add('bg-slate-800', 'text-white');
   }
 
-  // Trigger dedicated Tab Render functions
   switch (tabName) {
     case 'catalog': renderCardGrid(); break;
     case 'trade': renderTradeRoom(); break;
@@ -73,9 +77,7 @@ function switchTab(tabName) {
   }
 }
 
-// ==========================================================================
-// 2. FIRESTORE REALTIME LISTENERS & DATA FETCHING
-// ==========================================================================
+// 2. FIRESTORE REALTIME SYNC
 function fetchInventoryData() {
   db.collection("cards").onSnapshot(snapshot => {
     cardsData = [];
@@ -113,9 +115,7 @@ function fetchOrderHistory() {
   }, err => console.error("Error fetching order history:", err));
 }
 
-// ==========================================================================
-// 3. CATALOG VIEW RENDERING & FILTERS
-// ==========================================================================
+// 3. CATALOG GRID & FILTERS
 function renderCardGrid() {
   const container = document.getElementById('card-grid');
   if (!container) return;
@@ -196,9 +196,7 @@ function updateRemainingCardsCount() {
   }
 }
 
-// ==========================================================================
-// 4. TRADE ROOM VIEW
-// ==========================================================================
+// 4. TRADE ROOM
 function renderTradeRoom() {
   const container = document.getElementById('p2p-listings-grid');
   if (!container) return;
@@ -228,9 +226,7 @@ function renderTradeRoom() {
   `).join('');
 }
 
-// ==========================================================================
-// 5. AUCTION ROOM VIEW
-// ==========================================================================
+// 5. AUCTION ROOM
 function renderAuctionRoom() {
   const featuredCard = cardsData.find(c => c.serial === '*01') || cardsData[0];
   if (!featuredCard) return;
@@ -240,7 +236,6 @@ function renderAuctionRoom() {
   document.getElementById('auction-card-img').src = featuredCard.img || 'https://via.placeholder.com/150';
   document.getElementById('auction-card-owner-info').innerHTML = `Owner: <strong class="text-white">${featuredCard.owner || 'Admin House'}</strong>`;
 
-  // Fetch auction bids if exists
   db.collection("auctions").doc("current_auction").get().then(doc => {
     if (doc.exists) {
       const data = doc.data();
@@ -292,9 +287,7 @@ async function placeAuctionBid() {
   }
 }
 
-// ==========================================================================
-// 6. TRADE REQUESTS VIEW
-// ==========================================================================
+// 6. TRADE REQUESTS
 function renderTradeRequests() {
   const container = document.getElementById('trade-requests-grid');
   if (!container) return;
@@ -323,9 +316,7 @@ function renderTradeRequests() {
   `).join('');
 }
 
-// ==========================================================================
-// 7. INBOX & DIRECT CHAT MESSAGES
-// ==========================================================================
+// 7. INBOX & DIRECT CHAT
 function loadUserInboxThreads() {
   const container = document.getElementById('inbox-threads-list');
   if (!container) return;
@@ -379,9 +370,7 @@ function closeChatDrawer() {
   document.getElementById('chat-drawer').classList.add('translate-x-full');
 }
 
-// ==========================================================================
-// 8. HOLDERS DIRECTORY VIEW
-// ==========================================================================
+// 8. HOLDERS DIRECTORY
 function renderHoldersTable() {
   const tbody = document.getElementById('holders-table-body');
   if (!tbody) return;
@@ -407,9 +396,7 @@ function renderHoldersTable() {
   `).join('');
 }
 
-// ==========================================================================
-// 9. TRANSACTION HISTORY VIEW
-// ==========================================================================
+// 9. TRANSACTION HISTORY
 function renderHistoryTable() {
   const tbody = document.getElementById('history-table-body');
   if (!tbody) return;
@@ -452,9 +439,7 @@ function setHistoryFilter(filter) {
   renderHistoryTable();
 }
 
-// ==========================================================================
-// 10. MY VAULT / BINDER VIEW
-// ==========================================================================
+// 10. MY VAULT / BINDER
 function renderMyVault() {
   const container = document.getElementById('owned-cards-grid');
   if (!container) return;
@@ -484,9 +469,7 @@ function renderMyVault() {
   `).join('');
 }
 
-// ==========================================================================
 // 11. WISHLIST VIEW
-// ==========================================================================
 function toggleWishlist(cardId) {
   if (userWishlist.includes(cardId)) {
     userWishlist = userWishlist.filter(id => id !== cardId);
@@ -532,9 +515,7 @@ function renderWishlist() {
   `).join('');
 }
 
-// ==========================================================================
 // 12. ADMIN HUB VIEW
-// ==========================================================================
 function renderAdminHub() {
   const container = document.getElementById('admin-pending-orders-list');
   if (!container) return;
@@ -575,9 +556,7 @@ function refreshAdminHub() {
   showToast("Refreshed admin records.");
 }
 
-// ==========================================================================
-// 13. INVENTORY MANAGEMENT TABLE (ADMIN)
-// ==========================================================================
+// 13. INVENTORY TABLE
 function renderInventoryTable() {
   const tbody = document.getElementById('inventory-table-body');
   if (!tbody) return;
@@ -606,9 +585,7 @@ function renderInventoryTable() {
   `).join('');
 }
 
-// ==========================================================================
-// 14. SHOPPING CART & QRIS ORDER SUBMISSION
-// ==========================================================================
+// 14. SHOPPING CART & QRIS CHECKOUT
 function addToCart(cardId) {
   const card = cardsData.find(c => c.id === cardId);
   if (!card) return;
@@ -730,9 +707,7 @@ async function submitOrderWithProof() {
   }
 }
 
-// ==========================================================================
-// 15. MODALS & UTILITY HELPERS
-// ==========================================================================
+// 15. MODALS & UTILITIES
 function openCardDetailModal(cardId) {
   const card = cardsData.find(c => c.id === cardId);
   if (!card) return;
