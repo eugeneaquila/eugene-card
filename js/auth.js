@@ -3,35 +3,60 @@
 let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize Firebase Auth state listener
-  firebase.auth().onAuthStateChanged(user => {
-    currentUser = user;
-    updateAuthUI(user);
-    
-    if (typeof onAuthResolved === 'function') {
-      onAuthResolved(user);
-    }
+  // Ensure Firebase Auth is loaded and initialized before listening
+  if (typeof firebase !== 'undefined' && firebase.auth) {
+    firebase.auth().onAuthStateChanged(user => {
+      currentUser = user;
+      updateAuthUI(user);
+      
+      if (typeof onAuthResolved === 'function') {
+        onAuthResolved(user);
+      }
 
-    if (user) {
-      syncUserToFirestore(user);
-    }
-  });
+      if (user) {
+        syncUserToFirestore(user);
+      }
+    });
+  } else {
+    console.error("Firebase Auth SDK not detected. Check script order in index.html.");
+  }
 });
 
 function loginWithGoogle() {
+  if (typeof firebase === 'undefined' || !firebase.auth) {
+    showToast("Firebase Auth is not initialized.");
+    return;
+  }
+
   const provider = new firebase.auth.GoogleAuthProvider();
+  
+  // Force account selection prompt every time to prevent cached token loops
+  provider.setCustomParameters({
+    prompt: 'select_account'
+  });
+
   firebase.auth().signInWithPopup(provider)
     .then((result) => {
       const user = result.user;
       showToast(`Successfully signed in as ${user.displayName || user.email}`);
     })
     .catch((error) => {
-      console.error("Google Sign-In Error:", error);
-      showToast("Sign-in failed: " + error.message);
+      console.error("Google Sign-In Error Code:", error.code);
+      console.error("Google Sign-In Error Message:", error.message);
+      
+      if (error.code === 'auth/popup-blocked') {
+        showToast("Pop-up blocked by browser. Please allow popups for this site.");
+      } else if (error.code === 'auth/unauthorized-domain') {
+        showToast("Domain not authorized in Firebase Console settings.");
+      } else {
+        showToast("Sign-in failed: " + error.message);
+      }
     });
 }
 
 function logoutUser() {
+  if (typeof firebase === 'undefined' || !firebase.auth) return;
+
   firebase.auth().signOut()
     .then(() => {
       currentUser = null;
