@@ -183,7 +183,7 @@ function renderAuctionRoom() {
         <h2 class="text-lg font-black text-white">${activeAuction.cardName || 'Auction Card'}</h2>
         
         <div class="w-full aspect-[4/3] bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-center p-4">
-          <img src="${activeAuction.img || 'https://via.placeholder.com/250'}" class="max-h-full object-contain">
+          <img src="${activeAuction.imgUrl || activeAuction.img || 'https://via.placeholder.com/250'}" class="max-h-full object-contain">
         </div>
 
         <div class="flex justify-between items-center text-xs text-slate-300 pt-2">
@@ -302,8 +302,8 @@ function openCardDetailModal(cardId) {
   document.getElementById('detail-card-edition').textContent = card.edition || 'Beta Edition';
   document.getElementById('detail-card-sn').textContent = card.sn || '0001';
   document.getElementById('detail-card-tier').textContent = card.tier || '100';
-  document.getElementById('detail-card-price').textContent = `Rp ${(card.price || 100000).toLocaleString('id-ID')}`;
-  document.getElementById('detail-card-img').src = card.img || 'https://via.placeholder.com/200x250';
+  document.getElementById('detail-card-price').textContent = `Rp ${(card.price || card.baseFloorPrice || 100000).toLocaleString('id-ID')}`;
+  document.getElementById('detail-card-img').src = card.imgUrl || card.img || 'https://via.placeholder.com/200x250';
 
   const cartBtn = document.getElementById('detail-cart-btn');
   cartBtn.setAttribute('onclick', `addToCart('${card.id}'); closeCardDetailModal();`);
@@ -339,7 +339,8 @@ function renderCardGrid() {
     const isPremium = card.type === 'PREMIUM';
     const holoClass = isPremium ? 'card-holo-premium' : 'card-holo-standard';
     const isSaved = Array.isArray(userWishlist) && userWishlist.includes(card.id);
-    const cardPrice = card.price || 0;
+    const cardPrice = card.price || card.baseFloorPrice || 0;
+    const cardImg = card.imgUrl || card.img || 'https://via.placeholder.com/150';
     
     return `
       <div onclick="openCardDetailModal('${card.id}')" class="${holoClass} rounded-2xl p-3 cursor-pointer flex flex-col justify-between space-y-2 relative group hover:border-amber-500/50 transition-all">
@@ -356,7 +357,7 @@ function renderCardGrid() {
         </div>
 
         <div class="w-full aspect-[4/5] bg-slate-950/60 rounded-xl overflow-hidden flex items-center justify-center p-1 border border-slate-800">
-          <img src="${card.img || 'https://via.placeholder.com/150'}" alt="${card.name || 'Card'}" loading="lazy" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300">
+          <img src="${cardImg}" alt="${card.name || 'Card'}" loading="lazy" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300">
         </div>
 
         <div>
@@ -412,10 +413,10 @@ function openListCardForTradeModal() {
   }
 
   select.innerHTML = myCards.map(c => `
-    <option value="${c.id}">${c.name} (${c.serial}) - Rp ${(c.price || 100000).toLocaleString('id-ID')}</option>
+    <option value="${c.id}">${c.name} (${c.serial}) - Rp ${(c.price || c.baseFloorPrice || 100000).toLocaleString('id-ID')}</option>
   `).join('');
 
-  document.getElementById('list-card-price-input').value = myCards[0].price || 100000;
+  document.getElementById('list-card-price-input').value = myCards[0].price || myCards[0].baseFloorPrice || 100000;
   document.getElementById('list-card-trade-modal').classList.remove('hidden');
 }
 
@@ -433,7 +434,7 @@ async function submitListCardToTrade() {
     cardId: card.id,
     cardName: card.name,
     serial: card.serial,
-    img: card.img,
+    imgUrl: card.imgUrl || card.img || '',
     askingPrice: askingPrice,
     seller: userProfile.name || (currentUser ? currentUser.displayName : 'Collector'),
     sellerEmail: currentUser ? currentUser.email : 'collector@eugene.com',
@@ -476,6 +477,7 @@ function renderTradeRoom() {
 
   container.innerHTML = tradeListings.map(trade => {
     const isMyListing = trade.sellerEmail === myEmail || trade.seller === myName || (currentUser && isUserAdmin(currentUser.email));
+    const tradeImg = trade.imgUrl || trade.img || 'https://via.placeholder.com/150';
 
     return `
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg relative">
@@ -484,7 +486,7 @@ function renderTradeRoom() {
           <span class="font-mono text-amber-400 font-bold">${trade.serial || '*0001'}</span>
         </div>
         <div class="w-full aspect-square bg-slate-950 rounded-xl overflow-hidden p-2 border border-slate-800 flex items-center justify-center">
-          <img src="${trade.img || 'https://via.placeholder.com/150'}" class="max-h-full object-contain">
+          <img src="${tradeImg}" class="max-h-full object-contain">
         </div>
         <div>
           <h4 class="text-xs font-black text-white">${trade.cardName || 'Card Title'}</h4>
@@ -551,7 +553,7 @@ function openOwnerVaultModal(ownerName) {
   grid.innerHTML = cards.map(card => `
     <div class="bg-slate-950 border border-slate-800 rounded-2xl p-2.5 space-y-2 text-center">
       <div class="w-full aspect-[4/5] bg-slate-900 rounded-xl p-1 overflow-hidden flex items-center justify-center">
-        <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
+        <img src="${card.imgUrl || card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
       </div>
       <p class="text-xs font-bold text-white truncate">${card.name}</p>
       <p class="text-[10px] font-mono text-amber-400 font-bold">${card.serial || '*0001'}</p>
@@ -783,40 +785,44 @@ function renderInventoryTable() {
     return;
   }
 
-  tbody.innerHTML = items.map((c, index) => `
-    <tr class="hover:bg-slate-900/80 transition-colors border-b border-slate-800/60 ${index % 2 === 0 ? 'bg-slate-950/40' : 'bg-transparent'}">
-      <td class="p-4 font-mono text-amber-400 font-bold flex items-center gap-2">
-        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-glow"></span>
-        ${c.serial || '*0001'}
-      </td>
-      <td class="p-4 font-bold text-white flex items-center gap-3">
-        <img src="${c.img || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded-lg object-contain bg-slate-900 border border-slate-800 p-0.5">
-        <span class="truncate max-w-[160px]">${c.name || 'Unnamed Card'}</span>
-      </td>
-      <td class="p-4">
-        <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg border ${c.type === 'PREMIUM' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}">
-          ${c.type || 'STANDARD'}
-        </span>
-      </td>
-      <td class="p-4 font-mono font-bold text-emerald-400">Rp ${(c.price || 0).toLocaleString('id-ID')}</td>
-      <td class="p-4 text-slate-300 font-medium">
-        <div class="flex items-center gap-2">
-          <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${c.owner || 'Admin House'}" class="w-5 h-5 rounded-full border border-slate-700">
-          <span class="truncate max-w-[140px]">${c.owner || 'Admin House'}</span>
-        </div>
-      </td>
-      <td class="p-4">
-        <span class="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg border ${c.status === 'SOLD' ? 'bg-rose-500/10 text-rose-400 border-rose-500/25' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'}">
-          ${c.status || 'AVAILABLE'}
-        </span>
-      </td>
-      <td class="p-4 text-right">
-        <button onclick="openEditInventoryModal('${c.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-amber-400 rounded-xl text-xs font-black border border-slate-700/80 transition-all shadow-sm">
-          <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
-        </button>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = items.map((c, index) => {
+    const cardPrice = c.price || c.baseFloorPrice || 0;
+    const cardImg = c.imgUrl || c.img || 'https://via.placeholder.com/40';
+    return `
+      <tr class="hover:bg-slate-900/80 transition-colors border-b border-slate-800/60 ${index % 2 === 0 ? 'bg-slate-950/40' : 'bg-transparent'}">
+        <td class="p-4 font-mono text-amber-400 font-bold flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-glow"></span>
+          ${c.serial || '*0001'}
+        </td>
+        <td class="p-4 font-bold text-white flex items-center gap-3">
+          <img src="${cardImg}" class="w-8 h-8 rounded-lg object-contain bg-slate-900 border border-slate-800 p-0.5">
+          <span class="truncate max-w-[160px]">${c.name || 'Unnamed Card'}</span>
+        </td>
+        <td class="p-4">
+          <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg border ${c.type === 'PREMIUM' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}">
+            ${c.type || 'STANDARD'}
+          </span>
+        </td>
+        <td class="p-4 font-mono font-bold text-emerald-400">Rp ${cardPrice.toLocaleString('id-ID')}</td>
+        <td class="p-4 text-slate-300 font-medium">
+          <div class="flex items-center gap-2">
+            <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${c.owner || 'Admin House'}" class="w-5 h-5 rounded-full border border-slate-700">
+            <span class="truncate max-w-[140px]">${c.owner || 'Admin House'}</span>
+          </div>
+        </td>
+        <td class="p-4">
+          <span class="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg border ${c.status === 'SOLD' ? 'bg-rose-500/10 text-rose-400 border-rose-500/25' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'}">
+            ${c.status || 'AVAILABLE'}
+          </span>
+        </td>
+        <td class="p-4 text-right">
+          <button onclick="openEditInventoryModal('${c.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-amber-400 rounded-xl text-xs font-black border border-slate-700/80 transition-all shadow-sm">
+            <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function backupInventoryJSON() {
@@ -877,9 +883,9 @@ async function openEditInventoryModal(cardId) {
   document.getElementById('edit-card-sn').value = card.sn || '';
   document.getElementById('edit-card-tier').value = card.tier || '';
   document.getElementById('edit-card-printing').value = card.printing || '';
-  document.getElementById('edit-card-price').value = card.price || 0;
+  document.getElementById('edit-card-price').value = card.price || card.baseFloorPrice || 0;
   document.getElementById('edit-card-status').value = card.status || 'AVAILABLE';
-  document.getElementById('edit-card-img').value = card.img || '';
+  document.getElementById('edit-card-img').value = card.imgUrl || card.img || '';
 
   await populateOwnerDropdown(card.owner || 'Admin House');
   document.getElementById('inventory-edit-modal').classList.remove('hidden');
@@ -961,7 +967,7 @@ async function saveInventoryCardChanges() {
     price: parseFloat(document.getElementById('edit-card-price').value) || 0,
     status: document.getElementById('edit-card-status').value,
     owner: document.getElementById('edit-card-owner-select').value,
-    img: document.getElementById('edit-card-img').value
+    imgUrl: document.getElementById('edit-card-img').value
   };
 
   try {
@@ -1116,34 +1122,38 @@ function renderMyVault() {
     return;
   }
 
-  container.innerHTML = myCards.map(card => `
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2.5 flex flex-col justify-between">
-      <div>
-        <div class="flex justify-between items-center text-[10px]">
-          <span class="text-amber-400 font-mono font-bold">${card.serial || '*0001'}</span>
-          <span class="text-slate-400">${card.type || 'STANDARD'}</span>
+  container.innerHTML = myCards.map(card => {
+    const cardPrice = card.price || card.baseFloorPrice || 100000;
+    const cardImg = card.imgUrl || card.img || 'https://via.placeholder.com/150';
+    return `
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2.5 flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center text-[10px]">
+            <span class="text-amber-400 font-mono font-bold">${card.serial || '*0001'}</span>
+            <span class="text-slate-400">${card.type || 'STANDARD'}</span>
+          </div>
+          <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl overflow-hidden p-1 border border-slate-800 flex items-center justify-center my-2">
+            <img src="${cardImg}" class="h-full object-contain">
+          </div>
+          <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
+          <p class="text-[11px] font-mono text-emerald-400 font-bold mt-0.5">Floor Value: Rp ${cardPrice.toLocaleString('id-ID')}</p>
         </div>
-        <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl overflow-hidden p-1 border border-slate-800 flex items-center justify-center my-2">
-          <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
-        </div>
-        <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
-        <p class="text-[11px] font-mono text-emerald-400 font-bold mt-0.5">Floor Value: Rp ${(card.price || 100000).toLocaleString('id-ID')}</p>
-      </div>
 
-      <div class="grid grid-cols-3 gap-1 pt-2 border-t border-slate-800">
-        <button onclick="sellBackToAdmin('${card.id}')" class="py-1.5 bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 text-[10px] font-extrabold rounded-lg border border-rose-500/30">Sell</button>
-        <button onclick="listOwnedCardForTrade('${card.id}')" class="py-1.5 bg-amber-500/20 hover:bg-amber-400/30 text-amber-300 text-[10px] font-extrabold rounded-lg border border-amber-500/30">Trade</button>
-        <button onclick="putCardOnAuction('${card.id}')" class="py-1.5 bg-emerald-500/20 hover:bg-emerald-400/30 text-emerald-300 text-[10px] font-extrabold rounded-lg border border-emerald-500/30">Auction</button>
+        <div class="grid grid-cols-3 gap-1 pt-2 border-t border-slate-800">
+          <button onclick="sellBackToAdmin('${card.id}')" class="py-1.5 bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 text-[10px] font-extrabold rounded-lg border border-rose-500/30">Sell</button>
+          <button onclick="listOwnedCardForTrade('${card.id}')" class="py-1.5 bg-amber-500/20 hover:bg-amber-400/30 text-amber-300 text-[10px] font-extrabold rounded-lg border border-amber-500/30">Trade</button>
+          <button onclick="putCardOnAuction('${card.id}')" class="py-1.5 bg-emerald-500/20 hover:bg-emerald-400/30 text-emerald-300 text-[10px] font-extrabold rounded-lg border border-emerald-500/30">Auction</button>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 async function sellBackToAdmin(cardId) {
   const card = cardsData.find(c => c.id === cardId);
   if (!card) return;
 
-  const floorPrice = card.price || 100000;
+  const floorPrice = card.price || card.baseFloorPrice || 100000;
   if (!confirm(`Are you sure you want to sell "${card.name}" back to Admin for Rp ${floorPrice.toLocaleString('id-ID')}?`)) return;
 
   try {
@@ -1164,8 +1174,8 @@ async function listOwnedCardForTrade(cardId) {
     cardId: card.id,
     cardName: card.name,
     serial: card.serial,
-    img: card.img,
-    askingPrice: card.price || 100000,
+    imgUrl: card.imgUrl || card.img || '',
+    askingPrice: card.price || card.baseFloorPrice || 100000,
     seller: userProfile.name || (currentUser ? currentUser.displayName : 'Collector'),
     sellerEmail: currentUser ? currentUser.email : 'collector@eugene.com',
     createdAt: new Date().toISOString()
@@ -1189,10 +1199,10 @@ async function putCardOnAuction(cardId) {
       cardId: card.id,
       cardName: card.name,
       serial: card.serial,
-      img: card.img,
+      imgUrl: card.imgUrl || card.img || '',
       owner: card.owner,
-      startingBid: card.price || 100000,
-      highestBid: card.price || 100000,
+      startingBid: card.price || card.baseFloorPrice || 100000,
+      highestBid: card.price || card.baseFloorPrice || 100000,
       highBidder: "Admin House",
       status: "ACTIVE",
       expiresAt: new Date(Date.now() + 86400000).toISOString()
@@ -1234,18 +1244,21 @@ function renderWishlist() {
     return;
   }
 
-  container.innerHTML = savedCards.map(card => `
-    <div onclick="openCardDetailModal('${card.id}')" class="card-holo-standard rounded-2xl p-3 cursor-pointer space-y-2">
-      <div class="flex justify-between text-[10px] font-mono text-amber-400">
-        <span>${card.serial || '*0001'}</span>
-        <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-rose-500"><i class="fa-solid fa-heart"></i></button>
+  container.innerHTML = savedCards.map(card => {
+    const cardImg = card.imgUrl || card.img || 'https://via.placeholder.com/150';
+    return `
+      <div onclick="openCardDetailModal('${card.id}')" class="card-holo-standard rounded-2xl p-3 cursor-pointer space-y-2">
+        <div class="flex justify-between text-[10px] font-mono text-amber-400">
+          <span>${card.serial || '*0001'}</span>
+          <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-rose-500"><i class="fa-solid fa-heart"></i></button>
+        </div>
+        <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1 overflow-hidden flex items-center justify-center">
+          <img src="${cardImg}" class="h-full object-contain">
+        </div>
+        <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
       </div>
-      <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1 overflow-hidden flex items-center justify-center">
-        <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
-      </div>
-      <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function addToCart(cardId) {
@@ -1286,14 +1299,16 @@ function updateCartUI() {
 
   let subtotal = 0;
   container.innerHTML = cart.map(item => {
-    subtotal += item.price || 0;
+    const itemPrice = item.price || item.baseFloorPrice || 0;
+    const itemImg = item.imgUrl || item.img || 'https://via.placeholder.com/50';
+    subtotal += itemPrice;
     return `
       <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800">
         <div class="flex items-center gap-3">
-          <img src="${item.img || 'https://via.placeholder.com/50'}" class="w-10 h-10 object-contain rounded bg-slate-900 border border-slate-800">
+          <img src="${itemImg}" class="w-10 h-10 object-contain rounded bg-slate-900 border border-slate-800">
           <div>
             <h5 class="text-xs font-bold text-white">${item.name}</h5>
-            <span class="text-[10px] font-mono text-amber-400 font-bold">Rp ${(item.price || 0).toLocaleString('id-ID')}</span>
+            <span class="text-[10px] font-mono text-amber-400 font-bold">Rp ${itemPrice.toLocaleString('id-ID')}</span>
           </div>
         </div>
         <button onclick="removeFromCart('${item.id}')" class="text-slate-500 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
@@ -1330,7 +1345,7 @@ function proceedToCheckout() {
   }
   toggleCartDrawer();
 
-  let subtotal = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+  let subtotal = cart.reduce((sum, item) => sum + (item.price || item.baseFloorPrice || 0), 0);
   let total = subtotal + Math.round(subtotal * 0.02);
 
   document.getElementById('checkout-modal-title').textContent = "Scan & Pay via Official QRIS (Eugene Card - Toraja Utara)";
@@ -1350,7 +1365,7 @@ function closeCheckoutModal() {
 async function submitOrderWithProof() {
   if (cart.length === 0) return;
 
-  let subtotal = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+  let subtotal = cart.reduce((sum, item) => sum + (item.price || item.baseFloorPrice || 0), 0);
   let grandTotal = subtotal + Math.round(subtotal * 0.02);
 
   const orderData = {
@@ -1383,7 +1398,7 @@ function renderAdminHub() {
 
   const pendingOrders = orderHistory.filter(o => (o.status || 'PENDING') === 'PENDING');
   const totalCardsCount = cardsData.length;
-  const totalValuation = cardsData.reduce((sum, c) => sum + (c.price || 100000), 0);
+  const totalValuation = cardsData.reduce((sum, c) => sum + (c.price || c.baseFloorPrice || 100000), 0);
 
   const metricsHTML = `
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
