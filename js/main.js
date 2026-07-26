@@ -11,6 +11,7 @@ let tradeListings = [];
 let tradeRequests = [];
 let orderHistory = [];
 let allUsersList = [];
+let activeAuction = null;
 let userWishlist = JSON.parse(localStorage.getItem('eugene_wishlist') || '[]');
 let userProfile = JSON.parse(localStorage.getItem('eugene_profile') || '{"name":"Collector","username":"collector","bio":"Genesis Card Enthusiast","avatar":"","instagram":"","tiktok":"","website":""}');
 let searchDebounceTimer = null;
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchTradeRequests();
   fetchOrderHistory();
   fetchAllUsers();
+  fetchActiveAuction();
   fetchUnreadInboxCount();
   switchTab('catalog');
 });
@@ -135,6 +137,111 @@ function fetchAllUsers() {
     snapshot.forEach(doc => allUsersList.push({ id: doc.id, ...doc.data() }));
     if (currentTab === 'admin') renderAdminHub();
   }, err => console.error("Error fetching users:", err));
+}
+
+function fetchActiveAuction() {
+  db.collection("auctions").doc("featured_active").onSnapshot(doc => {
+    if (doc.exists && doc.data().status === "ACTIVE") {
+      activeAuction = doc.data();
+    } else {
+      activeAuction = null;
+    }
+    if (currentTab === 'auction') renderAuctionRoom();
+  }, err => console.error("Error fetching auction:", err));
+}
+
+function renderAuctionRoom() {
+  const container = document.getElementById('view-auction');
+  if (!container) return;
+
+  if (!activeAuction || activeAuction.status !== 'ACTIVE') {
+    container.innerHTML = `
+      <div class="max-w-4xl mx-auto py-16 text-center space-y-4">
+        <div class="w-16 h-16 bg-slate-900 border border-slate-800 rounded-3xl mx-flex flex items-center justify-center text-slate-500 text-xl mx-auto">
+          <i class="fa-solid fa-gavel"></i>
+        </div>
+        <h3 class="text-base font-black text-white">No Active Auctions</h3>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto">There are currently no cards listed in the auction room. Go to your Vault and put a card up for auction to start one!</p>
+      </div>
+    `;
+    return;
+  }
+
+  // If active auction exists, render standard auction view layout
+  container.innerHTML = `
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+        <div class="flex justify-between items-center">
+          <span class="px-3 py-1 rounded-xl bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30">FEATURED AUCTION</span>
+          <span class="text-xs font-mono text-slate-400"><i class="fa-solid fa-clock text-amber-400 mr-1"></i> Live Session</span>
+        </div>
+        <h2 class="text-lg font-black text-white">${activeAuction.cardName || 'Auction Card'}</h2>
+        
+        <div class="w-full aspect-[4/3] bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-center p-4">
+          <img src="${activeAuction.img || 'https://via.placeholder.com/250'}" class="max-h-full object-contain">
+        </div>
+
+        <div class="flex justify-between items-center text-xs text-slate-300 pt-2">
+          <span>Serial: <strong class="text-amber-400 font-mono">${activeAuction.serial || '*00'}</strong></span>
+          <span>Owner: <strong class="text-white">${activeAuction.owner || 'Collector'}</strong></span>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-6 flex flex-col justify-between shadow-xl">
+        <div class="space-y-4">
+          <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider">Current Highest Bid</h3>
+          <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+            <p class="text-2xl font-mono font-black text-emerald-400">Rp ${(activeAuction.highestBid || activeAuction.startingBid || 0).toLocaleString('id-ID')}</p>
+            <p class="text-[10px] text-slate-400">High Bidder: <strong class="text-white">${activeAuction.highBidder || 'None'}</strong></p>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-slate-300">Your Bid Amount (IDR)</label>
+            <input type="number" id="auction-bid-input" placeholder="e.g. 150000" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-amber-500">
+            <button onclick="placeAuctionBid()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow transition-all">
+              Place Bid via QRIS
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function placeAuctionBid() {
+  const bidInput = document.getElementById('auction-bid-input');
+  const bidAmount = parseFloat(bidInput.value) || 0;
+  const currentHighest = activeAuction.highestBid || activeAuction.startingBid || 0;
+
+  if (bidAmount <= currentHighest) {
+    showToast(`Bid must be higher than current bid (Rp ${currentHighest.toLocaleString('id-ID')})`);
+    return;
+  }
+
+  document.getElementById('qris-amount-display').textContent = `Rp ${bidAmount.toLocaleString('id-ID')}`;
+  document.getElementById('checkout-modal-title').textContent = `QRIS Payment for Auction Bid (${activeAuction.cardName})`;
+  document.getElementById('qris-img-element').src = DEFAULT_QRIS_IMAGE;
+  
+  const actionBtn = document.getElementById('checkout-action-btn');
+  actionBtn.setAttribute('onclick', `finalizeAuctionBid(${bidAmount})`);
+  document.getElementById('checkout-modal').classList.remove('hidden');
+}
+
+async function finalizeAuctionBid(bidAmount) {
+  try {
+    const bidderName = userProfile.name || (currentUser ? currentUser.displayName : 'Collector');
+    await db.collection("auctions").doc("featured_active").update({
+      highestBid: bidAmount,
+      highBidder: bidderName
+    });
+
+    closeCheckoutModal();
+    showToast("Bid successfully placed and recorded!");
+    fetchActiveAuction();
+  } catch (err) {
+    console.error("Auction Bid Error:", err);
+    showToast("Failed to submit bid.");
+  }
 }
 
 function fetchUnreadInboxCount() {
