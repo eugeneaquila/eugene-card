@@ -1,23 +1,35 @@
 // js/main.js
 
-// Global App State Variables
+// Global Application State
 let currentTab = 'catalog';
 let currentFilter = 'ALL';
 let historyFilter = 'ALL';
 let cart = [];
 let cardsData = [];
+let tradeListings = [];
+let tradeRequests = [];
+let orderHistory = [];
+let userWishlist = JSON.parse(localStorage.getItem('eugene_wishlist') || '[]');
 let searchDebounceTimer = null;
 
-// Default QRIS Image Source
+// Default Placeholder QRIS Image
 const DEFAULT_QRIS_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23ffffff'/><rect x='20' y='20' width='60' height='60' fill='%23000000'/><rect x='30' y='30' width='40' height='40' fill='%23ffffff'/><rect x='40' y='40' width='20' height='20' fill='%23000000'/><rect x='120' y='20' width='60' height='60' fill='%23000000'/><rect x='130' y='30' width='40' height='40' fill='%23ffffff'/><rect x='140' y='40' width='20' height='20' fill='%23000000'/><rect x='20' y='120' width='60' height='60' fill='%23000000'/><rect x='30' y='130' width='40' height='40' fill='%23ffffff'/><rect x='40' y='140' width='20' height='20' fill='%23000000'/><text x='100' y='110' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='%23000000'>OFFICIAL QRIS</text></svg>";
 
-// DOM Initialization
+// Initialization
 document.addEventListener('DOMContentLoaded', () => {
-  fetchInventoryData();
   setupQrisImage();
+  fetchInventoryData();
+  fetchTradeListings();
+  fetchTradeRequests();
+  fetchOrderHistory();
+  
+  // Default to Catalog
+  switchTab('catalog');
 });
 
-// Navigation Tab Switcher
+// ==========================================================================
+// 1. TAB SWITCHER & NAVIGATION ENGINE
+// ==========================================================================
 function switchTab(tabName) {
   currentTab = tabName;
   
@@ -32,39 +44,78 @@ function switchTab(tabName) {
   const activeEl = document.getElementById(`view-${tabName}`);
   if (activeEl) activeEl.classList.remove('hidden');
 
-  // Update navbar button highlight styles
+  // Reset navbar button highlight styles
   document.querySelectorAll('nav button').forEach(btn => {
     btn.classList.remove('bg-slate-800', 'text-white');
     btn.classList.add('text-slate-400');
   });
 
+  // Highlight active nav button
   const activeBtn = document.getElementById(`nav-${tabName}`);
   if (activeBtn) {
     activeBtn.classList.remove('text-slate-400');
     activeBtn.classList.add('bg-slate-800', 'text-white');
   }
 
-  // Trigger tab-specific loads
-  if (tabName === 'inventory') renderInventoryTable();
-  if (tabName === 'history') renderHistoryTable();
+  // Trigger dedicated Tab Render functions
+  switch (tabName) {
+    case 'catalog': renderCardGrid(); break;
+    case 'trade': renderTradeRoom(); break;
+    case 'auction': renderAuctionRoom(); break;
+    case 'trade-req': renderTradeRequests(); break;
+    case 'inbox': loadUserInboxThreads(); break;
+    case 'holders': renderHoldersTable(); break;
+    case 'history': renderHistoryTable(); break;
+    case 'dashboard': renderMyVault(); break;
+    case 'wishlist': renderWishlist(); break;
+    case 'admin': renderAdminHub(); break;
+    case 'inventory': renderInventoryTable(); break;
+  }
 }
 
-// Fetch Inventory Data Realtime from Firestore
+// ==========================================================================
+// 2. FIRESTORE REALTIME LISTENERS & DATA FETCHING
+// ==========================================================================
 function fetchInventoryData() {
-  db.collection("cards").onSnapshot((snapshot) => {
+  db.collection("cards").onSnapshot(snapshot => {
     cardsData = [];
-    snapshot.forEach(doc => {
-      cardsData.push({ id: doc.id, ...doc.data() });
-    });
-    
+    snapshot.forEach(doc => cardsData.push({ id: doc.id, ...doc.data() }));
     updateRemainingCardsCount();
-    renderCardGrid();
-  }, (error) => {
-    console.error("Error fetching cards:", error);
-  });
+    if (currentTab === 'catalog') renderCardGrid();
+    if (currentTab === 'inventory') renderInventoryTable();
+    if (currentTab === 'dashboard') renderMyVault();
+    if (currentTab === 'holders') renderHoldersTable();
+  }, err => console.error("Error fetching cards:", err));
 }
 
-// Render Main Collection Catalog Grid
+function fetchTradeListings() {
+  db.collection("trade_listings").onSnapshot(snapshot => {
+    tradeListings = [];
+    snapshot.forEach(doc => tradeListings.push({ id: doc.id, ...doc.data() }));
+    if (currentTab === 'trade') renderTradeRoom();
+  }, err => console.error("Error fetching trades:", err));
+}
+
+function fetchTradeRequests() {
+  db.collection("trade_requests").onSnapshot(snapshot => {
+    tradeRequests = [];
+    snapshot.forEach(doc => tradeRequests.push({ id: doc.id, ...doc.data() }));
+    if (currentTab === 'trade-req') renderTradeRequests();
+  }, err => console.error("Error fetching trade requests:", err));
+}
+
+function fetchOrderHistory() {
+  db.collection("orders").onSnapshot(snapshot => {
+    orderHistory = [];
+    snapshot.forEach(doc => orderHistory.push({ id: doc.id, ...doc.data() }));
+    if (currentTab === 'history') renderHistoryTable();
+    if (currentTab === 'admin') renderAdminHub();
+  }, err => console.error("Error fetching order history:", err));
+}
+
+// ==========================================================================
+// 3. CATALOG VIEW RENDERING & FILTERS
+// ==========================================================================
 function renderCardGrid() {
   const container = document.getElementById('card-grid');
   if (!container) return;
@@ -80,19 +131,25 @@ function renderCardGrid() {
   });
 
   if (filteredCards.length === 0) {
-    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No cards found matching criteria.</div>`;
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No cards found matching your criteria.</div>`;
     return;
   }
 
   container.innerHTML = filteredCards.map(card => {
     const isPremium = card.type === 'PREMIUM';
     const holoClass = isPremium ? 'card-holo-premium' : 'card-holo-standard';
+    const isSaved = userWishlist.includes(card.id);
     
     return `
       <div onclick="openCardDetailModal('${card.id}')" class="${holoClass} rounded-2xl p-3 cursor-pointer flex flex-col justify-between space-y-2 relative group">
         <div class="flex justify-between items-center text-[10px] font-extrabold">
           <span class="px-2 py-0.5 rounded-full ${isPremium ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}">${card.type || 'STANDARD'}</span>
-          <span class="font-mono text-slate-400">${card.serial || '*00'}</span>
+          <div class="flex items-center gap-1.5">
+            <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-xs ${isSaved ? 'text-rose-500' : 'text-slate-500 hover:text-rose-400'}">
+              <i class="fa-${isSaved ? 'solid' : 'regular'} fa-heart"></i>
+            </button>
+            <span class="font-mono text-slate-400">${card.serial || '*00'}</span>
+          </div>
         </div>
 
         <div class="w-full aspect-[4/5] bg-slate-950/60 rounded-xl overflow-hidden flex items-center justify-center p-1 border border-slate-800">
@@ -113,31 +170,24 @@ function renderCardGrid() {
   }).join('');
 }
 
-// Debounced Search Engine Input Handler
 function debouncedRenderCardGrid() {
   clearTimeout(searchDebounceTimer);
-  searchDebounceTimer = setTimeout(() => {
-    renderCardGrid();
-  }, 250);
+  searchDebounceTimer = setTimeout(() => renderCardGrid(), 250);
 }
 
-// Set Type Filter (ALL / PREMIUM / STANDARD)
 function setFilter(filter) {
   currentFilter = filter;
   ['ALL', 'PREMIUM', 'STANDARD'].forEach(f => {
     const btn = document.getElementById(`filter-${f}`);
     if (btn) {
-      if (f === filter) {
-        btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all';
-      } else {
-        btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
-      }
+      btn.className = (f === filter)
+        ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all'
+        : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
     }
   });
   renderCardGrid();
 }
 
-// Update Beta Stock Header Counter
 function updateRemainingCardsCount() {
   const countEl = document.getElementById('remaining-cards-count');
   if (countEl) {
@@ -146,40 +196,419 @@ function updateRemainingCardsCount() {
   }
 }
 
-// Open Detail View Modal
-function openCardDetailModal(cardId) {
-  const card = cardsData.find(c => c.id === cardId);
-  if (!card) return;
+// ==========================================================================
+// 4. TRADE ROOM VIEW
+// ==========================================================================
+function renderTradeRoom() {
+  const container = document.getElementById('p2p-listings-grid');
+  if (!container) return;
 
-  document.getElementById('detail-card-title').textContent = card.name || 'Unnamed Card';
-  document.getElementById('detail-card-serial').textContent = card.serial || '*00';
-  document.getElementById('detail-card-img').src = card.img || 'https://via.placeholder.com/150';
-  document.getElementById('detail-card-edition-badge').textContent = card.type || 'STANDARD';
-  document.getElementById('detail-card-edition-text').textContent = card.edition || 'Beta Edition';
-  document.getElementById('detail-card-sn-text').textContent = card.sn || '0000';
-  document.getElementById('detail-card-tier-text').textContent = card.tier || '100';
-  document.getElementById('detail-card-printing-text').textContent = card.printing || '1x';
-  document.getElementById('detail-card-owner').textContent = card.owner || 'Unowned (House)';
-  document.getElementById('detail-card-price').textContent = `Rp ${(card.price || 0).toLocaleString('id-ID')}`;
-  document.getElementById('detail-card-status').textContent = card.status || 'AVAILABLE';
-
-  const actionContainer = document.getElementById('detail-card-action-container');
-  if (actionContainer) {
-    actionContainer.innerHTML = `
-      <button onclick="addToCart('${card.id}'); closeCardDetailModal()" class="w-full py-3 bg-amber-500 text-slate-950 font-black text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all flex items-center justify-center gap-2">
-        <i class="fa-solid fa-cart-shopping"></i> Add Card to Cart
-      </button>
-    `;
+  if (tradeListings.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No active trade listings in the market right now.</div>`;
+    return;
   }
 
-  document.getElementById('card-detail-modal').classList.remove('hidden');
+  container.innerHTML = tradeListings.map(trade => `
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-bold text-slate-300"><i class="fa-solid fa-user text-amber-400 mr-1"></i> ${trade.seller || 'Collector'}</span>
+        <span class="font-mono text-amber-400 font-bold">${trade.serial || '*00'}</span>
+      </div>
+      <div class="w-full aspect-square bg-slate-950 rounded-xl overflow-hidden p-2 border border-slate-800 flex items-center justify-center">
+        <img src="${trade.img || 'https://via.placeholder.com/150'}" class="max-h-full object-contain">
+      </div>
+      <div>
+        <h4 class="text-xs font-black text-white">${trade.cardName || 'Card Title'}</h4>
+        <p class="text-sm font-mono font-bold text-emerald-400 mt-0.5">Rp ${(trade.askingPrice || 0).toLocaleString('id-ID')}</p>
+      </div>
+      <button onclick="addToCart('${trade.cardId}')" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl transition-all">
+        Buy Listing via QRIS
+      </button>
+    </div>
+  `).join('');
 }
 
-function closeCardDetailModal() {
-  document.getElementById('card-detail-modal').classList.add('hidden');
+// ==========================================================================
+// 5. AUCTION ROOM VIEW
+// ==========================================================================
+function renderAuctionRoom() {
+  const featuredCard = cardsData.find(c => c.serial === '*01') || cardsData[0];
+  if (!featuredCard) return;
+
+  document.getElementById('auction-card-title').textContent = featuredCard.name || 'Genesis Card';
+  document.getElementById('auction-card-serial').textContent = featuredCard.serial || '*01';
+  document.getElementById('auction-card-img').src = featuredCard.img || 'https://via.placeholder.com/150';
+  document.getElementById('auction-card-owner-info').innerHTML = `Owner: <strong class="text-white">${featuredCard.owner || 'Admin House'}</strong>`;
+
+  // Fetch auction bids if exists
+  db.collection("auctions").doc("current_auction").get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById('auction-current-bid').textContent = `Rp ${(data.currentBid || 750000).toLocaleString('id-ID')}`;
+      document.getElementById('auction-high-bidder').textContent = data.highBidder || 'Collector #104';
+      
+      const historyContainer = document.getElementById('auction-bid-history');
+      if (historyContainer && data.history) {
+        historyContainer.innerHTML = data.history.map(b => `
+          <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800">
+            <span class="text-slate-300 font-bold">${b.bidder}</span>
+            <span class="font-mono text-emerald-400 font-bold">Rp ${b.amount.toLocaleString('id-ID')}</span>
+          </div>
+        `).join('');
+      }
+    }
+  });
 }
 
-// Shopping Cart Functions
+async function placeAuctionBid() {
+  const input = document.getElementById('bid-input-amount');
+  const amount = parseInt(input.value);
+  if (!amount || amount <= 0) {
+    showToast("Please enter a valid bid amount.");
+    return;
+  }
+
+  const bidderName = currentUser ? (currentUser.displayName || currentUser.email) : 'Guest Collector';
+
+  try {
+    const auctionRef = db.collection("auctions").doc("current_auction");
+    const doc = await auctionRef.get();
+    
+    let history = doc.exists && doc.data().history ? doc.data().history : [];
+    history.unshift({ bidder: bidderName, amount: amount, timestamp: new Date().toISOString() });
+
+    await auctionRef.set({
+      currentBid: amount,
+      highBidder: bidderName,
+      history: history
+    }, { merge: true });
+
+    input.value = '';
+    showToast(`Bid placed for Rp ${amount.toLocaleString('id-ID')}!`);
+    renderAuctionRoom();
+  } catch (err) {
+    console.error("Bid Error:", err);
+    showToast("Failed to place bid.");
+  }
+}
+
+// ==========================================================================
+// 6. TRADE REQUESTS VIEW
+// ==========================================================================
+function renderTradeRequests() {
+  const container = document.getElementById('trade-requests-grid');
+  if (!container) return;
+
+  if (tradeRequests.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No active trade proposals found.</div>`;
+    return;
+  }
+
+  container.innerHTML = tradeRequests.map(req => `
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+      <div class="flex justify-between items-center text-xs">
+        <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 font-bold">${req.type || 'BUY OFFER'}</span>
+        <span class="text-slate-400 font-mono text-[10px]">${new Date(req.createdAt).toLocaleDateString()}</span>
+      </div>
+      <div class="text-xs space-y-1">
+        <p class="text-slate-300"><strong>Proposer:</strong> ${req.proposer || 'Collector'}</p>
+        <p class="text-slate-300"><strong>Target Card:</strong> ${req.targetCard || 'Card'}</p>
+        <p class="text-slate-400 italic">"${req.notes || 'No notes'}"</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="acceptTradeRequest('${req.id}')" class="flex-1 py-1.5 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl">Accept</button>
+        <button onclick="openCounterModal('${req.id}')" class="flex-1 py-1.5 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl">Counter</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==========================================================================
+// 7. INBOX & DIRECT CHAT MESSAGES
+// ==========================================================================
+function loadUserInboxThreads() {
+  const container = document.getElementById('inbox-threads-list');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div onclick="openChatDrawer('Admin House')" class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between cursor-pointer hover:border-indigo-500 transition-all">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center">
+          <i class="fa-solid fa-shield-halved text-rose-400 text-sm"></i>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold text-white">Admin Support & Concierge</h4>
+          <p class="text-[10px] text-slate-400">Click to send direct inquiries or payment proof...</p>
+        </div>
+      </div>
+      <span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/30">Active</span>
+    </div>
+  `;
+}
+
+function searchUsersForChat() {
+  const query = (document.getElementById('user-chat-search-input')?.value || '').toLowerCase();
+  const resultsContainer = document.getElementById('user-chat-search-results');
+  if (!resultsContainer) return;
+
+  if (!query) {
+    resultsContainer.classList.add('hidden');
+    return;
+  }
+
+  const collectors = [...new Set(cardsData.map(c => c.owner).filter(Boolean))];
+  const matched = collectors.filter(c => c.toLowerCase().includes(query));
+
+  resultsContainer.classList.remove('hidden');
+  resultsContainer.innerHTML = matched.map(name => `
+    <div onclick="openChatDrawer('${name}')" class="p-2 bg-slate-950 rounded-xl border border-slate-800 text-xs text-white hover:border-amber-500 cursor-pointer flex justify-between items-center">
+      <span>${name}</span>
+      <i class="fa-solid fa-comment text-amber-400 text-[10px]"></i>
+    </div>
+  `).join('');
+}
+
+function openChatDrawer(targetUser) {
+  document.getElementById('chat-target-user-name').textContent = targetUser || 'Collector';
+  document.getElementById('chat-drawer-overlay').classList.remove('hidden');
+  document.getElementById('chat-drawer').classList.remove('translate-x-full');
+}
+
+function closeChatDrawer() {
+  document.getElementById('chat-drawer-overlay').classList.add('hidden');
+  document.getElementById('chat-drawer').classList.add('translate-x-full');
+}
+
+// ==========================================================================
+// 8. HOLDERS DIRECTORY VIEW
+// ==========================================================================
+function renderHoldersTable() {
+  const tbody = document.getElementById('holders-table-body');
+  if (!tbody) return;
+
+  const holderMap = {};
+  cardsData.forEach(c => {
+    const owner = c.owner || 'Admin House';
+    if (!holderMap[owner]) holderMap[owner] = [];
+    holderMap[owner].push(c.serial || '*00');
+  });
+
+  tbody.innerHTML = Object.keys(holderMap).map(owner => `
+    <tr class="hover:bg-slate-950 transition-colors">
+      <td class="p-3 font-bold text-white">${owner}</td>
+      <td class="p-3 font-mono text-amber-400">${holderMap[owner].length} cards</td>
+      <td class="p-3 font-mono text-slate-400">${holderMap[owner].join(', ')}</td>
+      <td class="p-3 text-right">
+        <button onclick="openChatDrawer('${owner}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 text-[10px] font-bold rounded-lg">
+          <i class="fa-solid fa-comments mr-1"></i> Chat
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ==========================================================================
+// 9. TRANSACTION HISTORY VIEW
+// ==========================================================================
+function renderHistoryTable() {
+  const tbody = document.getElementById('history-table-body');
+  if (!tbody) return;
+
+  const userEmail = currentUser ? currentUser.email : '';
+  const filteredHistory = orderHistory.filter(o => {
+    if (historyFilter === 'MINE') return o.buyerEmail === userEmail;
+    if (historyFilter === 'APPROVED') return o.status === 'APPROVED';
+    return true;
+  });
+
+  if (filteredHistory.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500 text-xs">No transaction records found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filteredHistory.map(o => `
+    <tr class="hover:bg-slate-950 transition-colors">
+      <td class="p-3.5 font-mono text-amber-400 font-bold">${o.orderRef || '#0000'}</td>
+      <td class="p-3.5 text-white">${o.buyerName || 'Guest'}</td>
+      <td class="p-3.5 text-slate-300">${o.itemNames || 'Card Stock'}</td>
+      <td class="p-3.5 font-mono text-emerald-400 font-bold">Rp ${(o.totalAmount || 0).toLocaleString('id-ID')}</td>
+      <td class="p-3.5"><span class="text-[10px] text-slate-400 font-mono">Verified QRIS</span></td>
+      <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${o.status === 'APPROVED' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${o.status || 'PENDING'}</span></td>
+      <td class="p-3.5 text-right text-slate-500 text-[10px]">${new Date(o.createdAt || Date.now()).toLocaleDateString()}</td>
+    </tr>
+  `).join('');
+}
+
+function setHistoryFilter(filter) {
+  historyFilter = filter;
+  ['ALL', 'MINE', 'APPROVED'].forEach(f => {
+    const btn = document.getElementById(`history-filter-${f}`);
+    if (btn) {
+      btn.className = (f === filter)
+        ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all'
+        : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
+    }
+  });
+  renderHistoryTable();
+}
+
+// ==========================================================================
+// 10. MY VAULT / BINDER VIEW
+// ==========================================================================
+function renderMyVault() {
+  const container = document.getElementById('owned-cards-grid');
+  if (!container) return;
+
+  const myName = currentUser ? (currentUser.displayName || currentUser.email) : 'Eugene';
+  const myCards = cardsData.filter(c => c.owner === myName || c.owner === 'eugene.aquila06');
+
+  if (myCards.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Your vault is empty. Buy cards from the collection or trade room!</div>`;
+    return;
+  }
+
+  container.innerHTML = myCards.map(card => `
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
+      <div class="flex justify-between items-center text-[10px]">
+        <span class="text-amber-400 font-mono font-bold">${card.serial || '*00'}</span>
+        <span class="text-slate-400">${card.type || 'STANDARD'}</span>
+      </div>
+      <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl overflow-hidden p-1 border border-slate-800 flex items-center justify-center">
+        <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
+      </div>
+      <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
+      <button onclick="openListCardForTradeModal('${card.id}')" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold rounded-xl border border-slate-700">
+        List for Trade
+      </button>
+    </div>
+  `).join('');
+}
+
+// ==========================================================================
+// 11. WISHLIST VIEW
+// ==========================================================================
+function toggleWishlist(cardId) {
+  if (userWishlist.includes(cardId)) {
+    userWishlist = userWishlist.filter(id => id !== cardId);
+    showToast("Removed from Wishlist.");
+  } else {
+    userWishlist.push(cardId);
+    showToast("Added to Wishlist!");
+  }
+  localStorage.setItem('eugene_wishlist', JSON.stringify(userWishlist));
+  renderCardGrid();
+  if (currentTab === 'wishlist') renderWishlist();
+}
+
+function clearWishlist() {
+  userWishlist = [];
+  localStorage.setItem('eugene_wishlist', JSON.stringify([]));
+  renderWishlist();
+  showToast("Wishlist cleared.");
+}
+
+function renderWishlist() {
+  const container = document.getElementById('wishlist-page-grid');
+  if (!container) return;
+
+  const savedCards = cardsData.filter(c => userWishlist.includes(c.id));
+
+  if (savedCards.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No saved cards in your wishlist yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = savedCards.map(card => `
+    <div onclick="openCardDetailModal('${card.id}')" class="card-holo-standard rounded-2xl p-3 cursor-pointer space-y-2">
+      <div class="flex justify-between text-[10px] font-mono text-amber-400">
+        <span>${card.serial || '*00'}</span>
+        <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-rose-500"><i class="fa-solid fa-heart"></i></button>
+      </div>
+      <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1 overflow-hidden flex items-center justify-center">
+        <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
+      </div>
+      <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
+    </div>
+  `).join('');
+}
+
+// ==========================================================================
+// 12. ADMIN HUB VIEW
+// ==========================================================================
+function renderAdminHub() {
+  const container = document.getElementById('admin-pending-orders-list');
+  if (!container) return;
+
+  const pendingOrders = orderHistory.filter(o => o.status === 'PENDING');
+
+  if (pendingOrders.length === 0) {
+    container.innerHTML = `<p class="text-xs text-slate-500 py-4">No pending transactions requiring approval.</p>`;
+    return;
+  }
+
+  container.innerHTML = pendingOrders.map(o => `
+    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex justify-between items-center text-xs">
+      <div>
+        <span class="font-mono text-amber-400 font-bold">${o.orderRef || '#000'}</span>
+        <p class="text-white font-bold">${o.buyerName || 'Buyer'}</p>
+        <p class="text-emerald-400 font-mono">Rp ${(o.totalAmount || 0).toLocaleString('id-ID')}</p>
+      </div>
+      <button onclick="approveOrder('${o.id}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl">
+        Approve Payment
+      </button>
+    </div>
+  `).join('');
+}
+
+async function approveOrder(orderId) {
+  try {
+    await db.collection("orders").doc(orderId).update({ status: 'APPROVED' });
+    showToast("Order approved successfully!");
+  } catch (err) {
+    console.error("Approve Error:", err);
+    showToast("Failed to approve order.");
+  }
+}
+
+function refreshAdminHub() {
+  fetchOrderHistory();
+  showToast("Refreshed admin records.");
+}
+
+// ==========================================================================
+// 13. INVENTORY MANAGEMENT TABLE (ADMIN)
+// ==========================================================================
+function renderInventoryTable() {
+  const tbody = document.getElementById('inventory-table-body');
+  if (!tbody) return;
+
+  const search = (document.getElementById('inventory-search')?.value || '').toLowerCase();
+
+  const items = cardsData.filter(c => 
+    !search || 
+    (c.name && c.name.toLowerCase().includes(search)) || 
+    (c.serial && c.serial.toLowerCase().includes(search)) || 
+    (c.owner && c.owner.toLowerCase().includes(search))
+  );
+
+  tbody.innerHTML = items.map(c => `
+    <tr class="hover:bg-slate-950 transition-colors">
+      <td class="p-3 font-mono text-amber-400 font-bold">${c.serial || '*00'}</td>
+      <td class="p-3 font-bold text-white">${c.name || 'Unnamed'}</td>
+      <td class="p-3 text-slate-400">${c.edition || 'Beta'}</td>
+      <td class="p-3 font-mono">Rp ${(c.price || 0).toLocaleString('id-ID')}</td>
+      <td class="p-3 text-slate-300">${c.owner || 'House'}</td>
+      <td class="p-3"><span class="px-2 py-0.5 text-[10px] font-bold rounded ${c.status === 'SOLD' ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'}">${c.status || 'AVAILABLE'}</span></td>
+      <td class="p-3 text-right">
+        <button onclick="openEditInventoryModal('${c.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg text-[10px] font-bold">Edit</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ==========================================================================
+// 14. SHOPPING CART & QRIS ORDER SUBMISSION
+// ==========================================================================
 function addToCart(cardId) {
   const card = cardsData.find(c => c.id === cardId);
   if (!card) return;
@@ -242,7 +671,8 @@ function updateCartUI() {
 function toggleCartDrawer() {
   const overlay = document.getElementById('cart-drawer-overlay');
   const drawer = document.getElementById('cart-drawer');
-  
+  if (!overlay || !drawer) return;
+
   if (drawer.classList.contains('translate-x-full')) {
     overlay.classList.remove('hidden');
     drawer.classList.remove('translate-x-full');
@@ -252,7 +682,6 @@ function toggleCartDrawer() {
   }
 }
 
-// QRIS Checkout Flow
 function proceedToCheckout() {
   if (cart.length === 0) {
     showToast("Cart is empty.");
@@ -272,12 +701,142 @@ function closeCheckoutModal() {
   document.getElementById('checkout-modal').classList.add('hidden');
 }
 
+async function submitOrderWithProof() {
+  if (cart.length === 0) return;
+
+  let subtotal = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+  let grandTotal = subtotal + Math.round(subtotal * 0.02);
+
+  const orderData = {
+    orderRef: '#EC-' + Math.floor(100000 + Math.random() * 900000),
+    buyerName: currentUser ? (currentUser.displayName || currentUser.email) : 'Guest Collector',
+    buyerEmail: currentUser ? currentUser.email : 'guest@eugenecard.com',
+    itemNames: cart.map(i => i.name).join(', '),
+    totalAmount: grandTotal,
+    status: 'PENDING',
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await db.collection("orders").add(orderData);
+    cart = [];
+    updateCartUI();
+    closeCheckoutModal();
+    showToast("QRIS Order submitted for approval!");
+    switchTab('history');
+  } catch (err) {
+    console.error("Order Submit Error:", err);
+    showToast("Failed to submit order.");
+  }
+}
+
+// ==========================================================================
+// 15. MODALS & UTILITY HELPERS
+// ==========================================================================
+function openCardDetailModal(cardId) {
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  document.getElementById('detail-card-title').textContent = card.name || 'Unnamed Card';
+  document.getElementById('detail-card-serial').textContent = card.serial || '*00';
+  document.getElementById('detail-card-img').src = card.img || 'https://via.placeholder.com/150';
+  document.getElementById('detail-card-edition-badge').textContent = card.type || 'STANDARD';
+  document.getElementById('detail-card-edition-text').textContent = card.edition || 'Beta Edition';
+  document.getElementById('detail-card-sn-text').textContent = card.sn || '0000';
+  document.getElementById('detail-card-tier-text').textContent = card.tier || '100';
+  document.getElementById('detail-card-printing-text').textContent = card.printing || '1x';
+  document.getElementById('detail-card-owner').textContent = card.owner || 'Unowned (House)';
+  document.getElementById('detail-card-price').textContent = `Rp ${(card.price || 0).toLocaleString('id-ID')}`;
+  document.getElementById('detail-card-status').textContent = card.status || 'AVAILABLE';
+
+  const actionContainer = document.getElementById('detail-card-action-container');
+  if (actionContainer) {
+    actionContainer.innerHTML = `
+      <button onclick="addToCart('${card.id}'); closeCardDetailModal()" class="w-full py-3 bg-amber-500 text-slate-950 font-black text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all flex items-center justify-center gap-2">
+        <i class="fa-solid fa-cart-shopping"></i> Add Card to Cart
+      </button>
+    `;
+  }
+
+  document.getElementById('card-detail-modal').classList.remove('hidden');
+}
+
+function closeCardDetailModal() {
+  document.getElementById('card-detail-modal').classList.add('hidden');
+}
+
+function openListCardForTradeModal(cardId = '') {
+  document.getElementById('list-card-id-target').value = cardId;
+  document.getElementById('list-card-modal').classList.remove('hidden');
+}
+
+function closeListCardModal() {
+  document.getElementById('list-card-modal').classList.add('hidden');
+}
+
+function openProposeTradeModal() {
+  document.getElementById('propose-trade-modal').classList.remove('hidden');
+}
+
+function closeProposeTradeModal() {
+  document.getElementById('propose-trade-modal').classList.add('hidden');
+}
+
+function openProfileManagerModal() {
+  document.getElementById('profile-manager-modal').classList.remove('hidden');
+}
+
+function closeProfileManagerModal() {
+  document.getElementById('profile-manager-modal').classList.add('hidden');
+}
+
+function openEditInventoryModal(cardId) {
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  document.getElementById('edit-card-id').value = card.id;
+  document.getElementById('edit-card-name').value = card.name || '';
+  document.getElementById('edit-card-serial').value = card.serial || '';
+  document.getElementById('edit-card-type').value = card.type || 'STANDARD';
+  document.getElementById('edit-card-price').value = card.price || 0;
+  document.getElementById('edit-card-status').value = card.status || 'AVAILABLE';
+  document.getElementById('edit-card-img').value = card.img || '';
+
+  document.getElementById('inventory-edit-modal').classList.remove('hidden');
+}
+
+function closeInventoryModal() {
+  document.getElementById('inventory-edit-modal').classList.add('hidden');
+}
+
+async function saveInventoryCardChanges() {
+  const id = document.getElementById('edit-card-id').value;
+  if (!id) return;
+
+  const updatedData = {
+    name: document.getElementById('edit-card-name').value,
+    serial: document.getElementById('edit-card-serial').value,
+    type: document.getElementById('edit-card-type').value,
+    price: parseFloat(document.getElementById('edit-card-price').value) || 0,
+    status: document.getElementById('edit-card-status').value,
+    img: document.getElementById('edit-card-img').value
+  };
+
+  try {
+    await db.collection("cards").doc(id).update(updatedData);
+    closeInventoryModal();
+    showToast("Card updated successfully!");
+  } catch (err) {
+    console.error("Save Error:", err);
+    showToast("Failed to update card.");
+  }
+}
+
 function setupQrisImage() {
   const qrisImg = document.getElementById('qris-img-element');
   if (qrisImg) qrisImg.src = DEFAULT_QRIS_IMAGE;
 }
 
-// Toast Notification Banner
 function showToast(message) {
   const toast = document.getElementById('toast');
   const toastMsg = document.getElementById('toast-msg');
@@ -291,47 +850,4 @@ function showToast(message) {
     toast.classList.remove('opacity-100', 'translate-y-0');
     toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-20');
   }, 3000);
-}
-
-// Inventory Table Renderer (Admin)
-function renderInventoryTable() {
-  const tbody = document.getElementById('inventory-table-body');
-  if (!tbody) return;
-
-  const search = (document.getElementById('inventory-search')?.value || '').toLowerCase();
-
-  const items = cardsData.filter(c => 
-    !search || 
-    c.name?.toLowerCase().includes(search) || 
-    c.serial?.toLowerCase().includes(search) || 
-    c.owner?.toLowerCase().includes(search)
-  );
-
-  tbody.innerHTML = items.map(c => `
-    <tr class="hover:bg-slate-950 transition-colors">
-      <td class="p-3 font-mono text-amber-400 font-bold">${c.serial || '*00'}</td>
-      <td class="p-3 font-bold text-white">${c.name || 'Unnamed'}</td>
-      <td class="p-3 text-slate-400">${c.edition || 'Beta'}</td>
-      <td class="p-3 font-mono">Rp ${(c.price || 0).toLocaleString('id-ID')}</td>
-      <td class="p-3 text-slate-300">${c.owner || 'House'}</td>
-      <td class="p-3"><span class="px-2 py-0.5 text-[10px] font-bold rounded ${c.status === 'SOLD' ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'}">${c.status || 'AVAILABLE'}</span></td>
-      <td class="p-3 text-right">
-        <button onclick="openEditInventoryModal('${c.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg text-[10px] font-bold">Edit</button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-// Stub Handlers for Navigation Elements
-function renderHistoryTable() {}
-function toggleNotificationMenu() {
-  const el = document.getElementById('notification-dropdown');
-  if (el) el.classList.toggle('hidden');
-}
-function clearNotifications() {}
-function closeChatDrawer() {
-  const overlay = document.getElementById('chat-drawer-overlay');
-  const drawer = document.getElementById('chat-drawer');
-  if (overlay) overlay.classList.add('hidden');
-  if (drawer) drawer.classList.add('translate-x-full');
 }
