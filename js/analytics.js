@@ -1,183 +1,115 @@
-// js/analytics.js
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Analytics | Eugene Card</title>
+  
+  <!-- Firebase Compatibility SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 
-let cardsData = [];
-let ordersData = [];
+  <!-- Tailwind CSS, FontAwesome & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
 
-document.addEventListener('DOMContentLoaded', () => {
-  firebase.auth().onAuthStateChanged(async (user) => {
-    if (!user) {
-      showPaywall();
-      return;
-    }
+  <!-- Header -->
+  <header class="max-w-7xl mx-auto flex justify-between items-center mb-8">
+    <a href="index.html" class="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-extrabold text-amber-400 hover:bg-slate-800 transition-all flex items-center gap-2">
+      <i class="fa-solid fa-arrow-left"></i> Back to Marketplace
+    </a>
+    <div class="flex items-center gap-2">
+      <span class="px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 font-black text-[10px] rounded-full">ADMIN ACCESS ONLY</span>
+      <h1 class="text-sm font-black text-white uppercase tracking-wider hidden sm:block">Analytics & Valuation Hub</h1>
+    </div>
+  </header>
 
-    const hasAccess = await checkUserAnalyticsAccess(user);
-    if (!hasAccess) {
-      showPaywall();
-      return;
-    }
+  <main class="max-w-7xl mx-auto space-y-6">
 
-    hidePaywall();
-    initAnalyticsData();
-  });
-});
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
+        <span class="text-[10px] text-slate-400 font-bold uppercase">Total Market Volume</span>
+        <p id="analytics-total-volume" class="text-2xl font-black text-emerald-400 font-mono">Rp 0</p>
+        <span class="text-[10px] text-emerald-500 font-semibold"><i class="fa-solid fa-arrow-trend-up mr-1"></i>+12.4% this month</span>
+      </div>
 
-async function checkUserAnalyticsAccess(user) {
-  try {
-    const doc = await db.collection("users").doc(user.uid).get();
-    if (doc.exists) {
-      const data = doc.data();
-      const adminEmails = ["eugene.aquila06@gmail.com", "yujinybwork@gmail.com"];
-      if (adminEmails.includes((user.email || "").toLowerCase().trim())) return true;
-      if (data.role === 'PLUS' || data.role === 'ADMIN') return true;
-    }
-    return false;
-  } catch (err) {
-    console.error("Analytics Access Check Error:", err);
-    return false;
-  }
-}
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
+        <span class="text-[10px] text-slate-400 font-bold uppercase">Average Floor Price</span>
+        <p id="analytics-avg-floor" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
+        <span class="text-[10px] text-slate-500 font-semibold">Across 50 Serial Cards</span>
+      </div>
 
-function showPaywall() {
-  const paywallEl = document.getElementById('analytics-paywall');
-  if (paywallEl) paywallEl.classList.remove('hidden');
-}
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
+        <span class="text-[10px] text-slate-400 font-bold uppercase">Circulating Supply</span>
+        <p id="analytics-collected-count" class="text-2xl font-black text-indigo-400 font-mono">0 / 50</p>
+        <span class="text-[10px] text-indigo-400 font-semibold">Held by verified collectors</span>
+      </div>
 
-function hidePaywall() {
-  const paywallEl = document.getElementById('analytics-paywall');
-  if (paywallEl) paywallEl.classList.add('hidden');
-}
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
+        <span class="text-[10px] text-slate-400 font-bold uppercase">Market Liquidity Index</span>
+        <p id="analytics-liquidity-score" class="text-2xl font-black text-rose-400 font-mono">88.5 / 100</p>
+        <span class="text-[10px] text-rose-400 font-semibold"><i class="fa-solid fa-bolt mr-1"></i>High Trade Velocity</span>
+      </div>
+    </div>
 
-async function upgradeFromPaywall() {
-  const currentUser = firebase.auth().currentUser;
-  if (!currentUser) return;
-  try {
-    await db.collection("users").doc(currentUser.uid).set({
-      email: currentUser.email,
-      role: 'PLUS',
-      upgradedAt: new Date().toISOString()
-    }, { merge: true });
+    <!-- Interactive Market Floor Velocity Chart -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div>
+          <h3 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-chart-area text-amber-400 mr-2"></i>Floor Price & Volume Trends</h3>
+          <p class="text-xs text-slate-400">30-day historical execution price vs collection floor</p>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-[10px] bg-slate-950 border border-slate-800 px-3 py-1 rounded-xl text-emerald-400 font-mono font-bold">● Floor Price</span>
+          <span class="text-[10px] bg-slate-950 border border-slate-800 px-3 py-1 rounded-xl text-indigo-400 font-mono font-bold">● QRIS Sales</span>
+        </div>
+      </div>
+      <div class="h-64 w-full">
+        <canvas id="marketTrendChart"></canvas>
+      </div>
+    </div>
 
-    hidePaywall();
-    initAnalyticsData();
-  } catch (err) {
-    console.error("Paywall Upgrade Error:", err);
-  }
-}
+    <!-- Probabilistic Pricing & Valuation Table -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h3 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-calculator text-amber-400 mr-2"></i>Probabilistic Valuation Matrix</h3>
+          <p class="text-xs text-slate-400">Algorithmic fair-value forecasts based on tier rarity multipliers</p>
+        </div>
+        
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <input type="text" id="analytics-search-input" oninput="renderValuationTable()" placeholder="Search serial (*01)..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500 w-full sm:w-48">
+        </div>
+      </div>
 
-async function initAnalyticsData() {
-  try {
-    const cardsSnapshot = await db.collection("cards").get();
-    cardsData = [];
-    cardsSnapshot.forEach(doc => cardsData.push({ id: doc.id, ...doc.data() }));
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+            <tr>
+              <th class="p-3">Card Serial & Name</th>
+              <th class="p-3">Type</th>
+              <th class="p-3">Current Floor</th>
+              <th class="p-3">Est. Fair Value</th>
+              <th class="p-3">Projected (6M)</th>
+              <th class="p-3">Volatility Score</th>
+              <th class="p-3 text-right">Rating</th>
+            </tr>
+          </thead>
+          <tbody id="analytics-probability-table-body" class="divide-y divide-slate-800"></tbody>
+        </table>
+      </div>
+    </div>
 
-    const ordersSnapshot = await db.collection("orders").get();
-    ordersData = [];
-    ordersSnapshot.forEach(doc => ordersData.push({ id: doc.id, ...doc.data() }));
+  </main>
 
-    renderAnalyticsMetrics();
-    renderMarketTrendChart();
-    renderValuationTable();
-  } catch (err) {
-    console.error("Analytics Data Init Error:", err);
-  }
-}
-
-function renderAnalyticsMetrics() {
-  const totalVolume = ordersData.filter(o => o.status === 'APPROVED').reduce((sum, o) => sum + (o.totalAmount || 0), 0);
-  const avgFloor = cardsData.length > 0 ? cardsData.reduce((sum, c) => sum + (c.price || c.baseFloorPrice || 0), 0) / cardsData.length : 0;
-  const ownedCount = cardsData.filter(c => c.owner && c.owner !== 'House' && c.owner !== 'Admin House').length;
-
-  const volEl = document.getElementById('analytics-total-volume');
-  const avgEl = document.getElementById('analytics-avg-floor');
-  const countEl = document.getElementById('analytics-collected-count');
-
-  if (volEl) volEl.textContent = `Rp ${totalVolume.toLocaleString('id-ID')}`;
-  if (avgEl) avgEl.textContent = `Rp ${Math.round(avgFloor).toLocaleString('id-ID')}`;
-  if (countEl) countEl.textContent = `${ownedCount} / ${cardsData.length}`;
-}
-
-function renderMarketTrendChart() {
-  const ctx = document.getElementById('marketTrendChart');
-  if (!ctx || typeof Chart === 'undefined') return;
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['30D Ago', '25D Ago', '20D Ago', '15D Ago', '10D Ago', '5D Ago', 'Today'],
-      datasets: [
-        {
-          label: 'Floor Price (IDR)',
-          data: [120000, 125000, 130000, 128000, 135000, 142000, 150000],
-          borderColor: '#f59e0b',
-          backgroundColor: 'rgba(245, 158, 11, 0.1)',
-          fill: true,
-          tension: 0.3
-        },
-        {
-          label: 'Sales Volume (IDR)',
-          data: [400000, 650000, 500000, 900000, 750000, 1100000, 1350000],
-          borderColor: '#6366f1',
-          backgroundColor: 'rgba(99, 102, 241, 0.1)',
-          fill: true,
-          tension: 0.3
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
-      }
-    }
-  });
-}
-
-function calculateValuation(card) {
-  const baseFloor = card.price || card.baseFloorPrice || 100000;
-  const isPremium = card.type === 'PREMIUM';
-  const rarityMultiplier = isPremium ? 1.45 : 1.0;
-  const tierWeight = 1 + ((parseFloat(card.tier) || 100) / 2000);
-
-  const estimatedPrice = Math.round(baseFloor * rarityMultiplier * tierWeight);
-  const projectedPrice = Math.round(estimatedPrice * (isPremium ? 1.35 : 1.18));
-  const volatility = isPremium ? 'Low (Stable)' : 'Medium';
-
-  return { estimatedPrice, projectedPrice, volatility };
-}
-
-function renderValuationTable() {
-  const tbody = document.getElementById('analytics-probability-table-body');
-  if (!tbody) return;
-
-  const searchQuery = (document.getElementById('analytics-search-input')?.value || '').toLowerCase().trim();
-
-  const filtered = cardsData.filter(c => 
-    !searchQuery || 
-    (c.name && c.name.toLowerCase().includes(searchQuery)) ||
-    (c.serial && c.serial.toLowerCase().includes(searchQuery))
-  );
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No card metrics found.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(c => {
-    const { estimatedPrice, projectedPrice, volatility } = calculateValuation(c);
-    const cardPrice = c.price || c.baseFloorPrice || 0;
-    return `
-      <tr class="hover:bg-slate-950 transition-colors">
-        <td class="p-3 font-bold text-white">${c.name || 'Unnamed'} <span class="text-amber-400 font-mono">(${c.serial || '*00'})</span></td>
-        <td class="p-3 font-mono text-slate-300">${c.type || 'STANDARD'}</td>
-        <td class="p-3 font-mono text-slate-400">Rp ${cardPrice.toLocaleString('id-ID')}</td>
-        <td class="p-3 font-mono text-amber-400 font-bold">Rp ${estimatedPrice.toLocaleString('id-ID')}</td>
-        <td class="p-3 font-mono text-emerald-400 font-extrabold">Rp ${projectedPrice.toLocaleString('id-ID')}</td>
-        <td class="p-3 font-mono text-xs text-slate-400">${volatility}</td>
-        <td class="p-3 text-right"><span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-md border border-emerald-500/30">STRONG GROWTH</span></td>
-      </tr>
-    `;
-  }).join('');
-}
+  <script src="js/firebase-config.js"></script>
+  <script src="js/analytics.js"></script>
+</body>
+</html>
