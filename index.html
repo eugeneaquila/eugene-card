@@ -110,7 +110,7 @@
         </button>
       </nav>
 
-      <!-- Language & Auth -->
+      <!-- Language & Auth Header Container -->
       <div class="flex items-center gap-2 shrink-0">
         <button onclick="toggleLanguage()" class="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-mono font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-1">
           <i class="fa-solid fa-globe text-[11px]"></i>
@@ -343,6 +343,7 @@
         </button>
       </div>
 
+      <!-- COLLECTOR SOCIAL BANNER -->
       <div id="collector-social-banner" class="bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-lg">
         <div class="flex items-center gap-3">
           <img id="dashboard-banner-avatar" src="https://api.dicebear.com/7.x/identicon/svg?seed=Eugene" class="w-12 h-12 rounded-full object-cover border-2 border-amber-500/40 bg-slate-950">
@@ -353,6 +354,18 @@
             </div>
             <p id="dashboard-banner-bio" class="text-xs text-slate-400 mt-0.5">Genesis Card Enthusiast</p>
           </div>
+        </div>
+
+        <div id="dashboard-banner-links" class="flex items-center gap-2.5 text-xs">
+          <a id="banner-link-instagram" href="#" target="_blank" class="hidden px-2.5 py-1 bg-slate-950 border border-slate-800 rounded-xl text-slate-300 hover:text-pink-400 hover:border-pink-500/40 transition-all flex items-center gap-1.5">
+            <i class="fa-brands fa-instagram text-pink-400"></i> <span id="banner-ig-handle">@instagram</span>
+          </a>
+          <a id="banner-link-tiktok" href="#" target="_blank" class="hidden px-2.5 py-1 bg-slate-950 border border-slate-800 rounded-xl text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40 transition-all flex items-center gap-1.5">
+            <i class="fa-brands fa-tiktok text-cyan-400"></i> <span id="banner-tt-handle">@tiktok</span>
+          </a>
+          <a id="banner-link-website" href="#" target="_blank" class="hidden px-2.5 py-1 bg-slate-950 border border-slate-800 rounded-xl text-amber-400 hover:text-amber-300 hover:border-amber-500/40 transition-all flex items-center gap-1.5 font-mono font-bold">
+            <i class="fa-solid fa-globe"></i> <span id="banner-web-url">Website</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+          </a>
         </div>
       </div>
 
@@ -468,7 +481,7 @@
           <img id="profile-modal-avatar-preview" src="https://api.dicebear.com/7.x/identicon/svg?seed=Eugene" class="w-20 h-20 rounded-full object-cover border-2 border-amber-500/50 shadow-lg bg-slate-950">
         </div>
         <h3 class="text-lg font-black text-white">Collector Profile Settings</h3>
-        <p class="text-xs text-slate-400">Customize display name, handle, avatar URL and bio.</p>
+        <p class="text-xs text-slate-400">Customize display name, social media handles, and website</p>
       </div>
 
       <div class="space-y-3 text-xs">
@@ -490,14 +503,57 @@
           <input type="text" id="profile-edit-avatar-input" oninput="document.getElementById('profile-modal-avatar-preview').src = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-600 focus:border-amber-500 focus:outline-none" placeholder="https://example.com/avatar.png">
         </div>
 
+        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2.5">
+          <p class="font-bold text-amber-400 uppercase text-[10px] tracking-wider"><i class="fa-solid fa-share-nodes mr-1"></i> Social Media & Web Presence</p>
+          
+          <div>
+            <label class="block font-semibold text-slate-400 mb-1"><i class="fa-brands fa-instagram text-pink-400 mr-1"></i> Instagram Handle</label>
+            <input type="text" id="profile-edit-instagram-input" placeholder="e.g. eugene_cards" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-white focus:border-pink-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-400 mb-1"><i class="fa-brands fa-tiktok text-cyan-400 mr-1"></i> TikTok Handle</label>
+            <input type="text" id="profile-edit-tiktok-input" placeholder="e.g. @eugene_tok" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-white focus:border-cyan-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-400 mb-1"><i class="fa-solid fa-globe text-amber-400 mr-1"></i> Clickable Website URL</label>
+            <input type="text" id="profile-edit-website-input" placeholder="https://yourwebsite.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-white focus:border-amber-500 focus:outline-none">
+          </div>
+        </div>
+
         <div>
           <label class="block font-bold text-slate-400 mb-1">Collector Tagline / Bio</label>
-          <textarea id="profile-edit-bio-input" rows="3" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none resize-y"></textarea>
+          <textarea id="profile-edit-bio-input" rows="2" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none resize-y"></textarea>
         </div>
 
         <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all">
           Save Profile Updates
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPOSE TRADE MODAL -->
+  <div id="propose-trade-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeProposeTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Propose Card Offer</h3>
+      
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Target Card Serial</label>
+          <input type="text" id="trade-target-serial-input" placeholder="e.g. *01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Offer Amount (IDR)</label>
+          <input type="number" id="trade-offer-amount-input" placeholder="e.g. 150000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Offer Notes / Details</label>
+          <input type="text" id="trade-notes-input" placeholder="Details..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+        </div>
+        <button onclick="submitTradeProposal()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg">Submit Trade Offer</button>
       </div>
     </div>
   </div>
