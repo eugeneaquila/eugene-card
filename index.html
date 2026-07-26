@@ -100,9 +100,12 @@
         <button id="nav-trade-req" onclick="switchTab('trade-req')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navRequests">Trade Requests</span>
         </button>
-        <button id="nav-analytics" onclick="switchTab('analytics')" class="analytics-nav-btn hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
+        
+        <!-- Restored Analytics Navigation Button (Admin Only) -->
+        <button id="nav-analytics" onclick="switchTab('analytics')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
           <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span>
         </button>
+
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-comments text-indigo-400"></i> <span data-i18n="navInbox">Inbox</span>
         </button>
@@ -2465,17 +2468,14 @@
     function renderAuthHeader() {
       const container = document.getElementById('auth-header-container');
       const adminNavs = document.querySelectorAll('.admin-only-nav');
-      const analyticsNavs = document.querySelectorAll('.analytics-nav-btn');
       const adminSep = document.getElementById('admin-nav-separator');
 
       if (currentUser) {
         if (currentUser.isAdmin) {
           adminNavs.forEach(el => el.classList.remove('hidden'));
-          analyticsNavs.forEach(el => el.classList.remove('hidden'));
           if (adminSep) adminSep.classList.remove('hidden');
         } else {
           adminNavs.forEach(el => el.classList.add('hidden'));
-          analyticsNavs.forEach(el => el.classList.add('hidden'));
           if (adminSep) adminSep.classList.add('hidden');
         }
 
@@ -2498,7 +2498,6 @@
         `;
       } else {
         adminNavs.forEach(el => el.classList.add('hidden'));
-        analyticsNavs.forEach(el => el.classList.add('hidden'));
         if (adminSep) adminSep.classList.add('hidden');
         container.innerHTML = `<button onclick="openAuthModal()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Log In</button>`;
       }
