@@ -34,7 +34,6 @@ function isUserAdmin(email) {
   const normalized = email.toLowerCase().trim();
   if (ADMIN_EMAILS.includes(normalized)) return true;
   
-  // Also check if user exists in allUsersList with ADMIN role
   const foundUser = allUsersList.find(u => (u.email || '').toLowerCase().trim() === normalized);
   if (foundUser && (foundUser.role === 'ADMIN' || foundUser.isAdmin)) {
     return true;
@@ -69,7 +68,7 @@ function onAuthResolved(user) {
 }
 
 function updateAdminAuctionControls() {
-  // Hook for auction admin controls if needed
+  // Hook for auction admin controls if required
 }
 
 function switchTab(tabName) {
@@ -177,6 +176,63 @@ function fetchActiveAuction() {
   }, err => console.error("Error fetching auction:", err));
 }
 
+// REAL-TIME UNREAD INBOX BADGE MANAGEMENT
+function fetchUnreadInboxCount() {
+  const userEmail = currentUser ? currentUser.email : 'collector@eugene.com';
+
+  db.collection("messages")
+    .where("recipient", "==", userEmail)
+    .where("read", "==", false)
+    .onSnapshot(snapshot => {
+      const count = snapshot.size;
+      updateInboxBadgeUI(count);
+    }, err => console.error("Error fetching unread messages:", err));
+}
+
+function updateInboxBadgeUI(count) {
+  const inboxNavBtn = document.getElementById('nav-inbox');
+  if (!inboxNavBtn) return;
+
+  let badge = document.getElementById('inbox-badge-count');
+
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.id = 'inbox-badge-count';
+    badge.className = 'ml-1 px-1.5 py-0.5 text-[10px] font-black rounded-full bg-rose-500 text-white animate-pulse shadow-sm inline-flex items-center justify-center min-w-[18px]';
+    inboxNavBtn.appendChild(badge);
+  }
+
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : count;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+function markThreadMessagesAsRead(senderEmail) {
+  if (!senderEmail || !currentUser) return;
+
+  const myEmail = currentUser.email.toLowerCase().trim();
+  const targetEmail = senderEmail.toLowerCase().trim();
+
+  db.collection("messages")
+    .where("sender", "==", targetEmail)
+    .where("recipient", "==", myEmail)
+    .where("read", "==", false)
+    .get()
+    .then(snapshot => {
+      const batch = db.batch();
+      snapshot.forEach(doc => {
+        batch.update(doc.ref, { read: true });
+      });
+      if (!snapshot.empty) {
+        batch.commit();
+      }
+    })
+    .catch(err => console.error("Error marking thread messages as read:", err));
+}
+
 function renderAuctionRoom() {
   const container = document.getElementById('view-auction');
   if (!container) return;
@@ -193,7 +249,7 @@ function renderAuctionRoom() {
           <i class="fa-solid fa-gavel"></i>
         </div>
         <h3 class="text-base font-black text-white">No Active Auctions</h3>
-        <p class="text-xs text-slate-400 max-w-sm mx-auto">There are currently no cards listed in the auction room. Go to your Vault and put a card up for auction to start one!</p>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto">There are currently no cards listed in the auction room.</p>
       </div>
     `;
     return;
@@ -301,22 +357,6 @@ async function finalizeAuctionBid(bidAmount) {
   }
 }
 
-function fetchUnreadInboxCount() {
-  const userEmail = currentUser ? currentUser.email : 'collector@eugene.com';
-  db.collection("messages").where("recipient", "==", userEmail).where("read", "==", false).onSnapshot(snapshot => {
-    const count = snapshot.size;
-    const badge = document.getElementById('inbox-badge-count');
-    if (badge) {
-      if (count > 0) {
-        badge.textContent = count;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
-      }
-    }
-  }, err => console.error("Error fetching unread messages:", err));
-}
-
 function openCardDetailModal(cardId) {
   const card = cardsData.find(c => c.id === cardId);
   if (!card) return;
@@ -332,7 +372,9 @@ function openCardDetailModal(cardId) {
   document.getElementById('detail-card-img').src = card.imgUrl || card.img || 'https://via.placeholder.com/200x250';
 
   const cartBtn = document.getElementById('detail-cart-btn');
-  cartBtn.setAttribute('onclick', `addToCart('${card.id}'); closeCardDetailModal();`);
+  if (cartBtn) {
+    cartBtn.setAttribute('onclick', `addToCart('${card.id}'); closeCardDetailModal();`);
+  }
 
   document.getElementById('card-detail-modal').classList.remove('hidden');
 }
@@ -576,18 +618,20 @@ function openOwnerVaultModal(ownerName) {
   document.getElementById('owner-vault-avatar').src = `https://api.dicebear.com/7.x/identicon/svg?seed=${ownerName}`;
 
   const grid = document.getElementById('owner-vault-cards-grid');
-  grid.innerHTML = cards.map(card => `
-    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-2.5 space-y-2 text-center">
-      <div class="w-full aspect-[4/5] bg-slate-900 rounded-xl p-1 overflow-hidden flex items-center justify-center">
-        <img src="${card.imgUrl || card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
+  if (grid) {
+    grid.innerHTML = cards.map(card => `
+      <div class="bg-slate-950 border border-slate-800 rounded-2xl p-2.5 space-y-2 text-center">
+        <div class="w-full aspect-[4/5] bg-slate-900 rounded-xl p-1 overflow-hidden flex items-center justify-center">
+          <img src="${card.imgUrl || card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
+        </div>
+        <p class="text-xs font-bold text-white truncate">${card.name}</p>
+        <p class="text-[10px] font-mono text-amber-400 font-bold">${card.serial || '*0001'}</p>
+        <button onclick="closeOwnerVaultModal(); openOfferModalForCard('${card.id}')" class="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-extrabold rounded-xl transition-all">
+          Propose Offer
+        </button>
       </div>
-      <p class="text-xs font-bold text-white truncate">${card.name}</p>
-      <p class="text-[10px] font-mono text-amber-400 font-bold">${card.serial || '*0001'}</p>
-      <button onclick="closeOwnerVaultModal(); openOfferModalForCard('${card.id}')" class="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-extrabold rounded-xl transition-all">
-        Propose Offer
-      </button>
-    </div>
-  `).join('');
+    `).join('');
+  }
 
   document.getElementById('owner-vault-modal').classList.remove('hidden');
 }
@@ -1021,43 +1065,49 @@ function loadProfileBanner() {
 
   const igLink = document.getElementById('banner-link-instagram');
   const igHandle = document.getElementById('banner-ig-handle');
-  if (userProfile.instagram) {
-    const cleanedIg = userProfile.instagram.replace('@', '');
-    igLink.href = `https://instagram.com/${cleanedIg}`;
-    igHandle.textContent = `@${cleanedIg}`;
-    igLink.classList.remove('hidden');
-  } else {
-    igLink.classList.add('hidden');
+  if (igLink && igHandle) {
+    if (userProfile.instagram) {
+      const cleanedIg = userProfile.instagram.replace('@', '');
+      igLink.href = `https://instagram.com/${cleanedIg}`;
+      igHandle.textContent = `@${cleanedIg}`;
+      igLink.classList.remove('hidden');
+    } else {
+      igLink.classList.add('hidden');
+    }
   }
 
   const ttLink = document.getElementById('banner-link-tiktok');
   const ttHandle = document.getElementById('banner-tt-handle');
-  if (userProfile.tiktok) {
-    const cleanedTt = userProfile.tiktok.startsWith('@') ? userProfile.tiktok : `@${userProfile.tiktok}`;
-    ttLink.href = `https://tiktok.com/${cleanedTt}`;
-    ttHandle.textContent = cleanedTt;
-    ttLink.classList.remove('hidden');
-  } else {
-    ttLink.classList.add('hidden');
+  if (ttLink && ttHandle) {
+    if (userProfile.tiktok) {
+      const cleanedTt = userProfile.tiktok.startsWith('@') ? userProfile.tiktok : `@${userProfile.tiktok}`;
+      ttLink.href = `https://tiktok.com/${cleanedTt}`;
+      ttHandle.textContent = cleanedTt;
+      ttLink.classList.remove('hidden');
+    } else {
+      ttLink.classList.add('hidden');
+    }
   }
 
   const webLink = document.getElementById('banner-link-website');
   const webUrlSpan = document.getElementById('banner-web-url');
-  if (userProfile.website) {
-    let formattedUrl = userProfile.website;
-    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
-      formattedUrl = `https://${formattedUrl}`;
+  if (webLink && webUrlSpan) {
+    if (userProfile.website) {
+      let formattedUrl = userProfile.website;
+      if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+        formattedUrl = `https://${formattedUrl}`;
+      }
+      webLink.href = formattedUrl;
+      try {
+        const parsed = new URL(formattedUrl);
+        webUrlSpan.textContent = parsed.hostname;
+      } catch (e) {
+        webUrlSpan.textContent = "Website";
+      }
+      webLink.classList.remove('hidden');
+    } else {
+      webLink.classList.add('hidden');
     }
-    webLink.href = formattedUrl;
-    try {
-      const parsed = new URL(formattedUrl);
-      webUrlSpan.textContent = parsed.hostname;
-    } catch (e) {
-      webUrlSpan.textContent = "Website";
-    }
-    webLink.classList.remove('hidden');
-  } else {
-    webLink.classList.add('hidden');
   }
 }
 
@@ -1610,6 +1660,7 @@ function openPopoutChat(recipientEmail, recipientName) {
   document.getElementById('chat-header-avatar').src = `https://api.dicebear.com/7.x/identicon/svg?seed=${recipientEmail}`;
   document.getElementById('popout-chat-modal').classList.remove('hidden');
   
+  markThreadMessagesAsRead(recipientEmail);
   loadPopoutChatMessages();
 }
 
