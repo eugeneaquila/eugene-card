@@ -134,7 +134,6 @@
 
       <!-- Language Toggle, Cart, Notifications & Auth Header -->
       <div class="flex items-center gap-2 shrink-0">
-        <!-- Language Switcher Button -->
         <button onclick="toggleLanguage()" class="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-mono font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-1" title="Switch Language / Ganti Bahasa">
           <i class="fa-solid fa-globe text-[11px]"></i>
           <span id="current-lang-label">EN</span>
@@ -166,12 +165,12 @@
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <h3 id="chat-target-user-name" class="text-xs font-extrabold text-white">Direct Trade Chat</h3>
+            <h3 id="chat-target-user-name" class="text-xs font-extrabold text-white" data-i18n="chatDirectTitle">Direct Trade Chat</h3>
             <span id="chat-target-admin-badge" class="hidden text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/40">
               <i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN
             </span>
           </div>
-          <p id="chat-target-context" class="text-[10px] text-slate-400">Negotiate trade terms directly</p>
+          <p id="chat-target-context" class="text-[10px] text-slate-400" data-i18n="chatDirectSub">Negotiate trade terms directly</p>
         </div>
       </div>
       <button onclick="closeChatDrawer()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
@@ -179,10 +178,10 @@
 
     <!-- Messages List Container -->
     <div id="chat-messages-container" class="flex-1 py-4 space-y-3 overflow-y-auto max-h-[65vh]">
-      <div class="text-center py-10 text-slate-500 text-xs">No chat messages yet. Start the conversation!</div>
+      <div class="text-center py-10 text-slate-500 text-xs" data-i18n="noChatMessages">No chat messages yet. Start the conversation!</div>
     </div>
 
-    <!-- Send Chat & Image/Screenshot Attachment Input -->
+    <!-- Send Chat Input -->
     <div class="pt-3 border-t border-slate-800 space-y-2">
       <div id="chat-image-preview-box" class="hidden p-2 bg-slate-950 border border-slate-800 rounded-xl relative">
         <button onclick="clearChatImageAttachment()" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-slate-800 text-slate-400 text-[10px] flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
@@ -194,8 +193,8 @@
           <i class="fa-solid fa-image text-amber-400"></i>
           <input type="file" id="chat-file-input" accept="image/*" onchange="handleChatImageUpload(event)" class="hidden">
         </label>
-        <input type="text" id="chat-text-input" placeholder="Type message or attach screenshot..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-        <button onclick="sendChatMessage()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow transition-all">Send</button>
+        <input type="text" id="chat-text-input" placeholder="Type message or attach screenshot..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500" data-i18n-placeholder="chatInputPlaceholder">
+        <button onclick="sendChatMessage()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow transition-all" data-i18n="btnSend">Send</button>
       </div>
     </div>
   </div>
@@ -214,7 +213,7 @@
     </div>
     
     <div id="notification-list" class="max-h-80 overflow-y-auto divide-y divide-slate-800/60 p-1">
-      <div class="p-6 text-center text-xs text-slate-500">No recent notifications.</div>
+      <div class="p-6 text-center text-xs text-slate-500" data-i18n="noNotifications">No recent notifications.</div>
     </div>
   </div>
 
@@ -347,42 +346,42 @@
     <section id="view-analytics" class="hidden space-y-6">
       <div class="bg-gradient-to-r from-amber-950/60 via-slate-900 to-indigo-950/60 border border-amber-500/40 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider">EXCLUSIVE ACCESS</span>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide mt-1"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> Market Analytics & Valuation</h2>
-          <p class="text-xs text-slate-400 mt-1">Real-time marketplace metrics, floor price trends, and volume statistics.</p>
+          <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider" data-i18n="exclusiveAccess">EXCLUSIVE ACCESS</span>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide mt-1"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> <span data-i18n="analyticsTitle">Market Analytics & Valuation</span></h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="analyticsSubtitle">Real-time marketplace metrics, floor price trends, and volume statistics.</p>
         </div>
         <button onclick="renderMarketAnalytics()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-rotate"></i> Refresh Analytics
+          <i class="fa-solid fa-rotate"></i> <span data-i18n="refreshAnalytics">Refresh Analytics</span>
         </button>
       </div>
 
       <!-- ANALYTICS METRIC CARDS -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
-          <p class="text-[10px] font-bold text-slate-400 uppercase">Total Marketplace Volume</p>
+          <p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="totalVolume">Total Marketplace Volume</p>
           <p id="analytics-total-volume" class="text-2xl font-black text-emerald-400 font-mono">Rp 0</p>
-          <p class="text-[10px] text-emerald-500"><i class="fa-solid fa-arrow-trend-up"></i> +14.2% this week</p>
+          <p class="text-[10px] text-emerald-500"><i class="fa-solid fa-arrow-trend-up"></i> <span data-i18n="volumeTrend">+14.2% this week</span></p>
         </div>
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
-          <p class="text-[10px] font-bold text-slate-400 uppercase">Average Floor Price</p>
+          <p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="avgFloorPrice">Average Floor Price</p>
           <p id="analytics-avg-floor" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
-          <p class="text-[10px] text-slate-400">Across 50 edition cards</p>
+          <p class="text-[10px] text-slate-400" data-i18n="acrossCards">Across 50 edition cards</p>
         </div>
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
-          <p class="text-[10px] font-bold text-slate-400 uppercase">Collected / Owned</p>
+          <p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="collectedOwned">Collected / Owned</p>
           <p id="analytics-collected-count" class="text-2xl font-black text-indigo-400 font-mono">0 / 50</p>
-          <p class="text-[10px] text-slate-400">Primary & Secondary holders</p>
+          <p class="text-[10px] text-slate-400" data-i18n="holdersSub">Primary & Secondary holders</p>
         </div>
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
-          <p class="text-[10px] font-bold text-slate-400 uppercase">Active Trade Requests</p>
+          <p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="activeTradeReqs">Active Trade Requests</p>
           <p id="analytics-trade-reqs" class="text-2xl font-black text-purple-400 font-mono">0</p>
-          <p class="text-[10px] text-slate-400">Pending & countered</p>
+          <p class="text-[10px] text-slate-400" data-i18n="pendingCountered">Pending & countered</p>
         </div>
       </div>
 
       <!-- RECENT PRICE TRENDS TABLE -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-        <h3 class="text-xs font-extrabold text-white uppercase tracking-wider">Top Card Valuation Index</h3>
+        <h3 class="text-xs font-extrabold text-white uppercase tracking-wider" data-i18n="topValuationIndex">Top Card Valuation Index</h3>
         <div id="analytics-valuation-list" class="space-y-2"></div>
       </div>
     </section>
@@ -454,8 +453,8 @@
     <section id="view-dashboard" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
-          <h2 id="dashboard-heading" class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Vault / Binder</h2>
-          <p id="dashboard-subheading" class="text-xs text-slate-400 mt-1">Manage owned cards, sell back instantly to Admin via QRIS, or place them into Auction/Trade.</p>
+          <h2 id="dashboard-heading" class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> <span data-i18n="vaultTitle">My Vault / Binder</span></h2>
+          <p id="dashboard-subheading" class="text-xs text-slate-400 mt-1" data-i18n="vaultSubtitle">Manage owned cards, sell back instantly to Admin via QRIS, or place them into Auction/Trade.</p>
         </div>
         <button onclick="openProfileManagerModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl border border-slate-700 flex items-center gap-2">
           <i class="fa-solid fa-user-gear text-amber-400"></i> <span data-i18n="profileSettingsBtn">Profile Settings</span>
@@ -516,33 +515,33 @@
     <section id="view-admin" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub & Revenue Dashboard</h2>
-          <p class="text-xs text-slate-400 mt-1">Review customer QRIS payments and verify order requests.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> <span data-i18n="adminHubTitle">Admin Hub & Revenue Dashboard</span></h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="adminHubSubtitle">Review customer QRIS payments and verify order requests.</p>
         </div>
         <button onclick="refreshAdminHub()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-rotate"></i> Refresh Hub
+          <i class="fa-solid fa-rotate"></i> <span data-i18n="refreshHub">Refresh Hub</span>
         </button>
       </div>
 
       <!-- PERSONA SWITCHER FOR ADMIN TESTING -->
       <div class="bg-slate-950 p-4 rounded-3xl border border-rose-500/30 space-y-3">
-        <label class="block text-xs font-bold text-rose-400 uppercase tracking-wider"><i class="fa-solid fa-users-gear mr-1"></i> Admin Persona Switcher (Test Accounts)</label>
-        <p class="text-[11px] text-slate-400">Switch active account persona to test standard collector views versus admin privileges.</p>
+        <label class="block text-xs font-bold text-rose-400 uppercase tracking-wider"><i class="fa-solid fa-users-gear mr-1"></i> <span data-i18n="personaSwitcherTitle">Admin Persona Switcher (Test Accounts)</span></label>
+        <p class="text-[11px] text-slate-400" data-i18n="personaSwitcherSub">Switch active account persona to test standard collector views versus admin privileges.</p>
         <div class="grid grid-cols-2 sm:grid-cols-2 gap-2 pt-1">
           <button onclick="switchAccountPersona('eugene.aquila06')" class="py-2.5 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 font-extrabold text-xs rounded-xl border border-rose-500/30 flex items-center justify-center gap-1.5 transition-all">
-            <i class="fa-solid fa-shield-halved"></i> Admin Persona
+            <i class="fa-solid fa-shield-halved"></i> <span data-i18n="adminPersona">Admin Persona</span>
           </button>
           <button onclick="switchAccountPersona('Eugene')" class="py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-extrabold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition-all">
-            <i class="fa-solid fa-user"></i> Standard Collector
+            <i class="fa-solid fa-user"></i> <span data-i18n="stdCollectorPersona">Standard Collector</span>
           </button>
         </div>
       </div>
 
       <!-- PENDING ORDERS -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending QRIS Orders Requiring Action</h4>
+        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider" data-i18n="pendingOrdersTitle">Pending QRIS Orders Requiring Action</h4>
         <div id="admin-pending-orders-list" class="space-y-3">
-          <p class="text-xs text-slate-500">No pending transactions requiring approval.</p>
+          <p class="text-xs text-slate-500" data-i18n="noPendingOrders">No pending transactions requiring approval.</p>
         </div>
       </div>
     </section>
@@ -551,18 +550,18 @@
     <section id="view-inventory" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-boxes-stacked text-rose-400 mr-2"></i> Inventory Mgmt</h2>
-          <p class="text-xs text-slate-400 mt-1">Manage, edit, export, or import complete inventory backup state JSON.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-boxes-stacked text-rose-400 mr-2"></i> <span data-i18n="inventoryTitle">Inventory Mgmt</span></h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="inventorySubtitle">Manage, edit, export, or import complete inventory backup state JSON.</p>
         </div>
         
         <!-- BACKUP & IMPORT CONTROLS -->
         <div class="flex items-center gap-2 w-full sm:w-auto">
           <button onclick="exportInventoryBackup()" class="flex-1 sm:flex-initial px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-extrabold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm">
-            <i class="fa-solid fa-download"></i> Backup JSON
+            <i class="fa-solid fa-download"></i> <span data-i18n="backupJson">Backup JSON</span>
           </button>
           
           <label class="flex-1 sm:flex-initial px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold rounded-xl cursor-pointer transition-all flex items-center justify-center gap-2 shadow-sm">
-            <i class="fa-solid fa-upload"></i> Import Backup
+            <i class="fa-solid fa-upload"></i> <span data-i18n="importBackup">Import Backup</span>
             <input type="file" id="backup-file-input" accept=".json" onchange="importInventoryBackup(event)" class="hidden">
           </label>
         </div>
@@ -570,19 +569,19 @@
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center">
-          <input type="text" id="inventory-search" oninput="renderInventoryTable()" placeholder="Search serial / name / owner..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white w-64">
+          <input type="text" id="inventory-search" oninput="renderInventoryTable()" placeholder="Search serial / name / owner..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white w-64" data-i18n-placeholder="searchInventoryPlaceholder">
         </div>
         <div class="overflow-x-auto max-h-[500px]">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0">
               <tr>
-                <th class="p-3">Serial</th>
-                <th class="p-3">Name</th>
-                <th class="p-3">Edition</th>
-                <th class="p-3">Price</th>
-                <th class="p-3">Assigned Owner</th>
-                <th class="p-3">Status</th>
-                <th class="p-3 text-right">Actions</th>
+                <th class="p-3" data-i18n="thSerial">Serial</th>
+                <th class="p-3" data-i18n="thName">Name</th>
+                <th class="p-3" data-i18n="thEdition">Edition</th>
+                <th class="p-3" data-i18n="thPrice">Price</th>
+                <th class="p-3" data-i18n="thAssignedOwner">Assigned Owner</th>
+                <th class="p-3" data-i18n="thStatus">Status</th>
+                <th class="p-3 text-right" data-i18n="thActions">Actions</th>
               </tr>
             </thead>
             <tbody id="inventory-table-body" class="divide-y divide-slate-800"></tbody>
@@ -597,22 +596,22 @@
   <div id="list-card-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeListCardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 id="list-modal-title" class="text-base font-extrabold text-white">List Card for Trade</h3>
+      <h3 id="list-modal-title" class="text-base font-extrabold text-white" data-i18n="listCardTradeTitle">List Card for Trade</h3>
       <input type="hidden" id="list-card-id-target">
       <input type="hidden" id="list-modal-mode" value="trade">
       
       <div class="space-y-3 text-xs">
         <div id="list-card-select-container" class="hidden">
-          <label class="block font-bold text-slate-400 mb-1">Select Card from Your Vault</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="selectVaultCard">Select Card from Your Vault</label>
           <select id="list-card-select-input" onchange="document.getElementById('list-card-id-target').value = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"></select>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1" id="list-price-label">Asking Price (IDR)</label>
+          <label class="block font-bold text-slate-400 mb-1" id="list-price-label" data-i18n="askingPrice">Asking Price (IDR)</label>
           <input type="number" id="list-card-price-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
         </div>
 
-        <button onclick="submitCardListingModal()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl hover:bg-amber-400 transition-all">Publish Listing</button>
+        <button onclick="submitCardListingModal()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl hover:bg-amber-400 transition-all" data-i18n="publishListingBtn">Publish Listing</button>
       </div>
     </div>
   </div>
@@ -621,15 +620,15 @@
   <div id="propose-trade-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeProposeTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Propose QRIS Trade Offer</h3>
+      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> <span data-i18n="proposeModalTitle">Propose QRIS Trade Offer</span></h3>
       
       <div class="space-y-3 text-xs">
         <div class="relative">
-          <label class="block font-bold text-slate-400 mb-1">Select Card to Request (Search by Serial or Owner)</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="selectCardRequest">Select Card to Request (Search by Serial or Owner)</label>
           <input type="hidden" id="trade-req-card-id" value="">
           
           <button type="button" id="trade-dropdown-trigger" onclick="toggleTradeCardDropdown()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-left text-white flex justify-between items-center focus:outline-none focus:border-purple-500">
-            <span id="trade-dropdown-label">Select a card...</span>
+            <span id="trade-dropdown-label" data-i18n="selectCardPlaceholder">Select a card...</span>
             <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
           </button>
 
@@ -637,7 +636,7 @@
             <div class="p-2 border-b border-slate-800">
               <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
-                <input type="text" id="trade-search-input" oninput="filterTradeCardOptions()" placeholder="Search serial (*01) or owner..." class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-purple-500">
+                <input type="text" id="trade-search-input" oninput="filterTradeCardOptions()" placeholder="Search serial (*01) or owner..." class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-purple-500" data-i18n-placeholder="tradeSearchPlaceholder">
               </div>
             </div>
             <div id="trade-dropdown-list" class="max-h-48 overflow-y-auto divide-y divide-slate-900"></div>
@@ -645,19 +644,19 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Offer Type</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="offerTypeLabel">Offer Type</label>
           <select id="trade-req-type-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
-            <option value="BUY">Direct QRIS Buy Offer</option>
-            <option value="TRADE">Card-for-Card Trade</option>
+            <option value="BUY" data-i18n="optDirectBuy">Direct QRIS Buy Offer</option>
+            <option value="TRADE" data-i18n="optCardTrade">Card-for-Card Trade</option>
           </select>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Proposed Offer Amount / Notes (IDR or Details)</label>
-          <input type="text" id="trade-req-notes-input" placeholder="e.g. Offering Rp 150.000 or trade with *02" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="proposedNotesLabel">Proposed Offer Amount / Notes (IDR or Details)</label>
+          <input type="text" id="trade-req-notes-input" placeholder="e.g. Offering Rp 150.000 or trade with *02" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500" data-i18n-placeholder="tradeNotesPlaceholder">
         </div>
 
-        <button onclick="submitTradeRequest()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg">Submit QRIS Proposal</button>
+        <button onclick="submitTradeRequest()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg" data-i18n="submitProposalBtn">Submit QRIS Proposal</button>
       </div>
     </div>
   </div>
@@ -666,16 +665,16 @@
   <div id="counter-offer-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeCounterOfferModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-pen-to-square text-amber-400 mr-2"></i> Send Counter Offer</h3>
+      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-pen-to-square text-amber-400 mr-2"></i> <span data-i18n="counterModalTitle">Send Counter Offer</span></h3>
       <input type="hidden" id="counter-req-id-target">
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Your Counter Terms / Revised Offer Notes</label>
-          <input type="text" id="counter-notes-input" placeholder="e.g. Counter offer: I want Rp 250.000 or *05 instead." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="counterNotesLabel">Your Counter Terms / Revised Offer Notes</label>
+          <input type="text" id="counter-notes-input" placeholder="e.g. Counter offer: I want Rp 250.000 or *05 instead." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500" data-i18n-placeholder="counterNotesPlaceholder">
         </div>
 
-        <button onclick="submitCounterOffer()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-lg">Submit Counter Offer</button>
+        <button onclick="submitCounterOffer()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-lg" data-i18n="submitCounterBtn">Submit Counter Offer</button>
       </div>
     </div>
   </div>
@@ -686,12 +685,12 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <i id="loading-modal-spinner" class="fa-solid fa-circle-notch fa-spin text-amber-400 text-base"></i>
-          <h3 id="loading-modal-title" class="text-xs font-extrabold text-white">Processing Data...</h3>
+          <h3 id="loading-modal-title" class="text-xs font-extrabold text-white" data-i18n="processingData">Processing Data...</h3>
         </div>
         <button onclick="hideLoadingModal()" class="text-slate-500 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i></button>
       </div>
       
-      <p id="loading-modal-subtitle" class="text-[11px] text-slate-400 leading-tight">Please wait while the inventory updates.</p>
+      <p id="loading-modal-subtitle" class="text-[11px] text-slate-400 leading-tight" data-i18n="loadingWaitSub">Please wait while the inventory updates.</p>
 
       <div id="import-progress-container" class="space-y-1.5 hidden">
         <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
@@ -716,18 +715,18 @@
         <div class="relative w-20 h-20 mx-auto mb-2">
           <img id="profile-modal-avatar-preview" src="" class="w-20 h-20 rounded-full object-cover border-2 border-amber-500/50 shadow-lg bg-slate-950">
         </div>
-        <h3 class="text-lg font-black text-white">Collector Profile Settings</h3>
-        <p class="text-xs text-slate-400">Customize how your profile, username, and socials appear on the marketplace</p>
+        <h3 class="text-lg font-black text-white" data-i18n="profileSettingsTitle">Collector Profile Settings</h3>
+        <p class="text-xs text-slate-400" data-i18n="profileSettingsSub">Customize how your profile, username, and socials appear on the marketplace</p>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Display Name</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="displayNameLabel">Display Name</label>
           <input type="text" id="profile-edit-name-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Username (@handle - Unique)</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="usernameLabel">Username (@handle - Unique)</label>
           <div class="relative">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 font-bold">@</span>
             <input type="text" id="profile-edit-username-input" placeholder="e.g. eugenecards" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-7 pr-3 py-2 text-white focus:border-amber-500 focus:outline-none">
@@ -735,47 +734,47 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Email (Account)</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="emailLabel">Email (Account)</label>
           <input type="text" id="profile-edit-email-input" disabled class="w-full bg-slate-950/50 border border-slate-800/80 rounded-xl px-3 py-2 text-slate-500 cursor-not-allowed font-mono">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Upload Custom Avatar Picture</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="uploadAvatarLabel">Upload Custom Avatar Picture</label>
           <input type="file" id="profile-avatar-file-input" accept="image/*" onchange="handleProfileAvatarUpload(event)" class="w-full text-[11px] text-slate-400 bg-slate-950 border border-slate-800 rounded-xl p-2 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Or Avatar Image URL</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="avatarUrlLabel">Or Avatar Image URL</label>
           <input type="text" id="profile-edit-avatar-input" oninput="document.getElementById('profile-modal-avatar-preview').src = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-600 focus:border-amber-500 focus:outline-none" placeholder="https://example.com/avatar.png">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Collector Tagline / Bio</label>
-          <textarea id="profile-edit-bio-input" rows="3" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none resize-y"></textarea>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="bioLabel">Collector Tagline / Bio</label>
+          <textarea id="profile-edit-bio-input" rows="3" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none resize-y" data-i18n-placeholder="bioPlaceholder"></textarea>
         </div>
 
         <!-- SOCIAL MEDIA LINKS (OPTIONAL) -->
         <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-          <label class="block font-bold text-amber-400 uppercase text-[10px]"><i class="fa-solid fa-share-nodes mr-1"></i> Social Media & Links (Optional)</label>
+          <label class="block font-bold text-amber-400 uppercase text-[10px]"><i class="fa-solid fa-share-nodes mr-1"></i> <span data-i18n="socialsTitle">Social Media & Links (Optional)</span></label>
           <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-instagram text-rose-400 mr-1"></i> Instagram Handle / URL</label>
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-instagram text-rose-400 mr-1"></i> <span data-i18n="igLabel">Instagram Handle / URL</span></label>
             <input type="text" id="profile-edit-ig-input" placeholder="e.g. @eugene_cards or https://instagram.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
           </div>
           <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-x-twitter text-slate-300 mr-1"></i> X/Twitter Handle / URL</label>
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-x-twitter text-slate-300 mr-1"></i> <span data-i18n="twitterLabel">X/Twitter Handle / URL</span></label>
             <input type="text" id="profile-edit-twitter-input" placeholder="e.g. @eugene_cards or https://twitter.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
           </div>
           <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-tiktok text-cyan-400 mr-1"></i> TikTok Handle / URL</label>
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-tiktok text-cyan-400 mr-1"></i> <span data-i18n="tiktokLabel">TikTok Handle / URL</span></label>
             <input type="text" id="profile-edit-tiktok-input" placeholder="e.g. @eugene_cards or https://tiktok.com/@..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
           </div>
           <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-solid fa-globe text-indigo-400 mr-1"></i> Website URL (Clickable)</label>
+            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-solid fa-globe text-indigo-400 mr-1"></i> <span data-i18n="webLabel">Website URL (Clickable)</span></label>
             <input type="text" id="profile-edit-web-input" placeholder="e.g. https://eugenecards.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
           </div>
         </div>
 
-        <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all">
+        <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all" data-i18n="saveProfileBtn">
           Save Profile Updates
         </button>
       </div>
@@ -789,23 +788,23 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <h3 class="text-base font-extrabold text-white text-center">Customize Card Details</h3>
+      <h3 class="text-base font-extrabold text-white text-center" data-i18n="customizeCardTitle">Customize Card Details</h3>
 
       <div class="space-y-3 text-xs">
         <input type="hidden" id="edit-card-id">
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Card Name</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="cardNameLabel">Card Name</label>
           <input type="text" id="edit-card-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-400 mb-1">Card Code (e.g. *01 / *001)</label>
+            <label class="block font-bold text-slate-400 mb-1" data-i18n="cardCodeLabel">Card Code (e.g. *01 / *001)</label>
             <input type="text" id="edit-card-serial" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-400 mb-1">Type / Category</label>
+            <label class="block font-bold text-slate-400 mb-1" data-i18n="categoryLabel">Type / Category</label>
             <select id="edit-card-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
               <option value="PREMIUM">PREMIUM</option>
               <option value="STANDARD">STANDARD</option>
@@ -814,24 +813,24 @@
         </div>
 
         <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-3">
-          <p class="font-bold text-amber-400 uppercase text-[10px]">Extended Details</p>
+          <p class="font-bold text-amber-400 uppercase text-[10px]" data-i18n="extendedDetails">Extended Details</p>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block font-bold text-slate-400 mb-1">Edition</label>
+              <label class="block font-bold text-slate-400 mb-1" data-i18n="editionLabel">Edition</label>
               <input type="text" id="edit-card-edition" placeholder="e.g. Beta Edition: #0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
             </div>
             <div>
-              <label class="block font-bold text-slate-400 mb-1">SN (Serial No.)</label>
+              <label class="block font-bold text-slate-400 mb-1" data-i18n="snLabel">SN (Serial No.)</label>
               <input type="text" id="edit-card-sn" placeholder="e.g. 0001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block font-bold text-slate-400 mb-1">Tier</label>
+              <label class="block font-bold text-slate-400 mb-1" data-i18n="tierLabel">Tier</label>
               <input type="text" id="edit-card-tier" placeholder="e.g. 500" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
             </div>
             <div>
-              <label class="block font-bold text-slate-400 mb-1">Printing</label>
+              <label class="block font-bold text-slate-400 mb-1" data-i18n="printingLabel">Printing</label>
               <input type="text" id="edit-card-printing" placeholder="e.g. 1x" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
             </div>
           </div>
@@ -839,24 +838,24 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-400 mb-1">Price (IDR)</label>
+            <label class="block font-bold text-slate-400 mb-1" data-i18n="priceLabel">Price (IDR)</label>
             <input type="number" id="edit-card-price" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-400 mb-1">Status</label>
+            <label class="block font-bold text-slate-400 mb-1" data-i18n="statusLabel">Status</label>
             <select id="edit-card-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
-              <option value="AVAILABLE">AVAILABLE</option>
-              <option value="SOLD">SOLD</option>
+              <option value="AVAILABLE" data-i18n="optAvailable">AVAILABLE</option>
+              <option value="SOLD" data-i18n="optSold">SOLD</option>
             </select>
           </div>
         </div>
 
         <div class="relative">
-          <label class="block font-bold text-slate-400 mb-1">Assign Owner</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="assignOwnerLabel">Assign Owner</label>
           <input type="hidden" id="edit-card-owner-select" value="">
           
           <button type="button" id="owner-dropdown-trigger" onclick="toggleOwnerDropdown()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-left text-white flex justify-between items-center focus:outline-none focus:border-amber-500">
-            <span id="owner-dropdown-label">Unowned (House)</span>
+            <span id="owner-dropdown-label" data-i18n="unownedHouse">Unowned (House)</span>
             <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
           </button>
 
@@ -864,7 +863,7 @@
             <div class="p-2 border-b border-slate-800">
               <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
-                <input type="text" id="owner-search-input" oninput="filterOwnerOptions()" placeholder="Search collector name..." class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                <input type="text" id="owner-search-input" oninput="filterOwnerOptions()" placeholder="Search collector name..." class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500" data-i18n-placeholder="searchOwnerPlaceholder">
               </div>
             </div>
             <div id="owner-dropdown-list" class="max-h-48 overflow-y-auto divide-y divide-slate-900"></div>
@@ -872,16 +871,16 @@
         </div>
 
         <div class="space-y-1">
-          <label class="block font-bold text-slate-400">Upload Card Image File</label>
+          <label class="block font-bold text-slate-400" data-i18n="uploadCardImgLabel">Upload Card Image File</label>
           <input type="file" id="edit-card-file-input" accept="image/*" onchange="handleImageFileUpload(event)" class="w-full text-[11px] text-slate-400 bg-slate-950 border border-slate-800 rounded-xl p-2 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Or Image URL</label>
+          <label class="block font-bold text-slate-400 mb-1" data-i18n="orImgUrlLabel">Or Image URL</label>
           <input type="text" id="edit-card-img" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
         </div>
 
-        <button onclick="saveInventoryCardChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 transition-all">
+        <button onclick="saveInventoryCardChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 transition-all" data-i18n="saveCustomizationBtn">
           Save Customization
         </button>
       </div>
@@ -909,27 +908,27 @@
 
       <div class="grid grid-cols-2 gap-2 text-xs">
         <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-          <span class="text-[10px] text-slate-500 font-bold uppercase block">Edition</span>
+          <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="editionLabel">Edition</span>
           <strong id="detail-card-edition-text" class="text-amber-400 font-semibold">Beta Edition: #0</strong>
         </div>
         <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-          <span class="text-[10px] text-slate-500 font-bold uppercase block">SN (Serial No.)</span>
+          <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="snLabel">SN (Serial No.)</span>
           <strong id="detail-card-sn-text" class="text-indigo-400 font-mono">0001</strong>
         </div>
         <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-          <span class="text-[10px] text-slate-500 font-bold uppercase block">Tier</span>
+          <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="tierLabel">Tier</span>
           <strong id="detail-card-tier-text" class="text-emerald-400 font-semibold">500</strong>
         </div>
         <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-          <span class="text-[10px] text-slate-500 font-bold uppercase block">Printing</span>
+          <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="printingLabel">Printing</span>
           <strong id="detail-card-printing-text" class="text-purple-400 font-mono">1x</strong>
         </div>
       </div>
 
       <div class="space-y-1.5 text-xs bg-slate-950 p-3 rounded-2xl border border-slate-800">
-        <div class="flex justify-between text-slate-400"><span>Current Owner:</span><strong id="detail-card-owner" class="text-white">Unowned</strong></div>
-        <div class="flex justify-between text-slate-400"><span>Floor Price:</span><strong id="detail-card-price" class="text-emerald-400 font-mono">Rp 0</strong></div>
-        <div class="flex justify-between text-slate-400"><span>Availability:</span><strong id="detail-card-status" class="text-amber-400">AVAILABLE</strong></div>
+        <div class="flex justify-between text-slate-400"><span data-i18n="currentOwner">Current Owner:</span><strong id="detail-card-owner" class="text-white">Unowned</strong></div>
+        <div class="flex justify-between text-slate-400"><span data-i18n="floorPrice">Floor Price:</span><strong id="detail-card-price" class="text-emerald-400 font-mono">Rp 0</strong></div>
+        <div class="flex justify-between text-slate-400"><span data-i18n="availability">Availability:</span><strong id="detail-card-status" class="text-amber-400">AVAILABLE</strong></div>
       </div>
 
       <div id="detail-card-action-container"></div>
@@ -947,12 +946,12 @@
         <div class="w-16 h-16 rounded-2xl mx-auto bg-slate-950 border border-indigo-500/40 p-2 shadow-lg flex items-center justify-center">
           <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
         </div>
-        <h3 class="text-lg font-black text-white">Log In to Eugene Card</h3>
-        <p class="text-xs text-slate-400">Sign in to customize your collector profile and trade cards.</p>
+        <h3 class="text-lg font-black text-white" data-i18n="loginTitle">Log In to Eugene Card</h3>
+        <p class="text-xs text-slate-400" data-i18n="loginSub">Sign in to customize your collector profile and trade cards.</p>
       </div>
 
       <button onclick="loginWithGoogle()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all">
-        <i class="fa-brands fa-google text-red-500 text-sm"></i> Continue with Google
+        <i class="fa-brands fa-google text-red-500 text-sm"></i> <span data-i18n="continueGoogle">Continue with Google</span>
       </button>
     </div>
   </div>
@@ -962,18 +961,18 @@
   <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6">
     <div>
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-        <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> Cart (QRIS Checkout)</h3>
+        <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> <span data-i18n="cartTitle">Cart (QRIS Checkout)</span></h3>
         <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div id="cart-items-container" class="py-4 space-y-3 overflow-y-auto max-h-[50vh]"></div>
     </div>
     <div class="space-y-4 pt-4 border-t border-slate-800">
       <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2 text-xs">
-        <div class="flex justify-between text-slate-400"><span>Subtotal</span><span id="cart-subtotal" class="font-mono text-white">Rp 0</span></div>
-        <div class="flex justify-between text-slate-400"><span>Platform Tax (2%)</span><span id="cart-tax" class="font-mono text-amber-400">Rp 0</span></div>
-        <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span>Total (Inc. 2% Tax)</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
+        <div class="flex justify-between text-slate-400"><span data-i18n="subtotal">Subtotal</span><span id="cart-subtotal" class="font-mono text-white">Rp 0</span></div>
+        <div class="flex justify-between text-slate-400"><span data-i18n="platformTax">Platform Tax (2%)</span><span id="cart-tax" class="font-mono text-amber-400">Rp 0</span></div>
+        <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span data-i18n="totalIncTax">Total (Inc. 2% Tax)</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
       </div>
-      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg hover:bg-amber-400 transition-all">Proceed to QRIS Payment</button>
+      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg hover:bg-amber-400 transition-all" data-i18n="proceedQrisBtn">Proceed to QRIS Payment</button>
     </div>
   </div>
 
@@ -981,18 +980,18 @@
   <div id="checkout-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl text-center max-h-[90vh] overflow-y-auto">
       <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-lg font-black text-white">Scan & Pay via Official QRIS</h3>
-      <p class="text-[10px] text-slate-400">Merchant: <strong class="text-white">Eugene Card, Toko Kartu</strong></p>
+      <h3 class="text-lg font-black text-white" data-i18n="scanPayQris">Scan & Pay via Official QRIS</h3>
+      <p class="text-[10px] text-slate-400"><span data-i18n="merchantLabel">Merchant</span>: <strong class="text-white">Eugene Card, Toko Kartu</strong></p>
       
       <img id="qris-img-element" src="" class="w-48 h-48 mx-auto bg-white p-2 rounded-2xl shadow-inner border border-slate-800">
       
       <div>
-        <p class="text-[10px] text-slate-500 font-bold uppercase">Total Payment Amount (Inc. 2% Platform Tax)</p>
+        <p class="text-[10px] text-slate-500 font-bold uppercase" data-i18n="totalPayAmount">Total Payment Amount (Inc. 2% Platform Tax)</p>
         <p id="qris-amount-display" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
       </div>
 
       <div class="text-left space-y-2 bg-slate-950 p-3 rounded-2xl border border-slate-800 text-xs">
-        <label class="block font-bold text-slate-300">Upload QRIS Transfer Receipt Screenshot</label>
+        <label class="block font-bold text-slate-300" data-i18n="uploadReceiptLabel">Upload QRIS Transfer Receipt Screenshot</label>
         <input type="file" id="qris-proof-file-input" accept="image/*" onchange="handleQrisScreenshotUpload(event)" class="w-full text-[11px] text-slate-400 bg-slate-900 border border-slate-800 rounded-xl p-2 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-amber-500 file:text-slate-950">
         <input type="hidden" id="qris-proof-img-data" value="">
         <div id="qris-proof-preview-container" class="hidden text-center pt-2">
@@ -1000,7 +999,7 @@
         </div>
       </div>
 
-      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all">Submit QRIS Order for Admin Approval</button>
+      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all" data-i18n="submitQrisOrderBtn">Submit QRIS Order for Admin Approval</button>
     </div>
   </div>
 
@@ -1057,7 +1056,7 @@
     const CARDS_PER_BATCH = 10;
     let scrollObserver = null;
 
-    // Dictionary for EN | ID translation
+    // Comprehensive i18n Dictionary
     const i18nDict = {
       EN: {
         brandTitle: "EUGENE CARD",
@@ -1077,6 +1076,7 @@
         navAdmin: "Admin Hub",
         notifHeader: "Cookie & Activity Logs",
         clearAll: "Clear All",
+        noNotifications: "No recent notifications.",
         limitedEdition: "LIMITED EDITION",
         betaStockTitle: "Beta Edition Card Stock",
         betaStockSubtitle: "Official QRIS Primary Market Availability (2% Tax Included)",
@@ -1102,12 +1102,30 @@
         tradeReqTitle: "TRADE REQUESTS",
         tradeReqSubtitle: "Propose QRIS buy or trade offers on cards that already have an owner.",
         proposeTradeBtn: "Propose Card Trade",
+        exclusiveAccess: "EXCLUSIVE ACCESS",
+        analyticsTitle: "Market Analytics & Valuation",
+        analyticsSubtitle: "Real-time marketplace metrics, floor price trends, and volume statistics.",
+        refreshAnalytics: "Refresh Analytics",
+        totalVolume: "Total Marketplace Volume",
+        volumeTrend: "+14.2% this week",
+        avgFloorPrice: "Average Floor Price",
+        acrossCards: "Across 50 edition cards",
+        collectedOwned: "Collected / Owned",
+        holdersSub: "Primary & Secondary holders",
+        activeTradeReqs: "Active Trade Requests",
+        pendingCountered: "Pending & countered",
+        topValuationIndex: "Top Card Valuation Index",
         inboxTitle: "Direct Messages & Support Inbox",
         inboxSubtitle: "Search collectors to start a chat or view ongoing direct conversations.",
         refreshInbox: "Refresh Inbox",
         findCollector: "Find & Chat Collector",
         chatSearchPlaceholder: "Type collector name or email to start a chat...",
         loadingMessages: "Loading messages...",
+        chatDirectTitle: "Direct Trade Chat",
+        chatDirectSub: "Negotiate trade terms directly",
+        noChatMessages: "No chat messages yet. Start the conversation!",
+        chatInputPlaceholder: "Type message or attach screenshot...",
+        btnSend: "Send",
         historyTitle: "Transaction History (QRIS)",
         historySubtitle: "View completed QRIS purchases, order statuses, and 2% platform tax records.",
         histAll: "All Activity",
@@ -1120,6 +1138,8 @@
         thProof: "QRIS Receipt",
         thStatus: "Status",
         thDate: "Date / Time",
+        vaultTitle: "My Vault / Binder",
+        vaultSubtitle: "Manage owned cards, sell back instantly to Admin via QRIS, or place them into Auction/Trade.",
         profileSettingsBtn: "Profile Settings",
         wishlistTitle: "Saved Wishlist",
         wishlistSubtitle: "Click on any card to directly propose a trade offer to its owner!",
@@ -1128,7 +1148,97 @@
         thOwnerName: "Owner Name",
         thCardsOwned: "Cards Owned",
         thSerialsHeld: "Serials Held",
-        thAction: "Action"
+        thAction: "Action",
+        adminHubTitle: "Admin Hub & Revenue Dashboard",
+        adminHubSubtitle: "Review customer QRIS payments and verify order requests.",
+        refreshHub: "Refresh Hub",
+        personaSwitcherTitle: "Admin Persona Switcher (Test Accounts)",
+        personaSwitcherSub: "Switch active account persona to test standard collector views versus admin privileges.",
+        adminPersona: "Admin Persona",
+        stdCollectorPersona: "Standard Collector",
+        pendingOrdersTitle: "Pending QRIS Orders Requiring Action",
+        noPendingOrders: "No pending transactions requiring approval.",
+        inventoryTitle: "Inventory Mgmt",
+        inventorySubtitle: "Manage, edit, export, or import complete inventory backup state JSON.",
+        backupJson: "Backup JSON",
+        importBackup: "Import Backup",
+        searchInventoryPlaceholder: "Search serial / name / owner...",
+        thSerial: "Serial",
+        thName: "Name",
+        thEdition: "Edition",
+        thPrice: "Price",
+        thAssignedOwner: "Assigned Owner",
+        thActions: "Actions",
+        listCardTradeTitle: "List Card for Trade",
+        selectVaultCard: "Select Card from Your Vault",
+        askingPrice: "Asking Price (IDR)",
+        publishListingBtn: "Publish Listing",
+        proposeModalTitle: "Propose QRIS Trade Offer",
+        selectCardRequest: "Select Card to Request (Search by Serial or Owner)",
+        selectCardPlaceholder: "Select a card...",
+        tradeSearchPlaceholder: "Search serial (*01) or owner...",
+        offerTypeLabel: "Offer Type",
+        optDirectBuy: "Direct QRIS Buy Offer",
+        optCardTrade: "Card-for-Card Trade",
+        proposedNotesLabel: "Proposed Offer Amount / Notes (IDR or Details)",
+        tradeNotesPlaceholder: "e.g. Offering Rp 150.000 or trade with *02",
+        submitProposalBtn: "Submit QRIS Proposal",
+        counterModalTitle: "Send Counter Offer",
+        counterNotesLabel: "Your Counter Terms / Revised Offer Notes",
+        counterNotesPlaceholder: "e.g. Counter offer: I want Rp 250.000 or *05 instead.",
+        submitCounterBtn: "Submit Counter Offer",
+        processingData: "Processing Data...",
+        loadingWaitSub: "Please wait while the inventory updates.",
+        profileSettingsTitle: "Collector Profile Settings",
+        profileSettingsSub: "Customize how your profile, username, and socials appear on the marketplace",
+        displayNameLabel: "Display Name",
+        usernameLabel: "Username (@handle - Unique)",
+        emailLabel: "Email (Account)",
+        uploadAvatarLabel: "Upload Custom Avatar Picture",
+        avatarUrlLabel: "Or Avatar Image URL",
+        bioLabel: "Collector Tagline / Bio",
+        bioPlaceholder: "e.g. Genesis Card Enthusiast",
+        socialsTitle: "Social Media & Links (Optional)",
+        igLabel: "Instagram Handle / URL",
+        twitterLabel: "X/Twitter Handle / URL",
+        tiktokLabel: "TikTok Handle / URL",
+        webLabel: "Website URL (Clickable)",
+        saveProfileBtn: "Save Profile Updates",
+        customizeCardTitle: "Customize Card Details",
+        cardNameLabel: "Card Name",
+        cardCodeLabel: "Card Code (e.g. *01 / *001)",
+        categoryLabel: "Type / Category",
+        extendedDetails: "Extended Details",
+        editionLabel: "Edition",
+        snLabel: "SN (Serial No.)",
+        tierLabel: "Tier",
+        printingLabel: "Printing",
+        priceLabel: "Price (IDR)",
+        statusLabel: "Status",
+        optAvailable: "AVAILABLE",
+        optSold: "SOLD",
+        assignOwnerLabel: "Assign Owner",
+        unownedHouse: "Unowned (House)",
+        searchOwnerPlaceholder: "Search collector name...",
+        uploadCardImgLabel: "Upload Card Image File",
+        orImgUrlLabel: "Or Image URL",
+        saveCustomizationBtn: "Save Customization",
+        currentOwner: "Current Owner:",
+        floorPrice: "Floor Price:",
+        availability: "Availability:",
+        loginTitle: "Log In to Eugene Card",
+        loginSub: "Sign in to customize your collector profile and trade cards.",
+        continueGoogle: "Continue with Google",
+        cartTitle: "Cart (QRIS Checkout)",
+        subtotal: "Subtotal",
+        platformTax: "Platform Tax (2%)",
+        totalIncTax: "Total (Inc. 2% Tax)",
+        proceedQrisBtn: "Proceed to QRIS Payment",
+        scanPayQris: "Scan & Pay via Official QRIS",
+        merchantLabel: "Merchant",
+        totalPayAmount: "Total Payment Amount (Inc. 2% Platform Tax)",
+        uploadReceiptLabel: "Upload QRIS Transfer Receipt Screenshot",
+        submitQrisOrderBtn: "Submit QRIS Order for Admin Approval"
       },
       ID: {
         brandTitle: "EUGENE CARD",
@@ -1148,6 +1258,7 @@
         navAdmin: "Admin Hub",
         notifHeader: "Cookie & Catatan Aktivitas",
         clearAll: "Hapus Semua",
+        noNotifications: "Tidak ada notifikasi terbaru.",
         limitedEdition: "EDISI TERBATAS",
         betaStockTitle: "Stok Kartu Edisi Beta",
         betaStockSubtitle: "Ketersediaan Pasar Primer QRIS Resmi (Pajak 2% Termasuk)",
@@ -1173,12 +1284,30 @@
         tradeReqTitle: "PERMINTAAN TUKAR",
         tradeReqSubtitle: "Ajukan penawaran beli/tukar QRIS untuk kartu yang sudah dimiliki kolektor lain.",
         proposeTradeBtn: "Ajukan Penawaran",
+        exclusiveAccess: "AKSES EKSKLUSIF",
+        analyticsTitle: "Analitik Pasar & Valuasi",
+        analyticsSubtitle: "Metrik pasar real-time, tren harga dasar, dan statistik volume.",
+        refreshAnalytics: "Muat Ulang Analitik",
+        totalVolume: "Total Volume Pasar",
+        volumeTrend: "+14.2% minggu ini",
+        avgFloorPrice: "Rata-rata Harga Dasar",
+        acrossCards: "Dari 50 kartu edisi",
+        collectedOwned: "Terkumpul / Dimiliki",
+        holdersSub: "Pemegang Primer & Sekunder",
+        activeTradeReqs: "Permintaan Tukar Aktif",
+        pendingCountered: "Menunggu & Kontra",
+        topValuationIndex: "Indeks Valuasi Kartu Teratas",
         inboxTitle: "Pesan Langsung & Kotak Masuk",
         inboxSubtitle: "Cari kolektor untuk memulai obrolan atau melihat percakapan aktif.",
         refreshInbox: "Muat Ulang Pesan",
         findCollector: "Cari & Chat Kolektor",
         chatSearchPlaceholder: "Ketik nama kolektor atau email...",
         loadingMessages: "Memuat pesan...",
+        chatDirectTitle: "Chat Perdagangan Langsung",
+        chatDirectSub: "Negosiasikan syarat perdagangan secara langsung",
+        noChatMessages: "Belum ada pesan chat. Mulai percakapan!",
+        chatInputPlaceholder: "Ketik pesan atau lampirkan tangkapan layar...",
+        btnSend: "Kirim",
         historyTitle: "Riwayat Transaksi (QRIS)",
         historySubtitle: "Lihat pembelian QRIS selesai, status pesanan, dan catatan pajak platform 2%.",
         histAll: "Semua Aktivitas",
@@ -1191,6 +1320,8 @@
         thProof: "Bukti QRIS",
         thStatus: "Status",
         thDate: "Tanggal / Waktu",
+        vaultTitle: "Brankas / Album Saya",
+        vaultSubtitle: "Kelola kartu yang dimiliki, jual kembali secara instan ke Admin via QRIS, atau masukkan ke Lelang/Tukar.",
         profileSettingsBtn: "Pengaturan Profil",
         wishlistTitle: "Daftar Keinginan",
         wishlistSubtitle: "Klik kartu apa saja untuk langsung mengajukan penawaran tukar kepada pemiliknya!",
@@ -1199,7 +1330,97 @@
         thOwnerName: "Nama Kolektor",
         thCardsOwned: "Jumlah Kartu",
         thSerialsHeld: "Serial Dipegang",
-        thAction: "Aksi"
+        thAction: "Aksi",
+        adminHubTitle: "Pusat Admin & Dasbor Pendapatan",
+        adminHubSubtitle: "Tinjau pembayaran QRIS pelanggan dan verifikasi permintaan pesanan.",
+        refreshHub: "Muat Ulang Pusat",
+        personaSwitcherTitle: "Pengalih Persona Admin (Akun Uji)",
+        personaSwitcherSub: "Beralih persona akun aktif untuk menguji tampilan kolektor standar vs hak akses admin.",
+        adminPersona: "Persona Admin",
+        stdCollectorPersona: "Kolektor Standar",
+        pendingOrdersTitle: "Pesanan QRIS Menunggu Tindakan",
+        noPendingOrders: "Tidak ada transaksi menunggu persetujuan.",
+        inventoryTitle: "Manajemen Inventaris",
+        inventorySubtitle: "Kelola, edit, ekspor, atau impor JSON cadangan inventaris lengkap.",
+        backupJson: "Cadangkan JSON",
+        importBackup: "Impor Cadangan",
+        searchInventoryPlaceholder: "Cari serial / nama / pemilik...",
+        thSerial: "Serial",
+        thName: "Nama",
+        thEdition: "Edisi",
+        thPrice: "Harga",
+        thAssignedOwner: "Pemilik Ditugaskan",
+        thActions: "Aksi",
+        listCardTradeTitle: "Daftarkan Kartu untuk Dijual/Ditukar",
+        selectVaultCard: "Pilih Kartu dari Brankas Anda",
+        askingPrice: "Harga Penawaran (IDR)",
+        publishListingBtn: "Publikasikan Kartu",
+        proposeModalTitle: "Ajukan Penawaran QRIS",
+        selectCardRequest: "Pilih Kartu yang Diminta (Cari berdasarkan Serial atau Pemilik)",
+        selectCardPlaceholder: "Pilih kartu...",
+        tradeSearchPlaceholder: "Cari serial (*01) atau pemilik...",
+        offerTypeLabel: "Jenis Penawaran",
+        optDirectBuy: "Penawaran Beli Langsung QRIS",
+        optCardTrade: "Pertukaran Kartu-dengan-Kartu",
+        proposedNotesLabel: "Jumlah Penawaran / Catatan (IDR atau Rincian)",
+        tradeNotesPlaceholder: "misal: Menawarkan Rp 150.000 atau tukar dengan *02",
+        submitProposalBtn: "Kirim Proposal QRIS",
+        counterModalTitle: "Kirim Penawaran Kontra",
+        counterNotesLabel: "Ketentuan Kontra / Catatan Penawaran Revisi Anda",
+        counterNotesPlaceholder: "misal: Penawaran kontra: Saya minta Rp 250.000 atau *05 sebagai gantinya.",
+        submitCounterBtn: "Kirim Penawaran Kontra",
+        processingData: "Memproses Data...",
+        loadingWaitSub: "Harap tunggu sementara inventaris diperbarui.",
+        profileSettingsTitle: "Pengaturan Profil Kolektor",
+        profileSettingsSub: "Sesuaikan tampilan profil, username, dan media sosial Anda di pasar",
+        displayNameLabel: "Nama Tampilan",
+        usernameLabel: "Username (@handle - Unik)",
+        emailLabel: "Email (Akun)",
+        uploadAvatarLabel: "Unggah Foto Profil Kustom",
+        avatarUrlLabel: "Atau URL Gambar Avatar",
+        bioLabel: "Slogan / Bio Kolektor",
+        bioPlaceholder: "misal: Penggemar Kartu Genesis",
+        socialsTitle: "Media Sosial & Tautan (Opsional)",
+        igLabel: "Handle / URL Instagram",
+        twitterLabel: "Handle / URL X/Twitter",
+        tiktokLabel: "Handle / URL TikTok",
+        webLabel: "URL Situs Web (Dapat Diklik)",
+        saveProfileBtn: "Simpan Perubahan Profil",
+        customizeCardTitle: "Kustomisasi Rincian Kartu",
+        cardNameLabel: "Nama Kartu",
+        cardCodeLabel: "Kode Kartu (misal: *01 / *001)",
+        categoryLabel: "Kategori / Tipe",
+        extendedDetails: "Rincian Tambahan",
+        editionLabel: "Edisi",
+        snLabel: "SN (No. Serial)",
+        tierLabel: "Tingkat (Tier)",
+        printingLabel: "Pencetakan",
+        priceLabel: "Harga (IDR)",
+        statusLabel: "Status",
+        optAvailable: "TERSEDIA",
+        optSold: "TERJUAL",
+        assignOwnerLabel: "Tugaskan Pemilik",
+        unownedHouse: "Belum Dimiliki (Rumah)",
+        searchOwnerPlaceholder: "Cari nama kolektor...",
+        uploadCardImgLabel: "Unggah File Gambar Kartu",
+        orImgUrlLabel: "Atau URL Gambar",
+        saveCustomizationBtn: "Simpan Kustomisasi",
+        currentOwner: "Pemilik Saat Ini:",
+        floorPrice: "Harga Dasar:",
+        availability: "Ketersediaan:",
+        loginTitle: "Masuk ke Eugene Card",
+        loginSub: "Masuk untuk menyesuaikan profil kolektor dan bertukar kartu.",
+        continueGoogle: "Lanjutkan dengan Google",
+        cartTitle: "Keranjang (Pembayaran QRIS)",
+        subtotal: "Subtotal",
+        platformTax: "Pajak Platform (2%)",
+        totalIncTax: "Total (Termasuk Pajak 2%)",
+        proceedQrisBtn: "Lanjutkan ke Pembayaran QRIS",
+        scanPayQris: "Pindai & Bayar via QRIS Resmi",
+        merchantLabel: "Pedagang",
+        totalPayAmount: "Total Pembayaran (Termasuk Pajak 2%)",
+        uploadReceiptLabel: "Unggah Tangkapan Layar Struk Transfer QRIS",
+        submitQrisOrderBtn: "Kirim Pesanan QRIS untuk Persetujuan Admin"
       }
     };
 
@@ -1382,7 +1603,7 @@
       if (!list) return;
 
       if (systemNotifications.length === 0) {
-        list.innerHTML = `<div class="p-6 text-center text-xs text-slate-500">No recent notifications.</div>`;
+        list.innerHTML = `<div class="p-6 text-center text-xs text-slate-500" data-i18n="noNotifications">${i18nDict[currentLanguage].noNotifications}</div>`;
         return;
       }
 
@@ -1559,7 +1780,7 @@
 
       chatUnsubscribe = db.collection("chats").doc(chatId).collection("messages").orderBy("timestamp", "asc").onSnapshot(snapshot => {
         if (snapshot.empty) {
-          container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">No chat messages yet. Send a message or screenshot to discuss!</div>`;
+          container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs" data-i18n="noChatMessages">${i18nDict[currentLanguage].noChatMessages}</div>`;
           return;
         }
 
@@ -1875,7 +2096,7 @@
         progressContainer.classList.add('hidden');
       }
       
-      document.getElementById('loading-modal').classList.add('hidden');
+      document.getElementById('loading-modal').classList.remove('hidden');
     }
 
     function updateImportProgress(current, total, label) {
@@ -2084,6 +2305,7 @@
     }
 
     function updateAllViews() {
+      applyTranslations();
       renderCardGrid();
       renderOwnedCards();
       renderHoldersTable();
@@ -2144,10 +2366,10 @@
       if (!titleEl) return;
 
       if (!activeAuction) {
-        titleEl.innerText = "No Active Card Auction";
+        titleEl.innerText = currentLanguage === 'ID' ? "Tidak Ada Lelang Kartu Aktif" : "No Active Card Auction";
         serialEl.innerText = "*--";
         if (imgEl) imgEl.src = "https://placehold.co/1080x1350/1e1b4b/fbbf24?text=No+Auction";
-        if (ownerEl) ownerEl.innerHTML = `Owner: <strong class="text-white">None</strong>`;
+        if (ownerEl) ownerEl.innerHTML = `<span data-i18n="ownerLabel">${i18nDict[currentLanguage].ownerLabel}</span>: <strong class="text-white">None</strong>`;
         if (actionContainer) actionContainer.innerHTML = '';
         return;
       }
@@ -2155,7 +2377,7 @@
       titleEl.innerText = activeAuction.name || "Eugene Genesis Card";
       serialEl.innerText = activeAuction.serial || "*01";
       if (imgEl) imgEl.src = activeAuction.imgUrl || "https://placehold.co/1080x1350/1e1b4b/fbbf24?text=Card";
-      if (ownerEl) ownerEl.innerHTML = `Owner: <strong class="text-white">${activeAuction.owner || 'Admin'}</strong>`;
+      if (ownerEl) ownerEl.innerHTML = `<span data-i18n="ownerLabel">${i18nDict[currentLanguage].ownerLabel}</span>: <strong class="text-white">${activeAuction.owner || 'Admin'}</strong>`;
 
       const canCancel = currentUser && (currentUser.isAdmin || currentUser.name === activeAuction.owner || currentUser.username === activeAuction.owner);
       if (actionContainer) {
@@ -2711,11 +2933,11 @@
       if (currentUser?.username) ownersSet.add(currentUser.username);
 
       const currentCardOwner = card.owner || '';
-      ownerOptionsList = [{ value: '', label: 'Unowned (House)' }];
+      ownerOptionsList = [{ value: '', label: i18nDict[currentLanguage].unownedHouse }];
       ownersSet.forEach(ownerName => ownerOptionsList.push({ value: ownerName, label: ownerName }));
 
       const matched = ownerOptionsList.find(o => o.value === currentCardOwner);
-      selectOwnerOption(currentCardOwner, matched ? matched.label : (currentCardOwner || 'Unowned (House)'));
+      selectOwnerOption(currentCardOwner, matched ? matched.label : (currentCardOwner || i18nDict[currentLanguage].unownedHouse));
 
       document.getElementById('inventory-edit-modal').classList.remove('hidden');
     }
@@ -2810,9 +3032,9 @@
 
       const container = document.getElementById('detail-card-action-container');
       if (card.status === 'AVAILABLE') {
-        container.innerHTML = `<button onclick="addToCart('${card.id}'); closeCardDetailModal();" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Add Card to Cart (QRIS)</button>`;
+        container.innerHTML = `<button onclick="addToCart('${card.id}'); closeCardDetailModal();" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">${currentLanguage === 'ID' ? 'Tambah Kartu ke Keranjang (QRIS)' : 'Add Card to Cart (QRIS)'}</button>`;
       } else {
-        container.innerHTML = `<button disabled class="w-full py-2.5 bg-slate-950 text-slate-600 font-bold text-xs rounded-xl cursor-not-allowed">Already Owned</button>`;
+        container.innerHTML = `<button disabled class="w-full py-2.5 bg-slate-950 text-slate-600 font-bold text-xs rounded-xl cursor-not-allowed">${currentLanguage === 'ID' ? 'Sudah Dimiliki' : 'Already Owned'}</button>`;
       }
 
       document.getElementById('card-detail-modal').classList.remove('hidden');
@@ -2852,8 +3074,8 @@
       }
 
       document.getElementById('list-card-select-container')?.classList.remove('hidden');
-      document.getElementById('list-modal-title').innerText = 'List Card for QRIS Trade';
-      document.getElementById('list-price-label').innerText = 'Asking Price (IDR)';
+      document.getElementById('list-modal-title').innerText = i18nDict[currentLanguage].listCardTradeTitle;
+      document.getElementById('list-price-label').innerText = i18nDict[currentLanguage].askingPrice;
       document.getElementById('list-modal-mode').value = 'trade';
       document.getElementById('list-card-modal').classList.remove('hidden');
     }
@@ -2870,11 +3092,11 @@
       document.getElementById('list-card-select-container')?.classList.add('hidden');
 
       if (mode === 'auction') {
-        document.getElementById('list-modal-title').innerText = `List ${card.serial} for QRIS Auction`;
-        document.getElementById('list-price-label').innerText = 'Starting Bid Amount (IDR)';
+        document.getElementById('list-modal-title').innerText = `${currentLanguage === 'ID' ? 'Daftarkan' : 'List'} ${card.serial} ${currentLanguage === 'ID' ? 'untuk Lelang QRIS' : 'for QRIS Auction'}`;
+        document.getElementById('list-price-label').innerText = currentLanguage === 'ID' ? 'Jumlah Tawaran Awal (IDR)' : 'Starting Bid Amount (IDR)';
       } else {
-        document.getElementById('list-modal-title').innerText = `List ${card.serial} for QRIS Trade`;
-        document.getElementById('list-price-label').innerText = 'Asking Price (IDR)';
+        document.getElementById('list-modal-title').innerText = `${currentLanguage === 'ID' ? 'Daftarkan' : 'List'} ${card.serial} ${currentLanguage === 'ID' ? 'untuk Perdagangan QRIS' : 'for QRIS Trade'}`;
+        document.getElementById('list-price-label').innerText = i18nDict[currentLanguage].askingPrice;
       }
 
       document.getElementById('list-card-modal').classList.remove('hidden');
@@ -2957,7 +3179,7 @@
         searchText: `${c.serial} ${c.name} ${c.owner}`.toLowerCase()
       }));
 
-      selectTradeCardOption('', 'Select a card...');
+      selectTradeCardOption('', i18nDict[currentLanguage].selectCardPlaceholder);
       document.getElementById('propose-trade-modal').classList.remove('hidden');
     }
 
@@ -3207,20 +3429,17 @@
               <p class="text-[11px] font-mono text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800/80">Offer Details: ${req.notes}</p>
               
               <div class="flex items-center gap-2 pt-2 flex-wrap">
-                <!-- ACTION FOR TARGET OWNER -->
                 ${isTargetOwner && req.status === 'PENDING' ? `
                   <button onclick="acceptTradeRequest('${req.id}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-check"></i> Accept Offer</button>
                   <button onclick="openCounterOfferModal('${req.id}')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-pen-to-square"></i> Counter Offer</button>
                   <button onclick="rejectTradeRequest('${req.id}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] rounded-lg shadow transition-all">Reject Offer</button>
                 ` : ''}
 
-                <!-- ACTIONS FOR PROPOSER RECEIVING COUNTER OFFER -->
                 ${isProposer && isCountered ? `
                   <button onclick="acceptCounterOffer('${req.id}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Accept Offer</button>
                   <button onclick="withdrawTradeRequest('${req.id}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] rounded-lg shadow transition-all flex items-center gap-1"><i class="fa-solid fa-ban"></i> Cancel Offer</button>
                 ` : ''}
 
-                <!-- CANCEL / WITHDRAW OFFER BUTTON FOR PROPOSER OR ADMIN -->
                 ${(isProposer || currentUser?.isAdmin) && !isAccepted && !isRejected && !isCountered ? `
                   <button onclick="withdrawTradeRequest('${req.id}')" class="px-3 py-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-bold text-[10px] rounded-lg border border-rose-500/30 transition-all flex items-center gap-1">
                     <i class="fa-solid fa-ban"></i> Cancel Offer
@@ -3553,7 +3772,9 @@
         heading.innerHTML = `<div class="flex items-center gap-3"><img src="${targetAvatarUrl}" class="w-8 h-8 rounded-full object-cover border border-slate-700 bg-slate-950"> <span>${targetUser}'s Binder</span></div>`;
       }
       if (subheading) {
-        subheading.innerText = viewedCollectorFilter ? `Viewing collector inventory directory.` : `Manage owned cards, sell back instantly to Admin via QRIS, or place them into Auction/Trade.`;
+        subheading.innerText = viewedCollectorFilter 
+          ? (currentLanguage === 'ID' ? 'Melihat direktori inventaris kolektor.' : 'Viewing collector inventory directory.')
+          : i18nDict[currentLanguage].vaultSubtitle;
       }
 
       const owned = inventory.filter(c => c.owner === targetUser || (currentUser && (c.owner === currentUser.name || c.owner === currentUser.username)));
@@ -3576,14 +3797,14 @@
           ${isMyBinder ? `
             <div class="space-y-1.5 pt-1 border-t border-slate-800/80" onclick="event.stopPropagation()">
               <button onclick="sellBackToAdmin('${card.id}')" class="w-full py-1.5 bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 font-extrabold text-[10px] rounded-xl border border-rose-500/30 transition-all flex items-center justify-center gap-1">
-                <i class="fa-solid fa-rotate-left"></i> Sell Back to Admin (QRIS)
+                <i class="fa-solid fa-rotate-left"></i> ${currentLanguage === 'ID' ? 'Jual Kembali ke Admin (QRIS)' : 'Sell Back to Admin (QRIS)'}
               </button>
               <div class="grid grid-cols-2 gap-1">
                 <button onclick="openListCardModal('${card.id}', 'auction')" class="py-1.5 bg-emerald-950/40 hover:bg-emerald-900/40 text-emerald-400 font-extrabold text-[10px] rounded-xl border border-emerald-500/30 transition-all flex items-center justify-center gap-1">
-                  <i class="fa-solid fa-gavel"></i> Auction
+                  <i class="fa-solid fa-gavel"></i> ${currentLanguage === 'ID' ? 'Lelang' : 'Auction'}
                 </button>
                 <button onclick="openListCardModal('${card.id}', 'trade')" class="py-1.5 bg-purple-950/40 hover:bg-purple-900/40 text-purple-400 font-extrabold text-[10px] rounded-xl border border-purple-500/30 transition-all flex items-center justify-center gap-1">
-                  <i class="fa-solid fa-right-left"></i> Trade
+                  <i class="fa-solid fa-right-left"></i> ${currentLanguage === 'ID' ? 'Tukar' : 'Trade'}
                 </button>
               </div>
             </div>
@@ -3650,7 +3871,7 @@
             <td class="p-3 font-mono text-amber-400 font-bold">${ownersMap[k].cards}</td>
             <td class="p-3 font-mono text-slate-400">${ownersMap[k].serials.join(', ')}</td>
             <td class="p-3 text-right">
-              <button onclick="viewedCollectorVault('${k}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-700">View Binder</button>
+              <button onclick="viewedCollectorVault('${k}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px] rounded-lg border border-slate-700">${currentLanguage === 'ID' ? 'Lihat Brankas' : 'View Binder'}</button>
             </td>
           </tr>
         `;
@@ -3673,7 +3894,7 @@
         });
 
         if (pendingList.length === 0) {
-          container.innerHTML = `<p class="text-xs text-slate-500">No pending transactions requiring approval.</p>`;
+          container.innerHTML = `<p class="text-xs text-slate-500" data-i18n="noPendingOrders">${i18nDict[currentLanguage].noPendingOrders}</p>`;
           return;
         }
 
