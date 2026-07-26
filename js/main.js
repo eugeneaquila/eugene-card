@@ -1631,12 +1631,19 @@ function loadPopoutChatMessages() {
     let messages = [];
     snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
 
-    const myEmail = currentUser ? currentUser.email : 'collector@eugene.com';
-    const threadMessages = messages.filter(m => 
-      (m.sender === myEmail && (m.recipient === activeChatRecipient || m.recipient === 'all_collectors@eugene.com')) ||
-      (m.sender === activeChatRecipient && m.recipient === myEmail) ||
-      (m.recipient === 'all_collectors@eugene.com' && m.sender === activeChatRecipient)
-    );
+    const myEmail = (currentUser ? currentUser.email : 'collector@eugene.com').toLowerCase().trim();
+    const targetEmail = activeChatRecipient.toLowerCase().trim();
+
+    const threadMessages = messages.filter(m => {
+      const sender = (m.sender || '').toLowerCase().trim();
+      const recipient = (m.recipient || '').toLowerCase().trim();
+      
+      const isMyMessageToThem = sender === myEmail && (recipient === targetEmail || recipient === 'all_collectors@eugene.com');
+      const isTheirMessageToMe = sender === targetEmail && recipient === myEmail;
+      const isBroadcast = recipient === 'all_collectors@eugene.com';
+
+      return isMyMessageToThem || isTheirMessageToMe || isBroadcast;
+    });
 
     if (threadMessages.length === 0) {
       container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">No messages in this thread yet. Start the conversation!</div>`;
@@ -1644,7 +1651,7 @@ function loadPopoutChatMessages() {
     }
 
     container.innerHTML = threadMessages.map(msg => {
-      const isMe = msg.sender === myEmail;
+      const isMe = (msg.sender || '').toLowerCase().trim() === myEmail;
       return `
         <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1">
           <div class="max-w-[80%] p-3 rounded-2xl text-xs ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none'}">
