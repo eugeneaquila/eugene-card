@@ -17,8 +17,8 @@ let searchDebounceTimer = null;
 let activeChatRecipient = null;
 let currentChatScreenshotBase64 = null;
 
-// Official Eugene Card, Toko Kartu (Toraja Utara) QRIS Data Payload Render
-const DEFAULT_QRIS_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 250 250'><rect width='250' height='250' fill='%23ffffff'/><rect x='20' y='20' width='65' height='65' fill='%23000000'/><rect x='28' y='28' width='49' height='49' fill='%23ffffff'/><rect x='36' y='36' width='33' height='33' fill='%23000000'/><rect x='165' y='20' width='65' height='65' fill='%23000000'/><rect x='173' y='28' width='49' height='49' fill='%23ffffff'/><rect x='181' y='36' width='33' height='33' fill='%23000000'/><rect x='20' y='165' width='65' height='65' fill='%23000000'/><rect x='28' y='173' width='49' height='49' fill='%23ffffff'/><rect x='36' y='181' width='33' height='33' fill='%23000000'/><rect x='110' y='110' width='30' height='30' fill='%23000000'/><rect x='150' y='110' width='20' height='20' fill='%23000000'/><rect x='110' y='150' width='20' height='20' fill='%23000000'/><text x='125' y='235' font-family='sans-serif' font-size='9' font-weight='bold' text-anchor='middle' fill='%230369a1'>EUGENE CARD - TORAJA UTARA</text></svg>";
+// Official Hosted Eugene Card QRIS Image URL
+const DEFAULT_QRIS_IMAGE = "https://iili.io/CekvjN2.png";
 
 document.addEventListener('DOMContentLoaded', () => {
   setupQrisImage();
