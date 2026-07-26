@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchTradeListings();
   fetchTradeRequests();
   fetchOrderHistory();
+  fetchUnreadInboxCount();
   switchTab('catalog');
 });
 
@@ -33,6 +34,7 @@ function onAuthResolved(user) {
     switchTab('catalog');
   }
   updateAdminAuctionControls();
+  fetchUnreadInboxCount();
 }
 
 function switchTab(tabName) {
@@ -94,7 +96,6 @@ function fetchInventoryData() {
     if (currentTab === 'holders') renderHoldersTable();
   }, err => {
     console.error("Error fetching cards:", err);
-    if (cardsData.length === 0) renderCardGrid();
   });
 }
 
@@ -121,6 +122,22 @@ function fetchOrderHistory() {
     if (currentTab === 'history') renderHistoryTable();
     if (currentTab === 'admin') renderAdminHub();
   }, err => console.error("Error fetching order history:", err));
+}
+
+function fetchUnreadInboxCount() {
+  const userEmail = currentUser ? currentUser.email : 'collector@eugene.com';
+  db.collection("messages").where("recipient", "==", userEmail).where("read", "==", false).onSnapshot(snapshot => {
+    const count = snapshot.size;
+    const badge = document.getElementById('inbox-badge-count');
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+  }, err => console.error("Error fetching unread messages:", err));
 }
 
 function renderCardGrid() {
@@ -218,6 +235,59 @@ function updateRemainingCardsCount() {
   if (countEl) {
     const available = cardsData.filter(c => c.status === 'AVAILABLE' || !c.status).length;
     countEl.textContent = available > 0 ? available : 50;
+  }
+}
+
+// 3. FIXED LIST A CARD FUNCTIONALITY
+function openListCardForTradeModal() {
+  const select = document.getElementById('list-card-select');
+  if (!select) return;
+
+  const myName = userProfile.name || (currentUser ? currentUser.displayName : 'Collector');
+  const myCards = cardsData.filter(c => c.owner === myName || c.owner === (currentUser ? currentUser.email : ''));
+
+  if (myCards.length === 0) {
+    showToast("You don't own any cards in your vault to list yet!");
+    return;
+  }
+
+  select.innerHTML = myCards.map(c => `
+    <option value="${c.id}">${c.name} (${c.serial}) - Rp ${(c.price || 100000).toLocaleString('id-ID')}</option>
+  `).join('');
+
+  document.getElementById('list-card-price-input').value = myCards[0].price || 100000;
+  document.getElementById('list-card-trade-modal').classList.remove('hidden');
+}
+
+function closeListCardTradeModal() {
+  document.getElementById('list-card-trade-modal').classList.add('hidden');
+}
+
+async function submitListCardToTrade() {
+  const cardId = document.getElementById('list-card-select').value;
+  const askingPrice = parseFloat(document.getElementById('list-card-price-input').value) || 100000;
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  const listingPayload = {
+    cardId: card.id,
+    cardName: card.name,
+    serial: card.serial,
+    img: card.img,
+    askingPrice: askingPrice,
+    seller: userProfile.name || (currentUser ? currentUser.displayName : 'Collector'),
+    sellerEmail: currentUser ? currentUser.email : 'collector@eugene.com',
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await db.collection("trade_listings").add(listingPayload);
+    closeListCardTradeModal();
+    showToast("Card listed successfully in Trading Room!");
+    switchTab('trade');
+  } catch (err) {
+    console.error("List Card Error:", err);
+    showToast("Failed to list card.");
   }
 }
 
@@ -380,8 +450,6 @@ function renderTradeRequests() {
   const currentUserEmail = currentUser ? currentUser.email : '';
 
   container.innerHTML = tradeRequests.map(req => {
-    const isOwner = req.ownerEmail === currentUserEmail || req.targetOwner === (userProfile.name || 'Collector');
-    const isBuyer = req.proposerEmail === currentUserEmail || req.proposer === (userProfile.name || 'Collector');
     const isCountered = req.status === 'COUNTERED';
 
     return `
@@ -402,26 +470,73 @@ function renderTradeRequests() {
         </div>
 
         <div class="flex gap-2 pt-1">
-          ${isCountered && isBuyer ? `
-            <button onclick="acceptCounterOffer('${req.id}')" class="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl">Accept Counter</button>
-            <button onclick="declineTradeOffer('${req.id}')" class="flex-1 py-1.5 bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 font-extrabold text-xs rounded-xl border border-rose-500/30">Decline Counter</button>
-          ` : `
-            <button onclick="acceptTradeOffer('${req.id}')" class="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl">Accept Offer</button>
-            <button onclick="openCounterOfferModal('${req.id}')" class="flex-1 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl">Counter Offer</button>
-            <button onclick="declineTradeOffer('${req.id}')" class="flex-1 py-1.5 bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 font-extrabold text-xs rounded-xl border border-rose-500/30">Decline Offer</button>
-          `}
+          <button onclick="acceptTradeOffer('${req.id}')" class="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl">Accept Offer</button>
+          <button onclick="openCounterOfferModal('${req.id}')" class="flex-1 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl">Counter Offer</button>
+          <button onclick="declineTradeOffer('${req.id}')" class="flex-1 py-1.5 bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 font-extrabold text-xs rounded-xl border border-rose-500/30">Decline Offer</button>
         </div>
       </div>
     `;
   }).join('');
 }
 
+// 1. ACCEPT OFFER: SHOW QRIS, CHANGE OWNERSHIP, SEND AUTO MESSAGE TO ADMIN & POPUP
 async function acceptTradeOffer(reqId) {
+  const req = tradeRequests.find(r => r.id === reqId);
+  if (!req) return;
+
+  const totalAmount = req.offerAmount || 100000;
+
+  // 1. Show QRIS modal with payment
+  document.getElementById('qris-amount-display').textContent = `Rp ${totalAmount.toLocaleString('id-ID')}`;
+  document.getElementById('checkout-modal-title').textContent = `QRIS Payment for Accepted Offer (${req.targetCard})`;
+  document.getElementById('qris-img-element').src = DEFAULT_QRIS_IMAGE;
+  
+  const actionBtn = document.getElementById('checkout-action-btn');
+  actionBtn.setAttribute('onclick', `finalizeAcceptedOffer('${reqId}')`);
+  document.getElementById('checkout-modal').classList.remove('hidden');
+}
+
+async function finalizeAcceptedOffer(reqId) {
+  const req = tradeRequests.find(r => r.id === reqId);
+  if (!req) return;
+
   try {
-    await db.collection("trade_requests").doc(reqId).update({ status: 'ACCEPTED' });
-    showToast("Trade offer accepted!");
+    // Update trade request status
+    await db.collection("trade_requests").doc(reqId).update({ status: 'ACCEPTED & PAID' });
+
+    // Automatically change ownership of card in Firestore
+    if (req.targetCardId) {
+      await db.collection("cards").doc(req.targetCardId).update({
+        owner: req.proposer || 'Collector'
+      });
+    } else {
+      // Find card by serial
+      const matchingCard = cardsData.find(c => c.serial === req.targetCard);
+      if (matchingCard) {
+        await db.collection("cards").doc(matchingCard.id).update({
+          owner: req.proposer || 'Collector'
+        });
+      }
+    }
+
+    // Send auto message from buyer to admin
+    const buyerEmail = currentUser ? currentUser.email : (req.proposerEmail || 'collector@eugene.com');
+    const adminEmail = 'eugene.aquila06@gmail.com';
+    
+    await db.collection("messages").add({
+      sender: buyerEmail,
+      recipient: adminEmail,
+      text: `Automated Notice: Trade offer for card ${req.targetCard} was accepted and paid successfully via QRIS (Rp ${(req.offerAmount || 0).toLocaleString('id-ID')}).`,
+      createdAt: new Date().toISOString(),
+      read: false
+    });
+
+    closeCheckoutModal();
+    showToast(`Offer accepted! Card ownership transferred & notification sent to Admin.`);
+    fetchUnreadInboxCount();
   } catch (err) {
-    console.error("Accept Error:", err);
+    console.error("Finalize Offer Error:", err);
+    showToast("Error processing accepted offer.");
   }
 }
 
@@ -459,13 +574,68 @@ async function submitCounterOffer() {
   }
 }
 
-async function acceptCounterOffer(reqId) {
-  try {
-    await db.collection("trade_requests").doc(reqId).update({ status: 'COMPLETED' });
-    showToast("Counter offer accepted!");
-  } catch (err) {
-    console.error("Accept Counter Error:", err);
+// 4. OPTIMIZED BACKUP & IMPORT IN INVENTORY MANAGEMENT (NON-BLOCKING LOADER)
+function showNonBlockingLoader(msg) {
+  const loader = document.getElementById('non-blocking-loader');
+  const msgEl = document.getElementById('loader-msg');
+  if (loader && msgEl) {
+    msgEl.textContent = msg;
+    loader.classList.remove('hidden');
   }
+}
+
+function hideNonBlockingLoader() {
+  const loader = document.getElementById('non-blocking-loader');
+  if (loader) loader.classList.add('hidden');
+}
+
+function backupInventoryJSON() {
+  showNonBlockingLoader("Exporting inventory backup...");
+  try {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cardsData, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `eugene_card_inventory_backup_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    hideNonBlockingLoader();
+    showToast("Inventory backup downloaded successfully!");
+  } catch (err) {
+    hideNonBlockingLoader();
+    showToast("Backup export failed.");
+  }
+}
+
+async function importInventoryJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  showNonBlockingLoader("Importing inventory data...");
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const importedCards = JSON.parse(e.target.result);
+      if (!Array.isArray(importedCards)) throw new Error("Invalid format");
+
+      for (const card of importedCards) {
+        if (card.id) {
+          const { id, ...cardData } = card;
+          await db.collection("cards").doc(id).set(cardData, { merge: true });
+        } else {
+          await db.collection("cards").add(card);
+        }
+      }
+
+      hideNonBlockingLoader();
+      showToast("Inventory imported and synced successfully!");
+      fetchInventoryData();
+    } catch (err) {
+      hideNonBlockingLoader();
+      showToast("Import failed: Invalid JSON file structure.");
+    }
+  };
+  reader.readAsText(file);
 }
 
 function renderInventoryTable() {
@@ -879,7 +1049,13 @@ function proceedToCheckout() {
   let subtotal = cart.reduce((sum, item) => sum + (item.price || 0), 0);
   let total = subtotal + Math.round(subtotal * 0.02);
 
+  document.getElementById('checkout-modal-title').textContent = "Scan & Pay via Official QRIS";
   document.getElementById('qris-amount-display').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+  document.getElementById('qris-img-element').src = DEFAULT_QRIS_IMAGE;
+  
+  const actionBtn = document.getElementById('checkout-action-btn');
+  actionBtn.setAttribute('onclick', 'submitOrderWithProof()');
+
   document.getElementById('checkout-modal').classList.remove('hidden');
 }
 
@@ -917,11 +1093,12 @@ async function submitOrderWithProof() {
   }
 }
 
+// 5. FIXED PENDING ORDERS & ADMIN APPROVAL
 function renderAdminHub() {
   const container = document.getElementById('admin-pending-orders-list');
   if (!container) return;
 
-  const pendingOrders = orderHistory.filter(o => o.status === 'PENDING');
+  const pendingOrders = orderHistory.filter(o => (o.status || 'PENDING') === 'PENDING');
 
   if (pendingOrders.length === 0) {
     container.innerHTML = `<p class="text-xs text-slate-500 py-4">No pending transactions requiring approval.</p>`;
@@ -932,7 +1109,8 @@ function renderAdminHub() {
     <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex justify-between items-center text-xs">
       <div>
         <span class="font-mono text-amber-400 font-bold">${o.orderRef || '#000'}</span>
-        <p class="text-white font-bold">${o.buyerName || 'Buyer'}</p>
+        <p class="text-white font-bold">${o.buyerName || o.buyerEmail || 'Buyer'}</p>
+        <p class="text-slate-400">${o.itemNames || 'Items'}</p>
         <p class="text-emerald-400 font-mono">Rp ${(o.totalAmount || 0).toLocaleString('id-ID')}</p>
       </div>
       <button onclick="approveOrder('${o.id}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl">
@@ -946,14 +1124,92 @@ async function approveOrder(orderId) {
   try {
     await db.collection("orders").doc(orderId).update({ status: 'APPROVED' });
     showToast("Order approved successfully!");
+    fetchOrderHistory();
   } catch (err) {
     console.error("Approve Error:", err);
+    showToast("Failed to approve order.");
   }
 }
 
 function refreshAdminHub() {
   fetchOrderHistory();
   showToast("Refreshed admin records.");
+}
+
+// 6. FIXED CHAT SEARCH USER
+async function searchUsersForChat() {
+  const query = (document.getElementById('user-chat-search-input')?.value || '').toLowerCase().trim();
+  const resultsContainer = document.getElementById('user-chat-search-results');
+  if (!resultsContainer) return;
+
+  if (!query) {
+    resultsContainer.classList.add('hidden');
+    resultsContainer.innerHTML = '';
+    return;
+  }
+
+  try {
+    const snapshot = await db.collection("users").get();
+    let matches = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const name = (data.displayName || data.email || '').toLowerCase();
+      if (name.includes(query)) {
+        matches.push(data);
+      }
+    });
+
+    if (matches.length === 0) {
+      resultsContainer.innerHTML = `<div class="p-2 text-slate-500 text-xs">No collectors found.</div>`;
+      resultsContainer.classList.remove('hidden');
+      return;
+    }
+
+    resultsContainer.innerHTML = matches.map(m => `
+      <div onclick="openChatThread('${m.email || m.displayName}')" class="p-2.5 bg-slate-950 hover:bg-slate-900 rounded-xl cursor-pointer flex items-center justify-between text-xs border border-slate-800">
+        <span class="font-bold text-white">${m.displayName || m.email}</span>
+        <span class="text-indigo-400 font-bold">Chat <i class="fa-solid fa-arrow-right ml-1"></i></span>
+      </div>
+    `).join('');
+    resultsContainer.classList.remove('hidden');
+  } catch (err) {
+    console.error("Chat Search Error:", err);
+  }
+}
+
+function openChatThread(recipientEmail) {
+  switchTab('inbox');
+  showToast(`Opened chat thread with ${recipientEmail}`);
+  document.getElementById('user-chat-search-results').classList.add('hidden');
+  document.getElementById('user-chat-search-input').value = '';
+}
+
+function loadUserInboxThreads() {
+  const container = document.getElementById('inbox-threads-list');
+  if (!container) return;
+
+  db.collection("messages").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+    let messages = [];
+    snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
+
+    const userEmail = currentUser ? currentUser.email : 'collector@eugene.com';
+    const myMessages = messages.filter(m => m.recipient === userEmail || m.sender === userEmail);
+
+    if (myMessages.length === 0) {
+      container.innerHTML = `<div class="text-center py-12 text-slate-500 text-xs bg-slate-900 border border-slate-800 rounded-3xl">No inbox messages yet.</div>`;
+      return;
+    }
+
+    container.innerHTML = myMessages.map(msg => `
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1 text-xs">
+        <div class="flex justify-between text-slate-400 font-mono text-[10px]">
+          <span>From: <strong>${msg.sender}</strong> to <strong>${msg.recipient}</strong></span>
+          <span>${new Date(msg.createdAt || Date.now()).toLocaleTimeString()}</span>
+        </div>
+        <p class="text-white font-medium">${msg.text}</p>
+      </div>
+    `).join('');
+  }, err => console.error("Inbox load error:", err));
 }
 
 function switchAccountPersona(emailPersona) {
