@@ -13,6 +13,8 @@ let orderHistory = [];
 let userWishlist = JSON.parse(localStorage.getItem('eugene_wishlist') || '[]');
 let userProfile = JSON.parse(localStorage.getItem('eugene_profile') || '{"name":"Collector","username":"collector","bio":"Genesis Card Enthusiast","avatar":"","instagram":"","tiktok":"","website":""}');
 let searchDebounceTimer = null;
+let activeChatRecipient = null;
+let currentChatScreenshotBase64 = null;
 
 const DEFAULT_QRIS_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23ffffff'/><rect x='20' y='20' width='60' height='60' fill='%23000000'/><rect x='30' y='30' width='40' height='40' fill='%23ffffff'/><rect x='40' y='40' width='20' height='20' fill='%23000000'/><rect x='120' y='20' width='60' height='60' fill='%23000000'/><rect x='130' y='30' width='40' height='40' fill='%23ffffff'/><rect x='140' y='40' width='20' height='20' fill='%23000000'/><rect x='20' y='120' width='60' height='60' fill='%23000000'/><rect x='30' y='130' width='40' height='40' fill='%23ffffff'/><rect x='40' y='140' width='20' height='20' fill='%23000000'/><text x='100' y='110' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='%23000000'>OFFICIAL QRIS</text></svg>";
 
@@ -140,6 +142,31 @@ function fetchUnreadInboxCount() {
   }, err => console.error("Error fetching unread messages:", err));
 }
 
+// 7. COLLECTION CARD DETAILS MODAL
+function openCardDetailModal(cardId) {
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  document.getElementById('detail-card-title').textContent = card.name || 'Card Title';
+  document.getElementById('detail-card-serial').textContent = card.serial || '*000';
+  document.getElementById('detail-card-type').textContent = card.type || 'STANDARD';
+  document.getElementById('detail-card-owner').innerHTML = `Owner: <strong class="text-white">${card.owner || 'Admin House'}</strong>`;
+  document.getElementById('detail-card-edition').textContent = card.edition || 'Beta Edition';
+  document.getElementById('detail-card-sn').textContent = card.sn || '001';
+  document.getElementById('detail-card-tier').textContent = card.tier || 'Standard';
+  document.getElementById('detail-card-price').textContent = `Rp ${(card.price || 100000).toLocaleString('id-ID')}`;
+  document.getElementById('detail-card-img').src = card.img || 'https://via.placeholder.com/200x250';
+
+  const cartBtn = document.getElementById('detail-cart-btn');
+  cartBtn.setAttribute('onclick', `addToCart('${card.id}'); closeCardDetailModal();`);
+
+  document.getElementById('card-detail-modal').classList.remove('hidden');
+}
+
+function closeCardDetailModal() {
+  document.getElementById('card-detail-modal').classList.add('hidden');
+}
+
 function renderCardGrid() {
   const container = document.getElementById('card-grid');
   if (!container) return;
@@ -156,6 +183,7 @@ function renderCardGrid() {
       type: isPrem ? 'PREMIUM' : 'STANDARD',
       price: isPrem ? 250000 : 100000,
       status: 'AVAILABLE',
+      owner: 'Admin House',
       img: 'https://via.placeholder.com/200x250/0f172a/f59e0b?text=Eugene+Card'
     };
   });
@@ -238,7 +266,6 @@ function updateRemainingCardsCount() {
   }
 }
 
-// 3. FIXED LIST A CARD FUNCTIONALITY
 function openListCardForTradeModal() {
   const select = document.getElementById('list-card-select');
   if (!select) return;
@@ -447,8 +474,6 @@ function renderTradeRequests() {
     return;
   }
 
-  const currentUserEmail = currentUser ? currentUser.email : '';
-
   container.innerHTML = tradeRequests.map(req => {
     const isCountered = req.status === 'COUNTERED';
 
@@ -479,14 +504,12 @@ function renderTradeRequests() {
   }).join('');
 }
 
-// 1. ACCEPT OFFER: SHOW QRIS, CHANGE OWNERSHIP, SEND AUTO MESSAGE TO ADMIN & POPUP
 async function acceptTradeOffer(reqId) {
   const req = tradeRequests.find(r => r.id === reqId);
   if (!req) return;
 
   const totalAmount = req.offerAmount || 100000;
 
-  // 1. Show QRIS modal with payment
   document.getElementById('qris-amount-display').textContent = `Rp ${totalAmount.toLocaleString('id-ID')}`;
   document.getElementById('checkout-modal-title').textContent = `QRIS Payment for Accepted Offer (${req.targetCard})`;
   document.getElementById('qris-img-element').src = DEFAULT_QRIS_IMAGE;
@@ -501,16 +524,13 @@ async function finalizeAcceptedOffer(reqId) {
   if (!req) return;
 
   try {
-    // Update trade request status
     await db.collection("trade_requests").doc(reqId).update({ status: 'ACCEPTED & PAID' });
 
-    // Automatically change ownership of card in Firestore
     if (req.targetCardId) {
       await db.collection("cards").doc(req.targetCardId).update({
         owner: req.proposer || 'Collector'
       });
     } else {
-      // Find card by serial
       const matchingCard = cardsData.find(c => c.serial === req.targetCard);
       if (matchingCard) {
         await db.collection("cards").doc(matchingCard.id).update({
@@ -519,7 +539,6 @@ async function finalizeAcceptedOffer(reqId) {
       }
     }
 
-    // Send auto message from buyer to admin
     const buyerEmail = currentUser ? currentUser.email : (req.proposerEmail || 'collector@eugene.com');
     const adminEmail = 'eugene.aquila06@gmail.com';
     
@@ -574,68 +593,18 @@ async function submitCounterOffer() {
   }
 }
 
-// 4. OPTIMIZED BACKUP & IMPORT IN INVENTORY MANAGEMENT (NON-BLOCKING LOADER)
-function showNonBlockingLoader(msg) {
-  const loader = document.getElementById('non-blocking-loader');
-  const msgEl = document.getElementById('loader-msg');
-  if (loader && msgEl) {
-    msgEl.textContent = msg;
-    loader.classList.remove('hidden');
-  }
-}
-
-function hideNonBlockingLoader() {
-  const loader = document.getElementById('non-blocking-loader');
-  if (loader) loader.classList.add('hidden');
-}
-
-function backupInventoryJSON() {
-  showNonBlockingLoader("Exporting inventory backup...");
+// 6. ADMIN AUCTION CANCELLATION
+async function adminCancelAuction() {
   try {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cardsData, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `eugene_card_inventory_backup_${new Date().toISOString().slice(0,10)}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-    hideNonBlockingLoader();
-    showToast("Inventory backup downloaded successfully!");
+    await db.collection("auctions").doc("featured_active").set({
+      status: "CANCELLED",
+      highestBid: 0,
+      highBidder: "None"
+    }, { merge: true });
+    showToast("Auction successfully cancelled by Admin.");
   } catch (err) {
-    hideNonBlockingLoader();
-    showToast("Backup export failed.");
+    console.error("Cancel auction error:", err);
   }
-}
-
-async function importInventoryJSON(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  showNonBlockingLoader("Importing inventory data...");
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    try {
-      const importedCards = JSON.parse(e.target.result);
-      if (!Array.isArray(importedCards)) throw new Error("Invalid format");
-
-      for (const card of importedCards) {
-        if (card.id) {
-          const { id, ...cardData } = card;
-          await db.collection("cards").doc(id).set(cardData, { merge: true });
-        } else {
-          await db.collection("cards").add(card);
-        }
-      }
-
-      hideNonBlockingLoader();
-      showToast("Inventory imported and synced successfully!");
-      fetchInventoryData();
-    } catch (err) {
-      hideNonBlockingLoader();
-      showToast("Import failed: Invalid JSON file structure.");
-    }
-  };
-  reader.readAsText(file);
 }
 
 function renderInventoryTable() {
@@ -860,10 +829,37 @@ function closeProfileManagerModal() {
   document.getElementById('profile-manager-modal').classList.add('hidden');
 }
 
+// 3. UNIQUE USERNAME ENFORCEMENT
 async function saveProfileChanges() {
+  const newName = document.getElementById('profile-edit-name-input').value || 'Collector';
+  let newUsername = (document.getElementById('profile-edit-username-input').value || 'collector').toLowerCase().replace('@', '').trim();
+
+  // Check uniqueness across Firestore users if authenticated
+  if (currentUser) {
+    try {
+      const snapshot = await db.collection("users").get();
+      let isTaken = false;
+      snapshot.forEach(doc => {
+        if (doc.id !== currentUser.uid) {
+          const data = doc.data();
+          if (data.username && data.username.toLowerCase() === newUsername) {
+            isTaken = true;
+          }
+        }
+      });
+
+      if (isTaken) {
+        showToast("Error: Username is already taken by another account. Choose another.");
+        return;
+      }
+    } catch (err) {
+      console.error("Username uniqueness check error:", err);
+    }
+  }
+
   userProfile = {
-    name: document.getElementById('profile-edit-name-input').value || 'Collector',
-    username: document.getElementById('profile-edit-username-input').value || 'collector',
+    name: newName,
+    username: newUsername,
     bio: document.getElementById('profile-edit-bio-input').value || 'Collector Bio',
     avatar: document.getElementById('profile-edit-avatar-input').value || '',
     instagram: document.getElementById('profile-edit-instagram-input').value || '',
@@ -894,12 +890,13 @@ async function saveProfileChanges() {
   showToast("Profile settings saved successfully!");
 }
 
+// 5. CARD OWNERS: SELL BACK TO ADMIN (FLOOR PRICE), TRADE, OR AUCTION
 function renderMyVault() {
   const container = document.getElementById('owned-cards-grid');
   if (!container) return;
 
   const myName = userProfile.name || 'Eugene';
-  const myCards = cardsData.filter(c => c.owner === myName || c.owner === 'eugene.aquila06');
+  const myCards = cardsData.filter(c => c.owner === myName || c.owner === (currentUser ? currentUser.email : ''));
 
   if (myCards.length === 0) {
     container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Your vault is empty. Buy cards from the collection!</div>`;
@@ -907,17 +904,91 @@ function renderMyVault() {
   }
 
   container.innerHTML = myCards.map(card => `
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
-      <div class="flex justify-between items-center text-[10px]">
-        <span class="text-amber-400 font-mono font-bold">${card.serial || '*00'}</span>
-        <span class="text-slate-400">${card.type || 'STANDARD'}</span>
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2.5 flex flex-col justify-between">
+      <div>
+        <div class="flex justify-between items-center text-[10px]">
+          <span class="text-amber-400 font-mono font-bold">${card.serial || '*00'}</span>
+          <span class="text-slate-400">${card.type || 'STANDARD'}</span>
+        </div>
+        <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl overflow-hidden p-1 border border-slate-800 flex items-center justify-center my-2">
+          <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
+        </div>
+        <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
+        <p class="text-[11px] font-mono text-emerald-400 font-bold mt-0.5">Floor Value: Rp ${(card.price || 100000).toLocaleString('id-ID')}</p>
       </div>
-      <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl overflow-hidden p-1 border border-slate-800 flex items-center justify-center">
-        <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
+
+      <div class="grid grid-cols-3 gap-1 pt-2 border-t border-slate-800">
+        <button onclick="sellBackToAdmin('${card.id}')" class="py-1.5 bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 text-[10px] font-extrabold rounded-lg border border-rose-500/30" title="Sell Back to Admin at Floor Price">Sell</button>
+        <button onclick="listOwnedCardForTrade('${card.id}')" class="py-1.5 bg-amber-500/20 hover:bg-amber-400/30 text-amber-300 text-[10px] font-extrabold rounded-lg border border-amber-500/30" title="List for Trade">Trade</button>
+        <button onclick="putCardOnAuction('${card.id}')" class="py-1.5 bg-emerald-500/20 hover:bg-emerald-400/30 text-emerald-300 text-[10px] font-extrabold rounded-lg border border-emerald-500/30" title="Put on Auction">Auction</button>
       </div>
-      <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
     </div>
   `).join('');
+}
+
+async function sellBackToAdmin(cardId) {
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  const floorPrice = card.price || 100000;
+  if (!confirm(`Are you sure you want to sell "${card.name}" back to Admin for Rp ${floorPrice.toLocaleString('id-ID')}?`)) return;
+
+  try {
+    await db.collection("cards").doc(cardId).update({ owner: 'Admin House' });
+    showToast(`Successfully sold card back to Admin for Rp ${floorPrice.toLocaleString('id-ID')}`);
+    renderMyVault();
+  } catch (err) {
+    console.error("Sell back error:", err);
+    showToast("Failed to sell card back.");
+  }
+}
+
+async function listOwnedCardForTrade(cardId) {
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  const listingPayload = {
+    cardId: card.id,
+    cardName: card.name,
+    serial: card.serial,
+    img: card.img,
+    askingPrice: card.price || 100000,
+    seller: userProfile.name || (currentUser ? currentUser.displayName : 'Collector'),
+    sellerEmail: currentUser ? currentUser.email : 'collector@eugene.com',
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await db.collection("trade_listings").add(listingPayload);
+    showToast(`Listed "${card.name}" in Trading Room successfully!`);
+    switchTab('trade');
+  } catch (err) {
+    console.error("List trade error:", err);
+  }
+}
+
+async function putCardOnAuction(cardId) {
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  try {
+    await db.collection("auctions").doc("featured_active").set({
+      cardId: card.id,
+      cardName: card.name,
+      serial: card.serial,
+      img: card.img,
+      owner: card.owner,
+      startingBid: card.price || 100000,
+      highestBid: card.price || 100000,
+      highBidder: "Admin House",
+      status: "ACTIVE",
+      expiresAt: new Date(Date.now() + 86400000).toISOString()
+    });
+    showToast(`Successfully put "${card.name}" up for live Auction!`);
+    switchTab('auction');
+  } catch (err) {
+    console.error("Put on auction error:", err);
+  }
 }
 
 function toggleWishlist(cardId) {
@@ -1071,7 +1142,7 @@ async function submitOrderWithProof() {
 
   const orderData = {
     orderRef: '#EC-' + Math.floor(100000 + Math.random() * 900000),
-    buyerName: currentUser ? (currentUser.displayName || currentUser.email) : 'Guest Collector',
+    buyerName: userProfile.name || (currentUser ? currentUser.displayName : 'Collector'),
     buyerEmail: currentUser ? currentUser.email : 'guest@eugenecard.com',
     itemNames: cart.map(i => i.name).join(', '),
     totalAmount: grandTotal,
@@ -1093,7 +1164,7 @@ async function submitOrderWithProof() {
   }
 }
 
-// 5. FIXED PENDING ORDERS & ADMIN APPROVAL
+// 4. PENDING ORDERS IN ADMIN HUB (USING NAME NOT EMAIL) & HISTORY TRANSACTION NAMES
 function renderAdminHub() {
   const container = document.getElementById('admin-pending-orders-list');
   if (!container) return;
@@ -1109,7 +1180,7 @@ function renderAdminHub() {
     <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex justify-between items-center text-xs">
       <div>
         <span class="font-mono text-amber-400 font-bold">${o.orderRef || '#000'}</span>
-        <p class="text-white font-bold">${o.buyerName || o.buyerEmail || 'Buyer'}</p>
+        <p class="text-white font-bold">${o.buyerName || 'Buyer'}</p>
         <p class="text-slate-400">${o.itemNames || 'Items'}</p>
         <p class="text-emerald-400 font-mono">Rp ${(o.totalAmount || 0).toLocaleString('id-ID')}</p>
       </div>
@@ -1136,7 +1207,55 @@ function refreshAdminHub() {
   showToast("Refreshed admin records.");
 }
 
-// 6. FIXED CHAT SEARCH USER
+// 1. TRANSACTION HISTORY WITH CLICKABLE USER CHAT
+function renderHistoryTable() {
+  const tbody = document.getElementById('history-table-body');
+  if (!tbody) return;
+
+  const myEmail = currentUser ? currentUser.email : '';
+  const filtered = orderHistory.filter(o => {
+    if (historyFilter === 'MINE') return o.buyerEmail === myEmail;
+    if (historyFilter === 'APPROVED') return o.status === 'APPROVED';
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No transaction history records found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(o => `
+    <tr class="hover:bg-slate-950 transition-colors">
+      <td class="p-3.5 font-mono text-amber-400 font-bold">${o.orderRef || '#EC-000'}</td>
+      <td class="p-3.5 font-bold text-white">
+        <button onclick="openPopoutChat('${o.buyerEmail || ''}', '${o.buyerName || 'Collector'}')" class="hover:text-indigo-400 flex items-center gap-1.5 underline underline-offset-2">
+          <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${o.buyerName || 'Collector'}" class="w-5 h-5 rounded-full border border-slate-800">
+          ${o.buyerName || 'Collector'}
+        </button>
+      </td>
+      <td class="p-3.5 text-slate-300">${o.itemNames || 'Card Stock'}</td>
+      <td class="p-3.5 font-mono text-emerald-400 font-bold">Rp ${(o.totalAmount || 0).toLocaleString('id-ID')}</td>
+      <td class="p-3.5"><i class="fa-solid fa-qrcode text-indigo-400"></i> QRIS Verified</td>
+      <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${o.status === 'APPROVED' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${o.status || 'PENDING'}</span></td>
+      <td class="p-3.5 text-right font-mono text-slate-400">${new Date(o.createdAt || Date.now()).toLocaleDateString()}</td>
+    </tr>
+  `).join('');
+}
+
+function setHistoryFilter(filter) {
+  historyFilter = filter;
+  ['ALL', 'MINE', 'APPROVED'].forEach(f => {
+    const btn = document.getElementById(`history-filter-${f}`);
+    if (btn) {
+      btn.className = (f === filter)
+        ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all'
+        : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
+    }
+  });
+  renderHistoryTable();
+}
+
+// 2. POP-OUT CHAT UI & SCREENSHOT ATTACHMENTS
 async function searchUsersForChat() {
   const query = (document.getElementById('user-chat-search-input')?.value || '').toLowerCase().trim();
   const resultsContainer = document.getElementById('user-chat-search-results');
@@ -1166,9 +1285,9 @@ async function searchUsersForChat() {
     }
 
     resultsContainer.innerHTML = matches.map(m => `
-      <div onclick="openChatThread('${m.email || m.displayName}')" class="p-2.5 bg-slate-950 hover:bg-slate-900 rounded-xl cursor-pointer flex items-center justify-between text-xs border border-slate-800">
+      <div onclick="openPopoutChat('${m.email}', '${m.displayName || m.email}')" class="p-2.5 bg-slate-950 hover:bg-slate-900 rounded-xl cursor-pointer flex items-center justify-between text-xs border border-slate-800">
         <span class="font-bold text-white">${m.displayName || m.email}</span>
-        <span class="text-indigo-400 font-bold">Chat <i class="fa-solid fa-arrow-right ml-1"></i></span>
+        <span class="text-indigo-400 font-bold">Open Chat <i class="fa-solid fa-arrow-right ml-1"></i></span>
       </div>
     `).join('');
     resultsContainer.classList.remove('hidden');
@@ -1177,11 +1296,101 @@ async function searchUsersForChat() {
   }
 }
 
-function openChatThread(recipientEmail) {
-  switchTab('inbox');
-  showToast(`Opened chat thread with ${recipientEmail}`);
-  document.getElementById('user-chat-search-results').classList.add('hidden');
-  document.getElementById('user-chat-search-input').value = '';
+function openPopoutChat(recipientEmail, recipientName) {
+  activeChatRecipient = recipientEmail;
+  document.getElementById('chat-header-name').textContent = recipientName || recipientEmail;
+  document.getElementById('chat-header-avatar').src = `https://api.dicebear.com/7.x/identicon/svg?seed=${recipientEmail}`;
+  document.getElementById('popout-chat-modal').classList.remove('hidden');
+  
+  loadPopoutChatMessages();
+}
+
+function closePopoutChat() {
+  document.getElementById('popout-chat-modal').classList.add('hidden');
+  activeChatRecipient = null;
+  clearChatScreenshot();
+}
+
+function attachChatScreenshot(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    currentChatScreenshotBase64 = e.target.result;
+    document.getElementById('chat-screenshot-img').src = currentChatScreenshotBase64;
+    document.getElementById('chat-screenshot-preview-container').classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearChatScreenshot() {
+  currentChatScreenshotBase64 = null;
+  document.getElementById('chat-screenshot-preview-container').classList.add('hidden');
+  document.getElementById('chat-screenshot-img').src = '';
+}
+
+async function sendPopoutChatMessage() {
+  const textInput = document.getElementById('popout-chat-input');
+  const text = textInput.value.trim();
+  if ((!text && !currentChatScreenshotBase64) || !activeChatRecipient) return;
+
+  const senderEmail = currentUser ? currentUser.email : 'collector@eugene.com';
+
+  const messagePayload = {
+    sender: senderEmail,
+    recipient: activeChatRecipient,
+    text: text || '',
+    screenshot: currentChatScreenshotBase64 || null,
+    createdAt: new Date().toISOString(),
+    read: false
+  };
+
+  try {
+    await db.collection("messages").add(messagePayload);
+    textInput.value = '';
+    clearChatScreenshot();
+    loadPopoutChatMessages();
+  } catch (err) {
+    console.error("Send message error:", err);
+    showToast("Failed to send message.");
+  }
+}
+
+function loadPopoutChatMessages() {
+  const container = document.getElementById('popout-chat-messages');
+  if (!container || !activeChatRecipient) return;
+
+  db.collection("messages").orderBy("createdAt", "asc").onSnapshot(snapshot => {
+    let messages = [];
+    snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
+
+    const myEmail = currentUser ? currentUser.email : 'collector@eugene.com';
+    const threadMessages = messages.filter(m => 
+      (m.sender === myEmail && m.recipient === activeChatRecipient) ||
+      (m.sender === activeChatRecipient && m.recipient === myEmail)
+    );
+
+    if (threadMessages.length === 0) {
+      container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">No messages in this thread yet. Start the conversation!</div>`;
+      return;
+    }
+
+    container.innerHTML = threadMessages.map(msg => {
+      const isMe = msg.sender === myEmail;
+      return `
+        <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1">
+          <div class="max-w-[80%] p-3 rounded-2xl text-xs ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none'}">
+            ${msg.text ? `<p>${msg.text}</p>` : ''}
+            ${msg.screenshot ? `<img src="${msg.screenshot}" class="mt-2 rounded-xl max-h-48 object-cover border border-slate-700">` : ''}
+          </div>
+          <span class="text-[9px] font-mono text-slate-500">${new Date(msg.createdAt || Date.now()).toLocaleTimeString()}</span>
+        </div>
+      `;
+    }).join('');
+
+    container.scrollTop = container.scrollHeight;
+  }, err => console.error("Chat thread load error:", err));
 }
 
 function loadUserInboxThreads() {
@@ -1196,19 +1405,34 @@ function loadUserInboxThreads() {
     const myMessages = messages.filter(m => m.recipient === userEmail || m.sender === userEmail);
 
     if (myMessages.length === 0) {
-      container.innerHTML = `<div class="text-center py-12 text-slate-500 text-xs bg-slate-900 border border-slate-800 rounded-3xl">No inbox messages yet.</div>`;
+      container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs bg-slate-900 border border-slate-800 rounded-3xl">No inbox messages yet.</div>`;
       return;
     }
 
-    container.innerHTML = myMessages.map(msg => `
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1 text-xs">
-        <div class="flex justify-between text-slate-400 font-mono text-[10px]">
-          <span>From: <strong>${msg.sender}</strong> to <strong>${msg.recipient}</strong></span>
-          <span>${new Date(msg.createdAt || Date.now()).toLocaleTimeString()}</span>
+    const correspondents = {};
+    myMessages.forEach(m => {
+      const otherUser = m.sender === userEmail ? m.recipient : m.sender;
+      if (!correspondents[otherUser]) correspondents[otherUser] = m;
+    });
+
+    container.innerHTML = Object.keys(correspondents).map(email => {
+      const lastMsg = correspondents[email];
+      return `
+        <div onclick="openPopoutChat('${email}', '${email}')" class="bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-2xl p-4 cursor-pointer space-y-2 transition-all shadow">
+          <div class="flex items-center gap-2.5">
+            <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${email}" class="w-9 h-9 rounded-full border border-slate-800">
+            <div>
+              <h4 class="text-xs font-bold text-white">${email}</h4>
+              <p class="text-[10px] text-slate-400 truncate max-w-[200px]">${lastMsg.text || '[Attachment]'}</p>
+            </div>
+          </div>
+          <div class="flex justify-between items-center text-[10px] font-mono text-slate-500 pt-2 border-t border-slate-800/80">
+            <span>${new Date(lastMsg.createdAt || Date.now()).toLocaleDateString()}</span>
+            <span class="text-indigo-400 font-bold">Open Chat <i class="fa-solid fa-arrow-right"></i></span>
+          </div>
         </div>
-        <p class="text-white font-medium">${msg.text}</p>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }, err => console.error("Inbox load error:", err));
 }
 
