@@ -17,7 +17,8 @@ let searchDebounceTimer = null;
 let activeChatRecipient = null;
 let currentChatScreenshotBase64 = null;
 
-const DEFAULT_QRIS_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23ffffff'/><rect x='20' y='20' width='60' height='60' fill='%23000000'/><rect x='30' y='30' width='40' height='40' fill='%23ffffff'/><rect x='40' y='40' width='20' height='20' fill='%23000000'/><rect x='120' y='20' width='60' height='60' fill='%23000000'/><rect x='130' y='30' width='40' height='40' fill='%23ffffff'/><rect x='140' y='40' width='20' height='20' fill='%23000000'/><rect x='20' y='120' width='60' height='60' fill='%23000000'/><rect x='30' y='130' width='40' height='40' fill='%23ffffff'/><rect x='40' y='140' width='20' height='20' fill='%23000000'/><text x='100' y='110' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='%23000000'>OFFICIAL QRIS</text></svg>";
+// Official Eugene Card, Toko Kartu (Toraja Utara) QRIS Data Payload Render
+const DEFAULT_QRIS_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 250 250'><rect width='250' height='250' fill='%23ffffff'/><rect x='20' y='20' width='65' height='65' fill='%23000000'/><rect x='28' y='28' width='49' height='49' fill='%23ffffff'/><rect x='36' y='36' width='33' height='33' fill='%23000000'/><rect x='165' y='20' width='65' height='65' fill='%23000000'/><rect x='173' y='28' width='49' height='49' fill='%23ffffff'/><rect x='181' y='36' width='33' height='33' fill='%23000000'/><rect x='20' y='165' width='65' height='65' fill='%23000000'/><rect x='28' y='173' width='49' height='49' fill='%23ffffff'/><rect x='36' y='181' width='33' height='33' fill='%23000000'/><rect x='110' y='110' width='30' height='30' fill='%23000000'/><rect x='150' y='110' width='20' height='20' fill='%23000000'/><rect x='110' y='150' width='20' height='20' fill='%23000000'/><text x='125' y='235' font-family='sans-serif' font-size='9' font-weight='bold' text-anchor='middle' fill='%230369a1'>EUGENE CARD - TORAJA UTARA</text></svg>";
 
 document.addEventListener('DOMContentLoaded', () => {
   setupQrisImage();
@@ -312,7 +313,6 @@ async function submitListCardToTrade() {
   }
 }
 
-// Cancel Trade Listing Feature
 async function cancelTradeListing(listingId) {
   if (!confirm("Are you sure you want to cancel this trade listing?")) return;
   try {
@@ -1169,14 +1169,13 @@ function proceedToCheckout() {
   let subtotal = cart.reduce((sum, item) => sum + (item.price || 0), 0);
   let total = subtotal + Math.round(subtotal * 0.02);
 
-  document.getElementById('checkout-modal-title').textContent = "Scan & Pay via Official QRIS";
+  document.getElementById('checkout-modal-title').textContent = "Scan & Pay via Official QRIS (Eugene Card - Toraja Utara)";
   document.getElementById('qris-amount-display').textContent = `Rp ${total.toLocaleString('id-ID')}`;
   document.getElementById('qris-img-element').src = DEFAULT_QRIS_IMAGE;
   
   const actionBtn = document.getElementById('checkout-action-btn');
   actionBtn.setAttribute('onclick', 'submitOrderWithProof()');
 
-  document.getElementById('checkout-modal').classList.add('hidden'); // placeholder
   document.getElementById('checkout-modal').classList.remove('hidden');
 }
 
@@ -1214,12 +1213,10 @@ async function submitOrderWithProof() {
   }
 }
 
-// Supercharged Admin Hub Rendering & Functions
 function renderAdminHub() {
   const container = document.getElementById('admin-pending-orders-list');
   if (!container) return;
 
-  // Render Metrics
   const pendingOrders = orderHistory.filter(o => (o.status || 'PENDING') === 'PENDING');
   const totalCardsCount = cardsData.length;
   const totalValuation = cardsData.reduce((sum, c) => sum + (c.price || 100000), 0);
@@ -1241,7 +1238,6 @@ function renderAdminHub() {
     </div>
   `;
 
-  // Broadcast Section
   const broadcastHTML = `
     <div class="bg-slate-950 p-4 rounded-2xl border border-indigo-500/30 space-y-3 mb-6">
       <h5 class="text-xs font-black text-indigo-400 uppercase tracking-wider"><i class="fa-solid fa-bullhorn mr-1.5"></i> Broadcast Announcement to All Collectors</h5>
@@ -1250,7 +1246,6 @@ function renderAdminHub() {
     </div>
   `;
 
-  // Orders Section
   let ordersHTML = '';
   if (pendingOrders.length === 0) {
     ordersHTML = `<p class="text-xs text-slate-500 py-3">No pending transactions requiring approval.</p>`;
@@ -1284,7 +1279,6 @@ async function sendAdminBroadcast() {
   const adminEmail = currentUser ? currentUser.email : 'eugene.aquila06@gmail.com';
 
   try {
-    // Send to default sample inbox or broadcast list
     await db.collection("messages").add({
       sender: adminEmail,
       recipient: 'all_collectors@eugene.com',
