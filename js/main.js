@@ -12,6 +12,7 @@ let tradeRequests = [];
 let orderHistory = [];
 let allUsersList = [];
 let activeAuction = null;
+let auctionTimerInterval = null;
 let userWishlist = JSON.parse(localStorage.getItem('eugene_wishlist') || '[]');
 let userProfile = JSON.parse(localStorage.getItem('eugene_profile') || '{"name":"Collector","username":"collector","bio":"Genesis Card Enthusiast","avatar":"","instagram":"","tiktok":"","website":""}');
 let searchDebounceTimer = null;
@@ -154,10 +155,15 @@ function renderAuctionRoom() {
   const container = document.getElementById('view-auction');
   if (!container) return;
 
+  if (auctionTimerInterval) {
+    clearInterval(auctionTimerInterval);
+    auctionTimerInterval = null;
+  }
+
   if (!activeAuction || activeAuction.status !== 'ACTIVE') {
     container.innerHTML = `
       <div class="max-w-4xl mx-auto py-16 text-center space-y-4">
-        <div class="w-16 h-16 bg-slate-900 border border-slate-800 rounded-3xl mx-flex flex items-center justify-center text-slate-500 text-xl mx-auto">
+        <div class="w-16 h-16 bg-slate-900 border border-slate-800 rounded-3xl flex items-center justify-center text-slate-500 text-xl mx-auto">
           <i class="fa-solid fa-gavel"></i>
         </div>
         <h3 class="text-base font-black text-white">No Active Auctions</h3>
@@ -167,13 +173,12 @@ function renderAuctionRoom() {
     return;
   }
 
-  // If active auction exists, render standard auction view layout
   container.innerHTML = `
     <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
         <div class="flex justify-between items-center">
           <span class="px-3 py-1 rounded-xl bg-amber-500/20 text-amber-400 text-xs font-bold border border-amber-500/30">FEATURED AUCTION</span>
-          <span class="text-xs font-mono text-slate-400"><i class="fa-solid fa-clock text-amber-400 mr-1"></i> Live Session</span>
+          <span id="auction-countdown-badge" class="text-xs font-mono text-slate-300 bg-slate-950 px-3 py-1 rounded-xl border border-slate-800"><i class="fa-solid fa-clock text-amber-400 mr-1"></i> <span id="auction-timer-display">Calculating...</span></span>
         </div>
         <h2 class="text-lg font-black text-white">${activeAuction.cardName || 'Auction Card'}</h2>
         
@@ -206,6 +211,32 @@ function renderAuctionRoom() {
       </div>
     </div>
   `;
+
+  startLiveAuctionCountdown(activeAuction.expiresAt);
+}
+
+function startLiveAuctionCountdown(expiresAtString) {
+  const timerDisplay = document.getElementById('auction-timer-display');
+  if (!timerDisplay) return;
+
+  const targetTime = new Date(expiresAtString || Date.now() + 86400000).getTime();
+
+  auctionTimerInterval = setInterval(() => {
+    const now = Date.now();
+    const distance = targetTime - now;
+
+    if (distance < 0) {
+      clearInterval(auctionTimerInterval);
+      timerDisplay.textContent = "Auction Ended";
+      return;
+    }
+
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    timerDisplay.textContent = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+  }, 1000);
 }
 
 async function placeAuctionBid() {
