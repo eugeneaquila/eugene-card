@@ -1,6 +1,261 @@
 // js/main.js
 
-// HOLDERS DIRECTORY WITH CLICKABLE VAULT BINDER & OFFER ACTIONS
+let currentTab = 'catalog';
+let currentFilter = 'ALL';
+let historyFilter = 'ALL';
+
+// Persisted Cart in LocalStorage
+let cart = JSON.parse(localStorage.getItem('eugene_cart') || '[]');
+
+let cardsData = [];
+let tradeListings = [];
+let tradeRequests = [];
+let orderHistory = [];
+let userWishlist = JSON.parse(localStorage.getItem('eugene_wishlist') || '[]');
+let userProfile = JSON.parse(localStorage.getItem('eugene_profile') || '{"name":"Collector","username":"collector","bio":"Genesis Card Enthusiast","avatar":""}');
+let searchDebounceTimer = null;
+
+const DEFAULT_QRIS_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23ffffff'/><rect x='20' y='20' width='60' height='60' fill='%23000000'/><rect x='30' y='30' width='40' height='40' fill='%23ffffff'/><rect x='40' y='40' width='20' height='20' fill='%23000000'/><rect x='120' y='20' width='60' height='60' fill='%23000000'/><rect x='130' y='30' width='40' height='40' fill='%23ffffff'/><rect x='140' y='40' width='20' height='20' fill='%23000000'/><rect x='20' y='120' width='60' height='60' fill='%23000000'/><rect x='30' y='130' width='40' height='40' fill='%23ffffff'/><rect x='40' y='140' width='20' height='20' fill='%23000000'/><text x='100' y='110' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='%23000000'>OFFICIAL QRIS</text></svg>";
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupQrisImage();
+  updateCartUI();
+  loadProfileBanner();
+  
+  fetchInventoryData();
+  fetchTradeListings();
+  fetchTradeRequests();
+  fetchOrderHistory();
+  switchTab('catalog');
+});
+
+function onAuthResolved(user) {
+  if (['admin', 'inventory'].includes(currentTab) && (!user || !isUserAdmin(user.email))) {
+    switchTab('catalog');
+  }
+  updateAdminAuctionControls();
+}
+
+// 1. TAB SWITCHER
+function switchTab(tabName) {
+  const adminTabs = ['admin', 'inventory'];
+
+  if (adminTabs.includes(tabName)) {
+    const userEmail = currentUser ? currentUser.email : null;
+    if (!userEmail || !isUserAdmin(userEmail)) {
+      showToast("Access Denied: Admin privileges required.");
+      tabName = 'catalog';
+    }
+  }
+
+  currentTab = tabName;
+  
+  const sections = ['catalog', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'admin', 'inventory'];
+  sections.forEach(sec => {
+    const el = document.getElementById(`view-${sec}`);
+    if (el) el.classList.add('hidden');
+  });
+
+  const activeEl = document.getElementById(`view-${tabName}`);
+  if (activeEl) activeEl.classList.remove('hidden');
+
+  document.querySelectorAll('nav button').forEach(btn => {
+    btn.classList.remove('bg-slate-800', 'text-white');
+    btn.classList.add('text-slate-400');
+  });
+
+  const activeBtn = document.getElementById(`nav-${tabName}`);
+  if (activeBtn) {
+    activeBtn.classList.remove('text-slate-400');
+    activeBtn.classList.add('bg-slate-800', 'text-white');
+  }
+
+  switch (tabName) {
+    case 'catalog': renderCardGrid(); break;
+    case 'trade': renderTradeRoom(); break;
+    case 'auction': renderAuctionRoom(); break;
+    case 'trade-req': renderTradeRequests(); break;
+    case 'inbox': loadUserInboxThreads(); break;
+    case 'holders': renderHoldersTable(); break;
+    case 'history': renderHistoryTable(); break;
+    case 'dashboard': renderMyVault(); break;
+    case 'wishlist': renderWishlist(); break;
+    case 'admin': renderAdminHub(); break;
+    case 'inventory': renderInventoryTable(); break;
+  }
+}
+
+// 2. FIRESTORE REALTIME SNAPSHOTS
+function fetchInventoryData() {
+  db.collection("cards").onSnapshot(snapshot => {
+    cardsData = [];
+    snapshot.forEach(doc => cardsData.push({ id: doc.id, ...doc.data() }));
+    updateRemainingCardsCount();
+    if (currentTab === 'catalog') renderCardGrid();
+    if (currentTab === 'inventory') renderInventoryTable();
+    if (currentTab === 'dashboard') renderMyVault();
+    if (currentTab === 'holders') renderHoldersTable();
+  }, err => {
+    console.error("Error fetching cards:", err);
+    if (cardsData.length === 0) renderCardGrid();
+  });
+}
+
+function fetchTradeListings() {
+  db.collection("trade_listings").onSnapshot(snapshot => {
+    tradeListings = [];
+    snapshot.forEach(doc => tradeListings.push({ id: doc.id, ...doc.data() }));
+    if (currentTab === 'trade') renderTradeRoom();
+  }, err => console.error("Error fetching trades:", err));
+}
+
+function fetchTradeRequests() {
+  db.collection("trade_requests").onSnapshot(snapshot => {
+    tradeRequests = [];
+    snapshot.forEach(doc => tradeRequests.push({ id: doc.id, ...doc.data() }));
+    if (currentTab === 'trade-req') renderTradeRequests();
+  }, err => console.error("Error fetching trade requests:", err));
+}
+
+function fetchOrderHistory() {
+  db.collection("orders").onSnapshot(snapshot => {
+    orderHistory = [];
+    snapshot.forEach(doc => orderHistory.push({ id: doc.id, ...doc.data() }));
+    if (currentTab === 'history') renderHistoryTable();
+    if (currentTab === 'admin') renderAdminHub();
+  }, err => console.error("Error fetching order history:", err));
+}
+
+// 3. CATALOG GRID WITH FALLBACK PROTECTION
+function renderCardGrid() {
+  const container = document.getElementById('card-grid');
+  if (!container) return;
+
+  const searchQuery = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+
+  const displayCards = cardsData.length > 0 ? cardsData : Array.from({ length: 50 }, (_, i) => {
+    const num = i + 1;
+    const isPrem = num <= 10;
+    return {
+      id: `beta-card-${num}`,
+      name: `Eugene Beta #${num}`,
+      serial: isPrem ? `*${String(num).padStart(2, '0')}` : `*${String(num).padStart(3, '0')}`,
+      type: isPrem ? 'PREMIUM' : 'STANDARD',
+      price: isPrem ? 250000 : 100000,
+      status: 'AVAILABLE',
+      img: 'https://via.placeholder.com/200x250/0f172a/f59e0b?text=Eugene+Card'
+    };
+  });
+
+  const filteredCards = displayCards.filter(card => {
+    const cardType = card.type || 'STANDARD';
+    const matchesFilter = currentFilter === 'ALL' || cardType === currentFilter;
+    const matchesSearch = !searchQuery || 
+      (card.name && card.name.toLowerCase().includes(searchQuery)) ||
+      (card.serial && card.serial.toLowerCase().includes(searchQuery));
+    return matchesFilter && matchesSearch;
+  });
+
+  if (filteredCards.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No cards found matching your criteria.</div>`;
+    return;
+  }
+
+  container.innerHTML = filteredCards.map(card => {
+    const isPremium = card.type === 'PREMIUM';
+    const holoClass = isPremium ? 'card-holo-premium' : 'card-holo-standard';
+    const isSaved = Array.isArray(userWishlist) && userWishlist.includes(card.id);
+    const cardPrice = card.price || 0;
+    
+    return `
+      <div onclick="openCardDetailModal('${card.id}')" class="${holoClass} rounded-2xl p-3 cursor-pointer flex flex-col justify-between space-y-2 relative group hover:border-amber-500/50 transition-all">
+        <div class="flex justify-between items-center text-[10px] font-extrabold">
+          <span class="px-2 py-0.5 rounded-full ${isPremium ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}">
+            ${card.type || 'STANDARD'}
+          </span>
+          <div class="flex items-center gap-1.5">
+            <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-xs ${isSaved ? 'text-rose-500' : 'text-slate-500 hover:text-rose-400'}">
+              <i class="fa-${isSaved ? 'solid' : 'regular'} fa-heart"></i>
+            </button>
+            <span class="font-mono text-slate-400">${card.serial || '*00'}</span>
+          </div>
+        </div>
+
+        <div class="w-full aspect-[4/5] bg-slate-950/60 rounded-xl overflow-hidden flex items-center justify-center p-1 border border-slate-800">
+          <img src="${card.img || 'https://via.placeholder.com/150'}" alt="${card.name || 'Card'}" loading="lazy" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300">
+        </div>
+
+        <div>
+          <h4 class="text-xs font-black text-white truncate">${card.name || 'Unnamed Card'}</h4>
+          <div class="flex justify-between items-center mt-1">
+            <span class="text-[11px] font-mono text-emerald-400 font-bold">Rp ${cardPrice.toLocaleString('id-ID')}</span>
+            <button onclick="event.stopPropagation(); addToCart('${card.id}')" class="p-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-[10px] font-black shadow" title="Add to Cart">
+              <i class="fa-solid fa-cart-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function debouncedRenderCardGrid() {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => renderCardGrid(), 250);
+}
+
+function setFilter(filter) {
+  currentFilter = filter;
+  ['ALL', 'PREMIUM', 'STANDARD'].forEach(f => {
+    const btn = document.getElementById(`filter-${f}`);
+    if (btn) {
+      btn.className = (f === filter)
+        ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all'
+        : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
+    }
+  });
+  renderCardGrid();
+}
+
+function updateRemainingCardsCount() {
+  const countEl = document.getElementById('remaining-cards-count');
+  if (countEl) {
+    const available = cardsData.filter(c => c.status === 'AVAILABLE' || !c.status).length;
+    countEl.textContent = available > 0 ? available : 50;
+  }
+}
+
+// 4. TRADE ROOM
+function renderTradeRoom() {
+  const container = document.getElementById('p2p-listings-grid');
+  if (!container) return;
+
+  if (tradeListings.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No active trade listings in the market right now.</div>`;
+    return;
+  }
+
+  container.innerHTML = tradeListings.map(trade => `
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg">
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-bold text-slate-300"><i class="fa-solid fa-user text-amber-400 mr-1"></i> ${trade.seller || 'Collector'}</span>
+        <span class="font-mono text-amber-400 font-bold">${trade.serial || '*00'}</span>
+      </div>
+      <div class="w-full aspect-square bg-slate-950 rounded-xl overflow-hidden p-2 border border-slate-800 flex items-center justify-center">
+        <img src="${trade.img || 'https://via.placeholder.com/150'}" class="max-h-full object-contain">
+      </div>
+      <div>
+        <h4 class="text-xs font-black text-white">${trade.cardName || 'Card Title'}</h4>
+        <p class="text-sm font-mono font-bold text-emerald-400 mt-0.5">Rp ${(trade.askingPrice || 0).toLocaleString('id-ID')}</p>
+      </div>
+      <button onclick="addToCart('${trade.cardId}')" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl transition-all">
+        Buy Listing via QRIS
+      </button>
+    </div>
+  `).join('');
+}
+
+// 5. HOLDERS DIRECTORY WITH CLICKABLE VAULT BINDER & OFFER ACTIONS
 function renderHoldersTable() {
   const tbody = document.getElementById('holders-table-body');
   if (!tbody) return;
@@ -35,7 +290,6 @@ function renderHoldersTable() {
   `).join('');
 }
 
-// OPEN COLLECTOR VAULT BINDER MODAL
 function openOwnerVaultModal(ownerName) {
   const cards = cardsData.filter(c => (c.owner || 'Admin House') === ownerName);
 
@@ -64,7 +318,6 @@ function closeOwnerVaultModal() {
   document.getElementById('owner-vault-modal').classList.add('hidden');
 }
 
-// OPEN PROPOSE TRADE MODAL PRE-POPULATED WITH CARD SERIAL
 function openOfferModalForCard(cardId) {
   const card = cardsData.find(c => c.id === cardId);
   if (!card) return;
@@ -74,7 +327,7 @@ function openOfferModalForCard(cardId) {
   openProposeTradeModal();
 }
 
-// RENDER TRADE REQUESTS WITH ACCEPT, DECLINE & COUNTER ACTIONS
+// 6. TRADE REQUESTS WITH INTERACTIVE OFFERS
 function renderTradeRequests() {
   const container = document.getElementById('trade-requests-grid');
   if (!container) return;
@@ -108,7 +361,6 @@ function renderTradeRequests() {
           <p class="text-slate-400 italic">"${req.notes || 'No details'}"</p>
         </div>
 
-        <!-- Dynamic Action Buttons -->
         <div class="flex gap-2 pt-1">
           ${isCountered && isBuyer ? `
             <button onclick="acceptCounterOffer('${req.id}')" class="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl">Accept Counter</button>
@@ -136,7 +388,7 @@ async function acceptTradeOffer(reqId) {
 async function declineTradeOffer(reqId) {
   try {
     await db.collection("trade_requests").doc(reqId).delete();
-    showToast("Offer declined and removed.");
+    showToast("Offer declined.");
   } catch (err) {
     console.error("Decline Error:", err);
   }
@@ -161,7 +413,7 @@ async function submitCounterOffer() {
       status: 'COUNTERED'
     });
     closeCounterOfferModal();
-    showToast("Counter offer submitted to buyer!");
+    showToast("Counter offer submitted!");
   } catch (err) {
     console.error("Counter Error:", err);
   }
@@ -170,8 +422,467 @@ async function submitCounterOffer() {
 async function acceptCounterOffer(reqId) {
   try {
     await db.collection("trade_requests").doc(reqId).update({ status: 'COMPLETED' });
-    showToast("Counter offer accepted! Proceeding to fulfillment.");
+    showToast("Counter offer accepted!");
   } catch (err) {
     console.error("Accept Counter Error:", err);
   }
+}
+
+// 7. INVENTORY MANAGEMENT (ADMIN)
+function renderInventoryTable() {
+  const tbody = document.getElementById('inventory-table-body');
+  if (!tbody) return;
+
+  const search = (document.getElementById('inventory-search')?.value || '').toLowerCase();
+
+  const items = cardsData.filter(c => 
+    !search || 
+    (c.name && c.name.toLowerCase().includes(search)) || 
+    (c.serial && c.serial.toLowerCase().includes(search)) || 
+    (c.owner && c.owner.toLowerCase().includes(search))
+  );
+
+  tbody.innerHTML = items.map(c => `
+    <tr class="hover:bg-slate-950 transition-colors">
+      <td class="p-3 font-mono text-amber-400 font-bold">${c.serial || '*00'}</td>
+      <td class="p-3 font-bold text-white">${c.name || 'Unnamed'}</td>
+      <td class="p-3 text-slate-400">${c.type || 'STANDARD'}</td>
+      <td class="p-3 font-mono">Rp ${(c.price || 0).toLocaleString('id-ID')}</td>
+      <td class="p-3 text-slate-300">${c.owner || 'Admin House'}</td>
+      <td class="p-3"><span class="px-2 py-0.5 text-[10px] font-bold rounded ${c.status === 'SOLD' ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'}">${c.status || 'AVAILABLE'}</span></td>
+      <td class="p-3 text-right">
+        <button onclick="openEditInventoryModal('${c.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg text-[10px] font-bold border border-slate-700">Edit Attributes</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function openEditInventoryModal(cardId) {
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  document.getElementById('edit-card-id').value = card.id;
+  document.getElementById('edit-card-name').value = card.name || '';
+  
+  const typeSelect = document.getElementById('edit-card-type');
+  typeSelect.value = card.type || 'STANDARD';
+
+  document.getElementById('edit-card-serial').value = formatSerialNumber(card.serial || '1', typeSelect.value);
+  document.getElementById('edit-card-edition').value = card.edition || '';
+  document.getElementById('edit-card-sn').value = card.sn || '';
+  document.getElementById('edit-card-tier').value = card.tier || '';
+  document.getElementById('edit-card-printing').value = card.printing || '';
+  document.getElementById('edit-card-price').value = card.price || 0;
+  document.getElementById('edit-card-status').value = card.status || 'AVAILABLE';
+  document.getElementById('edit-card-img').value = card.img || '';
+
+  await populateOwnerDropdown(card.owner || 'Admin House');
+  document.getElementById('inventory-edit-modal').classList.remove('hidden');
+}
+
+function handleInventoryTypeChange() {
+  const currentSerial = document.getElementById('edit-card-serial').value;
+  const newType = document.getElementById('edit-card-type').value;
+  document.getElementById('edit-card-serial').value = formatSerialNumber(currentSerial, newType);
+}
+
+function formatSerialNumber(rawVal, cardType) {
+  if (!rawVal) return cardType === 'STANDARD' ? '*001' : '*01';
+
+  let cleaned = rawVal.replace(/[^\d-]/g, '');
+
+  if (cleaned.includes('-')) {
+    const parts = cleaned.split('-');
+    const paddedParts = parts.map(part => {
+      const num = parseInt(part, 10) || 0;
+      return cardType === 'STANDARD' ? String(num).padStart(3, '0') : String(num).padStart(2, '0');
+    });
+    return paddedParts.join('-');
+  } else {
+    const num = parseInt(cleaned, 10) || 1;
+    const padded = cardType === 'STANDARD' ? String(num).padStart(3, '0') : String(num).padStart(2, '0');
+    return `*${padded}`;
+  }
+}
+
+async function populateOwnerDropdown(currentOwner) {
+  const ownerSelect = document.getElementById('edit-card-owner-select');
+  if (!ownerSelect) return;
+
+  const defaultOptions = [
+    { label: 'Admin House', value: 'Admin House' },
+    { label: 'eugene.aquila06@gmail.com (Admin)', value: 'eugene.aquila06@gmail.com' },
+    { label: 'yujinybwork@gmail.com (Admin)', value: 'yujinybwork@gmail.com' }
+  ];
+
+  let usersList = [];
+  try {
+    const snapshot = await db.collection("users").get();
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.email) {
+        usersList.push({
+          label: `${data.displayName || data.email} (${data.role || 'REGULAR'})`,
+          value: data.displayName || data.email
+        });
+      }
+    });
+  } catch (err) {
+    console.error("Error fetching users:", err);
+  }
+
+  const allOwners = [...defaultOptions];
+  usersList.forEach(u => {
+    if (!allOwners.some(o => o.value.toLowerCase() === u.value.toLowerCase())) {
+      allOwners.push(u);
+    }
+  });
+
+  if (currentOwner && !allOwners.some(o => o.value.toLowerCase() === currentOwner.toLowerCase())) {
+    allOwners.push({ label: `${currentOwner} (Current)`, value: currentOwner });
+  }
+
+  ownerSelect.innerHTML = allOwners.map(opt => `
+    <option value="${opt.value}" ${opt.value.toLowerCase() === (currentOwner || '').toLowerCase() ? 'selected' : ''}>
+      ${opt.label}
+    </option>
+  `).join('');
+}
+
+async function saveInventoryCardChanges() {
+  const id = document.getElementById('edit-card-id').value;
+  if (!id) return;
+
+  const cardType = document.getElementById('edit-card-type').value;
+  const rawSerial = document.getElementById('edit-card-serial').value;
+
+  const updatedData = {
+    name: document.getElementById('edit-card-name').value,
+    serial: formatSerialNumber(rawSerial, cardType),
+    type: cardType,
+    edition: document.getElementById('edit-card-edition').value,
+    sn: document.getElementById('edit-card-sn').value,
+    tier: document.getElementById('edit-card-tier').value,
+    printing: document.getElementById('edit-card-printing').value,
+    price: parseFloat(document.getElementById('edit-card-price').value) || 0,
+    status: document.getElementById('edit-card-status').value,
+    owner: document.getElementById('edit-card-owner-select').value,
+    img: document.getElementById('edit-card-img').value
+  };
+
+  try {
+    await db.collection("cards").doc(id).update(updatedData);
+    closeInventoryModal();
+    showToast("Card attributes updated!");
+  } catch (err) {
+    console.error("Save Error:", err);
+    showToast("Failed to update card.");
+  }
+}
+
+function closeInventoryModal() {
+  document.getElementById('inventory-edit-modal').classList.add('hidden');
+}
+
+// 8. PROFILE & VAULT
+function loadProfileBanner() {
+  document.getElementById('dashboard-banner-name').textContent = userProfile.name || 'Collector';
+  document.getElementById('dashboard-banner-username').textContent = `@${userProfile.username || 'collector'}`;
+  document.getElementById('dashboard-banner-bio').textContent = userProfile.bio || 'Genesis Card Enthusiast';
+  
+  if (userProfile.avatar) {
+    document.getElementById('dashboard-banner-avatar').src = userProfile.avatar;
+  }
+}
+
+function openProfileManagerModal() {
+  document.getElementById('profile-edit-name-input').value = userProfile.name || '';
+  document.getElementById('profile-edit-username-input').value = userProfile.username || '';
+  document.getElementById('profile-edit-bio-input').value = userProfile.bio || '';
+  document.getElementById('profile-edit-avatar-input').value = userProfile.avatar || '';
+  document.getElementById('profile-manager-modal').classList.remove('hidden');
+}
+
+function closeProfileManagerModal() {
+  document.getElementById('profile-manager-modal').classList.add('hidden');
+}
+
+function saveProfileChanges() {
+  userProfile = {
+    name: document.getElementById('profile-edit-name-input').value || 'Collector',
+    username: document.getElementById('profile-edit-username-input').value || 'collector',
+    bio: document.getElementById('profile-edit-bio-input').value || 'Collector Bio',
+    avatar: document.getElementById('profile-edit-avatar-input').value || ''
+  };
+
+  localStorage.setItem('eugene_profile', JSON.stringify(userProfile));
+  loadProfileBanner();
+  closeProfileManagerModal();
+  showToast("Profile settings saved!");
+}
+
+function renderMyVault() {
+  const container = document.getElementById('owned-cards-grid');
+  if (!container) return;
+
+  const myName = userProfile.name || 'Eugene';
+  const myCards = cardsData.filter(c => c.owner === myName || c.owner === 'eugene.aquila06');
+
+  if (myCards.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">Your vault is empty. Buy cards from the collection!</div>`;
+    return;
+  }
+
+  container.innerHTML = myCards.map(card => `
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
+      <div class="flex justify-between items-center text-[10px]">
+        <span class="text-amber-400 font-mono font-bold">${card.serial || '*00'}</span>
+        <span class="text-slate-400">${card.type || 'STANDARD'}</span>
+      </div>
+      <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl overflow-hidden p-1 border border-slate-800 flex items-center justify-center">
+        <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
+      </div>
+      <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
+    </div>
+  `).join('');
+}
+
+// 9. WISHLIST & CART PERSISTENCE
+function toggleWishlist(cardId) {
+  if (userWishlist.includes(cardId)) {
+    userWishlist = userWishlist.filter(id => id !== cardId);
+    showToast("Removed from Wishlist.");
+  } else {
+    userWishlist.push(cardId);
+    showToast("Added to Wishlist!");
+  }
+  localStorage.setItem('eugene_wishlist', JSON.stringify(userWishlist));
+  renderCardGrid();
+}
+
+function clearWishlist() {
+  userWishlist = [];
+  localStorage.setItem('eugene_wishlist', JSON.stringify([]));
+  renderWishlist();
+  showToast("Wishlist cleared.");
+}
+
+function renderWishlist() {
+  const container = document.getElementById('wishlist-page-grid');
+  if (!container) return;
+
+  const savedCards = cardsData.filter(c => userWishlist.includes(c.id));
+
+  if (savedCards.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No saved cards in your wishlist yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = savedCards.map(card => `
+    <div onclick="openCardDetailModal('${card.id}')" class="card-holo-standard rounded-2xl p-3 cursor-pointer space-y-2">
+      <div class="flex justify-between text-[10px] font-mono text-amber-400">
+        <span>${card.serial || '*00'}</span>
+        <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-rose-500"><i class="fa-solid fa-heart"></i></button>
+      </div>
+      <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1 overflow-hidden flex items-center justify-center">
+        <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
+      </div>
+      <h4 class="text-xs font-bold text-white truncate">${card.name}</h4>
+    </div>
+  `).join('');
+}
+
+function addToCart(cardId) {
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  if (cart.some(item => item.id === cardId)) {
+    showToast("Card is already in your cart.");
+    return;
+  }
+
+  cart.push(card);
+  localStorage.setItem('eugene_cart', JSON.stringify(cart));
+  updateCartUI();
+  showToast(`Added "${card.name}" to cart.`);
+}
+
+function removeFromCart(cardId) {
+  cart = cart.filter(item => item.id !== cardId);
+  localStorage.setItem('eugene_cart', JSON.stringify(cart));
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const badge = document.getElementById('cart-badge-count');
+  if (badge) badge.textContent = cart.length;
+
+  const container = document.getElementById('cart-items-container');
+  if (!container) return;
+
+  if (cart.length === 0) {
+    container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">Your cart is currently empty.</div>`;
+    document.getElementById('cart-subtotal').textContent = 'Rp 0';
+    document.getElementById('cart-tax').textContent = 'Rp 0';
+    document.getElementById('cart-grand-total').textContent = 'Rp 0';
+    return;
+  }
+
+  let subtotal = 0;
+  container.innerHTML = cart.map(item => {
+    subtotal += item.price || 0;
+    return `
+      <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+        <div class="flex items-center gap-3">
+          <img src="${item.img || 'https://via.placeholder.com/50'}" class="w-10 h-10 object-contain rounded bg-slate-900 border border-slate-800">
+          <div>
+            <h5 class="text-xs font-bold text-white">${item.name}</h5>
+            <span class="text-[10px] font-mono text-amber-400 font-bold">Rp ${(item.price || 0).toLocaleString('id-ID')}</span>
+          </div>
+        </div>
+        <button onclick="removeFromCart('${item.id}')" class="text-slate-500 hover:text-rose-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    `;
+  }).join('');
+
+  const tax = Math.round(subtotal * 0.02);
+  const grandTotal = subtotal + tax;
+
+  document.getElementById('cart-subtotal').textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
+  document.getElementById('cart-tax').textContent = `Rp ${tax.toLocaleString('id-ID')}`;
+  document.getElementById('cart-grand-total').textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+}
+
+function toggleCartDrawer() {
+  const overlay = document.getElementById('cart-drawer-overlay');
+  const drawer = document.getElementById('cart-drawer');
+  if (!overlay || !drawer) return;
+
+  if (drawer.classList.contains('translate-x-full')) {
+    overlay.classList.remove('hidden');
+    drawer.classList.remove('translate-x-full');
+  } else {
+    overlay.classList.add('hidden');
+    drawer.classList.add('translate-x-full');
+  }
+}
+
+function proceedToCheckout() {
+  if (cart.length === 0) {
+    showToast("Cart is empty.");
+    return;
+  }
+  toggleCartDrawer();
+
+  let subtotal = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+  let total = subtotal + Math.round(subtotal * 0.02);
+
+  document.getElementById('qris-amount-display').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+  document.getElementById('checkout-modal').classList.remove('hidden');
+}
+
+function closeCheckoutModal() {
+  document.getElementById('checkout-modal').classList.add('hidden');
+}
+
+async function submitOrderWithProof() {
+  if (cart.length === 0) return;
+
+  let subtotal = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+  let grandTotal = subtotal + Math.round(subtotal * 0.02);
+
+  const orderData = {
+    orderRef: '#EC-' + Math.floor(100000 + Math.random() * 900000),
+    buyerName: currentUser ? (currentUser.displayName || currentUser.email) : 'Guest Collector',
+    buyerEmail: currentUser ? currentUser.email : 'guest@eugenecard.com',
+    itemNames: cart.map(i => i.name).join(', '),
+    totalAmount: grandTotal,
+    status: 'PENDING',
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await db.collection("orders").add(orderData);
+    cart = [];
+    localStorage.setItem('eugene_cart', JSON.stringify([]));
+    updateCartUI();
+    closeCheckoutModal();
+    showToast("QRIS Order submitted for approval!");
+    switchTab('history');
+  } catch (err) {
+    console.error("Order Submit Error:", err);
+    showToast("Failed to submit order.");
+  }
+}
+
+// 10. ADMIN & UTILITIES
+function renderAdminHub() {
+  const container = document.getElementById('admin-pending-orders-list');
+  if (!container) return;
+
+  const pendingOrders = orderHistory.filter(o => o.status === 'PENDING');
+
+  if (pendingOrders.length === 0) {
+    container.innerHTML = `<p class="text-xs text-slate-500 py-4">No pending transactions requiring approval.</p>`;
+    return;
+  }
+
+  container.innerHTML = pendingOrders.map(o => `
+    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex justify-between items-center text-xs">
+      <div>
+        <span class="font-mono text-amber-400 font-bold">${o.orderRef || '#000'}</span>
+        <p class="text-white font-bold">${o.buyerName || 'Buyer'}</p>
+        <p class="text-emerald-400 font-mono">Rp ${(o.totalAmount || 0).toLocaleString('id-ID')}</p>
+      </div>
+      <button onclick="approveOrder('${o.id}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl">
+        Approve Payment
+      </button>
+    </div>
+  `).join('');
+}
+
+async function approveOrder(orderId) {
+  try {
+    await db.collection("orders").doc(orderId).update({ status: 'APPROVED' });
+    showToast("Order approved successfully!");
+  } catch (err) {
+    console.error("Approve Error:", err);
+  }
+}
+
+function refreshAdminHub() {
+  fetchOrderHistory();
+  showToast("Refreshed admin records.");
+}
+
+function switchAccountPersona(emailPersona) {
+  if (currentUser) {
+    currentUser = { ...currentUser, email: emailPersona };
+  } else {
+    currentUser = { email: emailPersona, displayName: 'Test Persona' };
+  }
+  
+  if (typeof updateAuthUI === 'function') updateAuthUI(currentUser);
+  showToast(`Switched active persona to: ${emailPersona}`);
+  if (currentTab === 'admin' || currentTab === 'inventory') switchTab('catalog');
+}
+
+function setupQrisImage() {
+  const qrisImg = document.getElementById('qris-img-element');
+  if (qrisImg) qrisImg.src = DEFAULT_QRIS_IMAGE;
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toast-msg');
+  if (!toast || !toastMsg) return;
+
+  toastMsg.textContent = message;
+  toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-20');
+  toast.classList.add('opacity-100', 'translate-y-0');
+
+  setTimeout(() => {
+    toast.classList.remove('opacity-100', 'translate-y-0');
+    toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-20');
+  }, 3000);
 }
