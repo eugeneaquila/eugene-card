@@ -101,9 +101,9 @@
           <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navRequests">Trade Requests</span>
         </button>
         
-        <!-- Restored Analytics Navigation Button (Admin Only) -->
-        <button id="nav-analytics" onclick="switchTab('analytics')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
-          <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span>
+        <!-- Analytics Navigation Button (Opens analytics.html in a new tab for Admin) -->
+        <button onclick="openAnalyticsPage()" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30 transition-all">
+          <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-0.5 opacity-70"></i>
         </button>
 
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
@@ -343,50 +343,6 @@
       </div>
 
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </section>
-
-    <!-- MARKET ANALYTICS VIEW (ADMIN ONLY) -->
-    <section id="view-analytics" class="hidden space-y-6">
-      <div class="bg-gradient-to-r from-amber-950/60 via-slate-900 to-indigo-950/60 border border-amber-500/40 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider" data-i18n="exclusiveAccess">EXCLUSIVE ACCESS</span>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide mt-1"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> <span data-i18n="analyticsTitle">Market Analytics & Valuation</span></h2>
-          <p class="text-xs text-slate-400 mt-1" data-i18n="analyticsSubtitle">Real-time marketplace metrics, floor price trends, and volume statistics.</p>
-        </div>
-        <button onclick="renderMarketAnalytics()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-rotate"></i> <span data-i18n="refreshAnalytics">Refresh Analytics</span>
-        </button>
-      </div>
-
-      <!-- ANALYTICS METRIC CARDS -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
-          <p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="totalVolume">Total Marketplace Volume</p>
-          <p id="analytics-total-volume" class="text-2xl font-black text-emerald-400 font-mono">Rp 0</p>
-          <p class="text-[10px] text-emerald-500"><i class="fa-solid fa-arrow-trend-up"></i> <span data-i18n="volumeTrend">+14.2% this week</span></p>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
-          <p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="avgFloorPrice">Average Floor Price</p>
-          <p id="analytics-avg-floor" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
-          <p class="text-[10px] text-slate-400" data-i18n="acrossCards">Across 50 edition cards</p>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
-          <p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="collectedOwned">Collected / Owned</p>
-          <p id="analytics-collected-count" class="text-2xl font-black text-indigo-400 font-mono">0 / 50</p>
-          <p class="text-[10px] text-slate-400" data-i18n="holdersSub">Primary & Secondary holders</p>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
-          <p class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="activeTradeReqs">Active Trade Requests</p>
-          <p id="analytics-trade-reqs" class="text-2xl font-black text-purple-400 font-mono">0</p>
-          <p class="text-[10px] text-slate-400" data-i18n="pendingCountered">Pending & countered</p>
-        </div>
-      </div>
-
-      <!-- RECENT PRICE TRENDS TABLE -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-        <h3 class="text-xs font-extrabold text-white uppercase tracking-wider" data-i18n="topValuationIndex">Top Card Valuation Index</h3>
-        <div id="analytics-valuation-list" class="space-y-2"></div>
-      </div>
     </section>
 
     <!-- INBOX / CHAT VIEW -->
@@ -1342,7 +1298,7 @@
         vaultSubtitle: "Kelola kartu yang dimiliki, jual kembali secara instan ke Admin via QRIS, atau masukkan ke Lelang/Tukar.",
         profileSettingsBtn: "Pengaturan Profil",
         wishlistTitle: "Daftar Keinginan",
-        wishlistSubtitle: "Klik kartu apa saja untuk langsung mengajukan penawaran tukar kepada pemiliknya!",
+        wishlistSubtitle: "Klik kartu apa saja untuk langsung mengajukan penawaran tukار kepada pemiliknya!",
         holdersTitle: "Direktori Kolektor",
         holdersSubtitle: "Klik baris kolektor atau serial kartu untuk melihat koleksi dan mengirim tawaran.",
         thOwnerName: "Nama Kolektor",
@@ -2335,45 +2291,13 @@
       updateCartTotals();
       renderAuctionView();
       renderTradeRequests();
-      if (!document.getElementById('view-analytics').classList.contains('hidden')) {
-        renderMarketAnalytics();
-      }
     }
 
-    function renderMarketAnalytics() {
+    function openAnalyticsPage() {
       if (!currentUser || !currentUser.isAdmin) {
-        switchTab('catalog');
         return showToast('Market Analytics is restricted exclusively to Admins.');
       }
-
-      const totalVol = transactionsList.filter(t => t.status === 'APPROVED').reduce((sum, t) => sum + (t.total_amount || 0), 0);
-      const avgFloor = inventory.length > 0 ? inventory.reduce((s, c) => s + c.price, 0) / inventory.length : 0;
-      const collectedCount = inventory.filter(c => c.owner !== null).length;
-
-      document.getElementById('analytics-total-volume').innerText = formatIDR(totalVol);
-      document.getElementById('analytics-avg-floor').innerText = formatIDR(avgFloor);
-      document.getElementById('analytics-collected-count').innerText = `${collectedCount} / ${inventory.length}`;
-      document.getElementById('analytics-trade-reqs').innerText = tradeRequestsList.length;
-
-      const valuationList = document.getElementById('analytics-valuation-list');
-      if (valuationList) {
-        const sorted = [...inventory].sort((a,b) => b.price - a.price).slice(0, 8);
-        valuationList.innerHTML = sorted.map(c => `
-          <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex justify-between items-center text-xs">
-            <div class="flex items-center gap-3">
-              <img src="${c.imgUrl}" class="w-10 h-10 object-contain rounded bg-slate-900 border border-slate-800">
-              <div>
-                <p class="font-bold text-white">${c.name} (${c.serial})</p>
-                <p class="text-[10px] text-slate-400">Owner: ${c.owner || 'Unowned (House)'}</p>
-              </div>
-            </div>
-            <div class="text-right font-mono">
-              <p class="font-extrabold text-emerald-400">${formatIDR(c.price)}</p>
-              <p class="text-[9px] text-amber-400">${c.type} Tier</p>
-            </div>
-          </div>
-        `).join('');
-      }
+      window.open('analytics.html', '_blank');
     }
 
     function renderAuctionView() {
@@ -3749,21 +3673,16 @@
 
     function switchTab(tabName) {
       const adminTabs = ['admin', 'inventory'];
-      const analyticsTabs = ['analytics'];
 
       if (adminTabs.includes(tabName) && !currentUser?.isAdmin) {
         return showToast('Admin access required.');
       }
 
-      if (analyticsTabs.includes(tabName) && (!currentUser || !currentUser.isAdmin)) {
-        return showToast('Market Analytics is restricted exclusively to Admins.');
-      }
-
-      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'analytics', 'inbox', 'holders', 'history'].forEach(t => {
+      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const nav = document.getElementById(`nav-${t}`);
         if (view) view.classList.add('hidden');
-        if (nav && !adminTabs.includes(t) && !analyticsTabs.includes(t)) {
+        if (nav && !adminTabs.includes(t)) {
           nav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all';
         }
       });
@@ -3772,7 +3691,7 @@
       const activeNav = document.getElementById(`nav-${tabName}`);
 
       if (activeView) activeView.classList.remove('hidden');
-      if (activeNav && !adminTabs.includes(tabName) && !analyticsTabs.includes(tabName)) {
+      if (activeNav && !adminTabs.includes(tabName)) {
         activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap transition-all';
       }
 
@@ -3784,7 +3703,6 @@
       if (tabName === 'wishlist') renderWishlistPage();
       if (tabName === 'inventory') renderInventoryTable();
       if (tabName === 'admin') loadPendingTransactions();
-      if (tabName === 'analytics') renderMarketAnalytics();
       if (tabName === 'inbox') loadUserInboxThreads();
       if (tabName === 'holders') renderHoldersTable();
       if (tabName === 'history') fetchTransactionHistory();
