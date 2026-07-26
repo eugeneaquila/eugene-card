@@ -18,9 +18,29 @@ let userProfile = JSON.parse(localStorage.getItem('eugene_profile') || '{"name":
 let searchDebounceTimer = null;
 let activeChatRecipient = null;
 let currentChatScreenshotBase64 = null;
+let currentUser = null;
 
 // Official Hosted Eugene Card QRIS Image URL
 const DEFAULT_QRIS_IMAGE = "https://iili.io/CekvjN2.png";
+
+// Admin Emails List
+const ADMIN_EMAILS = [
+  "eugene.aquila06@gmail.com",
+  "yujinybwork@gmail.com"
+];
+
+function isUserAdmin(email) {
+  if (!email) return false;
+  const normalized = email.toLowerCase().trim();
+  if (ADMIN_EMAILS.includes(normalized)) return true;
+  
+  // Also check if user exists in allUsersList with ADMIN role
+  const foundUser = allUsersList.find(u => (u.email || '').toLowerCase().trim() === normalized);
+  if (foundUser && (foundUser.role === 'ADMIN' || foundUser.isAdmin)) {
+    return true;
+  }
+  return false;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   setupQrisImage();
@@ -38,12 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function onAuthResolved(user) {
+  currentUser = user;
   if (['admin', 'inventory'].includes(currentTab) && (!user || !isUserAdmin(user.email))) {
+    showToast("Access Denied: Admin privileges required.");
     switchTab('catalog');
   }
   updateAdminAuctionControls();
   fetchUnreadInboxCount();
   fetchAllUsers();
+}
+
+function updateAdminAuctionControls() {
+  // Hook for auction admin controls if needed
 }
 
 function switchTab(tabName) {
@@ -1487,6 +1513,7 @@ async function approveOrder(orderId) {
 function refreshAdminHub() {
   fetchOrderHistory();
   fetchInventoryData();
+  fetchAllUsers();
   showToast("Refreshed admin records.");
 }
 
