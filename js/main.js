@@ -3,18 +3,25 @@
 let currentTab = 'catalog';
 let currentFilter = 'ALL';
 let historyFilter = 'ALL';
-let cart = [];
+
+// Cart Persisted in LocalStorage
+let cart = JSON.parse(localStorage.getItem('eugene_cart') || '[]');
+
 let cardsData = [];
 let tradeListings = [];
 let tradeRequests = [];
 let orderHistory = [];
 let userWishlist = JSON.parse(localStorage.getItem('eugene_wishlist') || '[]');
+let userProfile = JSON.parse(localStorage.getItem('eugene_profile') || '{"name":"Collector","username":"collector","bio":"Genesis Card Enthusiast","avatar":""}');
 let searchDebounceTimer = null;
 
 const DEFAULT_QRIS_IMAGE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23ffffff'/><rect x='20' y='20' width='60' height='60' fill='%23000000'/><rect x='30' y='30' width='40' height='40' fill='%23ffffff'/><rect x='40' y='40' width='20' height='20' fill='%23000000'/><rect x='120' y='20' width='60' height='60' fill='%23000000'/><rect x='130' y='30' width='40' height='40' fill='%23ffffff'/><rect x='140' y='40' width='20' height='20' fill='%23000000'/><rect x='20' y='120' width='60' height='60' fill='%23000000'/><rect x='30' y='130' width='40' height='40' fill='%23ffffff'/><rect x='40' y='140' width='20' height='20' fill='%23000000'/><text x='100' y='110' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='%23000000'>OFFICIAL QRIS</text></svg>";
 
 document.addEventListener('DOMContentLoaded', () => {
   setupQrisImage();
+  updateCartUI(); // Restore persisted cart
+  loadProfileBanner();
+  
   fetchInventoryData();
   fetchTradeListings();
   fetchTradeRequests();
@@ -26,9 +33,10 @@ function onAuthResolved(user) {
   if (['admin', 'inventory'].includes(currentTab) && (!user || !isUserAdmin(user.email))) {
     switchTab('catalog');
   }
+  updateAdminAuctionControls();
 }
 
-// 1. SECURE TAB SWITCHER WITH GUARD
+// 1. NAVIGATION TAB SWITCHER
 function switchTab(tabName) {
   const adminTabs = ['admin', 'inventory'];
 
@@ -77,7 +85,7 @@ function switchTab(tabName) {
   }
 }
 
-// 2. FIRESTORE REALTIME SYNC
+// 2. FIRESTORE SYNC
 function fetchInventoryData() {
   db.collection("cards").onSnapshot(snapshot => {
     cardsData = [];
@@ -115,7 +123,7 @@ function fetchOrderHistory() {
   }, err => console.error("Error fetching order history:", err));
 }
 
-// 3. CATALOG GRID & FILTERS
+// 3. CATALOG GRID & SEARCH
 function renderCardGrid() {
   const container = document.getElementById('card-grid');
   if (!container) return;
@@ -226,7 +234,7 @@ function renderTradeRoom() {
   `).join('');
 }
 
-// 5. AUCTION ROOM
+// 5. AUCTION ROOM & ADMIN CANCEL AUCTION
 function renderAuctionRoom() {
   const featuredCard = cardsData.find(c => c.serial === '*01') || cardsData[0];
   if (!featuredCard) return;
@@ -235,6 +243,8 @@ function renderAuctionRoom() {
   document.getElementById('auction-card-serial').textContent = featuredCard.serial || '*01';
   document.getElementById('auction-card-img').src = featuredCard.img || 'https://via.placeholder.com/150';
   document.getElementById('auction-card-owner-info').innerHTML = `Owner: <strong class="text-white">${featuredCard.owner || 'Admin House'}</strong>`;
+
+  updateAdminAuctionControls();
 
   db.collection("auctions").doc("current_auction").get().then(doc => {
     if (doc.exists) {
@@ -253,6 +263,36 @@ function renderAuctionRoom() {
       }
     }
   });
+}
+
+function updateAdminAuctionControls() {
+  const container = document.getElementById('admin-auction-controls');
+  if (!container) return;
+  if (currentUser && isUserAdmin(currentUser.email)) {
+    container.classList.remove('hidden');
+  } else {
+    container.classList.add('hidden');
+  }
+}
+
+async function adminCancelAuction() {
+  if (!currentUser || !isUserAdmin(currentUser.email)) {
+    showToast("Unauthorized: Only admins can cancel auctions.");
+    return;
+  }
+
+  try {
+    await db.collection("auctions").doc("current_auction").set({
+      currentBid: 0,
+      highBidder: 'Auction Cancelled',
+      history: []
+    });
+    showToast("Auction successfully cancelled by Admin.");
+    renderAuctionRoom();
+  } catch (err) {
+    console.error("Cancel auction error:", err);
+    showToast("Failed to cancel auction.");
+  }
 }
 
 async function placeAuctionBid() {
@@ -310,16 +350,27 @@ function renderTradeRequests() {
       </div>
       <div class="flex gap-2">
         <button onclick="acceptTradeRequest('${req.id}')" class="flex-1 py-1.5 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl">Accept</button>
-        <button onclick="openCounterModal('${req.id}')" class="flex-1 py-1.5 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl">Counter</button>
+        <button onclick="showToast('Counter sent!')" class="flex-1 py-1.5 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl">Counter</button>
       </div>
     </div>
   `).join('');
+}
+
+async function acceptTradeRequest(reqId) {
+  try {
+    await db.collection("trade_requests").doc(reqId).delete();
+    showToast("Trade request accepted!");
+  } catch (err) {
+    console.error("Accept error:", err);
+  }
 }
 
 // 7. INBOX & DIRECT CHAT
 function loadUserInboxThreads() {
   const container = document.getElementById('inbox-threads-list');
   if (!container) return;
+
+  const collectors = [...new Set(cardsData.map(c => c.owner).filter(o => o && o !== 'Admin House'))];
 
   container.innerHTML = `
     <div onclick="openChatDrawer('Admin House')" class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between cursor-pointer hover:border-indigo-500 transition-all">
@@ -334,6 +385,19 @@ function loadUserInboxThreads() {
       </div>
       <span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/30">Active</span>
     </div>
+
+    ${collectors.map(name => `
+      <div onclick="openChatDrawer('${name}')" class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between cursor-pointer hover:border-amber-500 transition-all">
+        <div class="flex items-center gap-3">
+          <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${name}" class="w-10 h-10 rounded-full border border-slate-800 bg-slate-950">
+          <div>
+            <h4 class="text-xs font-bold text-white">${name}</h4>
+            <p class="text-[10px] text-slate-400">Click to discuss card trades or offers...</p>
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-slate-600 text-xs"></i>
+      </div>
+    `).join('')}
   `;
 }
 
@@ -370,7 +434,23 @@ function closeChatDrawer() {
   document.getElementById('chat-drawer').classList.add('translate-x-full');
 }
 
-// 8. HOLDERS DIRECTORY
+function sendChatMessage() {
+  const input = document.getElementById('chat-text-input');
+  if (!input || !input.value.trim()) return;
+
+  const container = document.getElementById('chat-messages-container');
+  const msgText = input.value.trim();
+
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'p-2.5 bg-amber-500/20 border border-amber-500/30 rounded-xl text-xs text-amber-200 ml-auto max-w-[80%] text-right';
+  msgDiv.textContent = msgText;
+
+  if (container) container.appendChild(msgDiv);
+  input.value = '';
+  showToast("Message sent!");
+}
+
+// 8. CLICKABLE HOLDERS DIRECTORY
 function renderHoldersTable() {
   const tbody = document.getElementById('holders-table-body');
   if (!tbody) return;
@@ -379,17 +459,26 @@ function renderHoldersTable() {
   cardsData.forEach(c => {
     const owner = c.owner || 'Admin House';
     if (!holderMap[owner]) holderMap[owner] = [];
-    holderMap[owner].push(c.serial || '*00');
+    holderMap[owner].push({ serial: c.serial || '*00', cardId: c.id });
   });
 
   tbody.innerHTML = Object.keys(holderMap).map(owner => `
-    <tr class="hover:bg-slate-950 transition-colors">
-      <td class="p-3 font-bold text-white">${owner}</td>
-      <td class="p-3 font-mono text-amber-400">${holderMap[owner].length} cards</td>
-      <td class="p-3 font-mono text-slate-400">${holderMap[owner].join(', ')}</td>
+    <tr onclick="openChatDrawer('${owner}')" class="hover:bg-slate-950 transition-colors cursor-pointer group">
+      <td class="p-3 font-bold text-white flex items-center gap-2">
+        <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${owner}" class="w-6 h-6 rounded-full border border-slate-800">
+        <span class="group-hover:text-amber-400 transition-colors">${owner}</span>
+      </td>
+      <td class="p-3 font-mono text-amber-400 font-bold">${holderMap[owner].length} cards</td>
+      <td class="p-3 font-mono text-slate-400">
+        ${holderMap[owner].map(item => `
+          <span onclick="event.stopPropagation(); openCardDetailModal('${item.cardId}')" class="inline-block px-1.5 py-0.5 mr-1 mb-1 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-[10px] font-bold text-slate-300 transition-all">
+            ${item.serial}
+          </span>
+        `).join('')}
+      </td>
       <td class="p-3 text-right">
-        <button onclick="openChatDrawer('${owner}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 text-[10px] font-bold rounded-lg">
-          <i class="fa-solid fa-comments mr-1"></i> Chat
+        <button onclick="event.stopPropagation(); openChatDrawer('${owner}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 text-[10px] font-bold rounded-lg border border-slate-700">
+          <i class="fa-solid fa-comments mr-1"></i> Trade Chat
         </button>
       </td>
     </tr>
@@ -439,12 +528,48 @@ function setHistoryFilter(filter) {
   renderHistoryTable();
 }
 
-// 10. MY VAULT / BINDER
+// 10. MY VAULT & PROFILE MANAGEMENT
+function loadProfileBanner() {
+  document.getElementById('dashboard-banner-name').textContent = userProfile.name || 'Collector';
+  document.getElementById('dashboard-banner-username').textContent = `@${userProfile.username || 'collector'}`;
+  document.getElementById('dashboard-banner-bio').textContent = userProfile.bio || 'Genesis Card Enthusiast';
+  
+  if (userProfile.avatar) {
+    document.getElementById('dashboard-banner-avatar').src = userProfile.avatar;
+  }
+}
+
+function openProfileManagerModal() {
+  document.getElementById('profile-edit-name-input').value = userProfile.name || '';
+  document.getElementById('profile-edit-username-input').value = userProfile.username || '';
+  document.getElementById('profile-edit-bio-input').value = userProfile.bio || '';
+  document.getElementById('profile-edit-avatar-input').value = userProfile.avatar || '';
+  document.getElementById('profile-manager-modal').classList.remove('hidden');
+}
+
+function closeProfileManagerModal() {
+  document.getElementById('profile-manager-modal').classList.add('hidden');
+}
+
+function saveProfileChanges() {
+  userProfile = {
+    name: document.getElementById('profile-edit-name-input').value || 'Collector',
+    username: document.getElementById('profile-edit-username-input').value || 'collector',
+    bio: document.getElementById('profile-edit-bio-input').value || 'Collector Bio',
+    avatar: document.getElementById('profile-edit-avatar-input').value || ''
+  };
+
+  localStorage.setItem('eugene_profile', JSON.stringify(userProfile));
+  loadProfileBanner();
+  closeProfileManagerModal();
+  showToast("Profile settings saved successfully!");
+}
+
 function renderMyVault() {
   const container = document.getElementById('owned-cards-grid');
   if (!container) return;
 
-  const myName = currentUser ? (currentUser.displayName || currentUser.email) : 'Eugene';
+  const myName = userProfile.name || 'Eugene';
   const myCards = cardsData.filter(c => c.owner === myName || c.owner === 'eugene.aquila06');
 
   if (myCards.length === 0) {
@@ -515,7 +640,7 @@ function renderWishlist() {
   `).join('');
 }
 
-// 12. ADMIN HUB VIEW
+// 12. ADMIN HUB & PERSONA SWITCHER
 function renderAdminHub() {
   const container = document.getElementById('admin-pending-orders-list');
   if (!container) return;
@@ -556,7 +681,19 @@ function refreshAdminHub() {
   showToast("Refreshed admin records.");
 }
 
-// 13. INVENTORY TABLE
+function switchAccountPersona(emailPersona) {
+  if (currentUser) {
+    currentUser = { ...currentUser, email: emailPersona };
+  } else {
+    currentUser = { email: emailPersona, displayName: 'Test Persona' };
+  }
+  
+  if (typeof updateAuthUI === 'function') updateAuthUI(currentUser);
+  showToast(`Switched active persona to: ${emailPersona}`);
+  if (currentTab === 'admin' || currentTab === 'inventory') switchTab('catalog');
+}
+
+// 13. FULL INVENTORY MANAGEMENT (ADMIN)
 function renderInventoryTable() {
   const tbody = document.getElementById('inventory-table-body');
   if (!tbody) return;
@@ -574,18 +711,70 @@ function renderInventoryTable() {
     <tr class="hover:bg-slate-950 transition-colors">
       <td class="p-3 font-mono text-amber-400 font-bold">${c.serial || '*00'}</td>
       <td class="p-3 font-bold text-white">${c.name || 'Unnamed'}</td>
-      <td class="p-3 text-slate-400">${c.edition || 'Beta'}</td>
+      <td class="p-3 text-slate-400">${c.type || 'STANDARD'}</td>
       <td class="p-3 font-mono">Rp ${(c.price || 0).toLocaleString('id-ID')}</td>
-      <td class="p-3 text-slate-300">${c.owner || 'House'}</td>
+      <td class="p-3 text-slate-300">${c.owner || 'Admin House'}</td>
       <td class="p-3"><span class="px-2 py-0.5 text-[10px] font-bold rounded ${c.status === 'SOLD' ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'}">${c.status || 'AVAILABLE'}</span></td>
       <td class="p-3 text-right">
-        <button onclick="openEditInventoryModal('${c.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg text-[10px] font-bold">Edit</button>
+        <button onclick="openEditInventoryModal('${c.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg text-[10px] font-bold border border-slate-700">Edit Full Attributes</button>
       </td>
     </tr>
   `).join('');
 }
 
-// 14. SHOPPING CART & QRIS CHECKOUT
+function openEditInventoryModal(cardId) {
+  const card = cardsData.find(c => c.id === cardId);
+  if (!card) return;
+
+  document.getElementById('edit-card-id').value = card.id;
+  document.getElementById('edit-card-name').value = card.name || '';
+  document.getElementById('edit-card-serial').value = card.serial || '';
+  document.getElementById('edit-card-type').value = card.type || 'STANDARD';
+  document.getElementById('edit-card-edition').value = card.edition || '';
+  document.getElementById('edit-card-sn').value = card.sn || '';
+  document.getElementById('edit-card-tier').value = card.tier || '';
+  document.getElementById('edit-card-printing').value = card.printing || '';
+  document.getElementById('edit-card-price').value = card.price || 0;
+  document.getElementById('edit-card-status').value = card.status || 'AVAILABLE';
+  document.getElementById('edit-card-owner').value = card.owner || '';
+  document.getElementById('edit-card-img').value = card.img || '';
+
+  document.getElementById('inventory-edit-modal').classList.remove('hidden');
+}
+
+function closeInventoryModal() {
+  document.getElementById('inventory-edit-modal').classList.add('hidden');
+}
+
+async function saveInventoryCardChanges() {
+  const id = document.getElementById('edit-card-id').value;
+  if (!id) return;
+
+  const updatedData = {
+    name: document.getElementById('edit-card-name').value,
+    serial: document.getElementById('edit-card-serial').value,
+    type: document.getElementById('edit-card-type').value,
+    edition: document.getElementById('edit-card-edition').value,
+    sn: document.getElementById('edit-card-sn').value,
+    tier: document.getElementById('edit-card-tier').value,
+    printing: document.getElementById('edit-card-printing').value,
+    price: parseFloat(document.getElementById('edit-card-price').value) || 0,
+    status: document.getElementById('edit-card-status').value,
+    owner: document.getElementById('edit-card-owner').value,
+    img: document.getElementById('edit-card-img').value
+  };
+
+  try {
+    await db.collection("cards").doc(id).update(updatedData);
+    closeInventoryModal();
+    showToast("Full card attributes updated successfully!");
+  } catch (err) {
+    console.error("Save Error:", err);
+    showToast("Failed to update card attributes.");
+  }
+}
+
+// 14. PERSISTED SHOPPING CART & QRIS
 function addToCart(cardId) {
   const card = cardsData.find(c => c.id === cardId);
   if (!card) return;
@@ -596,13 +785,19 @@ function addToCart(cardId) {
   }
 
   cart.push(card);
+  saveCartState();
   updateCartUI();
   showToast(`Added "${card.name}" to cart.`);
 }
 
 function removeFromCart(cardId) {
   cart = cart.filter(item => item.id !== cardId);
+  saveCartState();
   updateCartUI();
+}
+
+function saveCartState() {
+  localStorage.setItem('eugene_cart', JSON.stringify(cart));
 }
 
 function updateCartUI() {
@@ -697,6 +892,7 @@ async function submitOrderWithProof() {
   try {
     await db.collection("orders").add(orderData);
     cart = [];
+    saveCartState();
     updateCartUI();
     closeCheckoutModal();
     showToast("QRIS Order submitted for approval!");
@@ -707,7 +903,7 @@ async function submitOrderWithProof() {
   }
 }
 
-// 15. MODALS & UTILITIES
+// 15. MODAL HELPERS & UTILITIES
 function openCardDetailModal(cardId) {
   const card = cardsData.find(c => c.id === cardId);
   if (!card) return;
@@ -749,6 +945,34 @@ function closeListCardModal() {
   document.getElementById('list-card-modal').classList.add('hidden');
 }
 
+async function submitCardListing() {
+  const cardId = document.getElementById('list-card-id-target').value;
+  const price = parseFloat(document.getElementById('list-card-price-input').value) || 0;
+  
+  if (!cardId) {
+    showToast("Please select a valid card.");
+    return;
+  }
+
+  const card = cardsData.find(c => c.id === cardId);
+  try {
+    await db.collection("trade_listings").add({
+      cardId: cardId,
+      cardName: card ? card.name : 'Card',
+      serial: card ? card.serial : '*00',
+      img: card ? card.img : '',
+      askingPrice: price,
+      seller: currentUser ? (currentUser.displayName || currentUser.email) : 'Collector',
+      createdAt: new Date().toISOString()
+    });
+
+    closeListCardModal();
+    showToast("Listing published to Trading Room!");
+  } catch (err) {
+    console.error("Listing error:", err);
+  }
+}
+
 function openProposeTradeModal() {
   document.getElementById('propose-trade-modal').classList.remove('hidden');
 }
@@ -757,53 +981,23 @@ function closeProposeTradeModal() {
   document.getElementById('propose-trade-modal').classList.add('hidden');
 }
 
-function openProfileManagerModal() {
-  document.getElementById('profile-manager-modal').classList.remove('hidden');
-}
-
-function closeProfileManagerModal() {
-  document.getElementById('profile-manager-modal').classList.add('hidden');
-}
-
-function openEditInventoryModal(cardId) {
-  const card = cardsData.find(c => c.id === cardId);
-  if (!card) return;
-
-  document.getElementById('edit-card-id').value = card.id;
-  document.getElementById('edit-card-name').value = card.name || '';
-  document.getElementById('edit-card-serial').value = card.serial || '';
-  document.getElementById('edit-card-type').value = card.type || 'STANDARD';
-  document.getElementById('edit-card-price').value = card.price || 0;
-  document.getElementById('edit-card-status').value = card.status || 'AVAILABLE';
-  document.getElementById('edit-card-img').value = card.img || '';
-
-  document.getElementById('inventory-edit-modal').classList.remove('hidden');
-}
-
-function closeInventoryModal() {
-  document.getElementById('inventory-edit-modal').classList.add('hidden');
-}
-
-async function saveInventoryCardChanges() {
-  const id = document.getElementById('edit-card-id').value;
-  if (!id) return;
-
-  const updatedData = {
-    name: document.getElementById('edit-card-name').value,
-    serial: document.getElementById('edit-card-serial').value,
-    type: document.getElementById('edit-card-type').value,
-    price: parseFloat(document.getElementById('edit-card-price').value) || 0,
-    status: document.getElementById('edit-card-status').value,
-    img: document.getElementById('edit-card-img').value
-  };
+async function submitTradeProposal() {
+  const targetSerial = document.getElementById('trade-target-serial-input').value;
+  const notes = document.getElementById('trade-notes-input').value;
 
   try {
-    await db.collection("cards").doc(id).update(updatedData);
-    closeInventoryModal();
-    showToast("Card updated successfully!");
+    await db.collection("trade_requests").add({
+      targetCard: targetSerial,
+      notes: notes,
+      proposer: currentUser ? (currentUser.displayName || currentUser.email) : 'Collector',
+      type: 'BUY OFFER',
+      createdAt: new Date().toISOString()
+    });
+
+    closeProposeTradeModal();
+    showToast("Trade proposal submitted!");
   } catch (err) {
-    console.error("Save Error:", err);
-    showToast("Failed to update card.");
+    console.error("Proposal error:", err);
   }
 }
 
