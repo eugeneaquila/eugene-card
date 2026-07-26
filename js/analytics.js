@@ -3,113 +3,242 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Market Analytics | Eugene Card</title>
-  
-  <!-- Firebase Compatibility SDKs -->
+  <title>Eugene Card Marketplace | Market Analytics</title>
+
+  <!-- Browser Tab Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
+
+  <!-- Google Firebase Compatibility SDKs (v10.7.1) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 
-  <!-- Tailwind CSS, FontAwesome & Chart.js -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            amber: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons & Google Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #030712; color: #f3f4f6; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #030712; }
+    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
+  </style>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
 
   <!-- Header -->
-  <header class="max-w-7xl mx-auto flex justify-between items-center mb-8">
-    <a href="index.html" class="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-extrabold text-amber-400 hover:bg-slate-800 transition-all flex items-center gap-2">
-      <i class="fa-solid fa-arrow-left"></i> Back to Marketplace
-    </a>
-    <div class="flex items-center gap-2">
-      <span class="px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 font-black text-[10px] rounded-full">ADMIN ACCESS ONLY</span>
-      <h1 class="text-sm font-black text-white uppercase tracking-wider hidden sm:block">Analytics & Valuation Hub</h1>
+  <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+        <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-indigo-500/30 p-1 flex items-center justify-center shadow-lg">
+          <i class="fa-solid fa-chart-line text-amber-400"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-base tracking-wider text-white uppercase">EUGENE CARD</h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Analytics Hub</span>
+          </div>
+          <p class="text-xs text-slate-400">Real-time marketplace valuation & metrics</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="loadAnalyticsData()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs font-bold rounded-xl border border-slate-800 flex items-center gap-2 transition-all">
+          <i class="fa-solid fa-rotate"></i> Refresh Data
+        </button>
+        <button onclick="window.close()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-xl border border-slate-800 flex items-center gap-2 transition-all">
+          <i class="fa-solid fa-arrow-left"></i> Back to Marketplace
+        </button>
+      </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto space-y-6">
+  <!-- Main Body -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8">
 
-    <!-- KPI Metric Cards -->
+    <!-- Top Metric Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
-        <span class="text-[10px] text-slate-400 font-bold uppercase">Total Market Volume</span>
-        <p id="analytics-total-volume" class="text-2xl font-black text-emerald-400 font-mono">Rp 0</p>
-        <span class="text-[10px] text-emerald-500 font-semibold"><i class="fa-solid fa-arrow-trend-up mr-1"></i>+12.4% this month</span>
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
+        <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
+          <span>Total Volume</span>
+          <i class="fa-solid fa-wallet text-amber-400"></i>
+        </div>
+        <p id="stat-total-volume" class="text-2xl font-black text-white font-mono">Rp 0</p>
+        <p class="text-[10px] text-emerald-400 font-bold">+14.2% this week</p>
       </div>
 
-      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
-        <span class="text-[10px] text-slate-400 font-bold uppercase">Average Floor Price</span>
-        <p id="analytics-avg-floor" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
-        <span class="text-[10px] text-slate-500 font-semibold">Across 50 Serial Cards</span>
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
+        <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
+          <span>Average Floor Price</span>
+          <i class="fa-solid fa-tag text-indigo-400"></i>
+        </div>
+        <p id="stat-avg-price" class="text-2xl font-black text-white font-mono">Rp 0</p>
+        <p class="text-[10px] text-slate-500">Across 50 edition cards</p>
       </div>
 
-      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
-        <span class="text-[10px] text-slate-400 font-bold uppercase">Circulating Supply</span>
-        <p id="analytics-collected-count" class="text-2xl font-black text-indigo-400 font-mono">0 / 50</p>
-        <span class="text-[10px] text-indigo-400 font-semibold">Held by verified collectors</span>
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
+        <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
+          <span>Collected / Owned</span>
+          <i class="fa-solid fa-users text-teal-400"></i>
+        </div>
+        <p id="stat-collected-ratio" class="text-2xl font-black text-white font-mono">0 / 50</p>
+        <p class="text-[10px] text-teal-400 font-bold">Primary & Secondary holders</p>
       </div>
 
-      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
-        <span class="text-[10px] text-slate-400 font-bold uppercase">Market Liquidity Index</span>
-        <p id="analytics-liquidity-score" class="text-2xl font-black text-rose-400 font-mono">88.5 / 100</p>
-        <span class="text-[10px] text-rose-400 font-semibold"><i class="fa-solid fa-bolt mr-1"></i>High Trade Velocity</span>
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
+        <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
+          <span>Active Trade Requests</span>
+          <i class="fa-solid fa-handshake text-purple-400"></i>
+        </div>
+        <p id="stat-trade-reqs" class="text-2xl font-black text-white font-mono">0</p>
+        <p class="text-[10px] text-purple-400 font-bold">Pending & countered</p>
       </div>
     </div>
 
-    <!-- Interactive Market Floor Velocity Chart -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+    <!-- Valuation Table & Breakdown -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center">
         <div>
-          <h3 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-chart-area text-amber-400 mr-2"></i>Floor Price & Volume Trends</h3>
-          <p class="text-xs text-slate-400">30-day historical execution price vs collection floor</p>
-        </div>
-        <div class="flex gap-2">
-          <span class="text-[10px] bg-slate-950 border border-slate-800 px-3 py-1 rounded-xl text-emerald-400 font-mono font-bold">● Floor Price</span>
-          <span class="text-[10px] bg-slate-950 border border-slate-800 px-3 py-1 rounded-xl text-indigo-400 font-mono font-bold">● QRIS Sales</span>
-        </div>
-      </div>
-      <div class="h-64 w-full">
-        <canvas id="marketTrendChart"></canvas>
-      </div>
-    </div>
-
-    <!-- Probabilistic Pricing & Valuation Table -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <div>
-          <h3 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-calculator text-amber-400 mr-2"></i>Probabilistic Valuation Matrix</h3>
-          <p class="text-xs text-slate-400">Algorithmic fair-value forecasts based on tier rarity multipliers</p>
-        </div>
-        
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <input type="text" id="analytics-search-input" oninput="renderValuationTable()" placeholder="Search serial (*01)..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500 w-full sm:w-48">
+          <h3 class="text-base font-extrabold text-white uppercase tracking-wider">Top Card Valuation Index</h3>
+          <p class="text-xs text-slate-400">Live floor prices and ownership metrics per card serial</p>
         </div>
       </div>
 
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto max-h-[500px]">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0">
             <tr>
-              <th class="p-3">Card Serial & Name</th>
-              <th class="p-3">Type</th>
-              <th class="p-3">Current Floor</th>
-              <th class="p-3">Est. Fair Value</th>
-              <th class="p-3">Projected (6M)</th>
-              <th class="p-3">Volatility Score</th>
-              <th class="p-3 text-right">Rating</th>
+              <th class="p-3">Serial</th>
+              <th class="p-3">Card Name</th>
+              <th class="p-3">Tier</th>
+              <th class="p-3">Current Owner</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Floor Price</th>
             </tr>
           </thead>
-          <tbody id="analytics-probability-table-body" class="divide-y divide-slate-800"></tbody>
+          <tbody id="analytics-table-body" class="divide-y divide-slate-800">
+            <tr><td colspan="6" class="p-6 text-center text-slate-500">Loading analytics index...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
 
   </main>
 
-  <script src="js/firebase-config.js"></script>
-  <script src="js/analytics.js"></script>
+  <!-- Footer -->
+  <footer class="bg-slate-950 border-t border-slate-800/80 py-4 text-center text-xs text-slate-500">
+    Eugene Card Marketplace Analytics &copy; 2026
+  </footer>
+
+  <!-- Firebase & Analytics Script Logic -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCm13Nh6k6W9wsL0_OPpjKZNrbSg-pFsuA",
+      authDomain: "eugene-card-marketplace.firebaseapp.com",
+      projectId: "eugene-card-marketplace",
+      storageBucket: "eugene-card-marketplace.firebasestorage.app",
+      messagingSenderId: "789014481646",
+      appId: "1:789014481646:web:3858909b429985005a41ff",
+      measurementId: "G-MRPT21P9M1"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const analytics = firebase.analytics();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      auth.onAuthStateChanged(user => {
+        if (!user) {
+          // If not logged in, prompt or redirect back
+          alert('Admin access required to view Market Analytics.');
+          window.location.href = 'index.html';
+          return;
+        }
+        loadAnalyticsData();
+      });
+    });
+
+    async function loadAnalyticsData() {
+      try {
+        const cardsSnapshot = await db.collection("cards").get();
+        const txSnapshot = await db.collection("transactions").get();
+        const reqSnapshot = await db.collection("tradeRequests").get();
+
+        let cards = [];
+        cardsSnapshot.forEach(doc => cards.push(doc.data()));
+
+        let totalVolume = 0;
+        txSnapshot.forEach(doc => {
+          const tx = doc.data();
+          if (tx.status === 'APPROVED') {
+            totalVolume += (tx.total_amount || 0);
+          }
+        });
+
+        let totalPriceSum = 0;
+        let ownedCount = 0;
+        cards.forEach(c => {
+          totalPriceSum += (c.price || 0);
+          if (c.owner) ownedCount++;
+        });
+
+        const avgPrice = cards.length > 0 ? totalPriceSum / cards.length : 0;
+
+        document.getElementById('stat-total-volume').innerText = formatIDR(totalVolume);
+        document.getElementById('stat-avg-price').innerText = formatIDR(avgPrice);
+        document.getElementById('stat-collected-ratio').innerText = `${ownedCount} / ${cards.length || 50}`;
+        document.getElementById('stat-trade-reqs').innerText = reqSnapshot.size;
+
+        renderAnalyticsTable(cards);
+      } catch (e) {
+        console.error('Error loading analytics:', e);
+      }
+    }
+
+    function renderAnalyticsTable(cards) {
+      const tbody = document.getElementById('analytics-table-body');
+      if (!tbody) return;
+
+      if (cards.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No valuation metrics available.</td></tr>`;
+        return;
+      }
+
+      cards.sort((a, b) => (a.id || '').localeCompare(b.id || '', undefined, { numeric: true }));
+
+      tbody.innerHTML = cards.map(card => `
+        <tr class="hover:bg-slate-950/60 transition-colors">
+          <td class="p-3 font-mono font-bold text-amber-400">${card.serial || '*00'}</td>
+          <td class="p-3 font-bold text-white">${card.name || 'Card'}</td>
+          <td class="p-3 font-mono text-indigo-400">${card.tier || '100'}</td>
+          <td class="p-3 text-slate-300">${card.owner || 'Unowned (House)'}</td>
+          <td class="p-3"><span class="text-[9px] font-bold px-2 py-0.5 rounded ${card.status === 'SOLD' ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">${card.status || 'AVAILABLE'}</span></td>
+          <td class="p-3 text-right font-mono text-emerald-400 font-extrabold">${formatIDR(card.price || 0)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function formatIDR(amount) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
+    }
+  </script>
 </body>
 </html>
