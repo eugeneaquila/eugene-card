@@ -47,12 +47,25 @@
         <button id="nav-admin" onclick="switchTab('admin')" class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white transition-all">Admin Hub</button>
       </nav>
 
-      <!-- Cart Drawer Trigger & Quick Profile -->
-      <div class="flex items-center gap-2">
+      <!-- Cart & Google Sign-In Area -->
+      <div class="flex items-center gap-3">
         <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/50 rounded-xl text-slate-300 transition-all">
           <i class="fa-solid fa-cart-shopping"></i>
           <span id="cart-badge-count" class="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-slate-950 font-black rounded-full text-[10px] flex items-center justify-center">0</span>
         </button>
+
+        <!-- Google Sign-In / User Profile Widget -->
+        <div id="auth-container">
+          <button id="google-login-btn" onclick="loginWithGoogle()" class="flex items-center gap-2 px-3 py-2 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl shadow transition-all">
+            <i class="fa-brands fa-google text-rose-500"></i>
+            <span>Sign in with Google</span>
+          </button>
+          <div id="user-profile-widget" class="hidden flex items-center gap-2 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl">
+            <img id="header-user-avatar" src="" class="w-6 h-6 rounded-full border border-slate-700">
+            <span id="header-user-name" class="text-xs font-bold text-white max-w-[100px] truncate">Collector</span>
+            <button onclick="logoutUser()" class="text-slate-400 hover:text-rose-400 text-xs ml-1" title="Sign Out"><i class="fa-solid fa-right-from-bracket"></i></button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
