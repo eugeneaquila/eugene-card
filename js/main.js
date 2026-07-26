@@ -187,7 +187,7 @@ function renderAuctionRoom() {
         </div>
 
         <div class="flex justify-between items-center text-xs text-slate-300 pt-2">
-          <span>Serial: <strong class="text-amber-400 font-mono">${activeAuction.serial || '*00'}</strong></span>
+          <span>Serial: <strong class="text-amber-400 font-mono">${activeAuction.serial || '*0001'}</strong></span>
           <span>Owner: <strong class="text-white">${activeAuction.owner || 'Collector'}</strong></span>
         </div>
       </div>
@@ -296,7 +296,7 @@ function openCardDetailModal(cardId) {
   if (!card) return;
 
   document.getElementById('detail-card-title').textContent = card.name || 'Card Title';
-  document.getElementById('detail-card-serial').textContent = card.serial || '*000';
+  document.getElementById('detail-card-serial').textContent = card.serial || '*0001';
   document.getElementById('detail-card-type').textContent = card.type || 'STANDARD';
   document.getElementById('detail-card-owner').innerHTML = `Owner: <strong class="text-white">${card.owner || 'Admin House'}</strong>`;
   document.getElementById('detail-card-edition').textContent = card.edition || 'Beta Edition';
@@ -351,7 +351,7 @@ function renderCardGrid() {
             <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-xs ${isSaved ? 'text-rose-500' : 'text-slate-500 hover:text-rose-400'}">
               <i class="fa-${isSaved ? 'solid' : 'regular'} fa-heart"></i>
             </button>
-            <span class="font-mono text-slate-400">${card.serial || '*00'}</span>
+            <span class="font-mono text-slate-400">${card.serial || '*0001'}</span>
           </div>
         </div>
 
@@ -481,7 +481,7 @@ function renderTradeRoom() {
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg relative">
         <div class="flex items-center justify-between text-xs">
           <span class="font-bold text-slate-300"><i class="fa-solid fa-user text-amber-400 mr-1"></i> ${trade.seller || 'Collector'}</span>
-          <span class="font-mono text-amber-400 font-bold">${trade.serial || '*00'}</span>
+          <span class="font-mono text-amber-400 font-bold">${trade.serial || '*0001'}</span>
         </div>
         <div class="w-full aspect-square bg-slate-950 rounded-xl overflow-hidden p-2 border border-slate-800 flex items-center justify-center">
           <img src="${trade.img || 'https://via.placeholder.com/150'}" class="max-h-full object-contain">
@@ -554,7 +554,7 @@ function openOwnerVaultModal(ownerName) {
         <img src="${card.img || 'https://via.placeholder.com/150'}" class="h-full object-contain">
       </div>
       <p class="text-xs font-bold text-white truncate">${card.name}</p>
-      <p class="text-[10px] font-mono text-amber-400 font-bold">${card.serial || '*00'}</p>
+      <p class="text-[10px] font-mono text-amber-400 font-bold">${card.serial || '*0001'}</p>
       <button onclick="closeOwnerVaultModal(); openOfferModalForCard('${card.id}')" class="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-extrabold rounded-xl transition-all">
         Propose Offer
       </button>
@@ -778,16 +778,42 @@ function renderInventoryTable() {
     (c.owner && c.owner.toLowerCase().includes(search))
   );
 
-  tbody.innerHTML = items.map(c => `
-    <tr class="hover:bg-slate-950 transition-colors">
-      <td class="p-3 font-mono text-amber-400 font-bold">${c.serial || '*00'}</td>
-      <td class="p-3 font-bold text-white">${c.name || 'Unnamed'}</td>
-      <td class="p-3 text-slate-400">${c.type || 'STANDARD'}</td>
-      <td class="p-3 font-mono">Rp ${(c.price || 0).toLocaleString('id-ID')}</td>
-      <td class="p-3 text-slate-300">${c.owner || 'Admin House'}</td>
-      <td class="p-3"><span class="px-2 py-0.5 text-[10px] font-bold rounded ${c.status === 'SOLD' ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'}">${c.status || 'AVAILABLE'}</span></td>
-      <td class="p-3 text-right">
-        <button onclick="openEditInventoryModal('${c.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg text-[10px] font-bold border border-slate-700">Edit Attributes</button>
+  if (items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500 text-xs italic">No matching inventory records found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map((c, index) => `
+    <tr class="hover:bg-slate-900/80 transition-colors border-b border-slate-800/60 ${index % 2 === 0 ? 'bg-slate-950/40' : 'bg-transparent'}">
+      <td class="p-4 font-mono text-amber-400 font-bold flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-glow"></span>
+        ${c.serial || '*0001'}
+      </td>
+      <td class="p-4 font-bold text-white flex items-center gap-3">
+        <img src="${c.img || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded-lg object-contain bg-slate-900 border border-slate-800 p-0.5">
+        <span class="truncate max-w-[160px]">${c.name || 'Unnamed Card'}</span>
+      </td>
+      <td class="p-4">
+        <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg border ${c.type === 'PREMIUM' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}">
+          ${c.type || 'STANDARD'}
+        </span>
+      </td>
+      <td class="p-4 font-mono font-bold text-emerald-400">Rp ${(c.price || 0).toLocaleString('id-ID')}</td>
+      <td class="p-4 text-slate-300 font-medium">
+        <div class="flex items-center gap-2">
+          <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${c.owner || 'Admin House'}" class="w-5 h-5 rounded-full border border-slate-700">
+          <span class="truncate max-w-[140px]">${c.owner || 'Admin House'}</span>
+        </div>
+      </td>
+      <td class="p-4">
+        <span class="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg border ${c.status === 'SOLD' ? 'bg-rose-500/10 text-rose-400 border-rose-500/25' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'}">
+          ${c.status || 'AVAILABLE'}
+        </span>
+      </td>
+      <td class="p-4 text-right">
+        <button onclick="openEditInventoryModal('${c.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-amber-400 rounded-xl text-xs font-black border border-slate-700/80 transition-all shadow-sm">
+          <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
+        </button>
       </td>
     </tr>
   `).join('');
@@ -866,10 +892,10 @@ function handleInventoryTypeChange() {
 }
 
 function formatSerialNumber(rawVal, cardType) {
-  if (!rawVal) return cardType === 'STANDARD' ? '*001' : '*01';
+  if (!rawVal) return cardType === 'STANDARD' ? '*0001' : '*01';
   let cleaned = String(rawVal).replace(/[^\d]/g, '');
   const num = parseInt(cleaned, 10) || 1;
-  const padded = cardType === 'STANDARD' ? String(num).padStart(3, '0') : String(num).padStart(2, '0');
+  const padded = cardType === 'STANDARD' ? String(num).padStart(4, '0') : String(num).padStart(2, '0');
   return `*${padded}`;
 }
 
@@ -1094,7 +1120,7 @@ function renderMyVault() {
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2.5 flex flex-col justify-between">
       <div>
         <div class="flex justify-between items-center text-[10px]">
-          <span class="text-amber-400 font-mono font-bold">${card.serial || '*00'}</span>
+          <span class="text-amber-400 font-mono font-bold">${card.serial || '*0001'}</span>
           <span class="text-slate-400">${card.type || 'STANDARD'}</span>
         </div>
         <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl overflow-hidden p-1 border border-slate-800 flex items-center justify-center my-2">
@@ -1211,7 +1237,7 @@ function renderWishlist() {
   container.innerHTML = savedCards.map(card => `
     <div onclick="openCardDetailModal('${card.id}')" class="card-holo-standard rounded-2xl p-3 cursor-pointer space-y-2">
       <div class="flex justify-between text-[10px] font-mono text-amber-400">
-        <span>${card.serial || '*00'}</span>
+        <span>${card.serial || '*0001'}</span>
         <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-rose-500"><i class="fa-solid fa-heart"></i></button>
       </div>
       <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-1 overflow-hidden flex items-center justify-center">
