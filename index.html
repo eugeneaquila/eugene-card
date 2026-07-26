@@ -101,7 +101,7 @@
           <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navRequests">Trade Requests</span>
         </button>
         
-        <!-- Analytics Navigation Button (Opens analytics.html in a new tab for Admin) -->
+        <!-- Analytics Navigation Button -->
         <button onclick="openAnalyticsPage()" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30 transition-all">
           <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-0.5 opacity-70"></i>
         </button>
@@ -420,7 +420,7 @@
         </button>
       </div>
 
-      <!-- COLLECTOR SOCIAL LINKS CARD (CLICKABLE) -->
+      <!-- COLLECTOR SOCIAL LINKS CARD -->
       <div id="collector-social-banner" class="hidden bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <img id="dashboard-banner-avatar" src="" class="w-12 h-12 rounded-full object-cover border-2 border-amber-500/40 bg-slate-950">
@@ -610,14 +610,11 @@
           </select>
         </div>
 
-        <!-- DYNAMIC FIELD FOR OFFERED CARD (OWNED BY USER) -->
         <div id="trade-my-card-container" class="hidden">
           <label class="block font-bold text-purple-400 mb-1" data-i18n="selectMyCardOffer">Select Your Card to Offer in Trade</label>
-          <select id="trade-my-card-select" class="w-full bg-slate-950 border border-purple-500/50 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
-          </select>
+          <select id="trade-my-card-select" class="w-full bg-slate-950 border border-purple-500/50 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400"></select>
         </div>
 
-        <!-- DYNAMIC FIELD FOR PLUS AMOUNT (TOP UP IDR) -->
         <div id="trade-plus-amount-container" class="hidden">
           <label class="block font-bold text-amber-400 mb-1" data-i18n="plusAmountLabel">Plus Cash / Top-up Amount (IDR - Optional)</label>
           <input type="number" id="trade-plus-amount-input" placeholder="e.g. 50000" class="w-full bg-slate-950 border border-amber-500/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-400">
@@ -725,7 +722,6 @@
           <textarea id="profile-edit-bio-input" rows="3" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none resize-y" data-i18n-placeholder="bioPlaceholder"></textarea>
         </div>
 
-        <!-- SOCIAL MEDIA LINKS (OPTIONAL) -->
         <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
           <label class="block font-bold text-amber-400 uppercase text-[10px]"><i class="fa-solid fa-share-nodes mr-1"></i> <span data-i18n="socialsTitle">Social Media & Links (Optional)</span></label>
           <div>
@@ -1298,7 +1294,7 @@
         vaultSubtitle: "Kelola kartu yang dimiliki, jual kembali secara instan ke Admin via QRIS, atau masukkan ke Lelang/Tukar.",
         profileSettingsBtn: "Pengaturan Profil",
         wishlistTitle: "Daftar Keinginan",
-        wishlistSubtitle: "Klik kartu apa saja untuk langsung mengajukan penawaran tukار kepada pemiliknya!",
+        wishlistSubtitle: "Klik kartu apa saja untuk langsung mengajukan penawaran tukar kepada pemiliknya!",
         holdersTitle: "Direktori Kolektor",
         holdersSubtitle: "Klik baris kolektor atau serial kartu untuk melihat koleksi dan mengirim tawaran.",
         thOwnerName: "Nama Kolektor",
@@ -1774,7 +1770,7 @@
                 ${isSenderAdmin ? `<span class="text-[8px] font-black px-1 py-0 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">ADMIN</span>` : ''}
               </div>
               <div class="max-w-[80%] px-3 py-2 rounded-2xl text-xs ${isMe ? 'bg-amber-500 text-slate-950 font-medium rounded-tr-none' : 'bg-slate-950 border border-slate-800 text-white rounded-tl-none'}">
-                ${msg.imgUrl ? `<a href="${msg.imgUrl}" target="_blank"><img src="${msg.imgUrl}" class="max-w-full max-h-48 rounded-lg mb-1 border border-slate-800 hover:opacity-90 transition-opacity"></a>` : ''}
+                ${msg.imgUrl ? `<img src="${msg.imgUrl}" onclick="openReceiptPreview('${msg.imgUrl}')" class="max-w-full max-h-48 rounded-lg mb-1 border border-slate-800 hover:opacity-90 transition-opacity cursor-pointer">` : ''}
                 ${msg.text ? `<div>${msg.text}</div>` : ''}
               </div>
             </div>
@@ -1896,16 +1892,62 @@
       });
     }
 
+    // CANVAS-COMPRESSED SCREENSHOT UPLOAD TO PREVENT MOBILE RAM CRASHES
     function handleQrisScreenshotUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
+
       const reader = new FileReader();
       reader.onload = function(e) {
-        document.getElementById('qris-proof-img-data').value = e.target.result;
-        document.getElementById('qris-proof-preview-img').src = e.target.result;
-        document.getElementById('qris-proof-preview-container').classList.remove('hidden');
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          const MAX_WIDTH = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+          document.getElementById('qris-proof-img-data').value = compressedDataUrl;
+          document.getElementById('qris-proof-preview-img').src = compressedDataUrl;
+          document.getElementById('qris-proof-preview-container').classList.remove('hidden');
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    }
+
+    // SAFE MODAL RECEIPT PREVIEW (PREVENTS NEW-TAB MEMORY CRASH)
+    function openReceiptPreview(dataUrl) {
+      if (!dataUrl) return showToast('No receipt file found.');
+      
+      let modal = document.getElementById('receipt-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'receipt-modal';
+        modal.className = 'fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[10000] flex items-center justify-center p-4 cursor-pointer';
+        modal.onclick = () => modal.classList.add('hidden');
+        modal.innerHTML = `
+          <div class="relative max-w-sm w-full bg-slate-900 border border-slate-800 p-2 rounded-2xl shadow-2xl">
+            <img id="receipt-modal-img" class="w-full h-auto max-h-[80vh] object-contain rounded-xl">
+            <p class="text-center text-[10px] text-slate-400 mt-2 font-mono">Tap anywhere to close</p>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+      document.getElementById('receipt-modal-img').src = dataUrl;
+      modal.classList.remove('hidden');
     }
 
     function initDefaultInventory() {
@@ -2729,7 +2771,7 @@
         if (tx.status === 'REJECTED') badgeClass = 'bg-rose-500/20 text-rose-400 border-rose-500/30';
 
         const proofBtn = tx.qrisProofUrl 
-          ? `<a href="${tx.qrisProofUrl}" target="_blank" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 text-[10px] font-bold rounded-lg border border-slate-700 inline-flex items-center gap-1"><i class="fa-solid fa-image"></i> View Receipt</a>`
+          ? `<button onclick="openReceiptPreview('${tx.qrisProofUrl}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 text-[10px] font-bold rounded-lg border border-slate-700 inline-flex items-center gap-1"><i class="fa-solid fa-image"></i> View Receipt</button>`
           : `<span class="text-slate-600 text-[10px]">No File</span>`;
 
         return `
@@ -3115,7 +3157,6 @@
         myCardContainer.classList.remove('hidden');
         plusAmountContainer.classList.remove('hidden');
 
-        // Populate dropdown with user's owned cards from Vault
         const myCardSelect = document.getElementById('trade-my-card-select');
         if (myCardSelect && currentUser) {
           const myCards = inventory.filter(c => c.owner === currentUser.name || c.owner === currentUser.username);
@@ -3910,7 +3951,7 @@
           const itemsListStr = items.map(i => i.serial || 'Card').join(', ');
 
           const proofPreview = order.qrisProofUrl 
-            ? `<div class="mt-2"><a href="${order.qrisProofUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 text-[10px] font-bold rounded-lg"><i class="fa-solid fa-receipt text-amber-400"></i> View QRIS Receipt Screenshot</a></div>`
+            ? `<div class="mt-2"><button onclick="openReceiptPreview('${order.qrisProofUrl}')" class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 text-[10px] font-bold rounded-lg hover:bg-indigo-900/60 transition-all"><i class="fa-solid fa-receipt text-amber-400"></i> View QRIS Receipt Screenshot</button></div>`
             : `<div class="mt-1 text-[10px] text-slate-500 italic">No receipt screenshot attached.</div>`;
 
           const buyerAvatar = getCollectorAvatar(order.user_name);
