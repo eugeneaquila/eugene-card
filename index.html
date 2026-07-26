@@ -8,7 +8,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
 
-  <!-- Google Firebase Compatibility SDKs -->
+  <!-- Firebase Compatibility SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -78,7 +78,7 @@
           <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navRequests">Trade Requests</span>
         </button>
         
-        <!-- Standalone Analytics Page Link with Role Check -->
+        <!-- Analytics Link -->
         <a href="#" onclick="navigateToAnalytics(event)" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30 transition-all">
           <i class="fa-solid fa-chart-line text-amber-400"></i> 
           <span data-i18n="navAnalytics">Analytics</span>
@@ -116,7 +116,7 @@
 
       <!-- Language Toggle, Cart, Notifications & Auth Header -->
       <div class="flex items-center gap-2 shrink-0">
-        <button onclick="toggleLanguage()" class="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-mono font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-1" title="Switch Language / Ganti Bahasa">
+        <button onclick="toggleLanguage()" class="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-mono font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-1">
           <i class="fa-solid fa-globe text-[11px]"></i>
           <span id="current-lang-label">EN</span>
         </button>
@@ -137,7 +137,7 @@
     </div>
   </header>
 
-  <!-- Direct Trade Chat Drawer Overlay -->
+  <!-- Direct Chat Drawer -->
   <div id="chat-drawer-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[9990] hidden" onclick="closeChatDrawer()"></div>
   <div id="chat-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 z-[9995] transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-4">
     <div class="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -147,24 +147,22 @@
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <h3 id="chat-target-user-name" class="text-xs font-extrabold text-white" data-i18n="chatDirectTitle">Direct Trade Chat</h3>
+            <h3 id="chat-target-user-name" class="text-xs font-extrabold text-white">Direct Trade Chat</h3>
           </div>
-          <p id="chat-target-context" class="text-[10px] text-slate-400" data-i18n="chatDirectSub">Negotiate trade terms directly</p>
+          <p id="chat-target-context" class="text-[10px] text-slate-400">Negotiate trade terms directly</p>
         </div>
       </div>
       <button onclick="closeChatDrawer()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <!-- Messages Container -->
     <div id="chat-messages-container" class="flex-1 py-4 space-y-3 overflow-y-auto max-h-[65vh]">
-      <div class="text-center py-10 text-slate-500 text-xs" data-i18n="noChatMessages">No chat messages yet. Start the conversation!</div>
+      <div class="text-center py-10 text-slate-500 text-xs">No chat messages yet. Start the conversation!</div>
     </div>
 
-    <!-- Send Chat Input -->
     <div class="pt-3 border-t border-slate-800 space-y-2">
       <div class="flex items-center gap-2">
         <input type="text" id="chat-text-input" placeholder="Type message..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-        <button onclick="showToast('Message sent.')" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow transition-all">Send</button>
+        <button onclick="sendChatMessage()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow transition-all">Send</button>
       </div>
     </div>
   </div>
@@ -192,14 +190,14 @@
             <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
           </div>
           <div>
-            <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider" data-i18n="limitedEdition">LIMITED EDITION</span>
-            <h2 class="text-lg font-black text-white mt-0.5" data-i18n="betaStockTitle">Beta Edition Card Stock</h2>
-            <p class="text-xs text-slate-400" data-i18n="betaStockSubtitle">Official QRIS Primary Market Availability (2% Tax Included)</p>
+            <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider">LIMITED EDITION</span>
+            <h2 class="text-lg font-black text-white mt-0.5">Beta Edition Card Stock</h2>
+            <p class="text-xs text-slate-400">Official QRIS Primary Market Availability (2% Tax Included)</p>
           </div>
         </div>
         
         <div class="bg-slate-950/80 px-6 py-3 rounded-2xl border border-slate-800 text-center sm:text-right w-full sm:w-auto">
-          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" data-i18n="remainingCards">Remaining Cards</p>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Remaining Cards</p>
           <p class="text-2xl font-black font-mono text-amber-400"><span id="remaining-cards-count">50</span> <span class="text-slate-500 text-sm font-normal">/ 50 Available</span></p>
         </div>
       </div>
@@ -240,6 +238,12 @@
         <div>
           <h2 class="text-2xl font-black text-white uppercase tracking-wide">AUCTION ROOM</h2>
           <p class="text-xs text-slate-400 mt-1">Place competitive QRIS bids on rare serial cards before timer expires.</p>
+        </div>
+        <!-- Admin Auction Management Button -->
+        <div id="admin-auction-controls" class="hidden">
+          <button onclick="adminCancelAuction()" class="px-4 py-2 bg-rose-600/20 border border-rose-500/40 text-rose-400 font-extrabold text-xs rounded-xl hover:bg-rose-600/30 flex items-center gap-2">
+            <i class="fa-solid fa-ban"></i> Cancel Auction (Admin)
+          </button>
         </div>
       </div>
 
@@ -309,7 +313,7 @@
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Direct Messages</h2>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Direct Messages & Inbox</h2>
           <p class="text-xs text-slate-400 mt-1">Search collectors to start a chat or view ongoing direct conversations.</p>
         </div>
       </div>
@@ -361,14 +365,33 @@
       </div>
     </section>
 
-    <!-- DASHBOARD VIEW -->
+    <!-- DASHBOARD / MY VAULT VIEW -->
     <section id="view-dashboard" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Vault</h2>
-          <p class="text-xs text-slate-400 mt-1">Manage owned cards or list them into the market.</p>
+          <p class="text-xs text-slate-400 mt-1">Manage owned cards, customize your collector card, or list items into the market.</p>
         </div>
+        <button onclick="openProfileManagerModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl border border-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-user-gear text-amber-400"></i> Profile Settings
+        </button>
       </div>
+
+      <!-- Collector Active Profile Banner -->
+      <div id="collector-social-banner" class="bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+        <div class="flex items-center gap-3">
+          <img id="dashboard-banner-avatar" src="https://api.dicebear.com/7.x/identicon/svg?seed=Eugene" class="w-12 h-12 rounded-full object-cover border-2 border-amber-500/40 bg-slate-950">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="dashboard-banner-name" class="text-sm font-extrabold text-white">Collector</h3>
+              <span id="dashboard-banner-username" class="text-xs font-mono text-amber-400">@collector</span>
+            </div>
+            <p id="dashboard-banner-bio" class="text-xs text-slate-400 mt-0.5">Genesis Card Enthusiast</p>
+          </div>
+        </div>
+        <div id="dashboard-banner-links" class="flex items-center gap-2 text-xs text-slate-400"></div>
+      </div>
+
       <div id="owned-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
     </section>
 
@@ -385,7 +408,7 @@
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
         <h2 class="text-2xl font-black text-white uppercase tracking-wide">Holders Directory</h2>
-        <p class="text-xs text-slate-400 mt-1">View active collectors and their serial holdings.</p>
+        <p class="text-xs text-slate-400 mt-1">Click on any collector row or card serial to view their collection and start a trade chat.</p>
       </div>
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 overflow-x-auto">
         <table class="w-full text-left text-xs">
@@ -414,6 +437,20 @@
         </button>
       </div>
 
+      <!-- Admin Persona Switcher Box -->
+      <div class="bg-slate-950 p-4 rounded-3xl border border-rose-500/30 space-y-3">
+        <label class="block text-xs font-bold text-rose-400 uppercase tracking-wider"><i class="fa-solid fa-users-gear mr-1"></i> Admin Persona Switcher (Testing Mode)</label>
+        <p class="text-[11px] text-slate-400">Switch active account persona to test standard collector views versus admin privileges.</p>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="switchAccountPersona('eugene.aquila06@gmail.com')" class="py-2.5 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 font-extrabold text-xs rounded-xl border border-rose-500/30 flex items-center justify-center gap-1.5 transition-all">
+            <i class="fa-solid fa-shield-halved"></i> Admin Persona
+          </button>
+          <button onclick="switchAccountPersona('collector@eugene.com')" class="py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-extrabold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition-all">
+            <i class="fa-solid fa-user"></i> Standard Collector
+          </button>
+        </div>
+      </div>
+
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
         <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending Orders Requiring Action</h4>
         <div id="admin-pending-orders-list" class="space-y-3">
@@ -426,14 +463,14 @@
     <section id="view-inventory" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-boxes-stacked text-rose-400 mr-2"></i> Inventory Mgmt</h2>
-          <p class="text-xs text-slate-400 mt-1">Manage and edit card inventory attributes directly.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-boxes-stacked text-rose-400 mr-2"></i> Inventory Management</h2>
+          <p class="text-xs text-slate-400 mt-1">Manage and edit complete card attributes, assigned owners, and statuses.</p>
         </div>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center">
-          <input type="text" id="inventory-search" oninput="renderInventoryTable()" placeholder="Search serial / name..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white w-64">
+          <input type="text" id="inventory-search" oninput="renderInventoryTable()" placeholder="Search serial / name / owner..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white w-64">
         </div>
         <div class="overflow-x-auto max-h-[500px]">
           <table class="w-full text-left text-xs">
@@ -441,7 +478,7 @@
               <tr>
                 <th class="p-3">Serial</th>
                 <th class="p-3">Name</th>
-                <th class="p-3">Edition</th>
+                <th class="p-3">Type</th>
                 <th class="p-3">Price</th>
                 <th class="p-3">Assigned Owner</th>
                 <th class="p-3">Status</th>
@@ -456,71 +493,104 @@
 
   </main>
 
-  <!-- LIST CARD MODAL -->
-  <div id="list-card-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeListCardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-base font-extrabold text-white">List Card for Trade</h3>
-      <input type="hidden" id="list-card-id-target">
-      
+  <!-- PROFILE MANAGER MODAL -->
+  <div id="profile-manager-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+      <button onclick="closeProfileManagerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center space-y-1">
+        <div class="relative w-20 h-20 mx-auto mb-2">
+          <img id="profile-modal-avatar-preview" src="https://api.dicebear.com/7.x/identicon/svg?seed=Eugene" class="w-20 h-20 rounded-full object-cover border-2 border-amber-500/50 shadow-lg bg-slate-950">
+        </div>
+        <h3 class="text-lg font-black text-white">Collector Profile Settings</h3>
+        <p class="text-xs text-slate-400">Customize how your profile, username, and socials appear on the marketplace</p>
+      </div>
+
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Asking Price (IDR)</label>
-          <input type="number" id="list-card-price-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+          <label class="block font-bold text-slate-400 mb-1">Display Name</label>
+          <input type="text" id="profile-edit-name-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
         </div>
-        <button onclick="closeListCardModal(); showToast('Listing published!')" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl hover:bg-amber-400 transition-all">Publish Listing</button>
+
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Username (@handle)</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 font-bold">@</span>
+            <input type="text" id="profile-edit-username-input" placeholder="e.g. eugenecards" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-7 pr-3 py-2 text-white focus:border-amber-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Avatar Image URL</label>
+          <input type="text" id="profile-edit-avatar-input" oninput="document.getElementById('profile-modal-avatar-preview').src = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-600 focus:border-amber-500 focus:outline-none" placeholder="https://example.com/avatar.png">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Collector Tagline / Bio</label>
+          <textarea id="profile-edit-bio-input" rows="3" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none resize-y"></textarea>
+        </div>
+
+        <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all">
+          Save Profile Updates
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- PROPOSE TRADE MODAL -->
-  <div id="propose-trade-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeProposeTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Propose QRIS Trade Offer</h3>
-      
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block font-bold text-slate-400 mb-1">Target Card Serial</label>
-          <input type="text" placeholder="e.g. *01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
-        </div>
-        <div>
-          <label class="block font-bold text-slate-400 mb-1">Offer Notes / IDR Amount</label>
-          <input type="text" placeholder="Details..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
-        </div>
-        <button onclick="closeProposeTradeModal(); showToast('Proposal sent!')" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg">Submit QRIS Proposal</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- EDIT INVENTORY CARD MODAL -->
+  <!-- ENHANCED EDIT INVENTORY CARD MODAL -->
   <div id="inventory-edit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl max-h-[90vh] overflow-y-auto">
       <button onclick="closeInventoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <h3 class="text-base font-extrabold text-white text-center">Customize Card Details</h3>
+      <h3 class="text-base font-extrabold text-white text-center">Customize Full Card Attributes</h3>
 
       <div class="space-y-3 text-xs">
         <input type="hidden" id="edit-card-id">
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1">Card Name</label>
+          <label class="block font-bold text-slate-400 mb-1">Card Title</label>
           <input type="text" id="edit-card-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-400 mb-1">Card Serial</label>
+            <label class="block font-bold text-slate-400 mb-1">Serial Code (*01)</label>
             <input type="text" id="edit-card-serial" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-400 mb-1">Type</label>
+            <label class="block font-bold text-slate-400 mb-1">Type / Category</label>
             <select id="edit-card-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
               <option value="PREMIUM">PREMIUM</option>
               <option value="STANDARD">STANDARD</option>
             </select>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-3">
+          <p class="font-bold text-amber-400 uppercase text-[10px]">Extended Details</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-400 mb-1">Edition</label>
+              <input type="text" id="edit-card-edition" placeholder="e.g. Beta Edition: #0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-400 mb-1">SN (Serial No.)</label>
+              <input type="text" id="edit-card-sn" placeholder="e.g. 0001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-400 mb-1">Tier</label>
+              <input type="text" id="edit-card-tier" placeholder="e.g. 500" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-400 mb-1">Printing</label>
+              <input type="text" id="edit-card-printing" placeholder="e.g. 1x" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+            </div>
           </div>
         </div>
 
@@ -539,13 +609,54 @@
         </div>
 
         <div>
+          <label class="block font-bold text-slate-400 mb-1">Assign Owner Name</label>
+          <input type="text" id="edit-card-owner" placeholder="e.g. Admin House or Collector Name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
+        </div>
+
+        <div>
           <label class="block font-bold text-slate-400 mb-1">Image URL</label>
           <input type="text" id="edit-card-img" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
         </div>
 
         <button onclick="saveInventoryCardChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 transition-all">
-          Save Customization
+          Save Full Attributes
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS FOR LISTING & PROPOSALS -->
+  <div id="list-card-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeListCardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-base font-extrabold text-white">List Card for Trade</h3>
+      <input type="hidden" id="list-card-id-target">
+      
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Asking Price (IDR)</label>
+          <input type="number" id="list-card-price-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <button onclick="submitCardListing()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl hover:bg-amber-400 transition-all">Publish Listing</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="propose-trade-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeProposeTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Propose Trade Offer</h3>
+      
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Target Card Serial</label>
+          <input type="text" id="trade-target-serial-input" placeholder="e.g. *01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-400 mb-1">Offer Notes / Terms</label>
+          <input type="text" id="trade-notes-input" placeholder="Details..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+        </div>
+        <button onclick="submitTradeProposal()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg">Submit Proposal</button>
       </div>
     </div>
   </div>
@@ -662,7 +773,6 @@
     <span id="toast-msg">Action completed.</span>
   </div>
 
-  <!-- Navigation Helper to Check Analytics Access Before Redirecting -->
   <script>
     async function navigateToAnalytics(e) {
       e.preventDefault();
