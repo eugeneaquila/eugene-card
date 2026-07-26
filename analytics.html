@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Predictive Market Analytics</title>
+  <title>Eugene Card Marketplace | Advanced Predictive Analytics</title>
 
-  <!-- Browser Tab Favicon -->
+  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
 
   <!-- Google Firebase Compatibility SDKs (v10.7.1) -->
@@ -56,18 +56,18 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-base tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Predictive Analytics</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Predictive Analytics Hub</span>
           </div>
-          <p class="text-xs text-slate-400">Future value estimation & stability models</p>
+          <p class="text-xs text-slate-400">6–12 Month price forecasting & stability analytics</p>
         </div>
       </div>
 
       <div class="flex items-center gap-3">
         <button onclick="loadAnalyticsData()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs font-bold rounded-xl border border-slate-800 flex items-center gap-2 transition-all">
-          <i class="fa-solid fa-rotate"></i> Refresh Data
+          <i class="fa-solid fa-rotate"></i> Refresh Metrics
         </button>
         <button onclick="window.close()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-xl border border-slate-800 flex items-center gap-2 transition-all">
-          <i class="fa-solid fa-arrow-left"></i> Back to Marketplace
+          <i class="fa-solid fa-arrow-left"></i> Return to Market
         </button>
       </div>
     </div>
@@ -84,12 +84,12 @@
           <i class="fa-solid fa-wallet text-amber-400"></i>
         </div>
         <p id="stat-total-volume" class="text-2xl font-black text-white font-mono">Rp 0</p>
-        <p class="text-[10px] text-emerald-400 font-bold"><i class="fa-solid fa-arrow-trend-up"></i> Realtime approved QRIS trades</p>
+        <p class="text-[10px] text-emerald-400 font-bold"><i class="fa-solid fa-arrow-trend-up"></i> Settled QRIS Trades</p>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
         <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
-          <span>Current Asset Valuation</span>
+          <span>Current Market Cap</span>
           <i class="fa-solid fa-gem text-indigo-400"></i>
         </div>
         <p id="stat-total-valuation" class="text-2xl font-black text-white font-mono">Rp 0</p>
@@ -98,11 +98,11 @@
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
         <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
-          <span>Est. 12-Month Vault Value</span>
+          <span>12-Month Est. Vault Cap</span>
           <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
         </div>
         <p id="stat-future-valuation" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
-        <p id="stat-appreciation-rate" class="text-[10px] text-emerald-400 font-bold">+0% projected appreciation</p>
+        <p id="stat-appreciation-rate" class="text-[10px] text-emerald-400 font-bold">+0% projected gain</p>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
@@ -111,7 +111,7 @@
           <i class="fa-solid fa-shield-halved text-teal-400"></i>
         </div>
         <p id="stat-stability-index" class="text-2xl font-black text-teal-400 font-mono">0%</p>
-        <p class="text-[10px] text-teal-300 font-bold">Market low volatility rating</p>
+        <p class="text-[10px] text-teal-300 font-bold">Low Volatility Rating</p>
       </div>
     </div>
 
@@ -121,10 +121,10 @@
       <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
         <div class="flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> Asset Valuation Forecast</h3>
-            <p class="text-xs text-slate-400">Projected marketplace value expansion over time</p>
+            <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> 6–12 Month Valuation Forecast</h3>
+            <p class="text-xs text-slate-400">Current floor prices projected over 6 and 12-month timeframes</p>
           </div>
-          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AI Price Model</span>
+          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AI Predictive Model</span>
         </div>
         <div class="w-full h-72 relative">
           <canvas id="trendForecastChart"></canvas>
@@ -134,8 +134,8 @@
       <!-- Tier & Rarity Distribution Pie Chart -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl flex flex-col justify-between">
         <div>
-          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-pie-chart text-teal-400 mr-2"></i> Rarity Breakdown</h3>
-          <p class="text-xs text-slate-400">Premium vs. Standard card stock volume</p>
+          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-pie-chart text-teal-400 mr-2"></i> Rarity Distribution</h3>
+          <p class="text-xs text-slate-400">Premium vs. Standard card stock allocation</p>
         </div>
         <div class="w-full h-56 relative my-auto">
           <canvas id="tierDistributionChart"></canvas>
@@ -147,16 +147,21 @@
       </div>
     </div>
 
-    <!-- CARD FUTURE VALUE & STABILITY PREDICTION TABLE -->
-    <div class="bg-slate-900 border border-amber-500/30 rounded-3xl p-6 space-y-4 shadow-xl">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-4">
+    <!-- FORECAST SCENARIO SIMULATOR -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
         <div>
-          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-crystal-ball text-amber-400 mr-2"></i> Individual Card Value Projections & Stability</h3>
-          <p class="text-xs text-slate-400">AI-computed 6-Month & 12-Month value forecasts based on serial rarity and market stability rating</p>
+          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-sliders text-amber-400 mr-2"></i> 6–12 Month Forecast Scenario Simulator</h3>
+          <p class="text-xs text-slate-400">Select market sentiment to recalculate individual card price projections</p>
         </div>
-        <span class="text-[10px] font-black px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-widest">Live Estimation</span>
+        <div class="flex items-center gap-2">
+          <button onclick="setGrowthScenario('conservative')" id="btn-scenario-conservative" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Conservative (+5/10%)</button>
+          <button onclick="setGrowthScenario('moderate')" id="btn-scenario-moderate" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">Moderate (+15/25%)</button>
+          <button onclick="setGrowthScenario('bullish')" id="btn-scenario-bullish" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Bullish (+35/50%)</button>
+        </div>
       </div>
 
+      <!-- CARD FUTURE VALUE & STABILITY PREDICTION TABLE -->
       <div class="overflow-x-auto max-h-[500px]">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0">
@@ -164,14 +169,15 @@
               <th class="p-3">Serial</th>
               <th class="p-3">Card Name</th>
               <th class="p-3">Type</th>
-              <th class="p-3">Current Floor</th>
-              <th class="p-3">6-Month Est.</th>
-              <th class="p-3">12-Month Est.</th>
-              <th class="p-3 text-right">Stability Rating</th>
+              <th class="p-3">Current Price</th>
+              <th class="p-3">6-Mo. Est. Price</th>
+              <th class="p-3">12-Mo. Est. Price</th>
+              <th class="p-3">Est. 12-Mo. Delta ($\Delta$)</th>
+              <th class="p-3 text-right">Stability & Liquidity Rating</th>
             </tr>
           </thead>
           <tbody id="predictive-table-body" class="divide-y divide-slate-800">
-            <tr><td colspan="7" class="p-6 text-center text-slate-500">Calculating predictive valuations...</td></tr>
+            <tr><td colspan="8" class="p-6 text-center text-slate-500">Calculating predictive card prices...</td></tr>
           </tbody>
         </table>
       </div>
@@ -200,8 +206,16 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
+    let rawCardsData = [];
     let trendChartInstance = null;
     let tierChartInstance = null;
+    let currentScenario = 'moderate'; // default
+
+    const SCENARIOS = {
+      conservative: { std6m: 1.05, std12m: 1.10, prem6m: 1.12, prem12m: 1.20 },
+      moderate:     { std6m: 1.15, std12m: 1.25, prem6m: 1.25, prem12m: 1.50 },
+      bullish:      { std6m: 1.35, std12m: 1.50, prem6m: 1.50, prem12m: 2.00 }
+    };
 
     document.addEventListener('DOMContentLoaded', () => {
       auth.onAuthStateChanged(user => {
@@ -219,8 +233,8 @@
         const cardsSnapshot = await db.collection("cards").get();
         const ordersSnapshot = await db.collection("orders").get();
 
-        let cards = [];
-        cardsSnapshot.forEach(doc => cards.push(doc.data()));
+        rawCardsData = [];
+        cardsSnapshot.forEach(doc => rawCardsData.push(doc.data()));
 
         let totalVolume = 0;
         ordersSnapshot.forEach(doc => {
@@ -230,72 +244,94 @@
           }
         });
 
-        let currentValuation = 0;
-        let futureValuation = 0;
-        let premiumCount = 0;
-        let standardCount = 0;
-        let totalStabilitySum = 0;
-
-        const predictiveCards = cards.map(c => {
-          const currentPrice = c.price || c.baseFloorPrice || 100000;
-          const isPremium = c.type === 'PREMIUM';
-          
-          if (isPremium) premiumCount++;
-          else standardCount++;
-
-          // Calculation multiplier for future estimation
-          const multiplier6m = isPremium ? 1.25 : 1.10;
-          const multiplier12m = isPremium ? 1.50 : 1.20;
-
-          const est6m = Math.round(currentPrice * multiplier6m);
-          const est12m = Math.round(currentPrice * multiplier12m);
-
-          // Stability Score: Premium and held cards are rated higher
-          const stabilityScore = isPremium ? (c.owner && c.owner !== 'Admin House' ? 98 : 94) : (c.owner && c.owner !== 'Admin House' ? 90 : 85);
-
-          currentValuation += currentPrice;
-          futureValuation += est12m;
-          totalStabilitySum += stabilityScore;
-
-          return {
-            ...c,
-            currentPrice,
-            est6m,
-            est12m,
-            stabilityScore
-          };
-        });
-
-        const avgStability = cards.length > 0 ? Math.round(totalStabilitySum / cards.length) : 90;
-        const totalAppreciationPct = currentValuation > 0 ? Math.round(((futureValuation - currentValuation) / currentValuation) * 100) : 0;
-
         document.getElementById('stat-total-volume').innerText = formatIDR(totalVolume);
-        document.getElementById('stat-total-valuation').innerText = formatIDR(currentValuation);
-        document.getElementById('stat-future-valuation').innerText = formatIDR(futureValuation);
-        document.getElementById('stat-appreciation-rate').innerText = `+${totalAppreciationPct}% projected appreciation`;
-        document.getElementById('stat-stability-index').innerText = `${avgStability}%`;
-        document.getElementById('stat-total-cards').innerText = `Across ${cards.length} database cards`;
 
-        document.getElementById('premium-count-badge').innerText = premiumCount;
-        document.getElementById('standard-count-badge').innerText = standardCount;
-
-        renderPredictiveTable(predictiveCards);
-        renderTrendAndForecastChart(currentValuation, futureValuation);
-        renderTierDistributionChart(premiumCount, standardCount);
-
+        renderScenarioProjections();
       } catch (e) {
         console.error('Error loading analytics:', e);
       }
     }
 
+    function setGrowthScenario(scenarioKey) {
+      currentScenario = scenarioKey;
+      ['conservative', 'moderate', 'bullish'].forEach(k => {
+        const btn = document.getElementById(`btn-scenario-${k}`);
+        if (btn) {
+          btn.className = (k === scenarioKey)
+            ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all'
+            : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
+        }
+      });
+      renderScenarioProjections();
+    }
+
+    function renderScenarioProjections() {
+      if (rawCardsData.length === 0) return;
+
+      const sc = SCENARIOS[currentScenario];
+      let currentValuation = 0;
+      let futureValuation = 0;
+      let premiumCount = 0;
+      let standardCount = 0;
+      let totalStabilitySum = 0;
+
+      const predictiveCards = rawCardsData.map(c => {
+        const currentPrice = c.price || c.baseFloorPrice || 100000;
+        const isPremium = c.type === 'PREMIUM';
+
+        if (isPremium) premiumCount++;
+        else standardCount++;
+
+        const mult6m = isPremium ? sc.prem6m : sc.std6m;
+        const mult12m = isPremium ? sc.prem12m : sc.std12m;
+
+        const est6m = Math.round(currentPrice * mult6m);
+        const est12m = Math.round(currentPrice * mult12m);
+        const delta12m = est12m - currentPrice;
+        const pctGain12m = Math.round(((est12m - currentPrice) / currentPrice) * 100);
+
+        const stabilityScore = isPremium 
+          ? (c.owner && c.owner !== 'Admin House' ? 98 : 94) 
+          : (c.owner && c.owner !== 'Admin House' ? 90 : 85);
+
+        const liquidityRating = isPremium ? 'Vault Reserve' : (c.owner ? 'Moderate' : 'High Liquidity');
+
+        currentValuation += currentPrice;
+        futureValuation += est12m;
+        totalStabilitySum += stabilityScore;
+
+        return {
+          ...c,
+          currentPrice,
+          est6m,
+          est12m,
+          delta12m,
+          pctGain12m,
+          stabilityScore,
+          liquidityRating
+        };
+      });
+
+      const avgStability = Math.round(totalStabilitySum / rawCardsData.length);
+      const totalAppreciationPct = Math.round(((futureValuation - currentValuation) / currentValuation) * 100);
+
+      document.getElementById('stat-total-valuation').innerText = formatIDR(currentValuation);
+      document.getElementById('stat-future-valuation').innerText = formatIDR(futureValuation);
+      document.getElementById('stat-appreciation-rate').innerText = `+${totalAppreciationPct}% projected gain`;
+      document.getElementById('stat-stability-index').innerText = `${avgStability}%`;
+      document.getElementById('stat-total-cards').innerText = `Across ${rawCardsData.length} database cards`;
+
+      document.getElementById('premium-count-badge').innerText = premiumCount;
+      document.getElementById('standard-count-badge').innerText = standardCount;
+
+      renderPredictiveTable(predictiveCards);
+      renderTrendAndForecastChart(currentValuation, futureValuation);
+      renderTierDistributionChart(premiumCount, standardCount);
+    }
+
     function renderPredictiveTable(predictiveCards) {
       const tbody = document.getElementById('predictive-table-body');
       if (!tbody) return;
-
-      if (predictiveCards.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No card metrics available.</td></tr>`;
-        return;
-      }
 
       predictiveCards.sort((a, b) => (a.id || '').localeCompare(b.id || '', undefined, { numeric: true }));
 
@@ -307,10 +343,10 @@
           <td class="p-3 font-mono text-slate-300">${formatIDR(c.currentPrice)}</td>
           <td class="p-3 font-mono text-emerald-400 font-bold">${formatIDR(c.est6m)}</td>
           <td class="p-3 font-mono text-indigo-400 font-black">${formatIDR(c.est12m)}</td>
-          <td class="p-3 text-right">
-            <span class="px-2.5 py-1 rounded-full text-[10px] font-black border ${c.stabilityScore >= 90 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30'}">
-              <i class="fa-solid fa-shield-halved mr-1"></i> ${c.stabilityScore}% Stable
-            </span>
+          <td class="p-3 font-mono text-emerald-400 font-bold">+${formatIDR(c.delta12m)} (<span class="text-amber-400">+${c.pctGain12m}%</span>)</td>
+          <td class="p-3 text-right space-x-1">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">${c.stabilityScore}% Stable</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">${c.liquidityRating}</span>
           </td>
         </tr>
       `).join('');
@@ -324,7 +360,7 @@
       const val6m = Math.round(currentVal + (futureVal - currentVal) * 0.50);
       const val9m = Math.round(currentVal + (futureVal - currentVal) * 0.75);
 
-      const labels = ['Current Value', '+3 Months Est.', '+6 Months Est.', '+9 Months Est.', '+12 Months Est.'];
+      const labels = ['Current Floor', '+3 Months', '+6 Months (Est.)', '+9 Months', '+12 Months (Est.)'];
       const dataPoints = [currentVal, val3m, val6m, val9m, futureVal];
 
       trendChartInstance = new Chart(ctx, {
@@ -332,7 +368,7 @@
         data: {
           labels: labels,
           datasets: [{
-            label: 'Projected Asset Valuation (IDR)',
+            label: 'Market Valuation Forecast (IDR)',
             data: dataPoints,
             borderColor: '#818cf8',
             backgroundColor: 'rgba(129, 140, 248, 0.15)',
