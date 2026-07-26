@@ -27,3 +27,19 @@ function isUserAdmin(email) {
   if (!email) return false;
   return ADMIN_EMAILS.some(admin => admin.toLowerCase() === email.toLowerCase());
 }
+
+// Check if user has PLUS or ADMIN access
+async function checkUserAnalyticsAccess(user) {
+  if (!user) return false;
+  if (isUserAdmin(user.email)) return true;
+
+  try {
+    const doc = await db.collection("users").doc(user.uid).get();
+    if (doc.exists && doc.data().role === 'PLUS') {
+      return true;
+    }
+  } catch (err) {
+    console.error("Error checking membership role:", err);
+  }
+  return false;
+}
