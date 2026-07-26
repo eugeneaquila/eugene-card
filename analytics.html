@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>Market Analytics | Eugene Card</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 p-6">
+
+  <!-- Header Back Link -->
+  <header class="max-w-7xl mx-auto flex justify-between items-center mb-8">
+    <a href="index.html" class="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-extrabold text-amber-400 hover:bg-slate-800 transition-all">
+      <i class="fa-solid fa-arrow-left mr-2"></i> Back to Marketplace
+    </a>
+    <h1 class="text-sm font-black text-white uppercase tracking-wider">Analytics & Valuation Hub</h1>
+  </header>
+
+  <main class="max-w-7xl mx-auto space-y-6">
+    <!-- Analytics Metric Cards -->
+    <div id="analytics-metrics-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"></div>
+
+    <!-- Probabilistic Valuation Table -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+          <tr>
+            <th class="p-3">Card Serial & Name</th>
+            <th class="p-3">Rarity & Tier</th>
+            <th class="p-3">Current Floor</th>
+            <th class="p-3">Est. Probabilistic Price</th>
+            <th class="p-3">Projected Price (6-12M)</th>
+            <th class="p-3 text-right">Growth Rating</th>
+          </tr>
+        </thead>
+        <tbody id="analytics-probability-table-body" class="divide-y divide-slate-800"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Firebase & Dedicated Analytics Script -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/analytics.js"></script>
+</body>
+</html>
