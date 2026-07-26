@@ -32,7 +32,7 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black relative">
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black relative bg-slate-950 text-slate-100">
 
   <!-- Embedded Logo SVG -->
   <svg style="display: none;">
@@ -78,9 +78,11 @@
           <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navRequests">Trade Requests</span>
         </button>
         
-        <!-- Standalone Analytics Page Link -->
-        <a href="analytics.html" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30 transition-all">
-          <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span>
+        <!-- Standalone Analytics Page Link with Role Check -->
+        <a href="#" onclick="navigateToAnalytics(event)" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30 transition-all">
+          <i class="fa-solid fa-chart-line text-amber-400"></i> 
+          <span data-i18n="navAnalytics">Analytics</span>
+          <i class="fa-solid fa-lock text-[10px] text-amber-500/80 ml-0.5"></i>
         </a>
 
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
@@ -146,9 +148,6 @@
         <div>
           <div class="flex items-center gap-1.5">
             <h3 id="chat-target-user-name" class="text-xs font-extrabold text-white" data-i18n="chatDirectTitle">Direct Trade Chat</h3>
-            <span id="chat-target-admin-badge" class="hidden text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/40">
-              <i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN
-            </span>
           </div>
           <p id="chat-target-context" class="text-[10px] text-slate-400" data-i18n="chatDirectSub">Negotiate trade terms directly</p>
         </div>
@@ -163,38 +162,23 @@
 
     <!-- Send Chat Input -->
     <div class="pt-3 border-t border-slate-800 space-y-2">
-      <div id="chat-image-preview-box" class="hidden p-2 bg-slate-950 border border-slate-800 rounded-xl relative">
-        <button onclick="clearChatImageAttachment()" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-slate-800 text-slate-400 text-[10px] flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-        <img id="chat-image-preview-img" src="" class="h-20 rounded object-contain mx-auto border border-slate-800">
-      </div>
-
       <div class="flex items-center gap-2">
-        <label class="p-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl text-slate-400 hover:text-amber-400 cursor-pointer text-xs flex items-center gap-1 transition-all" title="Upload Screenshot or Photo">
-          <i class="fa-solid fa-image text-amber-400"></i>
-          <input type="file" id="chat-file-input" accept="image/*" onchange="handleChatImageUpload(event)" class="hidden">
-        </label>
-        <input type="text" id="chat-text-input" placeholder="Type message or attach screenshot..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500" data-i18n-placeholder="chatInputPlaceholder">
-        <button onclick="sendChatMessage()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow transition-all" data-i18n="btnSend">Send</button>
+        <input type="text" id="chat-text-input" placeholder="Type message..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+        <button onclick="showToast('Message sent.')" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow transition-all">Send</button>
       </div>
     </div>
   </div>
 
   <!-- Notification Dropdown -->
-  <div id="notification-dropdown" class="fixed top-16 right-4 sm:right-8 w-80 sm:w-96 bg-slate-900/95 border border-amber-500/40 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-[9999] hidden overflow-hidden backdrop-blur-xl">
+  <div id="notification-dropdown" class="fixed top-16 right-4 sm:right-8 w-80 sm:w-96 bg-slate-900/95 border border-amber-500/40 rounded-2xl shadow-2xl z-[9999] hidden overflow-hidden backdrop-blur-xl">
     <div class="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
       <div class="flex items-center gap-2">
-        <i class="fa-solid fa-cookie-bite text-xs text-amber-400"></i>
-        <h4 class="text-xs font-extrabold text-white" data-i18n="notifHeader">Cookie & Activity Logs</h4>
+        <i class="fa-solid fa-bell text-xs text-amber-400"></i>
+        <h4 class="text-xs font-extrabold text-white">Notifications</h4>
       </div>
-      <div class="flex items-center gap-3">
-        <button onclick="clearNotifications()" class="text-[10px] font-bold text-slate-400 hover:text-rose-400 transition-colors" data-i18n="clearAll">Clear All</button>
-        <button onclick="toggleNotificationMenu()" class="text-slate-400 hover:text-white text-xs p-1"><i class="fa-solid fa-xmark"></i></button>
-      </div>
+      <button onclick="toggleNotificationMenu()" class="text-slate-400 hover:text-white text-xs p-1"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    
-    <div id="notification-list" class="max-h-80 overflow-y-auto divide-y divide-slate-800/60 p-1">
-      <div class="p-6 text-center text-xs text-slate-500" data-i18n="noNotifications">No recent notifications.</div>
-    </div>
+    <div class="p-6 text-center text-xs text-slate-500">No new notifications.</div>
   </div>
 
   <!-- Main Body Content -->
@@ -216,19 +200,19 @@
         
         <div class="bg-slate-950/80 px-6 py-3 rounded-2xl border border-slate-800 text-center sm:text-right w-full sm:w-auto">
           <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" data-i18n="remainingCards">Remaining Cards</p>
-          <p class="text-2xl font-black font-mono text-amber-400"><span id="remaining-cards-count">50</span> <span class="text-slate-500 text-sm font-normal" data-i18n="availableSuffix">/ 50 Available</span></p>
+          <p class="text-2xl font-black font-mono text-amber-400"><span id="remaining-cards-count">50</span> <span class="text-slate-500 text-sm font-normal">/ 50 Available</span></p>
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800/80">
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="search-input" oninput="debouncedRenderCardGrid()" placeholder="Search serial (*01 / *001) or card name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500" data-i18n-placeholder="searchPlaceholder">
+          <input type="text" id="search-input" oninput="debouncedRenderCardGrid()" placeholder="Search serial (*01 / *001) or card name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
         </div>
         <div class="flex items-center gap-1.5">
-          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all" data-i18n="filterAll">All</button>
-          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="filterPremium">Premium</button>
-          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="filterStandard">Standard</button>
+          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">All</button>
+          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Premium</button>
+          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Standard</button>
         </div>
       </div>
 
@@ -239,11 +223,11 @@
     <section id="view-trade" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="tradeRoomTitle">TRADING ROOM</h2>
-          <p class="text-xs text-slate-400 mt-1" data-i18n="tradeRoomSubtitle">Buy and sell directly with other collectors via QRIS • 2% tax per trade</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide">TRADING ROOM</h2>
+          <p class="text-xs text-slate-400 mt-1">Buy and sell directly with other collectors via QRIS • 2% tax per trade</p>
         </div>
         <button onclick="openListCardForTradeModal()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center gap-2">
-          <i class="fa-solid fa-plus"></i> <span data-i18n="listCardBtn">List a Card</span>
+          <i class="fa-solid fa-plus"></i> <span>List a Card</span>
         </button>
       </div>
 
@@ -254,21 +238,20 @@
     <section id="view-auction" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="auctionRoomTitle">AUCTION ROOM</h2>
-          <p class="text-xs text-slate-400 mt-1" data-i18n="auctionRoomSubtitle">Place competitive QRIS bids on rare serial cards before timer expires.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide">AUCTION ROOM</h2>
+          <p class="text-xs text-slate-400 mt-1">Place competitive QRIS bids on rare serial cards before timer expires.</p>
         </div>
-        <div id="auction-header-action-container"></div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
           <div class="flex justify-between items-center border-b border-slate-800 pb-3">
             <div>
-              <span class="text-[10px] bg-amber-500/20 text-amber-400 font-extrabold px-2.5 py-1 rounded-md border border-amber-500/30" data-i18n="featuredAuction">FEATURED AUCTION</span>
+              <span class="text-[10px] bg-amber-500/20 text-amber-400 font-extrabold px-2.5 py-1 rounded-md border border-amber-500/30">FEATURED AUCTION</span>
               <h3 id="auction-card-title" class="text-lg font-black text-white mt-1">Eugene Genesis Card #01</h3>
             </div>
             <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-right">
-              <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="timeRemaining">Time Remaining</span>
+              <span class="text-[10px] text-slate-500 font-bold uppercase block">Time Remaining</span>
               <span id="auction-timer" class="text-lg font-black text-amber-400 font-mono">03h 14m 22s</span>
             </div>
           </div>
@@ -276,24 +259,24 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             <div class="bg-slate-950 rounded-2xl border border-amber-500/40 p-3 text-center flex flex-col items-center">
               <div class="w-full aspect-[4/5] max-h-64 bg-slate-900 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center mb-2">
-                <img id="auction-card-img" src="" loading="lazy" class="w-full h-full object-contain">
+                <img id="auction-card-img" src="" class="w-full h-full object-contain">
               </div>
               <p id="auction-card-serial" class="text-2xl font-black text-amber-400 font-mono">*01</p>
-              <p id="auction-card-owner-info" class="text-[10px] text-slate-400 mt-1"><span data-i18n="ownerLabel">Owner</span>: <strong class="text-white">Admin House</strong></p>
+              <p id="auction-card-owner-info" class="text-[10px] text-slate-400 mt-1">Owner: <strong class="text-white">Admin House</strong></p>
             </div>
 
             <div class="space-y-4">
               <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
-                <p class="text-xs text-slate-400" data-i18n="highestBid">Current Highest Bid</p>
+                <p class="text-xs text-slate-400">Current Highest Bid</p>
                 <p id="auction-current-bid" class="text-3xl font-black text-emerald-400 font-mono">Rp 750.000</p>
-                <p class="text-[10px] text-slate-400"><span data-i18n="highBidderLabel">High Bidder</span>: <strong id="auction-high-bidder" class="text-white">Collector #104</strong></p>
+                <p class="text-[10px] text-slate-400">High Bidder: <strong id="auction-high-bidder" class="text-white">Collector #104</strong></p>
               </div>
 
               <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-300" data-i18n="bidAmountLabel">Your Bid Amount (IDR) - QRIS</label>
+                <label class="block text-xs font-bold text-slate-300">Your Bid Amount (IDR) - QRIS</label>
                 <div class="flex gap-2">
                   <input type="number" id="bid-input-amount" placeholder="e.g. 775000" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                  <button onclick="placeAuctionBid()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl" data-i18n="placeBidBtn">Place Bid</button>
+                  <button onclick="placeAuctionBid()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl">Place Bid</button>
                 </div>
               </div>
             </div>
@@ -301,7 +284,7 @@
         </div>
 
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
-          <h4 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider" data-i18n="liveBidHistory">Live Bid History</h4>
+          <h4 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Live Bid History</h4>
           <div id="auction-bid-history" class="space-y-2 text-xs max-h-[280px] overflow-y-auto"></div>
         </div>
       </div>
@@ -311,55 +294,50 @@
     <section id="view-trade-req" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="tradeReqTitle">TRADE REQUESTS</h2>
-          <p class="text-xs text-slate-400 mt-1" data-i18n="tradeReqSubtitle">Propose QRIS buy or trade offers on cards that already have an owner.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide">TRADE REQUESTS</h2>
+          <p class="text-xs text-slate-400 mt-1">Propose QRIS buy or trade offers on cards that already have an owner.</p>
         </div>
         <button onclick="openProposeTradeModal()" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-xl shadow-lg flex items-center gap-2">
-          <i class="fa-solid fa-handshake"></i> <span data-i18n="proposeTradeBtn">Propose Card Trade</span>
+          <i class="fa-solid fa-handshake"></i> <span>Propose Card Trade</span>
         </button>
       </div>
 
       <div id="trade-requests-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
-    <!-- INBOX / CHAT VIEW -->
+    <!-- INBOX VIEW -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> <span data-i18n="inboxTitle">Direct Messages & Support Inbox</span></h2>
-          <p class="text-xs text-slate-400 mt-1" data-i18n="inboxSubtitle">Search collectors to start a chat or view ongoing direct conversations.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Direct Messages</h2>
+          <p class="text-xs text-slate-400 mt-1">Search collectors to start a chat or view ongoing direct conversations.</p>
         </div>
-        <button onclick="loadUserInboxThreads()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-indigo-400 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-rotate"></i> <span data-i18n="refreshInbox">Refresh Inbox</span>
-        </button>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
-        <h3 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-user-plus text-amber-400 mr-1.5"></i> <span data-i18n="findCollector">Find & Chat Collector</span></h3>
+        <h3 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-user-plus text-amber-400 mr-1.5"></i> Find Collector</h3>
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="user-chat-search-input" oninput="searchUsersForChat()" placeholder="Type collector name or email to start a chat..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500" data-i18n-placeholder="chatSearchPlaceholder">
+          <input type="text" id="user-chat-search-input" oninput="searchUsersForChat()" placeholder="Type collector name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
         <div id="user-chat-search-results" class="space-y-2 hidden max-h-48 overflow-y-auto"></div>
       </div>
 
-      <div id="inbox-threads-list" class="space-y-3">
-        <p class="text-xs text-slate-500 text-center py-10" data-i18n="loadingMessages">Loading messages...</p>
-      </div>
+      <div id="inbox-threads-list" class="space-y-3"></div>
     </section>
 
-    <!-- TRANSACTION HISTORY VIEW -->
+    <!-- HISTORY VIEW -->
     <section id="view-history" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> <span data-i18n="historyTitle">Transaction History (QRIS)</span></h2>
-          <p class="text-xs text-slate-400 mt-1" data-i18n="historySubtitle">View completed QRIS purchases, order statuses, and 2% platform tax records.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Transaction History</h2>
+          <p class="text-xs text-slate-400 mt-1">View completed QRIS purchases, order statuses, and tax records.</p>
         </div>
         
         <div class="flex items-center gap-2 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
-          <button onclick="setHistoryFilter('ALL')" id="history-filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all" data-i18n="histAll">All Activity</button>
-          <button onclick="setHistoryFilter('MINE')" id="history-filter-MINE" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="histMine">My Purchases</button>
-          <button onclick="setHistoryFilter('APPROVED')" id="history-filter-APPROVED" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="histApproved">Approved Only</button>
+          <button onclick="setHistoryFilter('ALL')" id="history-filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">All Activity</button>
+          <button onclick="setHistoryFilter('MINE')" id="history-filter-MINE" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">My Purchases</button>
+          <button onclick="setHistoryFilter('APPROVED')" id="history-filter-APPROVED" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Approved</button>
         </div>
       </div>
 
@@ -368,13 +346,13 @@
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0 z-10">
               <tr>
-                <th class="p-3.5" data-i18n="thOrderRef">Order Ref</th>
-                <th class="p-3.5" data-i18n="thBuyer">Buyer</th>
-                <th class="p-3.5" data-i18n="thItems">Items Acquired</th>
-                <th class="p-3.5" data-i18n="thAmount">Amount (IDR + 2% Tax)</th>
-                <th class="p-3.5" data-i18n="thProof">QRIS Receipt</th>
-                <th class="p-3.5" data-i18n="thStatus">Status</th>
-                <th class="p-3.5 text-right" data-i18n="thDate">Date / Time</th>
+                <th class="p-3.5">Order Ref</th>
+                <th class="p-3.5">Buyer</th>
+                <th class="p-3.5">Items Acquired</th>
+                <th class="p-3.5">Amount (IDR)</th>
+                <th class="p-3.5">Receipt</th>
+                <th class="p-3.5">Status</th>
+                <th class="p-3.5 text-right">Date</th>
               </tr>
             </thead>
             <tbody id="history-table-body" class="divide-y divide-slate-800/80"></tbody>
@@ -387,56 +365,36 @@
     <section id="view-dashboard" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
-          <h2 id="dashboard-heading" class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> <span data-i18n="vaultTitle">My Vault / Binder</span></h2>
-          <p id="dashboard-subheading" class="text-xs text-slate-400 mt-1" data-i18n="vaultSubtitle">Manage owned cards, sell back instantly to Admin via QRIS, or place them into Auction/Trade.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Vault</h2>
+          <p class="text-xs text-slate-400 mt-1">Manage owned cards or list them into the market.</p>
         </div>
-        <button onclick="openProfileManagerModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-user-gear text-amber-400"></i> <span data-i18n="profileSettingsBtn">Profile Settings</span>
-        </button>
       </div>
-
-      <div id="collector-social-banner" class="hidden bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <img id="dashboard-banner-avatar" src="" class="w-12 h-12 rounded-full object-cover border-2 border-amber-500/40 bg-slate-950">
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 id="dashboard-banner-name" class="text-sm font-extrabold text-white">Collector Name</h3>
-              <span id="dashboard-banner-username" class="text-xs font-mono text-amber-400">@username</span>
-            </div>
-            <p id="dashboard-banner-bio" class="text-xs text-slate-400 mt-0.5">Collector Bio</p>
-          </div>
-        </div>
-
-        <div id="dashboard-banner-links" class="flex items-center gap-2"></div>
-      </div>
-
       <div id="owned-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
     </section>
 
     <!-- WISHLIST VIEW -->
     <section id="view-wishlist" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center justify-between">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> <span data-i18n="wishlistTitle">Saved Wishlist</span></h2>
-        <button onclick="clearWishlist()" class="px-3 py-1.5 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl hover:bg-slate-700" data-i18n="clearAll">Clear All</button>
+        <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> Saved Wishlist</h2>
+        <button onclick="clearWishlist()" class="px-3 py-1.5 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl hover:bg-slate-700">Clear All</button>
       </div>
-      <p class="text-xs text-slate-400 -mt-2" data-i18n="wishlistSubtitle">Click on any card to directly propose a trade offer to its owner!</p>
       <div id="wishlist-page-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </section>
 
     <!-- HOLDERS VIEW -->
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-        <h2 class="text-2xl font-black text-white uppercase tracking-wide" data-i18n="holdersTitle">Holders Directory</h2>
-        <p class="text-xs text-slate-400 mt-1" data-i18n="holdersSubtitle">Click on any collector row or card serial to view their collection and send direct trade offers.</p>
+        <h2 class="text-2xl font-black text-white uppercase tracking-wide">Holders Directory</h2>
+        <p class="text-xs text-slate-400 mt-1">View active collectors and their serial holdings.</p>
       </div>
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
             <tr>
-              <th class="p-3" data-i18n="thOwnerName">Owner Name</th>
-              <th class="p-3" data-i18n="thCardsOwned">Cards Owned</th>
-              <th class="p-3" data-i18n="thSerialsHeld">Serials Held</th>
-              <th class="p-3 text-right" data-i18n="thAction">Action</th>
+              <th class="p-3">Owner Name</th>
+              <th class="p-3">Cards Owned</th>
+              <th class="p-3">Serials Held</th>
+              <th class="p-3 text-right">Action</th>
             </tr>
           </thead>
           <tbody id="holders-table-body" class="divide-y divide-slate-800"></tbody>
@@ -448,70 +406,46 @@
     <section id="view-admin" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> <span data-i18n="adminHubTitle">Admin Hub & Revenue Dashboard</span></h2>
-          <p class="text-xs text-slate-400 mt-1" data-i18n="adminHubSubtitle">Review customer QRIS payments and verify order requests.</p>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub</h2>
+          <p class="text-xs text-slate-400 mt-1">Review customer QRIS payments and verify order requests.</p>
         </div>
         <button onclick="refreshAdminHub()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-400 rounded-xl border border-slate-700 flex items-center gap-2">
-          <i class="fa-solid fa-rotate"></i> <span data-i18n="refreshHub">Refresh Hub</span>
+          <i class="fa-solid fa-rotate"></i> Refresh Hub
         </button>
       </div>
 
-      <div class="bg-slate-950 p-4 rounded-3xl border border-rose-500/30 space-y-3">
-        <label class="block text-xs font-bold text-rose-400 uppercase tracking-wider"><i class="fa-solid fa-users-gear mr-1"></i> <span data-i18n="personaSwitcherTitle">Admin Persona Switcher (Test Accounts)</span></label>
-        <p class="text-[11px] text-slate-400" data-i18n="personaSwitcherSub">Switch active account persona to test standard collector views versus admin privileges.</p>
-        <div class="grid grid-cols-2 sm:grid-cols-2 gap-2 pt-1">
-          <button onclick="switchAccountPersona('eugene.aquila06')" class="py-2.5 bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 font-extrabold text-xs rounded-xl border border-rose-500/30 flex items-center justify-center gap-1.5 transition-all">
-            <i class="fa-solid fa-shield-halved"></i> <span data-i18n="adminPersona">Admin Persona</span>
-          </button>
-          <button onclick="switchAccountPersona('Eugene')" class="py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-extrabold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition-all">
-            <i class="fa-solid fa-user"></i> <span data-i18n="stdCollectorPersona">Standard Collector</span>
-          </button>
-        </div>
-      </div>
-
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider" data-i18n="pendingOrdersTitle">Pending QRIS Orders Requiring Action</h4>
+        <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">Pending Orders Requiring Action</h4>
         <div id="admin-pending-orders-list" class="space-y-3">
-          <p class="text-xs text-slate-500" data-i18n="noPendingOrders">No pending transactions requiring approval.</p>
+          <p class="text-xs text-slate-500">No pending transactions requiring approval.</p>
         </div>
       </div>
     </section>
 
-    <!-- INVENTORY MANAGEMENT VIEW (ADMIN) -->
+    <!-- INVENTORY VIEW (ADMIN) -->
     <section id="view-inventory" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-boxes-stacked text-rose-400 mr-2"></i> <span data-i18n="inventoryTitle">Inventory Mgmt</span></h2>
-          <p class="text-xs text-slate-400 mt-1" data-i18n="inventorySubtitle">Manage, edit, export, or import complete inventory backup state JSON.</p>
-        </div>
-        
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <button onclick="exportInventoryBackup()" class="flex-1 sm:flex-initial px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-xs font-extrabold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm">
-            <i class="fa-solid fa-download"></i> <span data-i18n="backupJson">Backup JSON</span>
-          </button>
-          
-          <label class="flex-1 sm:flex-initial px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold rounded-xl cursor-pointer transition-all flex items-center justify-center gap-2 shadow-sm">
-            <i class="fa-solid fa-upload"></i> <span data-i18n="importBackup">Import Backup</span>
-            <input type="file" id="backup-file-input" accept=".json" onchange="importInventoryBackup(event)" class="hidden">
-          </label>
+          <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-boxes-stacked text-rose-400 mr-2"></i> Inventory Mgmt</h2>
+          <p class="text-xs text-slate-400 mt-1">Manage and edit card inventory attributes directly.</p>
         </div>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden">
         <div class="p-4 border-b border-slate-800 flex justify-between items-center">
-          <input type="text" id="inventory-search" oninput="renderInventoryTable()" placeholder="Search serial / name / owner..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white w-64" data-i18n-placeholder="searchInventoryPlaceholder">
+          <input type="text" id="inventory-search" oninput="renderInventoryTable()" placeholder="Search serial / name..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white w-64">
         </div>
         <div class="overflow-x-auto max-h-[500px]">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0">
               <tr>
-                <th class="p-3" data-i18n="thSerial">Serial</th>
-                <th class="p-3" data-i18n="thName">Name</th>
-                <th class="p-3" data-i18n="thEdition">Edition</th>
-                <th class="p-3" data-i18n="thPrice">Price</th>
-                <th class="p-3" data-i18n="thAssignedOwner">Assigned Owner</th>
-                <th class="p-3" data-i18n="thStatus">Status</th>
-                <th class="p-3 text-right" data-i18n="thActions">Actions</th>
+                <th class="p-3">Serial</th>
+                <th class="p-3">Name</th>
+                <th class="p-3">Edition</th>
+                <th class="p-3">Price</th>
+                <th class="p-3">Assigned Owner</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody id="inventory-table-body" class="divide-y divide-slate-800"></tbody>
@@ -522,202 +456,39 @@
 
   </main>
 
-  <!-- Modals & Overlays Container -->
-
-  <!-- LIST CARD / AUCTION MODAL -->
+  <!-- LIST CARD MODAL -->
   <div id="list-card-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeListCardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 id="list-modal-title" class="text-base font-extrabold text-white" data-i18n="listCardTradeTitle">List Card for Trade</h3>
+      <h3 class="text-base font-extrabold text-white">List Card for Trade</h3>
       <input type="hidden" id="list-card-id-target">
-      <input type="hidden" id="list-modal-mode" value="trade">
       
       <div class="space-y-3 text-xs">
-        <div id="list-card-select-container" class="hidden">
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="selectVaultCard">Select Card from Your Vault</label>
-          <select id="list-card-select-input" onchange="document.getElementById('list-card-id-target').value = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"></select>
-        </div>
-
         <div>
-          <label class="block font-bold text-slate-400 mb-1" id="list-price-label" data-i18n="askingPrice">Asking Price (IDR)</label>
+          <label class="block font-bold text-slate-400 mb-1">Asking Price (IDR)</label>
           <input type="number" id="list-card-price-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
         </div>
-
-        <button onclick="submitCardListingModal()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl hover:bg-amber-400 transition-all" data-i18n="publishListingBtn">Publish Listing</button>
+        <button onclick="closeListCardModal(); showToast('Listing published!')" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold rounded-xl hover:bg-amber-400 transition-all">Publish Listing</button>
       </div>
     </div>
   </div>
 
-  <!-- PROPOSE DIRECT TRADE REQUEST MODAL -->
+  <!-- PROPOSE TRADE MODAL -->
   <div id="propose-trade-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeProposeTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> <span data-i18n="proposeModalTitle">Propose QRIS Trade Offer</span></h3>
+      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Propose QRIS Trade Offer</h3>
       
       <div class="space-y-3 text-xs">
-        <div class="relative">
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="selectCardRequest">Select Card to Request (Search by Serial or Owner)</label>
-          <input type="hidden" id="trade-req-card-id" value="">
-          
-          <button type="button" id="trade-dropdown-trigger" onclick="toggleTradeCardDropdown()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-left text-white flex justify-between items-center focus:outline-none focus:border-purple-500">
-            <span id="trade-dropdown-label" data-i18n="selectCardPlaceholder">Select a card...</span>
-            <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
-          </button>
-
-          <div id="trade-dropdown-menu" class="absolute top-full left-0 w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl shadow-2xl z-50 hidden overflow-hidden">
-            <div class="p-2 border-b border-slate-800">
-              <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
-                <input type="text" id="trade-search-input" oninput="filterTradeCardOptions()" placeholder="Search serial (*01) or owner..." class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-purple-500" data-i18n-placeholder="tradeSearchPlaceholder">
-              </div>
-            </div>
-            <div id="trade-dropdown-list" class="max-h-48 overflow-y-auto divide-y divide-slate-900"></div>
-          </div>
-        </div>
-
         <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="offerTypeLabel">Offer Type</label>
-          <select id="trade-req-type-select" onchange="toggleTradeOfferTypeFields()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
-            <option value="BUY" data-i18n="optDirectBuy">Direct QRIS Buy Offer</option>
-            <option value="TRADE" data-i18n="optCardTrade">Card-for-Card Trade</option>
-          </select>
+          <label class="block font-bold text-slate-400 mb-1">Target Card Serial</label>
+          <input type="text" placeholder="e.g. *01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
         </div>
-
-        <div id="trade-my-card-container" class="hidden">
-          <label class="block font-bold text-purple-400 mb-1" data-i18n="selectMyCardOffer">Select Your Card to Offer in Trade</label>
-          <select id="trade-my-card-select" class="w-full bg-slate-950 border border-purple-500/50 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400"></select>
-        </div>
-
-        <div id="trade-plus-amount-container" class="hidden">
-          <label class="block font-bold text-amber-400 mb-1" data-i18n="plusAmountLabel">Plus Cash / Top-up Amount (IDR - Optional)</label>
-          <input type="number" id="trade-plus-amount-input" placeholder="e.g. 50000" class="w-full bg-slate-950 border border-amber-500/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-400">
-        </div>
-
         <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="proposedNotesLabel">Proposed Offer Amount / Notes (IDR or Details)</label>
-          <input type="text" id="trade-req-notes-input" placeholder="e.g. Offering Rp 150.000 or trade with *02" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500" data-i18n-placeholder="tradeNotesPlaceholder">
+          <label class="block font-bold text-slate-400 mb-1">Offer Notes / IDR Amount</label>
+          <input type="text" placeholder="Details..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
         </div>
-
-        <button onclick="submitTradeRequest()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg" data-i18n="submitProposalBtn">Submit QRIS Proposal</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- COUNTER OFFER MODAL -->
-  <div id="counter-offer-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeCounterOfferModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-pen-to-square text-amber-400 mr-2"></i> <span data-i18n="counterModalTitle">Send Counter Offer</span></h3>
-      <input type="hidden" id="counter-req-id-target">
-
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="counterNotesLabel">Your Counter Terms / Revised Offer Notes</label>
-          <input type="text" id="counter-notes-input" placeholder="e.g. Counter offer: I want Rp 250.000 or *05 instead." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500" data-i18n-placeholder="counterNotesPlaceholder">
-        </div>
-
-        <button onclick="submitCounterOffer()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-lg" data-i18n="submitCounterBtn">Submit Counter Offer</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- LOADING PROGRESS WIDGET -->
-  <div id="loading-modal" class="fixed bottom-6 right-6 z-[9999] hidden pointer-events-auto">
-    <div class="bg-slate-900/95 border border-indigo-500/40 rounded-2xl max-w-xs w-80 p-4 space-y-3 shadow-2xl backdrop-blur-xl relative">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <i id="loading-modal-spinner" class="fa-solid fa-circle-notch fa-spin text-amber-400 text-base"></i>
-          <h3 id="loading-modal-title" class="text-xs font-extrabold text-white" data-i18n="processingData">Processing Data...</h3>
-        </div>
-        <button onclick="hideLoadingModal()" class="text-slate-500 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      
-      <p id="loading-modal-subtitle" class="text-[11px] text-slate-400 leading-tight" data-i18n="loadingWaitSub">Please wait while the inventory updates.</p>
-
-      <div id="import-progress-container" class="space-y-1.5 hidden">
-        <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-          <div id="import-progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-amber-400 w-0 transition-all duration-150"></div>
-        </div>
-        <div class="flex justify-between items-center text-[9px] font-mono text-slate-400">
-          <span id="import-progress-status">0 / 0</span>
-          <span id="import-progress-percent">0%</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PROFILE MANAGER MODAL -->
-  <div id="profile-manager-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl max-h-[90vh] overflow-y-auto">
-      <button onclick="closeProfileManagerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="text-center space-y-1">
-        <div class="relative w-20 h-20 mx-auto mb-2">
-          <img id="profile-modal-avatar-preview" src="" class="w-20 h-20 rounded-full object-cover border-2 border-amber-500/50 shadow-lg bg-slate-950">
-        </div>
-        <h3 class="text-lg font-black text-white" data-i18n="profileSettingsTitle">Collector Profile Settings</h3>
-        <p class="text-xs text-slate-400" data-i18n="profileSettingsSub">Customize how your profile, username, and socials appear on the marketplace</p>
-      </div>
-
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="displayNameLabel">Display Name</label>
-          <input type="text" id="profile-edit-name-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="usernameLabel">Username (@handle - Unique)</label>
-          <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 font-bold">@</span>
-            <input type="text" id="profile-edit-username-input" placeholder="e.g. eugenecards" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-7 pr-3 py-2 text-white focus:border-amber-500 focus:outline-none">
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="emailLabel">Email (Account)</label>
-          <input type="text" id="profile-edit-email-input" disabled class="w-full bg-slate-950/50 border border-slate-800/80 rounded-xl px-3 py-2 text-slate-500 cursor-not-allowed font-mono">
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="uploadAvatarLabel">Upload Custom Avatar Picture</label>
-          <input type="file" id="profile-avatar-file-input" accept="image/*" onchange="handleProfileAvatarUpload(event)" class="w-full text-[11px] text-slate-400 bg-slate-950 border border-slate-800 rounded-xl p-2 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400">
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="avatarUrlLabel">Or Avatar Image URL</label>
-          <input type="text" id="profile-edit-avatar-input" oninput="document.getElementById('profile-modal-avatar-preview').src = this.value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-600 focus:border-amber-500 focus:outline-none" placeholder="https://example.com/avatar.png">
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="bioLabel">Collector Tagline / Bio</label>
-          <textarea id="profile-edit-bio-input" rows="3" placeholder="e.g. Genesis Card Enthusiast" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-amber-500 focus:outline-none resize-y" data-i18n-placeholder="bioPlaceholder"></textarea>
-        </div>
-
-        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-          <label class="block font-bold text-amber-400 uppercase text-[10px]"><i class="fa-solid fa-share-nodes mr-1"></i> <span data-i18n="socialsTitle">Social Media & Links (Optional)</span></label>
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-instagram text-rose-400 mr-1"></i> <span data-i18n="igLabel">Instagram Handle / URL</span></label>
-            <input type="text" id="profile-edit-ig-input" placeholder="e.g. @eugene_cards or https://instagram.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-x-twitter text-slate-300 mr-1"></i> <span data-i18n="twitterLabel">X/Twitter Handle / URL</span></label>
-            <input type="text" id="profile-edit-twitter-input" placeholder="e.g. @eugene_cards or https://twitter.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-brands fa-tiktok text-cyan-400 mr-1"></i> <span data-i18n="tiktokLabel">TikTok Handle / URL</span></label>
-            <input type="text" id="profile-edit-tiktok-input" placeholder="e.g. @eugene_cards or https://tiktok.com/@..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-0.5"><i class="fa-solid fa-globe text-indigo-400 mr-1"></i> <span data-i18n="webLabel">Website URL (Clickable)</span></label>
-            <input type="text" id="profile-edit-web-input" placeholder="e.g. https://eugenecards.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white text-[11px] focus:outline-none focus:border-amber-500">
-          </div>
-        </div>
-
-        <button onclick="saveProfileChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 shadow-lg transition-all" data-i18n="saveProfileBtn">
-          Save Profile Updates
-        </button>
+        <button onclick="closeProposeTradeModal(); showToast('Proposal sent!')" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-extrabold rounded-xl transition-all shadow-lg">Submit QRIS Proposal</button>
       </div>
     </div>
   </div>
@@ -729,23 +500,23 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <h3 class="text-base font-extrabold text-white text-center" data-i18n="customizeCardTitle">Customize Card Details</h3>
+      <h3 class="text-base font-extrabold text-white text-center">Customize Card Details</h3>
 
       <div class="space-y-3 text-xs">
         <input type="hidden" id="edit-card-id">
 
         <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="cardNameLabel">Card Name</label>
+          <label class="block font-bold text-slate-400 mb-1">Card Name</label>
           <input type="text" id="edit-card-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-400 mb-1" data-i18n="cardCodeLabel">Card Code (e.g. *01 / *001)</label>
+            <label class="block font-bold text-slate-400 mb-1">Card Serial</label>
             <input type="text" id="edit-card-serial" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-400 mb-1" data-i18n="categoryLabel">Type / Category</label>
+            <label class="block font-bold text-slate-400 mb-1">Type</label>
             <select id="edit-card-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
               <option value="PREMIUM">PREMIUM</option>
               <option value="STANDARD">STANDARD</option>
@@ -753,75 +524,26 @@
           </div>
         </div>
 
-        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-3">
-          <p class="font-bold text-amber-400 uppercase text-[10px]" data-i18n="extendedDetails">Extended Details</p>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-400 mb-1" data-i18n="editionLabel">Edition</label>
-              <input type="text" id="edit-card-edition" placeholder="e.g. Beta Edition: #0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
-            </div>
-            <div>
-              <label class="block font-bold text-slate-400 mb-1" data-i18n="snLabel">SN (Serial No.)</label>
-              <input type="text" id="edit-card-sn" placeholder="e.g. 0001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-400 mb-1" data-i18n="tierLabel">Tier</label>
-              <input type="text" id="edit-card-tier" placeholder="e.g. 500" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
-            </div>
-            <div>
-              <label class="block font-bold text-slate-400 mb-1" data-i18n="printingLabel">Printing</label>
-              <input type="text" id="edit-card-printing" placeholder="e.g. 1x" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
-            </div>
-          </div>
-        </div>
-
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-400 mb-1" data-i18n="priceLabel">Price (IDR)</label>
+            <label class="block font-bold text-slate-400 mb-1">Price (IDR)</label>
             <input type="number" id="edit-card-price" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-400 mb-1" data-i18n="statusLabel">Status</label>
+            <label class="block font-bold text-slate-400 mb-1">Status</label>
             <select id="edit-card-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
-              <option value="AVAILABLE" data-i18n="optAvailable">AVAILABLE</option>
-              <option value="SOLD" data-i18n="optSold">SOLD</option>
+              <option value="AVAILABLE">AVAILABLE</option>
+              <option value="SOLD">SOLD</option>
             </select>
           </div>
         </div>
 
-        <div class="relative">
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="assignOwnerLabel">Assign Owner</label>
-          <input type="hidden" id="edit-card-owner-select" value="">
-          
-          <button type="button" id="owner-dropdown-trigger" onclick="toggleOwnerDropdown()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-left text-white flex justify-between items-center focus:outline-none focus:border-amber-500">
-            <span id="owner-dropdown-label" data-i18n="unownedHouse">Unowned (House)</span>
-            <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
-          </button>
-
-          <div id="owner-dropdown-menu" class="absolute top-full left-0 w-full mt-1 bg-slate-950 border border-slate-800 rounded-xl shadow-2xl z-50 hidden overflow-hidden">
-            <div class="p-2 border-b border-slate-800">
-              <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[10px]"></i>
-                <input type="text" id="owner-search-input" oninput="filterOwnerOptions()" placeholder="Search collector name..." class="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500" data-i18n-placeholder="searchOwnerPlaceholder">
-              </div>
-            </div>
-            <div id="owner-dropdown-list" class="max-h-48 overflow-y-auto divide-y divide-slate-900"></div>
-          </div>
-        </div>
-
-        <div class="space-y-1">
-          <label class="block font-bold text-slate-400" data-i18n="uploadCardImgLabel">Upload Card Image File</label>
-          <input type="file" id="edit-card-file-input" accept="image/*" onchange="handleImageFileUpload(event)" class="w-full text-[11px] text-slate-400 bg-slate-950 border border-slate-800 rounded-xl p-2 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400">
-        </div>
-
         <div>
-          <label class="block font-bold text-slate-400 mb-1" data-i18n="orImgUrlLabel">Or Image URL</label>
+          <label class="block font-bold text-slate-400 mb-1">Image URL</label>
           <input type="text" id="edit-card-img" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none">
         </div>
 
-        <button onclick="saveInventoryCardChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 transition-all" data-i18n="saveCustomizationBtn">
+        <button onclick="saveInventoryCardChanges()" class="w-full py-3 bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-amber-400 transition-all">
           Save Customization
         </button>
       </div>
@@ -842,34 +564,34 @@
 
       <div class="w-full max-w-[220px] aspect-[4/5] mx-auto bg-slate-950 rounded-2xl border border-slate-800 p-2 text-center flex flex-col items-center justify-between shadow-inner">
         <div class="w-full h-48 bg-slate-900 rounded-xl overflow-hidden flex items-center justify-center">
-          <img id="detail-card-img" src="" loading="lazy" class="w-full h-full object-contain">
+          <img id="detail-card-img" src="" class="w-full h-full object-contain">
         </div>
         <p id="detail-card-serial" class="text-xl font-black text-amber-400 font-mono mt-1">*01</p>
       </div>
 
       <div class="grid grid-cols-2 gap-2 text-xs">
         <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-          <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="editionLabel">Edition</span>
-          <strong id="detail-card-edition-text" class="text-amber-400 font-semibold">Beta Edition: #0</strong>
+          <span class="text-[10px] text-slate-500 font-bold uppercase block">Edition</span>
+          <strong id="detail-card-edition-text" class="text-amber-400 font-semibold">Beta Edition</strong>
         </div>
         <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-          <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="snLabel">SN (Serial No.)</span>
+          <span class="text-[10px] text-slate-500 font-bold uppercase block">SN</span>
           <strong id="detail-card-sn-text" class="text-indigo-400 font-mono">0001</strong>
         </div>
         <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-          <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="tierLabel">Tier</span>
+          <span class="text-[10px] text-slate-500 font-bold uppercase block">Tier</span>
           <strong id="detail-card-tier-text" class="text-emerald-400 font-semibold">500</strong>
         </div>
         <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-          <span class="text-[10px] text-slate-500 font-bold uppercase block" data-i18n="printingLabel">Printing</span>
+          <span class="text-[10px] text-slate-500 font-bold uppercase block">Printing</span>
           <strong id="detail-card-printing-text" class="text-purple-400 font-mono">1x</strong>
         </div>
       </div>
 
       <div class="space-y-1.5 text-xs bg-slate-950 p-3 rounded-2xl border border-slate-800">
-        <div class="flex justify-between text-slate-400"><span data-i18n="currentOwner">Current Owner:</span><strong id="detail-card-owner" class="text-white">Unowned</strong></div>
-        <div class="flex justify-between text-slate-400"><span data-i18n="floorPrice">Floor Price:</span><strong id="detail-card-price" class="text-emerald-400 font-mono">Rp 0</strong></div>
-        <div class="flex justify-between text-slate-400"><span data-i18n="availability">Availability:</span><strong id="detail-card-status" class="text-amber-400">AVAILABLE</strong></div>
+        <div class="flex justify-between text-slate-400"><span>Current Owner:</span><strong id="detail-card-owner" class="text-white">Unowned</strong></div>
+        <div class="flex justify-between text-slate-400"><span>Floor Price:</span><strong id="detail-card-price" class="text-emerald-400 font-mono">Rp 0</strong></div>
+        <div class="flex justify-between text-slate-400"><span>Availability:</span><strong id="detail-card-status" class="text-amber-400">AVAILABLE</strong></div>
       </div>
 
       <div id="detail-card-action-container"></div>
@@ -887,60 +609,51 @@
         <div class="w-16 h-16 rounded-2xl mx-auto bg-slate-950 border border-indigo-500/40 p-2 shadow-lg flex items-center justify-center">
           <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
         </div>
-        <h3 class="text-lg font-black text-white" data-i18n="loginTitle">Log In to Eugene Card</h3>
-        <p class="text-xs text-slate-400" data-i18n="loginSub">Sign in to customize your collector profile and trade cards.</p>
+        <h3 class="text-lg font-black text-white">Log In to Eugene Card</h3>
+        <p class="text-xs text-slate-400">Sign in to customize your collector profile and trade cards.</p>
       </div>
 
       <button onclick="loginWithGoogle()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all">
-        <i class="fa-brands fa-google text-red-500 text-sm"></i> <span data-i18n="continueGoogle">Continue with Google</span>
+        <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Continue with Google</span>
       </button>
     </div>
   </div>
 
-  <!-- CART DRAWER & CHECKOUT -->
+  <!-- CART DRAWER -->
   <div id="cart-drawer-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden" onclick="toggleCartDrawer()"></div>
   <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6">
     <div>
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-        <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> <span data-i18n="cartTitle">Cart (QRIS Checkout)</span></h3>
+        <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> Cart (QRIS Checkout)</h3>
         <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div id="cart-items-container" class="py-4 space-y-3 overflow-y-auto max-h-[50vh]"></div>
     </div>
     <div class="space-y-4 pt-4 border-t border-slate-800">
       <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2 text-xs">
-        <div class="flex justify-between text-slate-400"><span data-i18n="subtotal">Subtotal</span><span id="cart-subtotal" class="font-mono text-white">Rp 0</span></div>
-        <div class="flex justify-between text-slate-400"><span data-i18n="platformTax">Platform Tax (2%)</span><span id="cart-tax" class="font-mono text-amber-400">Rp 0</span></div>
-        <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span data-i18n="totalIncTax">Total (Inc. 2% Tax)</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
+        <div class="flex justify-between text-slate-400"><span>Subtotal</span><span id="cart-subtotal" class="font-mono text-white">Rp 0</span></div>
+        <div class="flex justify-between text-slate-400"><span>Platform Tax (2%)</span><span id="cart-tax" class="font-mono text-amber-400">Rp 0</span></div>
+        <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span>Total (Inc. 2% Tax)</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
       </div>
-      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg hover:bg-amber-400 transition-all" data-i18n="proceedQrisBtn">Proceed to QRIS Payment</button>
+      <button onclick="proceedToCheckout()" class="w-full py-3.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg hover:bg-amber-400 transition-all">Proceed to QRIS Payment</button>
     </div>
   </div>
 
-  <!-- CHECKOUT MODAL WITH QRIS PROOF UPLOAD -->
+  <!-- CHECKOUT MODAL -->
   <div id="checkout-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 relative shadow-2xl text-center max-h-[90vh] overflow-y-auto">
       <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-lg font-black text-white" data-i18n="scanPayQris">Scan & Pay via Official QRIS</h3>
-      <p class="text-[10px] text-slate-400"><span data-i18n="merchantLabel">Merchant</span>: <strong class="text-white">Eugene Card, Toko Kartu</strong></p>
+      <h3 class="text-lg font-black text-white">Scan & Pay via Official QRIS</h3>
+      <p class="text-[10px] text-slate-400">Merchant: <strong class="text-white">Eugene Card, Toko Kartu</strong></p>
       
       <img id="qris-img-element" src="" class="w-48 h-48 mx-auto bg-white p-2 rounded-2xl shadow-inner border border-slate-800">
       
       <div>
-        <p class="text-[10px] text-slate-500 font-bold uppercase" data-i18n="totalPayAmount">Total Payment Amount (Inc. 2% Platform Tax)</p>
+        <p class="text-[10px] text-slate-500 font-bold uppercase">Total Payment Amount (Inc. 2% Tax)</p>
         <p id="qris-amount-display" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
       </div>
 
-      <div class="text-left space-y-2 bg-slate-950 p-3 rounded-2xl border border-slate-800 text-xs">
-        <label class="block font-bold text-slate-300" data-i18n="uploadReceiptLabel">Upload QRIS Transfer Receipt Screenshot</label>
-        <input type="file" id="qris-proof-file-input" accept="image/*" onchange="handleQrisScreenshotUpload(event)" class="w-full text-[11px] text-slate-400 bg-slate-900 border border-slate-800 rounded-xl p-2 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-amber-500 file:text-slate-950">
-        <input type="hidden" id="qris-proof-img-data" value="">
-        <div id="qris-proof-preview-container" class="hidden text-center pt-2">
-          <img id="qris-proof-preview-img" src="" class="h-24 mx-auto rounded border border-slate-700">
-        </div>
-      </div>
-
-      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all" data-i18n="submitQrisOrderBtn">Submit QRIS Order for Admin Approval</button>
+      <button onclick="submitOrderWithProof()" class="w-full py-3 bg-emerald-500 text-slate-950 font-extrabold text-xs rounded-xl hover:bg-emerald-400 transition-all">Submit QRIS Order for Admin Approval</button>
     </div>
   </div>
 
@@ -948,6 +661,24 @@
   <div id="toast" class="fixed bottom-6 right-6 z-[10000] bg-slate-900 border border-amber-500/40 text-amber-300 text-xs font-semibold px-4 py-3 rounded-2xl shadow-xl transform translate-y-20 opacity-0 transition-all pointer-events-none">
     <span id="toast-msg">Action completed.</span>
   </div>
+
+  <!-- Navigation Helper to Check Analytics Access Before Redirecting -->
+  <script>
+    async function navigateToAnalytics(e) {
+      e.preventDefault();
+      if (!currentUser) {
+        openAuthModal();
+        showToast("Please sign in to access Market Analytics.");
+        return;
+      }
+      const hasAccess = await checkUserAnalyticsAccess(currentUser);
+      if (hasAccess) {
+        window.location.href = 'analytics.html';
+      } else {
+        showToast("Analytics is exclusive to PLUS members & Admins. Upgrade your profile to unlock!");
+      }
+    }
+  </script>
 
   <!-- JavaScript Modules -->
   <script src="js/firebase-config.js"></script>
