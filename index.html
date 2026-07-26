@@ -79,72 +79,79 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-base tracking-wider text-white uppercase" data-i18n="brandTitle">EUGENE CARD</h1>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30" data-i18n="betaEdition">Beta Edition</span>
+            <h1 class="font-extrabold text-base tracking-wider text-white uppercase">EUGENE CARD</h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Beta Edition</span>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block" data-i18n="brandSubtitle">Trading Card Marketplace & Exchange Hub</p>
+          <p class="text-xs text-slate-400 hidden sm:block">Trading Card Marketplace & Exchange Hub</p>
         </div>
       </div>
 
       <!-- Navigation Tabs -->
       <nav class="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 overflow-x-auto max-w-full">
         <button id="nav-catalog" onclick="switchTab('catalog')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-layer-group text-amber-400"></i> <span data-i18n="navCollection">Collection</span>
+          <i class="fa-solid fa-layer-group text-amber-400"></i> <span>Collection</span>
         </button>
         <button id="nav-trade" onclick="switchTab('trade')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-right-left text-amber-400"></i> <span data-i18n="navTrade">Trade</span>
+          <i class="fa-solid fa-right-left text-amber-400"></i> <span>Trade</span>
         </button>
         <button id="nav-auction" onclick="switchTab('auction')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-gavel text-emerald-400"></i> <span data-i18n="navAuction">Auction</span>
+          <i class="fa-solid fa-gavel text-emerald-400"></i> <span>Auction</span>
         </button>
         <button id="nav-trade-req" onclick="switchTab('trade-req')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navRequests">Trade Requests</span>
+          <i class="fa-solid fa-handshake text-purple-400"></i> <span>Trade Requests</span>
         </button>
-        <button id="nav-analytics" onclick="switchTab('analytics')" class="analytics-nav-btn hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
-          <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span>
+        <button id="nav-analytics" onclick="switchTab('analytics')" class="analytics-nav-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
+          <i class="fa-solid fa-chart-line text-amber-400"></i> <span>Analytics</span>
         </button>
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-comments text-indigo-400"></i> <span data-i18n="navInbox">Inbox</span>
+          <i class="fa-solid fa-comments text-indigo-400"></i> <span>Inbox</span>
         </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-users text-teal-400"></i> <span data-i18n="navHolders">Holders</span>
+          <i class="fa-solid fa-users text-teal-400"></i> <span>Holders</span>
         </button>
         <button id="nav-history" onclick="switchTab('history')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span data-i18n="navHistory">History</span>
+          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span>History</span>
         </button>
 
         <div class="h-4 w-px bg-slate-800 mx-1 self-center hidden sm:block"></div>
 
         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-vault text-amber-400"></i> <span data-i18n="navVault">My Vault</span>
+          <i class="fa-solid fa-vault text-amber-400"></i> <span>My Vault</span>
         </button>
         <button id="nav-wishlist" onclick="switchTab('wishlist')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-heart text-rose-400"></i> <span data-i18n="navWishlist">Wishlist</span>
+          <i class="fa-solid fa-heart text-rose-400"></i> <span>Wishlist</span>
         </button>
 
-        <div id="admin-nav-separator" class="h-4 w-px bg-slate-800 mx-1 self-center hidden"></div>
+        <div class="h-4 w-px bg-slate-800 mx-1 self-center hidden"></div>
 
-        <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
-          <i class="fa-solid fa-boxes-stacked"></i> <span data-i18n="navInventory">Inventory</span>
+        <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
+          <i class="fa-solid fa-boxes-stacked"></i> <span>Inventory</span>
         </button>
-        <button id="nav-admin" onclick="switchTab('admin')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
-          <i class="fa-solid fa-shield-halved"></i> <span data-i18n="navAdmin">Admin Hub</span>
+        <button id="nav-admin" onclick="switchTab('admin')" class="admin-only-nav px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
+          <i class="fa-solid fa-shield-halved"></i> <span>Admin Hub</span>
         </button>
       </nav>
 
-      <!-- Language Toggle & Auth -->
+      <!-- Language Toggle, Cart & Auth Header -->
       <div class="flex items-center gap-2 shrink-0">
         <button onclick="toggleLanguage()" class="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-mono font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-1">
           <i class="fa-solid fa-globe text-[11px]"></i>
           <span id="current-lang-label">EN</span>
         </button>
+
+        <button onclick="toggleCartDrawer()" class="relative p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-800 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-cart-shopping text-sm text-amber-400"></i>
+          <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
+        </button>
+
+        <!-- Dynamic Auth Header -->
         <div id="auth-header-container"></div>
       </div>
 
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- Main Content Area -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8">
 
     <!-- CATALOG VIEW -->
@@ -157,11 +164,30 @@
           <div>
             <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider">LIMITED EDITION</span>
             <h2 class="text-lg font-black text-white mt-0.5">Beta Edition Card Stock</h2>
-            <p class="text-xs text-slate-400">Official Primary Market Availability</p>
+            <p class="text-xs text-slate-400">Official Primary Market Availability (2% Tax Included)</p>
           </div>
+        </div>
+        
+        <div class="bg-slate-950/80 px-6 py-3 rounded-2xl border border-slate-800 text-center sm:text-right w-full sm:w-auto">
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Remaining Cards</p>
+          <p class="text-2xl font-black font-mono text-amber-400"><span id="remaining-cards-count">50</span> <span class="text-slate-500 text-sm font-normal">/ 50 Available</span></p>
         </div>
       </div>
 
+      <!-- Search & Category Filters -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800/80">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="search-input" oninput="debouncedRenderCardGrid()" placeholder="Search serial (*01 / *001) or card name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">All</button>
+          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Premium</button>
+          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Standard</button>
+        </div>
+      </div>
+
+      <!-- Card Grid Container -->
       <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </section>
 
@@ -178,7 +204,7 @@
         </button>
       </div>
 
-      <!-- ANALYTICS METRIC CARDS -->
+      <!-- METRICS TOP CARDS -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1">
           <p class="text-[10px] font-bold text-slate-400 uppercase">Total Marketplace Volume</p>
@@ -234,24 +260,65 @@
     </section>
 
     <!-- OTHER VIEWS PLACEHOLDERS -->
-    <section id="view-trade" class="hidden"><p class="text-slate-400 text-xs">Trade view initialized.</p></section>
-    <section id="view-auction" class="hidden"><p class="text-slate-400 text-xs">Auction view initialized.</p></section>
-    <section id="view-trade-req" class="hidden"><p class="text-slate-400 text-xs">Requests view initialized.</p></section>
-    <section id="view-inbox" class="hidden"><p class="text-slate-400 text-xs">Inbox view initialized.</p></section>
-    <section id="view-holders" class="hidden"><p class="text-slate-400 text-xs">Holders view initialized.</p></section>
-    <section id="view-history" class="hidden"><p class="text-slate-400 text-xs">History view initialized.</p></section>
-    <section id="view-dashboard" class="hidden"><p class="text-slate-400 text-xs">Vault view initialized.</p></section>
-    <section id="view-wishlist" class="hidden"><p class="text-slate-400 text-xs">Wishlist view initialized.</p></section>
-    <section id="view-inventory" class="hidden"><p class="text-slate-400 text-xs">Inventory view initialized.</p></section>
-    <section id="view-admin" class="hidden"><p class="text-slate-400 text-xs">Admin view initialized.</p></section>
+    <section id="view-trade" class="hidden"><p class="text-slate-400 text-xs">Trade room active.</p></section>
+    <section id="view-auction" class="hidden"><p class="text-slate-400 text-xs">Auction room active.</p></section>
+    <section id="view-trade-req" class="hidden"><p class="text-slate-400 text-xs">Trade requests active.</p></section>
+    <section id="view-inbox" class="hidden"><p class="text-slate-400 text-xs">Inbox active.</p></section>
+    <section id="view-holders" class="hidden"><p class="text-slate-400 text-xs">Holders directory active.</p></section>
+    <section id="view-history" class="hidden"><p class="text-slate-400 text-xs">History active.</p></section>
+    <section id="view-dashboard" class="hidden"><p class="text-slate-400 text-xs">My Vault active.</p></section>
+    <section id="view-wishlist" class="hidden"><p class="text-slate-400 text-xs">Wishlist active.</p></section>
+    <section id="view-inventory" class="hidden"><p class="text-slate-400 text-xs">Inventory management active.</p></section>
+    <section id="view-admin" class="hidden"><p class="text-slate-400 text-xs">Admin hub active.</p></section>
 
   </main>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 rounded-2xl mx-auto bg-slate-950 border border-indigo-500/40 p-2 shadow-lg flex items-center justify-center">
+          <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
+        </div>
+        <h3 class="text-lg font-black text-white">Log In to Eugene Card</h3>
+        <p class="text-xs text-slate-400">Sign in to customize your collector profile and trade cards.</p>
+      </div>
+
+      <button onclick="loginWithGoogle()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all">
+        <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Continue with Google</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CART DRAWER -->
+  <div id="cart-drawer-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden" onclick="toggleCartDrawer()"></div>
+  <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-900 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between p-6">
+    <div>
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <h3 class="text-base font-extrabold text-white"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> <span>Cart (QRIS Checkout)</span></h3>
+        <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="cart-items-container" class="py-4 space-y-3 overflow-y-auto max-h-[50vh]"></div>
+    </div>
+    <div class="space-y-4 pt-4 border-t border-slate-800">
+      <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2 text-xs">
+        <div class="flex justify-between text-slate-400"><span>Subtotal</span><span id="cart-subtotal" class="font-mono text-white">Rp 0</span></div>
+        <div class="flex justify-between text-slate-400"><span>Platform Tax (2%)</span><span id="cart-tax" class="font-mono text-amber-400">Rp 0</span></div>
+        <div class="flex justify-between font-extrabold text-sm text-white pt-2 border-t border-slate-800"><span>Total (Inc. 2% Tax)</span><span id="cart-grand-total" class="font-mono text-amber-400">Rp 0</span></div>
+      </div>
+    </div>
+  </div>
 
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed bottom-6 right-6 z-[10000] bg-slate-900 border border-amber-500/40 text-amber-300 text-xs font-semibold px-4 py-3 rounded-2xl shadow-xl transform translate-y-20 opacity-0 transition-all pointer-events-none">
     <span id="toast-msg">Action completed.</span>
   </div>
 
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCm13Nh6k6W9wsL0_OPpjKZNrbSg-pFsuA",
@@ -266,9 +333,13 @@
       firebase.initializeApp(firebaseConfig);
     }
 
-    const db = firebase.firestore();
+    const auth = firebase.auth();
     let inventory = [];
-    let currentUser = { name: "Eugene Admin", isAdmin: true };
+    let cart = [];
+    let currentUser = null;
+    let currentFilter = 'ALL';
+    let visibleCardCount = 50; // Show full 50 cards
+    let debounceTimer;
 
     function formatIDR(amount) {
       return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount || 0);
@@ -288,32 +359,75 @@
       if (langLabel) langLabel.innerText = langLabel.innerText === 'EN' ? 'ID' : 'EN';
     }
 
-    function switchTab(tabName) {
-      const views = ['catalog', 'trade', 'auction', 'trade-req', 'analytics', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'inventory', 'admin'];
-      views.forEach(v => {
-        const el = document.getElementById(`view-${v}`);
-        if (el) el.classList.add('hidden');
-      });
-      const active = document.getElementById(`view-${tabName}`);
-      if (active) active.classList.remove('hidden');
+    function renderAuthHeader() {
+      const container = document.getElementById('auth-header-container');
+      if (!container) return;
 
-      if (tabName === 'analytics') renderMarketAnalytics();
+      if (currentUser) {
+        container.innerHTML = `
+          <div class="flex items-center gap-2.5 bg-slate-900 border border-slate-800 rounded-xl p-1.5 pl-2.5 cursor-pointer">
+            <img src="${currentUser.photoURL || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + currentUser.email}" class="w-7 h-7 rounded-full object-cover">
+            <div class="flex flex-col text-right">
+              <span class="text-xs font-black text-white leading-tight">${currentUser.displayName || 'Eugene'}</span>
+              <span class="text-[9px] font-bold text-amber-400 font-mono">Collector</span>
+            </div>
+            <button onclick="logoutUser()" class="p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg ml-1"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `<button onclick="openAuthModal()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all">Log In</button>`;
+      }
     }
 
-    function initMockInventory() {
+    function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
+    function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+
+    async function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        await auth.signInWithPopup(provider);
+        closeAuthModal();
+      } catch (err) {
+        showToast("Login error: " + err.message);
+      }
+    }
+
+    async function logoutUser() {
+      await auth.signOut();
+      currentUser = null;
+      renderAuthHeader();
+      showToast("Logged out.");
+    }
+
+    function generateCardSvg(serial, isPremium) {
+      const color1 = isPremium ? '%231e1b4b' : '%230f172a';
+      const color2 = isPremium ? '%23fbbf24' : '%233b82f6';
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" width="100%" height="100%">
+        <rect width="300" height="400" rx="16" fill="${color1}"/>
+        <circle cx="150" cy="180" r="80" fill="none" stroke="${color2}" stroke-width="4" stroke-dasharray="10 5"/>
+        <polygon points="150,120 190,160 190,210 150,250 110,210 110,160" fill="${color2}" opacity="0.8"/>
+        <text x="150" y="320" font-family="sans-serif" font-weight="900" font-size="28" fill="${color2}" text-anchor="middle">${serial}</text>
+      </svg>`;
+      return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    }
+
+    function initFull50Inventory() {
       const list = [];
       for (let i = 1; i <= 50; i++) {
         const isPremium = i <= 25;
         const padNum = String(i).padStart(2, '0');
+        const serialStr = `*${padNum}`;
         const price = isPremium ? 500000 : 100000;
+        
         list.push({
           id: `card-${padNum}`,
-          serial: `*${padNum}`,
+          serial: serialStr,
           name: isPremium ? `Eugene Premium #${padNum}` : `Eugene Standard #${padNum}`,
           type: isPremium ? 'PREMIUM' : 'STANDARD',
           price: price,
           tier: isPremium ? '500' : '100',
-          imgUrl: `https://placehold.co/1080x1350/${isPremium ? '1e1b4b' : '0f172a'}/fbbf24?text=*${padNum}`
+          status: 'AVAILABLE',
+          imgUrl: generateCardSvg(serialStr, isPremium)
         });
       }
       return list;
@@ -351,6 +465,63 @@
       }
 
       return { estimatedProbabilisticPrice, futureProjectedPrice, growthPct, ratingLabel, ratingColor };
+    }
+
+    function renderCardGrid() {
+      const grid = document.getElementById('card-grid');
+      if (!grid) return;
+
+      const searchVal = (document.getElementById('search-input')?.value || '').toLowerCase();
+      const filtered = inventory.filter(card => {
+        const matchesFilter = currentFilter === 'ALL' ? true : card.type === currentFilter;
+        const matchesSearch = (card.serial || '').toLowerCase().includes(searchVal) || (card.name || '').toLowerCase().includes(searchVal);
+        return matchesFilter && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">No cards match your filter.</div>`;
+        return;
+      }
+
+      const visible = filtered.slice(0, visibleCardCount);
+
+      grid.innerHTML = visible.map(card => {
+        const isPremium = card.type === 'PREMIUM';
+        return `
+          <div class="${isPremium ? 'card-holo-premium' : 'card-holo-standard'} rounded-2xl p-3 flex flex-col justify-between relative cursor-pointer">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${isPremium ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span>
+              <i class="fa-regular fa-heart text-slate-500 hover:text-rose-400 transition-colors"></i>
+            </div>
+
+            <div class="w-full aspect-[4/5] bg-slate-950/80 rounded-xl border border-slate-800 p-2 flex items-center justify-center mb-2 overflow-hidden">
+              <img src="${card.imgUrl}" loading="lazy" class="w-full h-full object-contain">
+            </div>
+
+            <p class="text-center font-black ${isPremium ? 'text-amber-400' : 'text-blue-400'} font-mono mb-1">${card.serial}</p>
+            <p class="text-[11px] font-extrabold text-white truncate text-center">${card.name}</p>
+            
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs font-mono text-emerald-400 font-extrabold">${formatIDR(card.price)}</span>
+              <button onclick="addToCart('${card.id}')" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-lg transition-all">Buy</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function debouncedRenderCardGrid() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(renderCardGrid, 150);
+    }
+
+    function setFilter(type) {
+      currentFilter = type;
+      ['ALL', 'PREMIUM', 'STANDARD'].forEach(f => {
+        const btn = document.getElementById(`filter-${f}`);
+        if (btn) btn.className = f === type ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all' : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
+      });
+      renderCardGrid();
     }
 
     function renderMarketAnalytics() {
@@ -398,24 +569,39 @@
       }).join('');
     }
 
-    function renderCardGrid() {
-      const grid = document.getElementById('card-grid');
-      if (!grid) return;
-      grid.innerHTML = inventory.slice(0, 10).map(card => `
-        <div class="card-holo-standard rounded-2xl p-3 flex flex-col justify-between relative cursor-pointer">
-          <p class="text-center font-black text-amber-400 font-mono">${card.serial}</p>
-          <p class="text-xs font-bold text-white text-center">${card.name}</p>
-          <span class="text-xs font-mono text-emerald-400 font-extrabold text-center block mt-1">${formatIDR(card.price)}</span>
-        </div>
-      `).join('');
+    function switchTab(tabName) {
+      const views = ['catalog', 'trade', 'auction', 'trade-req', 'analytics', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'inventory', 'admin'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) el.classList.add('hidden');
+      });
+      const active = document.getElementById(`view-${tabName}`);
+      if (active) active.classList.remove('hidden');
+
+      if (tabName === 'analytics') renderMarketAnalytics();
+    }
+
+    function addToCart(cardId) {
+      const card = inventory.find(c => c.id === cardId);
+      if (!card || cart.some(i => i.id === cardId)) return;
+      cart.push(card);
+      document.getElementById('cart-badge-count').innerText = cart.length;
+      showToast(`Added ${card.serial} to cart.`);
+    }
+
+    function toggleCartDrawer() {
+      document.getElementById('cart-drawer').classList.toggle('translate-x-full');
+      document.getElementById('cart-drawer-overlay').classList.toggle('hidden');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      inventory = initMockInventory();
+      inventory = initFull50Inventory();
       renderCardGrid();
-      
-      const adminNavs = document.querySelectorAll('.admin-only-nav, .analytics-nav-btn');
-      adminNavs.forEach(el => el.classList.remove('hidden'));
+
+      auth.onAuthStateChanged(user => {
+        currentUser = user;
+        renderAuthHeader();
+      });
     });
   </script>
 </body>
