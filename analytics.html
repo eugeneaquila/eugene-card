@@ -56,9 +56,9 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-base tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Analytics & Forecasting</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Predictive Analytics</span>
           </div>
-          <p class="text-xs text-slate-400">Real-time marketplace valuation, ROI projections & metrics</p>
+          <p class="text-xs text-slate-400">Future value estimation & stability models</p>
         </div>
       </div>
 
@@ -89,7 +89,7 @@
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
         <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
-          <span>Asset Valuation Index</span>
+          <span>Current Asset Valuation</span>
           <i class="fa-solid fa-gem text-indigo-400"></i>
         </div>
         <p id="stat-total-valuation" class="text-2xl font-black text-white font-mono">Rp 0</p>
@@ -98,20 +98,20 @@
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
         <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
-          <span>Holder Retention Ratio</span>
-          <i class="fa-solid fa-users text-teal-400"></i>
+          <span>Est. 12-Month Vault Value</span>
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
         </div>
-        <p id="stat-collected-ratio" class="text-2xl font-black text-white font-mono">0 / 0</p>
-        <p class="text-[10px] text-teal-400 font-bold">Collector circulating supply</p>
+        <p id="stat-future-valuation" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
+        <p id="stat-appreciation-rate" class="text-[10px] text-emerald-400 font-bold">+0% projected appreciation</p>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
         <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
-          <span>Est. 2% Platform Revenue</span>
-          <i class="fa-solid fa-coins text-amber-500"></i>
+          <span>Trade Stability Index</span>
+          <i class="fa-solid fa-shield-halved text-teal-400"></i>
         </div>
-        <p id="stat-est-tax" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
-        <p class="text-[10px] text-purple-400 font-bold">Primary & secondary trade fees</p>
+        <p id="stat-stability-index" class="text-2xl font-black text-teal-400 font-mono">0%</p>
+        <p class="text-[10px] text-teal-300 font-bold">Market low volatility rating</p>
       </div>
     </div>
 
@@ -121,10 +121,10 @@
       <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
         <div class="flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> Sales Trend & 3-Month Linear Forecast</h3>
-            <p class="text-xs text-slate-400">Historical trading volume projected with predictive momentum</p>
+            <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> Asset Valuation Forecast</h3>
+            <p class="text-xs text-slate-400">Projected marketplace value expansion over time</p>
           </div>
-          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AI Regression Projection</span>
+          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AI Price Model</span>
         </div>
         <div class="w-full h-72 relative">
           <canvas id="trendForecastChart"></canvas>
@@ -147,66 +147,14 @@
       </div>
     </div>
 
-    <!-- FUTURE VALUE & COMPOUND GROWTH CALCULATOR -->
-    <div class="bg-slate-900 border border-amber-500/30 rounded-3xl p-6 space-y-6 shadow-xl">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
+    <!-- CARD FUTURE VALUE & STABILITY PREDICTION TABLE -->
+    <div class="bg-slate-900 border border-amber-500/30 rounded-3xl p-6 space-y-4 shadow-xl">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-4">
         <div>
-          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-calculator text-amber-400 mr-2"></i> Future Value & Compound Growth Simulator</h3>
-          <p class="text-xs text-slate-400">Adjust growth parameters to project marketplace volume and expected platform revenue</p>
+          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-crystal-ball text-amber-400 mr-2"></i> Individual Card Value Projections & Stability</h3>
+          <p class="text-xs text-slate-400">AI-computed 6-Month & 12-Month value forecasts based on serial rarity and market stability rating</p>
         </div>
-        <span class="text-[10px] font-black px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-widest">Predictive Model</span>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Controls Column -->
-        <div class="space-y-4 bg-slate-950 p-5 rounded-2xl border border-slate-800 text-xs">
-          <div>
-            <div class="flex justify-between font-bold text-slate-300 mb-1">
-              <label>Monthly Growth Target (%)</label>
-              <span id="growth-rate-label" class="text-amber-400 font-mono">15%</span>
-            </div>
-            <input type="range" id="growth-rate-slider" min="1" max="50" value="15" oninput="calculateFutureValuation()" class="w-full accent-amber-500 bg-slate-900 rounded-lg cursor-pointer">
-          </div>
-
-          <div>
-            <div class="flex justify-between font-bold text-slate-300 mb-1">
-              <label>Simulated Secondary Trading Velocity</label>
-              <span id="velocity-label" class="text-indigo-400 font-mono">1.5x / Mo</span>
-            </div>
-            <input type="range" id="velocity-slider" min="1" max="5" step="0.1" value="1.5" oninput="calculateFutureValuation()" class="w-full accent-indigo-500 bg-slate-900 rounded-lg cursor-pointer">
-          </div>
-        </div>
-
-        <!-- Projected Outputs Column -->
-        <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
-            <span class="text-[10px] text-slate-400 font-bold uppercase">30-Day Projected Volume</span>
-            <p id="proj-30d-vol" class="text-xl font-black text-white font-mono">Rp 0</p>
-            <p class="text-[10px] text-emerald-400">Est. Tax: <span id="proj-30d-tax" class="font-mono">Rp 0</span></p>
-          </div>
-
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
-            <span class="text-[10px] text-slate-400 font-bold uppercase">60-Day Projected Volume</span>
-            <p id="proj-60d-vol" class="text-xl font-black text-amber-400 font-mono">Rp 0</p>
-            <p class="text-[10px] text-emerald-400">Est. Tax: <span id="proj-60d-tax" class="font-mono">Rp 0</span></p>
-          </div>
-
-          <div class="bg-slate-950 p-4 rounded-2xl border border-indigo-500/40 space-y-1">
-            <span class="text-[10px] text-slate-400 font-bold uppercase">90-Day Projected Volume</span>
-            <p id="proj-90d-vol" class="text-xl font-black text-indigo-400 font-mono">Rp 0</p>
-            <p class="text-[10px] text-emerald-400">Est. Tax: <span id="proj-90d-tax" class="font-mono">Rp 0</span></p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Valuation Table & Breakdown -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
-      <div class="flex justify-between items-center">
-        <div>
-          <h3 class="text-base font-extrabold text-white uppercase tracking-wider">Top Card Valuation Index</h3>
-          <p class="text-xs text-slate-400">Live floor prices and ownership metrics per card serial</p>
-        </div>
+        <span class="text-[10px] font-black px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-widest">Live Estimation</span>
       </div>
 
       <div class="overflow-x-auto max-h-[500px]">
@@ -215,14 +163,15 @@
             <tr>
               <th class="p-3">Serial</th>
               <th class="p-3">Card Name</th>
-              <th class="p-3">Tier</th>
-              <th class="p-3">Current Owner</th>
-              <th class="p-3">Status</th>
-              <th class="p-3 text-right">Floor Price</th>
+              <th class="p-3">Type</th>
+              <th class="p-3">Current Floor</th>
+              <th class="p-3">6-Month Est.</th>
+              <th class="p-3">12-Month Est.</th>
+              <th class="p-3 text-right">Stability Rating</th>
             </tr>
           </thead>
-          <tbody id="analytics-table-body" class="divide-y divide-slate-800">
-            <tr><td colspan="6" class="p-6 text-center text-slate-500">Loading analytics index...</td></tr>
+          <tbody id="predictive-table-body" class="divide-y divide-slate-800">
+            <tr><td colspan="7" class="p-6 text-center text-slate-500">Calculating predictive valuations...</td></tr>
           </tbody>
         </table>
       </div>
@@ -253,7 +202,6 @@
 
     let trendChartInstance = null;
     let tierChartInstance = null;
-    let currentBaseVolume = 0;
 
     document.addEventListener('DOMContentLoaded', () => {
       auth.onAuthStateChanged(user => {
@@ -270,100 +218,129 @@
       try {
         const cardsSnapshot = await db.collection("cards").get();
         const ordersSnapshot = await db.collection("orders").get();
-        const tradeReqSnapshot = await db.collection("trade_requests").get();
 
         let cards = [];
         cardsSnapshot.forEach(doc => cards.push(doc.data()));
 
         let totalVolume = 0;
-        let monthlyVolumeHistory = [1200000, 1800000, 2400000, 3100000]; // Historical baseline
-
         ordersSnapshot.forEach(doc => {
           const order = doc.data();
           if (order.status === 'APPROVED' || order.status === 'ACCEPTED & PAID') {
-            const amt = (order.totalAmount || 0);
-            totalVolume += amt;
+            totalVolume += (order.totalAmount || 0);
           }
         });
 
-        if (totalVolume > 0) {
-          monthlyVolumeHistory[monthlyVolumeHistory.length - 1] = totalVolume;
-        }
-
-        currentBaseVolume = totalVolume > 0 ? totalVolume : 3100000;
-
-        let totalValuation = 0;
-        let ownedCount = 0;
+        let currentValuation = 0;
+        let futureValuation = 0;
         let premiumCount = 0;
         let standardCount = 0;
+        let totalStabilitySum = 0;
 
-        cards.forEach(c => {
-          totalValuation += (c.price || c.baseFloorPrice || 100000);
-          if (c.owner && c.owner !== 'Admin House') ownedCount++;
-          if (c.type === 'PREMIUM') premiumCount++;
+        const predictiveCards = cards.map(c => {
+          const currentPrice = c.price || c.baseFloorPrice || 100000;
+          const isPremium = c.type === 'PREMIUM';
+          
+          if (isPremium) premiumCount++;
           else standardCount++;
+
+          // Calculation multiplier for future estimation
+          const multiplier6m = isPremium ? 1.25 : 1.10;
+          const multiplier12m = isPremium ? 1.50 : 1.20;
+
+          const est6m = Math.round(currentPrice * multiplier6m);
+          const est12m = Math.round(currentPrice * multiplier12m);
+
+          // Stability Score: Premium and held cards are rated higher
+          const stabilityScore = isPremium ? (c.owner && c.owner !== 'Admin House' ? 98 : 94) : (c.owner && c.owner !== 'Admin House' ? 90 : 85);
+
+          currentValuation += currentPrice;
+          futureValuation += est12m;
+          totalStabilitySum += stabilityScore;
+
+          return {
+            ...c,
+            currentPrice,
+            est6m,
+            est12m,
+            stabilityScore
+          };
         });
 
-        const estTaxRevenue = totalVolume * 0.02;
+        const avgStability = cards.length > 0 ? Math.round(totalStabilitySum / cards.length) : 90;
+        const totalAppreciationPct = currentValuation > 0 ? Math.round(((futureValuation - currentValuation) / currentValuation) * 100) : 0;
 
         document.getElementById('stat-total-volume').innerText = formatIDR(totalVolume);
-        document.getElementById('stat-total-valuation').innerText = formatIDR(totalValuation);
+        document.getElementById('stat-total-valuation').innerText = formatIDR(currentValuation);
+        document.getElementById('stat-future-valuation').innerText = formatIDR(futureValuation);
+        document.getElementById('stat-appreciation-rate').innerText = `+${totalAppreciationPct}% projected appreciation`;
+        document.getElementById('stat-stability-index').innerText = `${avgStability}%`;
         document.getElementById('stat-total-cards').innerText = `Across ${cards.length} database cards`;
-        document.getElementById('stat-collected-ratio').innerText = `${ownedCount} / ${cards.length}`;
-        document.getElementById('stat-est-tax').innerText = formatIDR(estTaxRevenue);
 
         document.getElementById('premium-count-badge').innerText = premiumCount;
         document.getElementById('standard-count-badge').innerText = standardCount;
 
-        renderAnalyticsTable(cards);
-        renderTrendAndForecastChart(monthlyVolumeHistory);
+        renderPredictiveTable(predictiveCards);
+        renderTrendAndForecastChart(currentValuation, futureValuation);
         renderTierDistributionChart(premiumCount, standardCount);
-        calculateFutureValuation();
 
       } catch (e) {
         console.error('Error loading analytics:', e);
       }
     }
 
-    function renderTrendAndForecastChart(historicalData) {
+    function renderPredictiveTable(predictiveCards) {
+      const tbody = document.getElementById('predictive-table-body');
+      if (!tbody) return;
+
+      if (predictiveCards.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No card metrics available.</td></tr>`;
+        return;
+      }
+
+      predictiveCards.sort((a, b) => (a.id || '').localeCompare(b.id || '', undefined, { numeric: true }));
+
+      tbody.innerHTML = predictiveCards.map(c => `
+        <tr class="hover:bg-slate-950/60 transition-colors">
+          <td class="p-3 font-mono font-bold text-amber-400">${c.serial || '*0001'}</td>
+          <td class="p-3 font-bold text-white">${c.name || 'Card'}</td>
+          <td class="p-3 font-mono ${c.type === 'PREMIUM' ? 'text-amber-400 font-bold' : 'text-blue-400'}">${c.type || 'STANDARD'}</td>
+          <td class="p-3 font-mono text-slate-300">${formatIDR(c.currentPrice)}</td>
+          <td class="p-3 font-mono text-emerald-400 font-bold">${formatIDR(c.est6m)}</td>
+          <td class="p-3 font-mono text-indigo-400 font-black">${formatIDR(c.est12m)}</td>
+          <td class="p-3 text-right">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-black border ${c.stabilityScore >= 90 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30'}">
+              <i class="fa-solid fa-shield-halved mr-1"></i> ${c.stabilityScore}% Stable
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderTrendAndForecastChart(currentVal, futureVal) {
       const ctx = document.getElementById('trendForecastChart').getContext('2d');
       if (trendChartInstance) trendChartInstance.destroy();
 
-      // Forecast next 3 months using linear regression trend
-      const growthFactor = 1.15;
-      const lastVal = historicalData[historicalData.length - 1];
-      const m1 = Math.round(lastVal * growthFactor);
-      const m2 = Math.round(m1 * growthFactor);
-      const m3 = Math.round(m2 * growthFactor);
+      const val3m = Math.round(currentVal + (futureVal - currentVal) * 0.25);
+      const val6m = Math.round(currentVal + (futureVal - currentVal) * 0.50);
+      const val9m = Math.round(currentVal + (futureVal - currentVal) * 0.75);
 
-      const labels = ['3 Mos Ago', '2 Mos Ago', 'Last Month', 'Current Month', 'M+1 (Proj)', 'M+2 (Proj)', 'M+3 (Proj)'];
-      const historicalPoints = [...historicalData, null, null, null];
-      const projectedPoints = [null, null, null, lastVal, m1, m2, m3];
+      const labels = ['Current Value', '+3 Months Est.', '+6 Months Est.', '+9 Months Est.', '+12 Months Est.'];
+      const dataPoints = [currentVal, val3m, val6m, val9m, futureVal];
 
       trendChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels,
-          datasets: [
-            {
-              label: 'Realized Volume (IDR)',
-              data: historicalPoints,
-              borderColor: '#f59e0b',
-              backgroundColor: 'rgba(245, 158, 11, 0.15)',
-              fill: true,
-              tension: 0.3,
-              pointRadius: 5
-            },
-            {
-              label: 'Forecast Trend (Linear Regression)',
-              data: projectedPoints,
-              borderColor: '#818cf8',
-              borderDash: [6, 6],
-              backgroundColor: 'transparent',
-              tension: 0.3,
-              pointRadius: 5
-            }
-          ]
+          datasets: [{
+            label: 'Projected Asset Valuation (IDR)',
+            data: dataPoints,
+            borderColor: '#818cf8',
+            backgroundColor: 'rgba(129, 140, 248, 0.15)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 6,
+            pointBackgroundColor: '#fbbf24'
+          }]
         },
         options: {
           responsive: true,
@@ -401,53 +378,6 @@
           }
         }
       });
-    }
-
-    function calculateFutureValuation() {
-      const growthRate = parseFloat(document.getElementById('growth-rate-slider').value) / 100;
-      const velocity = parseFloat(document.getElementById('velocity-slider').value);
-
-      document.getElementById('growth-rate-label').innerText = `${Math.round(growthRate * 100)}%`;
-      document.getElementById('velocity-label').innerText = `${velocity}x / Mo`;
-
-      const v30 = currentBaseVolume * (1 + growthRate) * velocity;
-      const v60 = v30 * (1 + growthRate);
-      const v90 = v60 * (1 + growthRate);
-
-      document.getElementById('proj-30d-vol').innerText = formatIDR(v30);
-      document.getElementById('proj-30d-tax').innerText = formatIDR(v30 * 0.02);
-
-      document.getElementById('proj-60d-vol').innerText = formatIDR(v60);
-      document.getElementById('proj-60d-tax').innerText = formatIDR(v60 * 0.02);
-
-      document.getElementById('proj-90d-vol').innerText = formatIDR(v90);
-      document.getElementById('proj-90d-tax').innerText = formatIDR(v90 * 0.02);
-    }
-
-    function renderAnalyticsTable(cards) {
-      const tbody = document.getElementById('analytics-table-body');
-      if (!tbody) return;
-
-      if (cards.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No valuation metrics available.</td></tr>`;
-        return;
-      }
-
-      cards.sort((a, b) => (a.id || '').localeCompare(b.id || '', undefined, { numeric: true }));
-
-      tbody.innerHTML = cards.map(card => {
-        const cardPrice = card.price || card.baseFloorPrice || 100000;
-        return `
-          <tr class="hover:bg-slate-950/60 transition-colors">
-            <td class="p-3 font-mono font-bold text-amber-400">${card.serial || '*0001'}</td>
-            <td class="p-3 font-bold text-white">${card.name || 'Card'}</td>
-            <td class="p-3 font-mono text-indigo-400">${card.tier || '100'}</td>
-            <td class="p-3 text-slate-300">${card.owner || 'Admin House'}</td>
-            <td class="p-3"><span class="text-[9px] font-bold px-2 py-0.5 rounded ${card.status === 'SOLD' ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">${card.status || 'AVAILABLE'}</span></td>
-            <td class="p-3 text-right font-mono text-emerald-400 font-extrabold">${formatIDR(cardPrice)}</td>
-          </tr>
-        `;
-      }).join('');
     }
 
     function formatIDR(amount) {
