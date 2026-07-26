@@ -85,7 +85,7 @@ const translations = {
 
 document.addEventListener('DOMContentLoaded', () => {
   applyLanguage(currentLanguage);
-  updateAuthUI(null); // Render immediate fallback Guest UI while auth initializes
+  updateAuthUI(null);
 
   if (typeof auth !== 'undefined') {
     auth.onAuthStateChanged(async (user) => {
@@ -116,11 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function updateAuthUI(user) {
   const container = document.getElementById('auth-header-container');
-  
-  // Safe Admin Check
   const isAdmin = user && user.email && typeof isUserAdmin === 'function' && isUserAdmin(user.email);
 
-  // Toggle Admin Nav Visibility
   document.querySelectorAll('.admin-only-nav').forEach(el => {
     if (isAdmin) el.classList.remove('hidden');
     else el.classList.add('hidden');
