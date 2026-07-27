@@ -1404,6 +1404,7 @@
       const btnLabel = document.getElementById('current-lang-label');
       if (btnLabel) btnLabel.innerText = currentLanguage;
       applyTranslations();
+      updateAllViews();
       showToast(currentLanguage === 'ID' ? 'Bahasa diubah ke Bahasa Indonesia' : 'Language switched to English');
     }
 
@@ -2703,7 +2704,7 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">No cards match your filter criteria.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-500 text-xs">${currentLanguage === 'ID' ? 'Tidak ada kartu yang cocok dengan filter Anda.' : 'No cards match your filter criteria.'}</div>`;
         return;
       }
 
@@ -2735,13 +2736,13 @@
               <p class="text-[11px] font-extrabold text-white truncate">${card.name}</p>
               <div class="flex items-center justify-between">
                 <span class="text-xs font-mono text-emerald-400 font-extrabold">${formatIDR(card.price)}</span>
-                <span class="text-[9px] text-slate-400 truncate max-w-[80px]">${card.owner || 'Unowned'}</span>
+                <span class="text-[9px] text-slate-400 truncate max-w-[80px]">${card.owner || (currentLanguage === 'ID' ? 'Tidak Dimiliki' : 'Unowned')}</span>
               </div>
 
               ${!isSold ? `
-                <button onclick="addToCart('${card.id}')" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all">Add to Cart</button>
+                <button onclick="addToCart('${card.id}')" class="w-full py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-[10px] rounded-xl transition-all">${currentLanguage === 'ID' ? 'Tambah ke Keranjang' : 'Add to Cart'}</button>
               ` : `
-                <button disabled class="w-full py-1.5 bg-slate-950 text-slate-600 font-bold text-[10px] rounded-xl cursor-not-allowed">Owned</button>
+                <button disabled class="w-full py-1.5 bg-slate-950 text-slate-600 font-bold text-[10px] rounded-xl cursor-not-allowed">${currentLanguage === 'ID' ? 'Dimiliki' : 'Owned'}</button>
               `}
             </div>
           </div>
@@ -2749,7 +2750,7 @@
       }).join('');
 
       if (visibleCardCount < filtered.length) {
-        grid.innerHTML += `<div id="scroll-sentinel" class="col-span-full h-10 flex items-center justify-center text-xs text-slate-500 font-mono">Loading more cards...</div>`;
+        grid.innerHTML += `<div id="scroll-sentinel" class="col-span-full h-10 flex items-center justify-center text-xs text-slate-500 font-mono">${currentLanguage === 'ID' ? 'Memuat lebih banyak kartu...' : 'Loading more cards...'}</div>`;
         setupScrollSentinel(filtered.length);
       }
     }
@@ -4207,6 +4208,25 @@
 
     function formatIDR(amount) {
       return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
+    }
+
+    // The native file-input button text ("Choose File") is browser UI chrome —
+    // it follows the browser's own language setting and cannot be translated
+    // via CSS or JS. These file inputs are visually hidden and triggered by a
+    // <label for="..."> styled as a button instead, with this function keeping
+    // the "selected filename" text next to it in sync and in the right language.
+    function updateFileNameDisplay(inputEl, displayElId) {
+      const displayEl = document.getElementById(displayElId);
+      if (!displayEl) return;
+      if (inputEl.files && inputEl.files.length > 0) {
+        displayEl.textContent = inputEl.files[0].name;
+        displayEl.classList.remove('text-slate-500');
+        displayEl.classList.add('text-emerald-400');
+      } else {
+        displayEl.textContent = currentLanguage === 'ID' ? 'Belum ada file dipilih' : 'No file chosen';
+        displayEl.classList.remove('text-emerald-400');
+        displayEl.classList.add('text-slate-500');
+      }
     }
 
     function showToast(msg) {
