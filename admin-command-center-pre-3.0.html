@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eugene Card — Admin Command Center 3.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<style>
+body{background:#020617;color:#f8fafc}
+.glass{background:rgba(15,23,42,.76);backdrop-filter:blur(16px);border:1px solid rgba(148,163,184,.14)}
+</style>
+</head>
+<body class="min-h-screen">
+<div class="max-w-7xl mx-auto px-4 py-6 md:py-10">
+  <header class="glass rounded-3xl p-6 md:p-8 mb-5">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+      <div>
+        <span class="inline-flex px-2.5 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[10px] font-black uppercase tracking-widest">Eugene Card 3.0</span>
+        <h1 class="text-3xl md:text-5xl font-black mt-4">Admin Command Center</h1>
+        <p class="text-sm text-slate-400 mt-2 max-w-2xl">Marketplace control room: operations, collectors, inventory, auctions, trades and finance.</p>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <a href="index.html" class="px-3 py-2 rounded-xl bg-slate-800 text-xs font-bold">Marketplace</a>
+        <a href="analytics.html" class="px-3 py-2 rounded-xl bg-amber-500/10 text-amber-300 text-xs font-bold">Analytics</a>
+        <a href="revenue.html" class="px-3 py-2 rounded-xl bg-emerald-500/10 text-emerald-300 text-xs font-bold">Revenue</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="auth-state" class="mb-5"></div>
+
+  <section class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="glass rounded-2xl p-5"><p class="text-[10px] text-slate-500 uppercase font-black">Cards</p><p id="cards" class="text-3xl font-black mt-1">—</p></div>
+    <div class="glass rounded-2xl p-5"><p class="text-[10px] text-slate-500 uppercase font-black">Inventory Floor</p><p id="inventory" class="text-3xl font-black mt-1">—</p></div>
+    <div class="glass rounded-2xl p-5"><p class="text-[10px] text-slate-500 uppercase font-black">Collectors</p><p id="collectors" class="text-3xl font-black mt-1">—</p></div>
+    <div class="glass rounded-2xl p-5"><p class="text-[10px] text-slate-500 uppercase font-black">Pending Trades</p><p id="trades" class="text-3xl font-black mt-1">—</p></div>
+  </section>
+
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+    <div class="glass rounded-3xl p-5 lg:col-span-2">
+      <h2 class="font-black">Operations</h2>
+      <p class="text-xs text-slate-500 mt-1">Open the area that needs attention.</p>
+      <div class="grid sm:grid-cols-2 gap-3 mt-4">
+        <a href="index.html" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-violet-500/40"><b>Marketplace Operations</b><p class="text-[10px] text-slate-500 mt-1">Inventory, auctions, trades, history and Inbox.</p></a>
+        <a href="analytics.html" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-500/40"><b>Market Analytics</b><p class="text-[10px] text-slate-500 mt-1">Valuation, demand and market signals.</p></a>
+        <a href="revenue.html" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-emerald-500/40"><b>Revenue</b><p class="text-[10px] text-slate-500 mt-1">Sales, fees, transaction funnel and exports.</p></a>
+        <a href="index.html" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-cyan-500/40"><b>Past History</b><p class="text-[10px] text-slate-500 mt-1">Audit transactions and marketplace activity.</p></a>
+      </div>
+    </div>
+    <div class="glass rounded-3xl p-5">
+      <h2 class="font-black">System Health</h2>
+      <div class="space-y-3 mt-4">
+        <div class="flex justify-between p-3 rounded-xl bg-slate-950"><span class="text-xs">Firestore</span><b class="text-[10px] text-emerald-400">CONNECTED</b></div>
+        <div class="flex justify-between p-3 rounded-xl bg-slate-950"><span class="text-xs">Admin Auth</span><b id="admin-status" class="text-[10px] text-slate-400">CHECKING</b></div>
+        <div class="flex justify-between p-3 rounded-xl bg-slate-950"><span class="text-xs">Realtime Data</span><b id="data-status" class="text-[10px] text-slate-400">CHECKING</b></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const ADMIN_EMAILS = ['eugene.aquila06@gmail.com','yujinybwork@gmail.com'];
+const firebaseConfig = {
+      apiKey: "AIzaSyCm13Nh6k6W9wsL0_OPpjKZNrbSg-pFsuA",
+      authDomain: "eugene-card-marketplace.firebaseapp.com",
+      projectId: "eugene-card-marketplace",
+      storageBucket: "eugene-card-marketplace.firebasestorage.app",
+      messagingSenderId: "789014481646",
+      appId: "1:789014481646:web:3858909b429985005a41ff",
+      measurementId: "G-MRPT21P9M1"
+    };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+const money = v => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Number(v||0));
+const set = (id,v) => document.getElementById(id).textContent = v;
+
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    document.getElementById('auth-state').innerHTML = '<div class="glass rounded-2xl p-4 text-sm text-rose-300">Please sign in through Eugene Card first, then open this page.</div>';
+    return;
+  }
+  let claims = {};
+  try { claims = (await user.getIdTokenResult(true)).claims || {}; } catch(e) {}
+  const isAdmin = claims.admin === true || ADMIN_EMAILS.includes((user.email||'').toLowerCase());
+  set('admin-status', isAdmin ? 'VERIFIED' : 'RESTRICTED');
+  document.getElementById('admin-status').className = 'text-[10px] font-black ' + (isAdmin ? 'text-emerald-400' : 'text-rose-400');
+  if (!isAdmin) {
+    document.getElementById('auth-state').innerHTML = '<div class="glass rounded-2xl p-4 text-sm text-rose-300">Admin access required.</div>';
+    return;
+  }
+  document.getElementById('auth-state').innerHTML = '<div class="glass rounded-2xl p-4 text-sm text-emerald-300">Admin session verified for ' + (user.email||user.displayName||'Admin') + '.</div>';
+
+  db.collection('cards').onSnapshot(s => {
+    const rows = s.docs.map(d => ({id:d.id,...d.data()}));
+    set('cards', rows.length.toLocaleString('en-US'));
+    set('inventory', money(rows.reduce((a,c)=>a+Number(c.price||c.baseFloorPrice||0),0)));
+    set('collectors', new Set(rows.map(c=>String(c.owner||'').trim().toLowerCase()).filter(Boolean)).size.toLocaleString('en-US'));
+    set('data-status','LIVE');
+    document.getElementById('data-status').className='text-[10px] font-black text-emerald-400';
+  }, e => {
+    set('data-status','LIMITED');
+    document.getElementById('data-status').className='text-[10px] font-black text-amber-400';
+  });
+
+  db.collection('tradeRequests').where('status','in',['PENDING','COUNTERED']).onSnapshot(s => set('trades',s.size.toLocaleString('en-US')), () => set('trades','—'));
+});
+</script>
+</body>
+</html>
