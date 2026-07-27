@@ -2553,26 +2553,14 @@ function openAnalyticsPage() {
     function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
     function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
-   import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
-
-async function handleGoogleLogin() {
-  try {
-    // 1. Trigger Native Android Google Account Picker
-    const googleUser = await GoogleSignIn.signIn({
-      clientId: '789014481646-7jk38802a2f4pnd917nv1culc2u8t14g.apps.googleusercontent.com'
-    });
-
-    // 2. Convert Google ID Token into Firebase Credential
-    const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.idToken);
-
-    // 3. Sign in to Firebase Auth inside the app
-    const authResult = await firebase.auth().signInWithCredential(credential);
-    console.log("Logged in user:", authResult.user);
-
-  } catch (error) {
-    console.error("Google native login failed:", error);
-  }
-}
+    async function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        await auth.signInWithPopup(provider);
+      } catch (error) {
+        showToast('Google Login Error: ' + error.message);
+      }
+    }
 
     async function handleUserSession(user) {
       const email = user.email ? user.email.toLowerCase() : '';
