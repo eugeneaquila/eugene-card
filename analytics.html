@@ -58,7 +58,7 @@
             <h1 class="font-extrabold text-base tracking-wider text-white uppercase">EUGENE CARD</h1>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30" data-i18n="badgeAnalytics">Predictive Analytics Hub</span>
           </div>
-          <p class="text-xs text-slate-400" data-i18n="analyticsSub">6–12 Month price forecasting & stability analytics</p>
+          <p class="text-xs text-slate-400" data-i18n="analyticsSub">Post-trade floor price estimation & market velocity analytics</p>
         </div>
       </div>
 
@@ -121,9 +121,8 @@
       </div>
     </div>
 
-    <!-- CHARTS SECTION: TREND & FORECAST + RARITY BREAKDOWN -->
+    <!-- CHARTS SECTION -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Valuation & Future Sales Forecast Line Chart -->
       <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
         <div class="flex flex-wrap justify-between items-center gap-2">
           <div>
@@ -137,7 +136,6 @@
         </div>
       </div>
 
-      <!-- Tier & Rarity Distribution Pie Chart -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl flex flex-col justify-between">
         <div>
           <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-pie-chart text-teal-400 mr-2"></i> <span data-i18n="chartRarityTitle">Rarity Distribution</span></h3>
@@ -153,12 +151,12 @@
       </div>
     </div>
 
-    <!-- FORECAST SCENARIO SIMULATOR -->
+    <!-- FORECAST SCENARIO SIMULATOR WITH POST-TRADE ESTIMATES -->
     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
         <div>
-          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-sliders text-amber-400 mr-2"></i> <span data-i18n="simulatorTitle">6–12 Month Forecast Scenario Simulator</span></h3>
-          <p class="text-xs text-slate-400" data-i18n="simulatorSub">Select market sentiment to recalculate individual card price projections</p>
+          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-sliders text-amber-400 mr-2"></i> <span data-i18n="simulatorTitle">Post-Trade Price Estimation & Forecast Simulator</span></h3>
+          <p class="text-xs text-slate-400" data-i18n="simulatorSub">Projects expected floor price increment after each successful trade execution</p>
         </div>
         <div class="flex items-center gap-2">
           <button onclick="setGrowthScenario('conservative')" id="btn-scenario-conservative" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="btnConservative">Conservative (+5/10%)</button>
@@ -168,22 +166,23 @@
       </div>
 
       <!-- CARD FUTURE VALUE & STABILITY PREDICTION TABLE -->
-      <div class="overflow-x-auto max-h-[500px]">
+      <div class="overflow-x-auto max-h-[550px]">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0 z-10">
             <tr>
               <th class="p-3" data-i18n="thSerial">Serial</th>
               <th class="p-3" data-i18n="thName">Card Name</th>
               <th class="p-3" data-i18n="thType">Type</th>
-              <th class="p-3" data-i18n="thCurrentPrice">Current Price</th>
+              <th class="p-3" data-i18n="thCurrentPrice">Current Floor</th>
+              <th class="p-3 text-emerald-400 font-extrabold" data-i18n="thNextTradePrice">Est. Price After Next Trade</th>
+              <th class="p-3 text-emerald-400" data-i18n="thTradeDelta">Post-Trade Gain ($\Delta$)</th>
               <th class="p-3" data-i18n="th6mEst">6-Mo. Est. Price</th>
               <th class="p-3" data-i18n="th12mEst">12-Mo. Est. Price</th>
-              <th class="p-3" data-i18n="th12mDelta">Est. 12-Mo. Delta ($\Delta$)</th>
-              <th class="p-3 text-right" data-i18n="thRating">Stability & Liquidity Rating</th>
+              <th class="p-3 text-right" data-i18n="thRating">Stability & Rating</th>
             </tr>
           </thead>
           <tbody id="predictive-table-body" class="divide-y divide-slate-800">
-            <tr><td colspan="8" class="p-6 text-center text-slate-500" data-i18n="listeningRealtime">Listening to real-time database updates...</td></tr>
+            <tr><td colspan="9" class="p-6 text-center text-slate-500" data-i18n="listeningRealtime">Listening to real-time database updates...</td></tr>
           </tbody>
         </table>
       </div>
@@ -191,12 +190,10 @@
 
   </main>
 
-  <!-- Footer -->
   <footer class="bg-slate-950 border-t border-slate-800/80 py-4 text-center text-xs text-slate-500">
     Eugene Card Marketplace Analytics &copy; 2026
   </footer>
 
-  <!-- Firebase & Realtime Analytics Script Logic WITH I18N -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCm13Nh6k6W9wsL0_OPpjKZNrbSg-pFsuA",
@@ -213,6 +210,7 @@
     const auth = firebase.auth();
 
     let rawCardsData = [];
+    let rawTradeCountsMap = {};
     let totalRealizedVolume = 0;
     let trendChartInstance = null;
     let tierChartInstance = null;
@@ -222,7 +220,7 @@
     const analyticsI18n = {
       EN: {
         badgeAnalytics: "Predictive Analytics Hub",
-        analyticsSub: "6–12 Month price forecasting & stability analytics",
+        analyticsSub: "Post-trade floor price estimation & market velocity analytics",
         btnRefresh: "Refresh Metrics",
         btnReturn: "Return to Market",
         kpiRealizedVolume: "Realized Sales Volume",
@@ -236,19 +234,20 @@
         badgeAiModel: "AI Predictive Model",
         chartRarityTitle: "Rarity Distribution",
         chartRaritySub: "Premium vs. Standard card stock allocation",
-        simulatorTitle: "6–12 Month Forecast Scenario Simulator",
-        simulatorSub: "Select market sentiment to recalculate individual card price projections",
+        simulatorTitle: "Post-Trade Price Estimation & Forecast Simulator",
+        simulatorSub: "Projects expected floor price increment after each successful trade execution",
         btnConservative: "Conservative (+5/10%)",
         btnModerate: "Moderate (+15/25%)",
         btnBullish: "Bullish (+35/50%)",
         thSerial: "Serial",
         thName: "Card Name",
         thType: "Type",
-        thCurrentPrice: "Current Price",
-        th6mEst: "6-Mo. Est. Price",
-        th12mEst: "12-Mo. Est. Price",
-        th12mDelta: "Est. 12-Mo. Delta (Δ)",
-        thRating: "Stability & Liquidity Rating",
+        thCurrentPrice: "Current Floor",
+        thNextTradePrice: "Est. Price After Next Trade",
+        thTradeDelta: "Post-Trade Gain (Δ)",
+        th6mEst: "6-Mo. Est.",
+        th12mEst: "12-Mo. Est.",
+        thRating: "Stability & Rating",
         listeningRealtime: "Listening to real-time database updates...",
         noCardsDb: "No card inventory found in database.",
         acrossSuffix: "Across {n} database cards",
@@ -260,7 +259,7 @@
       },
       ID: {
         badgeAnalytics: "Pusat Analitik Prediktif",
-        analyticsSub: "Prakiraan harga 6–12 bulan & analitik stabilitas",
+        analyticsSub: "Prakiraan harga pasca-transaksi & analitik kecepatan pasar",
         btnRefresh: "Muat Ulang Metrik",
         btnReturn: "Kembali ke Pasar",
         kpiRealizedVolume: "Volume Penjualan Terealisasi",
@@ -274,19 +273,20 @@
         badgeAiModel: "Model Prediktif AI",
         chartRarityTitle: "Distribusi Kelangkaan",
         chartRaritySub: "Alokasi stok kartu Premium vs. Standar",
-        simulatorTitle: "Simulator Skenario Prakiraan 6–12 Bulan",
-        simulatorSub: "Pilih sentimen pasar untuk menghitung ulang proyeksi harga kartu",
+        simulatorTitle: "Simulator Prakiraan & Estimasi Harga Pasca-Transaksi",
+        simulatorSub: "Kenaikan harga dasar yang diperkirakan setelah setiap transaksi berhasil",
         btnConservative: "Konservatif (+5/10%)",
         btnModerate: "Moderat (+15/25%)",
         btnBullish: "Optimis (+35/50%)",
         thSerial: "Serial",
         thName: "Nama Kartu",
         thType: "Tipe",
-        thCurrentPrice: "Harga Saat Ini",
-        th6mEst: "Est. Harga 6-Bln",
-        th12mEst: "Est. Harga 12-Bln",
-        th12mDelta: "Est. Selisih 12-Bln (Δ)",
-        thRating: "Peringkat Stabilitas & Likuiditas",
+        thCurrentPrice: "Harga Dasar",
+        thNextTradePrice: "Est. Harga Pasca-Transaksi",
+        thTradeDelta: "Kenaikan Pasca-Transaksi (Δ)",
+        th6mEst: "Est. 6-Bln",
+        th12mEst: "Est. 12-Bln",
+        thRating: "Peringkat Stabilitas",
         listeningRealtime: "Mendengarkan pembaruan database real-time...",
         noCardsDb: "Tidak ada inventaris kartu di database.",
         acrossSuffix: "Dari {n} kartu di database",
@@ -315,9 +315,9 @@
     }
 
     const SCENARIOS = {
-      conservative: { std6m: 1.05, std12m: 1.10, prem6m: 1.12, prem12m: 1.20 },
-      moderate:     { std6m: 1.15, std12m: 1.25, prem6m: 1.25, prem12m: 1.50 },
-      bullish:      { std6m: 1.35, std12m: 1.50, prem6m: 1.50, prem12m: 2.00 }
+      conservative: { std6m: 1.05, std12m: 1.10, prem6m: 1.12, prem12m: 1.20, tradeBump: 1.03 },
+      moderate:     { std6m: 1.15, std12m: 1.25, prem6m: 1.25, prem12m: 1.50, tradeBump: 1.05 },
+      bullish:      { std6m: 1.35, std12m: 1.50, prem6m: 1.50, prem12m: 2.00, tradeBump: 1.10 }
     };
 
     const ADMIN_EMAILS = ['eugene.aquila06@gmail.com', 'yujinybwork@gmail.com', 'eugene.aquila06', 'admin house'];
@@ -356,13 +356,26 @@
 
       db.collection("transactions").onSnapshot(snapshot => {
         totalRealizedVolume = 0;
+        rawTradeCountsMap = {};
+
         snapshot.forEach(doc => {
           const tx = doc.data();
           if (tx.status === 'APPROVED' || tx.status === 'ACCEPTED') {
             totalRealizedVolume += parseFloat(tx.total_amount || tx.totalAmount || 0);
+
+            if (Array.isArray(tx.items)) {
+              tx.items.forEach(item => {
+                const cardId = item.id || item.serial;
+                if (cardId) {
+                  rawTradeCountsMap[cardId] = (rawTradeCountsMap[cardId] || 0) + 1;
+                }
+              });
+            }
           }
         });
+
         document.getElementById('stat-total-volume').innerText = formatIDR(totalRealizedVolume);
+        renderScenarioProjections();
       }, err => {
         console.error("Transactions realtime listener error:", err);
       });
@@ -386,7 +399,7 @@
 
       if (rawCardsData.length === 0) {
         document.getElementById('predictive-table-body').innerHTML = `
-          <tr><td colspan="8" class="p-6 text-center text-slate-500">${dict.noCardsDb}</td></tr>
+          <tr><td colspan="9" class="p-6 text-center text-slate-500">${dict.noCardsDb}</td></tr>
         `;
         return;
       }
@@ -408,6 +421,13 @@
         const mult6m = isPremium ? sc.prem6m : sc.std6m;
         const mult12m = isPremium ? sc.prem12m : sc.std12m;
 
+        // Post-Trade Floor Price Estimation Formula
+        const cardTrades = rawTradeCountsMap[c.id] || rawTradeCountsMap[c.serial] || 0;
+        const baseBump = isPremium ? (sc.tradeBump + 0.02) : sc.tradeBump;
+        const estNextTradePrice = Math.round(currentPrice * baseBump);
+        const nextTradeDelta = estNextTradePrice - currentPrice;
+        const nextTradePctGain = Math.round(((estNextTradePrice - currentPrice) / currentPrice) * 100);
+
         const est6m = Math.round(currentPrice * mult6m);
         const est12m = Math.round(currentPrice * mult12m);
         const delta12m = est12m - currentPrice;
@@ -427,6 +447,10 @@
         return {
           ...c,
           currentPrice,
+          estNextTradePrice,
+          nextTradeDelta,
+          nextTradePctGain,
+          cardTrades,
           est6m,
           est12m,
           delta12m,
@@ -466,9 +490,10 @@
           <td class="p-3 font-bold text-white">${c.name || 'Card'}</td>
           <td class="p-3 font-mono ${c.type === 'PREMIUM' ? 'text-amber-400 font-bold' : 'text-blue-400'}">${c.type || 'STANDARD'}</td>
           <td class="p-3 font-mono text-slate-300">${formatIDR(c.currentPrice)}</td>
-          <td class="p-3 font-mono text-emerald-400 font-bold">${formatIDR(c.est6m)}</td>
+          <td class="p-3 font-mono text-emerald-400 font-black">${formatIDR(c.estNextTradePrice)}</td>
+          <td class="p-3 font-mono text-emerald-400 font-bold">+${formatIDR(c.nextTradeDelta)} (<span class="text-amber-400">+${c.nextTradePctGain}%</span>)</td>
+          <td class="p-3 font-mono text-indigo-300 font-bold">${formatIDR(c.est6m)}</td>
           <td class="p-3 font-mono text-indigo-400 font-black">${formatIDR(c.est12m)}</td>
-          <td class="p-3 font-mono text-emerald-400 font-bold">+${formatIDR(c.delta12m)} (<span class="text-amber-400">+${c.pctGain12m}%</span>)</td>
           <td class="p-3 text-right space-x-1">
             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">${c.stabilityScore}% ${dict.stableLabel}</span>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">${c.liquidityRating}</span>
