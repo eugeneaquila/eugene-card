@@ -1,0 +1,54 @@
+type User @table {
+  username: String!
+  email: String!
+  reputationScore: Int!
+  bio: String
+  location: String
+}
+
+type Card @table {
+  setName: String!
+  cardName: String!
+  rarity: String!
+  initialMarketValue: Float!
+  series: String
+  imageRef: String
+}
+
+type CollectionItem @table {
+  owner: User!
+  card: Card!
+  condition: String!
+  purchasePrice: Float!
+  isForSale: Boolean
+  isForTrade: Boolean
+  askingPrice: Float
+}
+
+type Trade @table {
+  initiator: User!
+  responder: User!
+  status: String!
+  notes: String
+  completionDate: Timestamp
+}
+
+type MarketListing @table {
+  item: CollectionItem!
+  seller: User!
+  price: Float!
+  description: String
+  expiresAt: Timestamp
+}
+
+type TradeItem @table {
+  trade: Trade!
+  item: CollectionItem!
+  side: String!
+}
+
+type Wishlist @table {
+  user: User!
+  card: Card!
+  notified: Boolean
+}
