@@ -1,0 +1,169 @@
+mutation CreateCard($data: [Card_Data!]!) @auth(level: USER) {
+  card_insertMany(data: $data)
+}
+
+mutation UpdateCard($id: UUID!, $data: Card_Data!) @auth(level: USER) {
+  card_update(id: $id, data: $data)
+}
+
+mutation DeleteCard($id: UUID!) @auth(level: USER) {
+  card_delete(id: $id)
+}
+
+query GetCard($id: UUID!) @auth(level: PUBLIC, insecureReason: "Publicly readable collection information.") {
+  card(id: $id) {
+    cardName setName rarity
+  }
+}
+
+query ListCards @auth(level: PUBLIC, insecureReason: "Publicly readable collection information.") {
+  cards {
+    cardName setName rarity
+  }
+}
+
+mutation CreateCollectionItem($data: CollectionItem_Data!) @auth(level: USER) {
+  collectionItem_insert(data: $data)
+}
+
+mutation UpdateCollectionItem($id: UUID!, $data: CollectionItem_Data!) @auth(level: USER) {
+  collectionItem_update(id: $id, data: $data)
+}
+
+mutation DeleteCollectionItem($id: UUID!) @auth(level: USER) {
+  collectionItem_delete(id: $id)
+}
+
+query GetMyCollectionItem($id: UUID!) @auth(level: USER) {
+  collectionItem(id: $id) {
+    card { cardName }
+    condition
+  }
+}
+
+query ListMyCollectionItems @auth(level: USER) {
+  collectionItems(where: {ownerId: {eq_expr: "auth.uid"}}) {
+    card { cardName }
+    condition
+  }
+}
+
+mutation CreateMarketListing($data: MarketListing_Data!) @auth(level: USER) {
+  marketListing_insert(data: $data)
+}
+
+mutation UpdateMarketListing($id: UUID!, $data: MarketListing_Data!) @auth(level: USER) {
+  marketListing_update(id: $id, data: $data)
+}
+
+mutation DeleteMarketListing($id: UUID!) @auth(level: USER) {
+  marketListing_delete(id: $id)
+}
+
+query GetMarketListing($id: UUID!) @auth(level: PUBLIC, insecureReason: "Market listings are public.") {
+  marketListing(id: $id) {
+    price description
+  }
+}
+
+query ListMarketListings @auth(level: PUBLIC, insecureReason: "Market listings are public.") {
+  marketListings {
+    price description
+  }
+}
+
+mutation CreateTrade($data: Trade_Data!) @auth(level: USER) {
+  trade_insert(data: $data)
+}
+
+mutation UpdateTrade($id: UUID!, $data: Trade_Data!) @auth(level: USER) {
+  trade_update(id: $id, data: $data)
+}
+
+mutation DeleteTrade($id: UUID!) @auth(level: USER) {
+  trade_delete(id: $id)
+}
+
+query GetTrade($id: UUID!) @auth(level: USER) {
+  trade(id: $id) {
+    status notes
+  }
+}
+
+query ListMyTrades @auth(level: USER) {
+  trades(where: {_or: [{initiatorId: {eq_expr: "auth.uid"}}, {responderId: {eq_expr: "auth.uid"}}]}) {
+    status
+  }
+}
+
+mutation CreateTradeItem($data: TradeItem_Data!) @auth(level: USER) {
+  tradeItem_insert(data: $data)
+}
+
+mutation UpdateTradeItem($id: UUID!, $data: TradeItem_Data!) @auth(level: USER) {
+  tradeItem_update(id: $id, data: $data)
+}
+
+mutation DeleteTradeItem($id: UUID!) @auth(level: USER) {
+  tradeItem_delete(id: $id)
+}
+
+query GetTradeItem($id: UUID!) @auth(level: USER) {
+  tradeItem(id: $id) {
+    side
+  }
+}
+
+query ListTradeItems($tradeId: UUID!) @auth(level: USER) {
+  tradeItems(where: {tradeId: {eq: $tradeId}}) {
+    side
+  }
+}
+
+mutation CreateUser($data: User_Data!) @auth(level: USER) {
+  user_insert(data: $data)
+}
+
+mutation UpdateUser($data: User_Data!) @auth(level: USER) {
+  user_update(key: {id_expr: "auth.uid"}, data: $data)
+}
+
+mutation DeleteUser @auth(level: USER) {
+  user_delete(key: {id_expr: "auth.uid"})
+}
+
+query GetUser($id: UUID!) @auth(level: PUBLIC, insecureReason: "User profiles are public.") {
+  user(id: $id) {
+    username reputationScore
+  }
+}
+
+query ListUsers @auth(level: PUBLIC, insecureReason: "User list is public.") {
+  users {
+    username
+  }
+}
+
+mutation CreateWishlist($data: Wishlist_Data!) @auth(level: USER) {
+  wishlist_insert(data: $data)
+}
+
+mutation UpdateWishlist($id: UUID!, $data: Wishlist_Data!) @auth(level: USER) {
+  wishlist_update(id: $id, data: $data)
+}
+
+mutation DeleteWishlist($id: UUID!) @auth(level: USER) {
+  wishlist_delete(id: $id)
+}
+
+query GetWishlist($id: UUID!) @auth(level: USER) {
+  wishlist(id: $id) {
+    card { cardName }
+  }
+}
+
+query ListMyWishlist @auth(level: USER) {
+  wishlists(where: {userId: {eq_expr: "auth.uid"}}) {
+    card { cardName }
+  }
+}
