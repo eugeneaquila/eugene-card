@@ -1431,12 +1431,6 @@
       return ADMIN_EMAILS.some(e => e.toLowerCase() === lower || e.split('@')[0].toLowerCase() === lower);
     }
 
-function openAnalyticsPage() {
-  if (!currentUser || !currentUser.isAdmin) {
-    return showToast('Analytics Hub is restricted exclusively to Admins.');
-  }
-  window.open('analytics.html', '_blank');
-
     async function loadCollectorProfiles() {
       try {
         const snapshot = await db.collection("profiles").get();
