@@ -395,6 +395,7 @@
               <tr>
                 <th class="p-3.5" data-i18n="thOrderRef">Order Ref</th>
                 <th class="p-3.5" data-i18n="thBuyer">Buyer</th>
+                <th class="p-3.5" data-i18n="thSeller">Seller</th>
                 <th class="p-3.5" data-i18n="thItems">Items Acquired</th>
                 <th class="p-3.5" data-i18n="thAmount">Amount (IDR + 2% Tax)</th>
                 <th class="p-3.5" data-i18n="thProof">QRIS Receipt</th>
@@ -1101,6 +1102,7 @@
         histApproved: "Approved Only",
         thOrderRef: "Order Ref",
         thBuyer: "Buyer",
+        thSeller: "Seller",
         thItems: "Items Acquired",
         thAmount: "Amount (IDR + 2% Tax)",
         thProof: "QRIS Receipt",
@@ -1285,6 +1287,7 @@
         histApproved: "Disetujui Saja",
         thOrderRef: "Ref Pesanan",
         thBuyer: "Pembeli",
+        thSeller: "Penjual",
         thItems: "Kartu Didapat",
         thAmount: "Jumlah (IDR + Pajak 2%)",
         thProof: "Bukti QRIS",
@@ -2818,7 +2821,7 @@
       });
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500">No transaction records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-500">No transaction records found.</td></tr>`;
         return;
       }
 
@@ -2827,6 +2830,9 @@
         const itemsFormatted = items.length > 0 
           ? items.map(i => `<span class="inline-block bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800 text-[10px] font-mono text-amber-400 mr-1 mb-1">${i.serial || 'Card'}</span>`).join('')
           : '<span class="text-slate-500">N/A</span>';
+
+        const sellers = [...new Set(items.map(i => i.owner || 'Admin House'))];
+        const sellerDisplay = sellers.length > 0 ? sellers.join(', ') : 'Admin House';
 
         let badgeClass = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
         if (tx.status === 'APPROVED') badgeClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
@@ -2840,6 +2846,7 @@
           <tr class="hover:bg-slate-950/60 transition-colors">
             <td class="p-3.5 font-mono font-extrabold text-indigo-400">${tx.id || 'ORD-000'}</td>
             <td class="p-3.5 font-bold text-white">${tx.user_name || 'Guest'}</td>
+            <td class="p-3.5 font-bold text-slate-300">${sellerDisplay}</td>
             <td class="p-3.5">${itemsFormatted}</td>
             <td class="p-3.5 font-mono text-emerald-400 font-extrabold">${formatIDR(tx.total_amount || 0)} <span class="text-[9px] text-amber-400 block font-normal">Includes 2% Tax</span></td>
             <td class="p-3.5">${proofBtn}</td>
@@ -3690,7 +3697,7 @@
         batch.set(db.collection("transactions").doc(orderRef), {
           id: orderRef,
           user_name: highBidder,
-          items: [{ id: cardId, serial, name, price: currentBid }],
+          items: [{ id: cardId, serial, name, price: currentBid, owner: owner }],
           total_amount: currentBid,
           status: 'APPROVED',
           source: 'AUCTION',
