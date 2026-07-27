@@ -112,6 +112,11 @@
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-users text-teal-400"></i> <span data-i18n="navHolders">Holders</span>
         </button>
+		
+		<!-- Analytics Navigation Button (Admin Only) -->
+<button onclick="openAnalyticsPage()" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/40 border border-amber-500/40 transition-all">
+  <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-0.5 opacity-70"></i>
+</button>
         <button id="nav-history" onclick="switchTab('history')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span data-i18n="navHistory">History</span>
         </button>
@@ -1024,6 +1029,13 @@
     let visibleCardCount = 10;
     const CARDS_PER_BATCH = 10;
     let scrollObserver = null;
+
+function openAnalyticsPage() {
+  if (!currentUser || !currentUser.isAdmin) {
+    return showToast('Analytics Hub is restricted exclusively to Admins.');
+  }
+  window.open('analytics.html', '_blank');
+}
 
     // Comprehensive i18n Dictionary
     const i18nDict = {
