@@ -56,18 +56,24 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-base tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">Predictive Analytics Hub</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30" data-i18n="badgeAnalytics">Predictive Analytics Hub</span>
           </div>
-          <p class="text-xs text-slate-400">6–12 Month price forecasting & stability analytics</p>
+          <p class="text-xs text-slate-400" data-i18n="analyticsSub">6–12 Month price forecasting & stability analytics</p>
         </div>
       </div>
 
       <div class="flex items-center gap-3">
-        <button onclick="loadAnalyticsData()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs font-bold rounded-xl border border-slate-800 flex items-center gap-2 transition-all">
-          <i class="fa-solid fa-rotate"></i> Refresh Metrics
+        <!-- Language Switcher Button -->
+        <button onclick="toggleAnalyticsLanguage()" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 font-mono font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-1.5" title="Switch Language / Ganti Bahasa">
+          <i class="fa-solid fa-globe"></i>
+          <span id="analytics-lang-label">EN</span>
+        </button>
+
+        <button onclick="triggerManualRefresh()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs font-bold rounded-xl border border-slate-800 flex items-center gap-2 transition-all">
+          <i class="fa-solid fa-rotate" id="refresh-icon"></i> <span data-i18n="btnRefresh">Refresh Metrics</span>
         </button>
         <button onclick="window.close()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-xl border border-slate-800 flex items-center gap-2 transition-all">
-          <i class="fa-solid fa-arrow-left"></i> Return to Market
+          <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btnReturn">Return to Market</span>
         </button>
       </div>
     </div>
@@ -80,16 +86,16 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
         <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
-          <span>Realized Sales Volume</span>
+          <span data-i18n="kpiRealizedVolume">Realized Sales Volume</span>
           <i class="fa-solid fa-wallet text-amber-400"></i>
         </div>
         <p id="stat-total-volume" class="text-2xl font-black text-white font-mono">Rp 0</p>
-        <p class="text-[10px] text-emerald-400 font-bold"><i class="fa-solid fa-arrow-trend-up"></i> Settled QRIS Trades</p>
+        <p class="text-[10px] text-emerald-400 font-bold"><i class="fa-solid fa-arrow-trend-up"></i> <span data-i18n="kpiSettledTrades">Settled QRIS Trades</span></p>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
         <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
-          <span>Current Market Cap</span>
+          <span data-i18n="kpiMarketCap">Current Market Cap</span>
           <i class="fa-solid fa-gem text-indigo-400"></i>
         </div>
         <p id="stat-total-valuation" class="text-2xl font-black text-white font-mono">Rp 0</p>
@@ -98,7 +104,7 @@
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
         <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
-          <span>12-Month Est. Vault Cap</span>
+          <span data-i18n="kpiEstVaultCap">12-Month Est. Vault Cap</span>
           <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
         </div>
         <p id="stat-future-valuation" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
@@ -107,11 +113,11 @@
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-2">
         <div class="flex justify-between items-center text-slate-400 text-xs font-bold">
-          <span>Trade Stability Index</span>
+          <span data-i18n="kpiStabilityIndex">Trade Stability Index</span>
           <i class="fa-solid fa-shield-halved text-teal-400"></i>
         </div>
         <p id="stat-stability-index" class="text-2xl font-black text-teal-400 font-mono">0%</p>
-        <p class="text-[10px] text-teal-300 font-bold">Low Volatility Rating</p>
+        <p class="text-[10px] text-teal-300 font-bold" data-i18n="kpiVolatilityRating">Low Volatility Rating</p>
       </div>
     </div>
 
@@ -121,10 +127,10 @@
       <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
         <div class="flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> 6–12 Month Valuation Forecast</h3>
-            <p class="text-xs text-slate-400">Current floor prices projected over 6 and 12-month timeframes</p>
+            <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> <span data-i18n="chartValuationTitle">6–12 Month Valuation Forecast</span></h3>
+            <p class="text-xs text-slate-400" data-i18n="chartValuationSub">Current floor prices projected over 6 and 12-month timeframes</p>
           </div>
-          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AI Predictive Model</span>
+          <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" data-i18n="badgeAiModel">AI Predictive Model</span>
         </div>
         <div class="w-full h-72 relative">
           <canvas id="trendForecastChart"></canvas>
@@ -134,8 +140,8 @@
       <!-- Tier & Rarity Distribution Pie Chart -->
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl flex flex-col justify-between">
         <div>
-          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-pie-chart text-teal-400 mr-2"></i> Rarity Distribution</h3>
-          <p class="text-xs text-slate-400">Premium vs. Standard card stock allocation</p>
+          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-pie-chart text-teal-400 mr-2"></i> <span data-i18n="chartRarityTitle">Rarity Distribution</span></h3>
+          <p class="text-xs text-slate-400" data-i18n="chartRaritySub">Premium vs. Standard card stock allocation</p>
         </div>
         <div class="w-full h-56 relative my-auto">
           <canvas id="tierDistributionChart"></canvas>
@@ -151,13 +157,13 @@
     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
         <div>
-          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-sliders text-amber-400 mr-2"></i> 6–12 Month Forecast Scenario Simulator</h3>
-          <p class="text-xs text-slate-400">Select market sentiment to recalculate individual card price projections</p>
+          <h3 class="text-base font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-sliders text-amber-400 mr-2"></i> <span data-i18n="simulatorTitle">6–12 Month Forecast Scenario Simulator</span></h3>
+          <p class="text-xs text-slate-400" data-i18n="simulatorSub">Select market sentiment to recalculate individual card price projections</p>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="setGrowthScenario('conservative')" id="btn-scenario-conservative" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Conservative (+5/10%)</button>
-          <button onclick="setGrowthScenario('moderate')" id="btn-scenario-moderate" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all">Moderate (+15/25%)</button>
-          <button onclick="setGrowthScenario('bullish')" id="btn-scenario-bullish" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all">Bullish (+35/50%)</button>
+          <button onclick="setGrowthScenario('conservative')" id="btn-scenario-conservative" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="btnConservative">Conservative (+5/10%)</button>
+          <button onclick="setGrowthScenario('moderate')" id="btn-scenario-moderate" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all" data-i18n="btnModerate">Moderate (+15/25%)</button>
+          <button onclick="setGrowthScenario('bullish')" id="btn-scenario-bullish" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all" data-i18n="btnBullish">Bullish (+35/50%)</button>
         </div>
       </div>
 
@@ -166,18 +172,18 @@
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0">
             <tr>
-              <th class="p-3">Serial</th>
-              <th class="p-3">Card Name</th>
-              <th class="p-3">Type</th>
-              <th class="p-3">Current Price</th>
-              <th class="p-3">6-Mo. Est. Price</th>
-              <th class="p-3">12-Mo. Est. Price</th>
-              <th class="p-3">Est. 12-Mo. Delta ($\Delta$)</th>
-              <th class="p-3 text-right">Stability & Liquidity Rating</th>
+              <th class="p-3" data-i18n="thSerial">Serial</th>
+              <th class="p-3" data-i18n="thName">Card Name</th>
+              <th class="p-3" data-i18n="thType">Type</th>
+              <th class="p-3" data-i18n="thCurrentPrice">Current Price</th>
+              <th class="p-3" data-i18n="th6mEst">6-Mo. Est. Price</th>
+              <th class="p-3" data-i18n="th12mEst">12-Mo. Est. Price</th>
+              <th class="p-3" data-i18n="th12mDelta">Est. 12-Mo. Delta ($\Delta$)</th>
+              <th class="p-3 text-right" data-i18n="thRating">Stability & Liquidity Rating</th>
             </tr>
           </thead>
           <tbody id="predictive-table-body" class="divide-y divide-slate-800">
-            <tr><td colspan="8" class="p-6 text-center text-slate-500">Calculating predictive card prices...</td></tr>
+            <tr><td colspan="8" class="p-6 text-center text-slate-500" data-i18n="listeningRealtime">Listening to real-time database updates...</td></tr>
           </tbody>
         </table>
       </div>
@@ -190,7 +196,7 @@
     Eugene Card Marketplace Analytics &copy; 2026
   </footer>
 
-  <!-- Firebase & Analytics Script Logic -->
+  <!-- Firebase & Realtime Analytics Script Logic WITH I18N -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCm13Nh6k6W9wsL0_OPpjKZNrbSg-pFsuA",
@@ -207,9 +213,106 @@
     const auth = firebase.auth();
 
     let rawCardsData = [];
+    let totalRealizedVolume = 0;
     let trendChartInstance = null;
     let tierChartInstance = null;
-    let currentScenario = 'moderate'; // default
+    let currentScenario = 'moderate';
+    let currentAnalyticsLang = localStorage.getItem('eugene_lang') || 'EN';
+
+    const analyticsI18n = {
+      EN: {
+        badgeAnalytics: "Predictive Analytics Hub",
+        analyticsSub: "6–12 Month price forecasting & stability analytics",
+        btnRefresh: "Refresh Metrics",
+        btnReturn: "Return to Market",
+        kpiRealizedVolume: "Realized Sales Volume",
+        kpiSettledTrades: "Settled QRIS Trades",
+        kpiMarketCap: "Current Market Cap",
+        kpiEstVaultCap: "12-Month Est. Vault Cap",
+        kpiStabilityIndex: "Trade Stability Index",
+        kpiVolatilityRating: "Low Volatility Rating",
+        chartValuationTitle: "6–12 Month Valuation Forecast",
+        chartValuationSub: "Current floor prices projected over 6 and 12-month timeframes",
+        badgeAiModel: "AI Predictive Model",
+        chartRarityTitle: "Rarity Distribution",
+        chartRaritySub: "Premium vs. Standard card stock allocation",
+        simulatorTitle: "6–12 Month Forecast Scenario Simulator",
+        simulatorSub: "Select market sentiment to recalculate individual card price projections",
+        btnConservative: "Conservative (+5/10%)",
+        btnModerate: "Moderate (+15/25%)",
+        btnBullish: "Bullish (+35/50%)",
+        thSerial: "Serial",
+        thName: "Card Name",
+        thType: "Type",
+        thCurrentPrice: "Current Price",
+        th6mEst: "6-Mo. Est. Price",
+        th12mEst: "12-Mo. Est. Price",
+        th12mDelta: "Est. 12-Mo. Delta (Δ)",
+        thRating: "Stability & Liquidity Rating",
+        listeningRealtime: "Listening to real-time database updates...",
+        noCardsDb: "No card inventory found in database.",
+        acrossSuffix: "Across {n} database cards",
+        gainSuffix: "+{n}% projected gain",
+        stableLabel: "Stable",
+        vaultReserve: "Vault Reserve",
+        highLiquidity: "High Liquidity",
+        moderateLiquidity: "Moderate"
+      },
+      ID: {
+        badgeAnalytics: "Pusat Analitik Prediktif",
+        analyticsSub: "Prakiraan harga 6–12 bulan & analitik stabilitas",
+        btnRefresh: "Muat Ulang Metrik",
+        btnReturn: "Kembali ke Pasar",
+        kpiRealizedVolume: "Volume Penjualan Terealisasi",
+        kpiSettledTrades: "Transaksi QRIS Selesai",
+        kpiMarketCap: "Kapitalisasi Pasar Saat Ini",
+        kpiEstVaultCap: "Est. Nilai Brankas 12-Bulan",
+        kpiStabilityIndex: "Indeks Stabilitas Perdagangan",
+        kpiVolatilityRating: "Peringkat Volatilitas Rendah",
+        chartValuationTitle: "Prakiraan Valuasi 6–12 Bulan",
+        chartValuationSub: "Proyeksi harga dasar saat ini untuk jangka waktu 6 dan 12 bulan",
+        badgeAiModel: "Model Prediktif AI",
+        chartRarityTitle: "Distribusi Kelangkaan",
+        chartRaritySub: "Alokasi stok kartu Premium vs. Standar",
+        simulatorTitle: "Simulator Skenario Prakiraan 6–12 Bulan",
+        simulatorSub: "Pilih sentimen pasar untuk menghitung ulang proyeksi harga kartu",
+        btnConservative: "Konservatif (+5/10%)",
+        btnModerate: "Moderat (+15/25%)",
+        btnBullish: "Optimis (+35/50%)",
+        thSerial: "Serial",
+        thName: "Nama Kartu",
+        thType: "Tipe",
+        thCurrentPrice: "Harga Saat Ini",
+        th6mEst: "Est. Harga 6-Bln",
+        th12mEst: "Est. Harga 12-Bln",
+        th12mDelta: "Est. Selisih 12-Bln (Δ)",
+        thRating: "Peringkat Stabilitas & Likuiditas",
+        listeningRealtime: "Mendengarkan pembaruan database real-time...",
+        noCardsDb: "Tidak ada inventaris kartu di database.",
+        acrossSuffix: "Dari {n} kartu di database",
+        gainSuffix: "+{n}% proyeksi kenaikan",
+        stableLabel: "Stabil",
+        vaultReserve: "Cadangan Brankas",
+        highLiquidity: "Likuiditas Tinggi",
+        moderateLiquidity: "Moderat"
+      }
+    };
+
+    function toggleAnalyticsLanguage() {
+      currentAnalyticsLang = currentAnalyticsLang === 'EN' ? 'ID' : 'EN';
+      localStorage.setItem('eugene_lang', currentAnalyticsLang);
+      document.getElementById('analytics-lang-label').innerText = currentAnalyticsLang;
+      applyAnalyticsTranslations();
+      renderScenarioProjections();
+    }
+
+    function applyAnalyticsTranslations() {
+      const dict = analyticsI18n[currentAnalyticsLang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerText = dict[key];
+      });
+    }
 
     const SCENARIOS = {
       conservative: { std6m: 1.05, std12m: 1.10, prem6m: 1.12, prem12m: 1.20 },
@@ -217,39 +320,52 @@
       bullish:      { std6m: 1.35, std12m: 1.50, prem6m: 1.50, prem12m: 2.00 }
     };
 
+    const ADMIN_EMAILS = ['eugene.aquila06@gmail.com', 'yujinybwork@gmail.com', 'eugene.aquila06', 'admin house'];
+
+    function isUserAdmin(user) {
+      if (!user) return false;
+      const email = (user.email || '').toLowerCase();
+      const displayName = (user.displayName || '').toLowerCase();
+      return ADMIN_EMAILS.some(e => email.includes(e) || displayName.includes(e));
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('analytics-lang-label').innerText = currentAnalyticsLang;
+      applyAnalyticsTranslations();
+
       auth.onAuthStateChanged(user => {
-        if (!user) {
+        if (!user || !isUserAdmin(user)) {
           alert('Admin access required to view Market Analytics.');
           window.location.href = 'index.html';
           return;
         }
-        loadAnalyticsData();
+        initRealtimeAnalyticsListeners();
       });
     });
 
-    async function loadAnalyticsData() {
-      try {
-        const cardsSnapshot = await db.collection("cards").get();
-        const ordersSnapshot = await db.collection("orders").get();
-
+    function initRealtimeAnalyticsListeners() {
+      db.collection("cards").onSnapshot(snapshot => {
         rawCardsData = [];
-        cardsSnapshot.forEach(doc => rawCardsData.push(doc.data()));
+        snapshot.forEach(doc => {
+          rawCardsData.push({ id: doc.id, ...doc.data() });
+        });
+        renderScenarioProjections();
+      }, err => {
+        console.error("Cards realtime listener error:", err);
+      });
 
-        let totalVolume = 0;
-        ordersSnapshot.forEach(doc => {
-          const order = doc.data();
-          if (order.status === 'APPROVED' || order.status === 'ACCEPTED & PAID') {
-            totalVolume += (order.totalAmount || 0);
+      db.collection("transactions").onSnapshot(snapshot => {
+        totalRealizedVolume = 0;
+        snapshot.forEach(doc => {
+          const tx = doc.data();
+          if (tx.status === 'APPROVED' || tx.status === 'ACCEPTED') {
+            totalRealizedVolume += parseFloat(tx.total_amount || tx.totalAmount || 0);
           }
         });
-
-        document.getElementById('stat-total-volume').innerText = formatIDR(totalVolume);
-
-        renderScenarioProjections();
-      } catch (e) {
-        console.error('Error loading analytics:', e);
-      }
+        document.getElementById('stat-total-volume').innerText = formatIDR(totalRealizedVolume);
+      }, err => {
+        console.error("Transactions realtime listener error:", err);
+      });
     }
 
     function setGrowthScenario(scenarioKey) {
@@ -266,7 +382,14 @@
     }
 
     function renderScenarioProjections() {
-      if (rawCardsData.length === 0) return;
+      const dict = analyticsI18n[currentAnalyticsLang];
+
+      if (rawCardsData.length === 0) {
+        document.getElementById('predictive-table-body').innerHTML = `
+          <tr><td colspan="8" class="p-6 text-center text-slate-500">${dict.noCardsDb}</td></tr>
+        `;
+        return;
+      }
 
       const sc = SCENARIOS[currentScenario];
       let currentValuation = 0;
@@ -276,7 +399,7 @@
       let totalStabilitySum = 0;
 
       const predictiveCards = rawCardsData.map(c => {
-        const currentPrice = c.price || c.baseFloorPrice || 100000;
+        const currentPrice = parseFloat(c.price || c.baseFloorPrice || 100000);
         const isPremium = c.type === 'PREMIUM';
 
         if (isPremium) premiumCount++;
@@ -290,11 +413,12 @@
         const delta12m = est12m - currentPrice;
         const pctGain12m = Math.round(((est12m - currentPrice) / currentPrice) * 100);
 
+        const hasOwner = c.owner && c.owner !== 'Admin House' && c.owner !== 'Unowned';
         const stabilityScore = isPremium 
-          ? (c.owner && c.owner !== 'Admin House' ? 98 : 94) 
-          : (c.owner && c.owner !== 'Admin House' ? 90 : 85);
+          ? (hasOwner ? 98 : 94) 
+          : (hasOwner ? 90 : 85);
 
-        const liquidityRating = isPremium ? 'Vault Reserve' : (c.owner ? 'Moderate' : 'High Liquidity');
+        const liquidityRating = isPremium ? dict.vaultReserve : (hasOwner ? dict.moderateLiquidity : dict.highLiquidity);
 
         currentValuation += currentPrice;
         futureValuation += est12m;
@@ -317,9 +441,9 @@
 
       document.getElementById('stat-total-valuation').innerText = formatIDR(currentValuation);
       document.getElementById('stat-future-valuation').innerText = formatIDR(futureValuation);
-      document.getElementById('stat-appreciation-rate').innerText = `+${totalAppreciationPct}% projected gain`;
+      document.getElementById('stat-appreciation-rate').innerText = dict.gainSuffix.replace('{n}', totalAppreciationPct);
       document.getElementById('stat-stability-index').innerText = `${avgStability}%`;
-      document.getElementById('stat-total-cards').innerText = `Across ${rawCardsData.length} database cards`;
+      document.getElementById('stat-total-cards').innerText = dict.acrossSuffix.replace('{n}', rawCardsData.length);
 
       document.getElementById('premium-count-badge').innerText = premiumCount;
       document.getElementById('standard-count-badge').innerText = standardCount;
@@ -333,7 +457,8 @@
       const tbody = document.getElementById('predictive-table-body');
       if (!tbody) return;
 
-      predictiveCards.sort((a, b) => (a.id || '').localeCompare(b.id || '', undefined, { numeric: true }));
+      const dict = analyticsI18n[currentAnalyticsLang];
+      predictiveCards.sort((a, b) => (a.serial || a.id || '').localeCompare(b.serial || b.id || '', undefined, { numeric: true }));
 
       tbody.innerHTML = predictiveCards.map(c => `
         <tr class="hover:bg-slate-950/60 transition-colors">
@@ -345,7 +470,7 @@
           <td class="p-3 font-mono text-indigo-400 font-black">${formatIDR(c.est12m)}</td>
           <td class="p-3 font-mono text-emerald-400 font-bold">+${formatIDR(c.delta12m)} (<span class="text-amber-400">+${c.pctGain12m}%</span>)</td>
           <td class="p-3 text-right space-x-1">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">${c.stabilityScore}% Stable</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">${c.stabilityScore}% ${dict.stableLabel}</span>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">${c.liquidityRating}</span>
           </td>
         </tr>
@@ -353,23 +478,28 @@
     }
 
     function renderTrendAndForecastChart(currentVal, futureVal) {
-      const ctx = document.getElementById('trendForecastChart').getContext('2d');
+      const canvas = document.getElementById('trendForecastChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (trendChartInstance) trendChartInstance.destroy();
 
       const val3m = Math.round(currentVal + (futureVal - currentVal) * 0.25);
       const val6m = Math.round(currentVal + (futureVal - currentVal) * 0.50);
       const val9m = Math.round(currentVal + (futureVal - currentVal) * 0.75);
 
-      const labels = ['Current Floor', '+3 Months', '+6 Months (Est.)', '+9 Months', '+12 Months (Est.)'];
-      const dataPoints = [currentVal, val3m, val6m, val9m, futureVal];
+      const labels = currentAnalyticsLang === 'ID' 
+        ? ['Saat Ini', '+3 Bulan', '+6 Bulan (Est.)', '+9 Bulan', '+12 Bulan (Est.)']
+        : ['Current Floor', '+3 Months', '+6 Months (Est.)', '+9 Months', '+12 Months (Est.)'];
+
+      const chartLabel = currentAnalyticsLang === 'ID' ? 'Prakiraan Valuasi Pasar (IDR)' : 'Market Valuation Forecast (IDR)';
 
       trendChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels,
           datasets: [{
-            label: 'Market Valuation Forecast (IDR)',
-            data: dataPoints,
+            label: chartLabel,
+            data: [currentVal, val3m, val6m, val9m, futureVal],
             borderColor: '#818cf8',
             backgroundColor: 'rgba(129, 140, 248, 0.15)',
             fill: true,
@@ -393,7 +523,9 @@
     }
 
     function renderTierDistributionChart(premium, standard) {
-      const ctx = document.getElementById('tierDistributionChart').getContext('2d');
+      const canvas = document.getElementById('tierDistributionChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (tierChartInstance) tierChartInstance.destroy();
 
       tierChartInstance = new Chart(ctx, {
@@ -414,6 +546,15 @@
           }
         }
       });
+    }
+
+    function triggerManualRefresh() {
+      const icon = document.getElementById('refresh-icon');
+      if (icon) icon.classList.add('fa-spin');
+      renderScenarioProjections();
+      setTimeout(() => {
+        if (icon) icon.classList.remove('fa-spin');
+      }, 500);
     }
 
     function formatIDR(amount) {
