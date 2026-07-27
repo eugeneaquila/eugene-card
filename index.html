@@ -53,6 +53,11 @@
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #030712; }
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
+    .collector-stat-bar { height: 7px; border-radius: 9999px; background: #0f172a; overflow: hidden; }
+    .collector-stat-bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #06b6d4, #6366f1); }
+    .achievement-card { transition: transform .2s ease, border-color .2s ease; }
+    .achievement-card:hover { transform: translateY(-2px); border-color: rgba(34,211,238,.45); }
+    .achievement-card.locked { opacity: .42; filter: grayscale(.65); }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black relative">
@@ -112,8 +117,7 @@
 		</button>
 
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-          <i class="fa-solid fa-comments text-indigo-400"></i>
-          <span data-i18n="navInbox">Inbox</span>
+          <i class="fa-solid fa-comments text-indigo-400"></i> <span data-i18n="navInbox">Inbox</span>
           <span id="inbox-unread-nav-badge" class="hidden min-w-4 h-4 px-1 bg-rose-500 text-white font-black text-[9px] rounded-full items-center justify-center leading-none">0</span>
         </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
@@ -125,6 +129,9 @@
 
         <div class="h-4 w-px bg-slate-800 mx-1 self-center hidden sm:block"></div>
 
+        <button id="nav-hub" onclick="switchTab('collector-hub')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+          <i class="fa-solid fa-chart-pie text-cyan-400"></i> <span>Collector Hub</span>
+        </button>
         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-vault text-amber-400"></i> <span data-i18n="navVault">My Vault</span>
         </button>
@@ -413,6 +420,102 @@
             <tbody id="history-table-body" class="divide-y divide-slate-800/80"></tbody>
           </table>
         </div>
+      </div>
+    </section>
+
+    <!-- COLLECTOR HUB / PORTFOLIO VIEW -->
+    <section id="view-collector-hub" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col lg:flex-row justify-between gap-5">
+        <div class="flex items-center gap-4">
+          <img id="hub-profile-avatar" src="" class="w-16 h-16 rounded-2xl object-cover border-2 border-cyan-500/40 bg-slate-950">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 id="hub-profile-name" class="text-2xl font-black text-white">Collector Hub</h2>
+              <span id="hub-profile-level" class="px-2 py-1 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-[10px] font-black">LEVEL 1</span>
+            </div>
+            <p id="hub-profile-username" class="text-xs text-amber-400 font-mono mt-1">@collector</p>
+            <p id="hub-profile-bio" class="text-xs text-slate-400 mt-1">Your collection, market activity and collector achievements.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="openProfileManagerModal()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl border border-slate-700">
+            <i class="fa-solid fa-user-gear mr-1 text-amber-400"></i> Profile
+          </button>
+          <button onclick="switchTab('inbox')" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl">
+            <i class="fa-solid fa-comments mr-1"></i> Inbox
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <p class="text-[10px] text-slate-500 font-bold uppercase">Collection Value</p>
+          <p id="hub-collection-value" class="text-lg font-black text-emerald-400 font-mono mt-1">Rp 0</p>
+          <p id="hub-collection-cost" class="text-[10px] text-slate-500 mt-1">Floor-value estimate</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <p class="text-[10px] text-slate-500 font-bold uppercase">Cards Owned</p>
+          <p id="hub-card-count" class="text-lg font-black text-white mt-1">0</p>
+          <p id="hub-completion" class="text-[10px] text-cyan-400 mt-1">0% of catalog</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <p class="text-[10px] text-slate-500 font-bold uppercase">Trading Reputation</p>
+          <p id="hub-reputation" class="text-lg font-black text-amber-400 mt-1">0 XP</p>
+          <p id="hub-trade-count" class="text-[10px] text-slate-500 mt-1">0 completed activities</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <p class="text-[10px] text-slate-500 font-bold uppercase">Wishlist</p>
+          <p id="hub-wishlist-count" class="text-lg font-black text-rose-400 mt-1">0</p>
+          <p class="text-[10px] text-slate-500 mt-1">watching for availability</p>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-trophy text-amber-400 mr-2"></i>Achievements</h3>
+              <p class="text-[10px] text-slate-500 mt-1">Milestones earned from collecting, trading and auctions.</p>
+            </div>
+            <span id="hub-achievement-count" class="text-[10px] font-black text-slate-400">0 / 8</span>
+          </div>
+          <div id="hub-achievements" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+          <h3 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-bell text-indigo-400 mr-2"></i>Smart Alerts</h3>
+          <p class="text-[10px] text-slate-500 mt-1 mb-3">Wishlist, auction and order activity.</p>
+          <div id="hub-alerts" class="space-y-2 max-h-72 overflow-y-auto"></div>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-chart-line text-emerald-400 mr-2"></i>Collection Portfolio</h3>
+            <button onclick="switchTab('dashboard')" class="text-[10px] text-cyan-400 font-bold hover:text-cyan-300">Open Vault →</button>
+          </div>
+          <div id="hub-portfolio-breakdown" class="space-y-2"></div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i>Recent Activity</h3>
+            <button onclick="toggleNotificationMenu()" class="text-[10px] text-indigo-400 font-bold hover:text-indigo-300">Open notifications →</button>
+          </div>
+          <div id="hub-recent-activity" class="space-y-2 max-h-72 overflow-y-auto"></div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-receipt text-amber-400 mr-2"></i>Order Tracking</h3>
+            <p class="text-[10px] text-slate-500 mt-1">Your latest QRIS orders and delivery state.</p>
+          </div>
+          <button onclick="switchTab('history')" class="text-[10px] text-cyan-400 font-bold">Full history →</button>
+        </div>
+        <div id="hub-order-tracking" class="grid md:grid-cols-2 gap-3"></div>
       </div>
     </section>
 
@@ -908,6 +1011,55 @@
       </div>
 
       <div id="detail-card-action-container"></div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button id="detail-wishlist-action" onclick="toggleWishlistFromDetail()" class="py-2 bg-rose-950/30 hover:bg-rose-900/40 text-rose-300 font-bold text-[10px] rounded-xl border border-rose-500/30">
+          <i class="fa-solid fa-heart mr-1"></i> Wishlist
+        </button>
+        <button id="detail-owner-chat-action" onclick="chatFromCardDetail()" class="py-2 bg-indigo-950/30 hover:bg-indigo-900/40 text-indigo-300 font-bold text-[10px] rounded-xl border border-indigo-500/30">
+          <i class="fa-solid fa-comments mr-1"></i> Chat Owner
+        </button>
+      </div>
+      <div id="detail-card-history" class="bg-slate-950 border border-slate-800 rounded-2xl p-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[10px] font-black uppercase text-slate-500">Ownership / Activity History</span>
+          <span class="text-[9px] text-slate-600">Derived from marketplace records</span>
+        </div>
+        <div id="detail-card-history-list" class="space-y-1.5 max-h-28 overflow-y-auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIRECT TRADE OFFER MODAL -->
+  <div id="trade-offer-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-purple-500/30 rounded-3xl max-w-lg w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeTradeOfferModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-800 text-slate-400 text-xs flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div>
+        <h3 class="text-lg font-black text-white"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i>Trade Offer</h3>
+        <p id="trade-offer-target-label" class="text-xs text-slate-400 mt-1">Send an offer directly to another collector.</p>
+      </div>
+
+      <input type="hidden" id="trade-offer-target-user">
+      <input type="hidden" id="trade-offer-requested-card">
+
+      <div class="grid md:grid-cols-2 gap-3">
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3">
+          <p class="text-[10px] font-black uppercase text-slate-500 mb-2">You offer</p>
+          <select id="trade-offer-my-card" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"></select>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3">
+          <p class="text-[10px] font-black uppercase text-slate-500 mb-2">You want</p>
+          <div id="trade-offer-requested-card-preview" class="text-xs text-slate-300">Select a card first.</div>
+        </div>
+      </div>
+
+      <textarea id="trade-offer-note" rows="3" placeholder="Optional message: explain why you'd like to trade..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"></textarea>
+
+      <div class="flex gap-2">
+        <button onclick="closeTradeOfferModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl">Cancel</button>
+        <button onclick="submitDirectTradeOffer()" class="flex-1 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-black text-xs rounded-xl"><i class="fa-solid fa-paper-plane mr-1"></i> Send Offer</button>
+      </div>
     </div>
   </div>
 
@@ -1029,6 +1181,11 @@
     let inboxUnsubscribe = null;
     let inboxUnreadState = {};
     let inboxUnreadInitialized = false;
+    let tradeRequestUnsubscribe = null;
+    let auctionAlertTimer = null;
+    let lastAuctionSnapshot = null;
+    let activeDetailCardId = null;
+    let lastWishlistSnapshot = {};
 
     let visibleCardCount = 10;
     const CARDS_PER_BATCH = 10;
@@ -1621,6 +1778,427 @@
       showToast('Notifications cleared.');
     }
 
+
+    // ===== EUGENE CARD 2.0 COLLECTOR FEATURES =====
+
+    function getCollectorIdentity() {
+      return currentUser ? String(currentUser.username || currentUser.name || '').trim() : '';
+    }
+
+    function getCollectorIdentities() {
+      if (!currentUser) return [];
+      return [currentUser.username, currentUser.name].filter(Boolean).map(v => String(v).trim().toLowerCase());
+    }
+
+    function getTimeMillis(value) {
+      if (!value) return 0;
+      if (typeof value.toMillis === 'function') return value.toMillis();
+      if (value.seconds) return value.seconds * 1000;
+      const parsed = new Date(value).getTime();
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function inboxUnreadStorageKey() {
+      return `eugene_inbox_unread_${getCollectorIdentity().toLowerCase() || 'guest'}`;
+    }
+
+    function loadInboxUnreadState() {
+      try { inboxUnreadState = JSON.parse(localStorage.getItem(inboxUnreadStorageKey()) || '{}'); }
+      catch (e) { inboxUnreadState = {}; }
+      renderInboxUnreadBadge();
+    }
+
+    function saveInboxUnreadState() {
+      try { localStorage.setItem(inboxUnreadStorageKey(), JSON.stringify(inboxUnreadState)); } catch (e) {}
+    }
+
+    function renderInboxUnreadBadge() {
+      const badge = document.getElementById('inbox-unread-nav-badge');
+      if (!badge) return;
+      const count = Object.values(inboxUnreadState).filter(v => v && v.unread).length;
+      badge.textContent = count > 99 ? '99+' : String(count);
+      badge.classList.toggle('hidden', count === 0);
+      badge.classList.toggle('flex', count > 0);
+    }
+
+    function markInboxRead(chatId) {
+      if (!chatId) return;
+      inboxUnreadState[chatId] = { lastSeen: Date.now(), unread: false };
+      saveInboxUnreadState();
+      renderInboxUnreadBadge();
+    }
+
+    function startInboxNotificationListener() {
+      if (inboxUnsubscribe) inboxUnsubscribe();
+      if (!currentUser) return;
+      loadInboxUnreadState();
+      inboxUnreadInitialized = false;
+
+      inboxUnsubscribe = db.collection('chats').onSnapshot(snapshot => {
+        const mine = getCollectorIdentities();
+
+        snapshot.forEach(doc => {
+          const d = doc.data() || {};
+          const participants = Array.isArray(d.participants) ? d.participants : doc.id.replace('chat-', '').split('-vs-');
+          const isMine = currentUser.isAdmin || participants.some(p => mine.includes(String(p).toLowerCase()));
+          if (!isMine) return;
+
+          const sender = String(d.lastSender || '').toLowerCase();
+          const updated = getTimeMillis(d.updatedAt);
+          const seen = Number(inboxUnreadState[doc.id]?.lastSeen || 0);
+          const incoming = sender && !mine.includes(sender);
+
+          if (incoming && updated > seen && doc.id !== currentChatContextId) {
+            const wasUnread = !!inboxUnreadState[doc.id]?.unread;
+            inboxUnreadState[doc.id] = { lastSeen: seen, unread: true };
+            if (inboxUnreadInitialized && !wasUnread) {
+              addNotification('New Inbox Message', `${d.lastSender || 'Collector'}: ${d.lastMessage || 'You received a new message.'}`, 'fa-comments text-indigo-400');
+            }
+          }
+        });
+
+        saveInboxUnreadState();
+        renderInboxUnreadBadge();
+      }, err => console.warn('Inbox listener:', err));
+    }
+
+    function renderSmartAlerts() {
+      const el = document.getElementById('hub-alerts');
+      if (!el) return;
+      const alerts = [];
+
+      const watched = inventory.filter(c => wishlist.has(c.id));
+      watched.forEach(c => {
+        if (c.status === 'AVAILABLE') alerts.push({icon:'fa-heart text-rose-400', title:'Wishlist available', text:`${c.serial} is available now.`, action:`openCardDetailModal('${c.id}')`});
+      });
+
+      if (activeAuction) {
+        const mine = getCollectorIdentity().toLowerCase();
+        if (String(activeAuction.highBidder || '').toLowerCase() === mine) {
+          alerts.push({icon:'fa-gavel text-emerald-400', title:'You are winning', text:`${activeAuction.serial || 'Auction'} at ${formatIDR(activeAuction.currentBid || 0)}.`, action:"switchTab('auction')"});
+        }
+        const end = new Date(activeAuction.expiresAt || 0).getTime();
+        if (end && end - Date.now() > 0 && end - Date.now() < 10 * 60 * 1000) {
+          alerts.push({icon:'fa-clock text-amber-400', title:'Auction ending soon', text:`${activeAuction.serial || 'Auction'} ends in under 10 minutes.`, action:"switchTab('auction')"});
+        }
+      }
+
+      const myOrders = transactionsList.filter(t => getCollectorIdentities().includes(String(t.user_name || '').toLowerCase())).slice(0, 3);
+      myOrders.forEach(o => {
+        alerts.push({icon:'fa-receipt text-cyan-400', title:`Order ${o.status || 'PENDING'}`, text:`${o.id || 'Order'} • ${formatIDR(o.total_amount || 0)}`, action:"switchTab('history')"});
+      });
+
+      if (!alerts.length) {
+        el.innerHTML = `<div class="text-[11px] text-slate-500 py-4 text-center">No active smart alerts right now.</div>`;
+        return;
+      }
+
+      el.innerHTML = alerts.slice(0, 8).map(a => `
+        <button onclick="${a.action}" class="w-full text-left bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl p-2.5 flex gap-2.5 transition-all">
+          <i class="fa-solid ${a.icon} mt-0.5"></i>
+          <span class="min-w-0"><strong class="block text-[10px] text-white">${a.title}</strong><span class="block text-[10px] text-slate-400 truncate">${a.text}</span></span>
+        </button>
+      `).join('');
+    }
+
+    function collectorMetrics() {
+      const mine = getCollectorIdentities();
+      const owned = inventory.filter(c => mine.includes(String(c.owner || '').toLowerCase()));
+      const value = owned.reduce((s, c) => s + Number(c.price || 0), 0);
+      const premium = owned.filter(c => c.type === 'PREMIUM').length;
+      const standard = owned.filter(c => c.type !== 'PREMIUM').length;
+      const wishlistCount = wishlist.size;
+
+      const myTrades = tradeRequestsList.filter(t => {
+        const from = String(t.fromUser || t.requester || t.user_name || '').toLowerCase();
+        const to = String(t.toUser || t.owner || t.targetUser || '').toLowerCase();
+        return mine.includes(from) || mine.includes(to);
+      });
+      const completedTrades = myTrades.filter(t => String(t.status || '').toUpperCase() === 'ACCEPTED' || String(t.status || '').toUpperCase() === 'COMPLETED').length;
+      const auctionsWon = Number(localStorage.getItem(`eugene_auction_wins_${getCollectorIdentity().toLowerCase()}`) || 0);
+      const purchases = transactionsList.filter(t => mine.includes(String(t.user_name || '').toLowerCase()) && String(t.status || '').toUpperCase() === 'APPROVED').length;
+
+      const xp = owned.length * 25 + completedTrades * 100 + auctionsWon * 150 + purchases * 50;
+      const level = Math.max(1, Math.floor(xp / 100) + 1);
+
+      return { owned, value, premium, standard, wishlistCount, completedTrades, auctionsWon, purchases, xp, level };
+    }
+
+    function collectorAchievements(m) {
+      return [
+        ['FIRST CARD', 'Own your first card.', m.owned.length >= 1, 'fa-id-card'],
+        ['BETA COLLECTOR', 'Own 3 Beta cards.', m.owned.length >= 3, 'fa-layer-group'],
+        ['SERIAL HUNTER', 'Own a card with SN under 0010.', m.owned.some(c => parseInt(c.sn || '9999', 10) < 10), 'fa-fingerprint'],
+        ['TRADER', 'Complete your first trade.', m.completedTrades >= 1, 'fa-right-left'],
+        ['AUCTION HUNTER', 'Win your first auction.', m.auctionsWon >= 1, 'fa-gavel'],
+        ['FULL SET', 'Own 10 or more cards.', m.owned.length >= 10, 'fa-crown'],
+        ['WISHLIST WATCHER', 'Save 5 cards.', m.wishlistCount >= 5, 'fa-heart'],
+        ['COLLECTOR ELITE', 'Reach 1,000 XP.', m.xp >= 1000, 'fa-star']
+      ];
+    }
+
+    function renderCollectorHub() {
+      const hub = document.getElementById('view-collector-hub');
+      if (!hub) return;
+      if (!currentUser) {
+        document.getElementById('hub-profile-name').textContent = 'Log in to open Collector Hub';
+        document.getElementById('hub-profile-username').textContent = '';
+        document.getElementById('hub-card-count').textContent = '0';
+        document.getElementById('hub-collection-value').textContent = formatIDR(0);
+        return;
+      }
+
+      const m = collectorMetrics();
+      const profile = getCollectorProfile(getCollectorIdentity()) || currentUser;
+
+      document.getElementById('hub-profile-avatar').src = profile.avatarUrl || getCollectorAvatar(getCollectorIdentity());
+      document.getElementById('hub-profile-name').textContent = profile.name || getCollectorIdentity();
+      document.getElementById('hub-profile-username').textContent = profile.username ? `@${profile.username}` : `@${getCollectorIdentity()}`;
+      document.getElementById('hub-profile-bio').textContent = profile.bio || 'Collector & Trading Card Enthusiast';
+      document.getElementById('hub-profile-level').textContent = `LEVEL ${m.level}`;
+      document.getElementById('hub-collection-value').textContent = formatIDR(m.value);
+      document.getElementById('hub-card-count').textContent = m.owned.length;
+      document.getElementById('hub-completion').textContent = `${inventory.length ? Math.round((m.owned.length / inventory.length) * 100) : 0}% of catalog`;
+      document.getElementById('hub-reputation').textContent = `${m.xp} XP`;
+      document.getElementById('hub-trade-count').textContent = `${m.completedTrades} completed trades • ${m.auctionsWon} auction wins`;
+      document.getElementById('hub-wishlist-count').textContent = m.wishlistCount;
+
+      const achievements = collectorAchievements(m);
+      document.getElementById('hub-achievement-count').textContent = `${achievements.filter(a => a[2]).length} / ${achievements.length}`;
+      document.getElementById('hub-achievements').innerHTML = achievements.map(a => `
+        <div class="achievement-card ${a[2] ? '' : 'locked'} bg-slate-950 border border-slate-800 rounded-2xl p-3 text-center">
+          <div class="w-9 h-9 mx-auto rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-2">
+            <i class="fa-solid ${a[3]} ${a[2] ? 'text-amber-400' : 'text-slate-600'}"></i>
+          </div>
+          <p class="text-[9px] font-black text-white">${a[0]}</p>
+          <p class="text-[9px] text-slate-500 mt-1">${a[1]}</p>
+        </div>
+      `).join('');
+
+      const premiumPct = m.owned.length ? Math.round(m.premium / m.owned.length * 100) : 0;
+      const standardPct = m.owned.length ? 100 - premiumPct : 0;
+      document.getElementById('hub-portfolio-breakdown').innerHTML = `
+        <div class="flex justify-between text-[10px]"><span class="text-slate-400">Premium</span><strong class="text-amber-400">${m.premium} cards</strong></div>
+        <div class="collector-stat-bar"><span style="width:${premiumPct}%"></span></div>
+        <div class="flex justify-between text-[10px] pt-2"><span class="text-slate-400">Standard</span><strong class="text-indigo-400">${m.standard} cards</strong></div>
+        <div class="collector-stat-bar"><span style="width:${standardPct}%"></span></div>
+        <div class="flex justify-between text-[10px] pt-3 border-t border-slate-800 mt-3"><span class="text-slate-400">Average card value</span><strong class="text-emerald-400 font-mono">${formatIDR(m.owned.length ? m.value / m.owned.length : 0)}</strong></div>
+      `;
+
+      const recent = systemNotifications.slice(0, 6);
+      document.getElementById('hub-recent-activity').innerHTML = recent.length
+        ? recent.map(n => `<div class="flex gap-2.5 bg-slate-950 border border-slate-800 rounded-xl p-2.5"><i class="fa-solid ${n.iconClass} mt-0.5"></i><div class="min-w-0"><strong class="block text-[10px] text-white">${n.title}</strong><span class="block text-[10px] text-slate-500 truncate">${n.message}</span></div></div>`).join('')
+        : `<div class="text-[11px] text-slate-500 py-4 text-center">Your activity will appear here.</div>`;
+
+      const myOrders = transactionsList.filter(t => getCollectorIdentities().includes(String(t.user_name || '').toLowerCase())).slice(0, 4);
+      document.getElementById('hub-order-tracking').innerHTML = myOrders.length
+        ? myOrders.map(o => {
+            const status = String(o.status || 'PENDING').toUpperCase();
+            const steps = ['PENDING', 'APPROVED'];
+            const approved = status === 'APPROVED';
+            return `<div class="bg-slate-950 border border-slate-800 rounded-2xl p-3">
+              <div class="flex justify-between items-center"><strong class="text-xs text-white">${o.id || 'Order'}</strong><span class="text-[9px] font-black px-2 py-1 rounded-full ${approved ? 'bg-emerald-500/15 text-emerald-400' : status === 'REJECTED' ? 'bg-rose-500/15 text-rose-400' : 'bg-amber-500/15 text-amber-400'}">${status}</span></div>
+              <p class="text-[10px] text-slate-400 mt-1">${Array.isArray(o.items) ? o.items.length : 0} card(s) • ${formatIDR(o.total_amount || 0)}</p>
+              <div class="flex items-center gap-1.5 mt-3 text-[9px]">
+                <span class="${status !== 'REJECTED' ? 'text-emerald-400' : 'text-slate-600'}">● Submitted</span>
+                <span class="text-slate-700">→</span>
+                <span class="${approved ? 'text-emerald-400' : 'text-slate-600'}">● Admin Approved</span>
+                <span class="text-slate-700">→</span>
+                <span class="${approved ? 'text-cyan-400' : 'text-slate-600'}">● Card Transfer</span>
+              </div>
+            </div>`;
+          }).join('')
+        : `<div class="md:col-span-2 text-[11px] text-slate-500 py-4 text-center">No orders yet.</div>`;
+
+      renderSmartAlerts();
+    }
+
+    function snapshotWishlistPrices() {
+      if (!currentUser) return;
+      const key = `eugene_wishlist_prices_${getCollectorIdentity().toLowerCase()}`;
+      let old = {};
+      try { old = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+      const next = {};
+
+      inventory.filter(c => wishlist.has(c.id)).forEach(c => {
+        next[c.id] = { price: Number(c.price || 0), status: c.status };
+        if (old[c.id]) {
+          if (Number(c.price || 0) !== Number(old[c.id].price || 0)) {
+            addNotification('Wishlist Price Changed', `${c.serial} changed to ${formatIDR(c.price)}.`, 'fa-tag text-amber-400');
+          }
+          if (old[c.id].status !== 'AVAILABLE' && c.status === 'AVAILABLE') {
+            addNotification('Wishlist Card Available', `${c.serial} is available again.`, 'fa-heart text-rose-400');
+          }
+        }
+      });
+      try { localStorage.setItem(key, JSON.stringify(next)); } catch (e) {}
+    }
+
+    function recordAuctionAlerts(nextAuction) {
+      if (!currentUser || !nextAuction) return;
+      const mine = getCollectorIdentity().toLowerCase();
+      const previous = lastAuctionSnapshot;
+      if (previous && String(previous.highBidder || '').toLowerCase() === mine &&
+          String(nextAuction.highBidder || '').toLowerCase() !== mine &&
+          Number(nextAuction.currentBid || 0) > Number(previous.currentBid || 0)) {
+        addNotification('You were outbid!', `${nextAuction.serial || 'Auction'} is now at ${formatIDR(nextAuction.currentBid || 0)}.`, 'fa-gavel text-rose-400');
+      }
+      lastAuctionSnapshot = nextAuction;
+    }
+
+    function startAuctionAlertTimer() {
+      if (auctionAlertTimer) clearInterval(auctionAlertTimer);
+      auctionAlertTimer = setInterval(() => {
+        renderSmartAlerts();
+      }, 30000);
+    }
+
+    function openTradeOfferModal(targetUser, requestedCardId) {
+      if (!currentUser) return showToast('Please log in to send a trade offer.');
+      const target = String(targetUser || '').trim();
+      if (!target) return showToast('This card has no collector owner.');
+      const myCards = inventory.filter(c => getCollectorIdentities().includes(String(c.owner || '').toLowerCase()));
+      if (!myCards.length) return showToast('You need at least one owned card to offer in a trade.');
+
+      document.getElementById('trade-offer-target-user').value = target;
+      document.getElementById('trade-offer-requested-card').value = requestedCardId || '';
+      document.getElementById('trade-offer-target-label').textContent = `Offer one of your cards to ${target}.`;
+      document.getElementById('trade-offer-my-card').innerHTML = myCards.map(c => `<option value="${c.id}">${c.serial} — ${c.name}</option>`).join('');
+
+      const requested = inventory.find(c => c.id === requestedCardId);
+      document.getElementById('trade-offer-requested-card-preview').innerHTML = requested
+        ? `<div class="flex items-center gap-2"><img src="${requested.imgUrl}" class="w-10 h-12 object-contain rounded border border-slate-800"><div><strong class="block text-white">${requested.name}</strong><span class="text-amber-400 font-mono">${requested.serial}</span></div></div>`
+        : 'No requested card selected.';
+      document.getElementById('trade-offer-note').value = '';
+      document.getElementById('trade-offer-modal').classList.remove('hidden');
+    }
+
+    function closeTradeOfferModal() {
+      document.getElementById('trade-offer-modal')?.classList.add('hidden');
+    }
+
+    async function submitDirectTradeOffer() {
+      if (!currentUser) return showToast('Please log in first.');
+      const targetUser = document.getElementById('trade-offer-target-user').value;
+      const offeredCardId = document.getElementById('trade-offer-my-card').value;
+      const requestedCardId = document.getElementById('trade-offer-requested-card').value;
+      const note = document.getElementById('trade-offer-note').value.trim();
+      const offered = inventory.find(c => c.id === offeredCardId);
+      const requested = inventory.find(c => c.id === requestedCardId);
+      if (!offered || !requested) return showToast('Select valid cards for this offer.');
+
+      const requestId = `trade-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const payload = {
+        id: requestId,
+        type: 'DIRECT_TRADE_OFFER',
+        fromUser: getCollectorIdentity(),
+        toUser: targetUser,
+        owner: targetUser,
+        requester: getCollectorIdentity(),
+        offeredCardId,
+        offeredCardSerial: offered.serial,
+        requestedCardId,
+        requestedCardSerial: requested.serial,
+        message: note,
+        status: 'PENDING',
+        created_at: new Date().toISOString()
+      };
+
+      try {
+        await db.collection('tradeRequests').doc(requestId).set(payload);
+        addNotification('Trade Offer Sent', `${offered.serial} offered for ${requested.serial}.`, 'fa-handshake text-purple-400');
+        closeTradeOfferModal();
+        showToast('Trade offer sent.');
+        switchTab('inbox');
+      } catch (e) {
+        showToast('Trade offer error: ' + e.message);
+      }
+    }
+
+    function renderTradeOfferButtonForCard(card) {
+      if (!currentUser || !card.owner) return '';
+      const mine = getCollectorIdentities();
+      if (mine.includes(String(card.owner).toLowerCase())) return '';
+      return `<button onclick="event.stopPropagation(); openTradeOfferModal('${String(card.owner).replace(/'/g, "\\'")}', '${card.id}')" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-black text-[10px] rounded-xl mt-2"><i class="fa-solid fa-handshake mr-1"></i> Propose Trade</button>`;
+    }
+
+    function toggleWishlistFromDetail() {
+      if (!activeDetailCardId) return;
+      toggleWishlist(activeDetailCardId);
+      const card = inventory.find(c => c.id === activeDetailCardId);
+      const btn = document.getElementById('detail-wishlist-action');
+      if (btn && card) btn.innerHTML = `<i class="fa-solid fa-heart mr-1"></i> ${wishlist.has(card.id) ? 'Saved' : 'Wishlist'}`;
+      renderCollectorHub();
+    }
+
+    function chatFromCardDetail() {
+      const card = inventory.find(c => c.id === activeDetailCardId);
+      if (!card || !card.owner) return showToast('This card has no collector owner.');
+      openDirectChat(card.owner, `Card ${card.serial}`);
+      closeCardDetailModal();
+      switchTab('inbox');
+    }
+
+    function renderCardHistory(cardId) {
+      const el = document.getElementById('detail-card-history-list');
+      if (!el) return;
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+      const events = [];
+
+      transactionsList.forEach(t => {
+        const items = Array.isArray(t.items) ? t.items : [];
+        if (items.some(i => i.id === cardId || i.serial === card.serial)) {
+          events.push({time: t.created_at, title: `Order ${t.status || 'PENDING'}`, detail: `${t.user_name || 'Collector'} • ${formatIDR(t.total_amount || 0)}`});
+        }
+      });
+
+      if (card.owner) events.push({time: '', title: 'Current ownership', detail: card.owner});
+      events.sort((a,b) => getTimeMillis(b.time) - getTimeMillis(a.time));
+
+      el.innerHTML = events.length
+        ? events.slice(0, 8).map(e => `<div class="flex justify-between gap-3 text-[10px] border-b border-slate-800/70 pb-1.5"><span class="text-slate-300">${e.title}</span><span class="text-slate-500 text-right">${e.detail}</span></div>`).join('')
+        : `<div class="text-[10px] text-slate-600">No marketplace history recorded yet.</div>`;
+    }
+
+    function markTradeRequestNotifications() {
+      if (!currentUser) return;
+      const mine = getCollectorIdentities();
+      const key = `eugene_trade_seen_${getCollectorIdentity().toLowerCase()}`;
+      let seen = {};
+      try { seen = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+
+      tradeRequestsList.forEach(t => {
+        const to = String(t.toUser || t.owner || t.targetUser || '').toLowerCase();
+        if (!mine.includes(to)) return;
+        const created = getTimeMillis(t.created_at || t.createdAt);
+        if (created > Number(seen[t.id] || 0) && String(t.status || 'PENDING').toUpperCase() === 'PENDING') {
+          addNotification('New Trade Offer', `${t.fromUser || t.requester || 'Collector'} offered ${t.offeredCardSerial || 'a card'} for ${t.requestedCardSerial || 'your card'}.`, 'fa-handshake text-purple-400');
+          seen[t.id] = created;
+        }
+      });
+      try { localStorage.setItem(key, JSON.stringify(seen)); } catch (e) {}
+    }
+
+    function markOrderStatusNotifications() {
+      if (!currentUser) return;
+      const mine = getCollectorIdentities();
+      const key = `eugene_order_status_seen_${getCollectorIdentity().toLowerCase()}`;
+      let seen = {};
+      try { seen = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+
+      transactionsList.filter(t => mine.includes(String(t.user_name || '').toLowerCase())).forEach(t => {
+        const status = String(t.status || 'PENDING').toUpperCase();
+        if (seen[t.id] && seen[t.id] === status) return;
+        if (seen[t.id] && seen[t.id] !== status) {
+          const icon = status === 'APPROVED' ? 'fa-circle-check text-emerald-400' : status === 'REJECTED' ? 'fa-circle-xmark text-rose-400' : 'fa-receipt text-amber-400';
+          addNotification(`Order ${status}`, `${t.id || 'Order'} is now ${status.toLowerCase()}.`, icon);
+        }
+        seen[t.id] = status;
+      });
+      try { localStorage.setItem(key, JSON.stringify(seen)); } catch (e) {}
+    }
+
     function searchUsersForChat() {
       const query = (document.getElementById('user-chat-search-input')?.value || '').toLowerCase().trim();
       const resultsContainer = document.getElementById('user-chat-search-results');
@@ -1701,7 +2279,7 @@
 
       const participants = [myIdent, targetIdent].sort();
       currentChatContextId = `chat-${participants.join('-vs-')}`;
-      markInboxThreadRead(currentChatContextId);
+      markInboxRead(currentChatContextId);
 
       document.getElementById('chat-target-user-name').innerText = targetUserName;
       document.getElementById('chat-target-context').innerText = contextInfo;
@@ -1833,164 +2411,6 @@
       }
     }
 
-    function getInboxNotificationStorageKey() {
-      const email = currentUser?.email ? currentUser.email.toLowerCase() : 'guest';
-      return `eugene_inbox_unread_${email}`;
-    }
-
-    function loadInboxUnreadState() {
-      try {
-        const saved = localStorage.getItem(getInboxNotificationStorageKey());
-        inboxUnreadState = saved ? JSON.parse(saved) : {};
-      } catch (e) {
-        inboxUnreadState = {};
-      }
-      renderInboxUnreadBadges();
-    }
-
-    function saveInboxUnreadState() {
-      try {
-        localStorage.setItem(getInboxNotificationStorageKey(), JSON.stringify(inboxUnreadState));
-      } catch (e) {}
-    }
-
-    function getTimestampMillis(value) {
-      if (!value) return 0;
-      if (typeof value.toMillis === 'function') return value.toMillis();
-      if (value.seconds) return (value.seconds * 1000) + Math.floor((value.nanoseconds || 0) / 1000000);
-      const parsed = new Date(value).getTime();
-      return Number.isFinite(parsed) ? parsed : 0;
-    }
-
-    function getMyChatIdentities() {
-      if (!currentUser) return [];
-      return [currentUser.username, currentUser.name]
-        .filter(Boolean)
-        .map(v => v.trim().toLowerCase());
-    }
-
-    function isChatUnread(chatId, data) {
-      if (!currentUser || !data) return false;
-      const sender = String(data.lastSender || '').trim().toLowerCase();
-      const lastUpdated = getTimestampMillis(data.updatedAt);
-      const lastSeen = Number(inboxUnreadState[chatId] || 0);
-      return !!sender && !getMyChatIdentities().includes(sender) && lastUpdated > lastSeen;
-    }
-
-    function countUnreadInboxThreads() {
-      let count = 0;
-      Object.keys(inboxUnreadState).forEach(chatId => {
-        if (inboxUnreadState[chatId] && inboxUnreadState[chatId].unread) count++;
-      });
-      return count;
-    }
-
-    function renderInboxUnreadBadges() {
-      const badge = document.getElementById('inbox-unread-nav-badge');
-      const count = countUnreadInboxThreads();
-
-      if (badge) {
-        badge.innerText = count > 99 ? '99+' : String(count);
-        badge.classList.toggle('hidden', count === 0);
-        badge.classList.toggle('flex', count > 0);
-      }
-
-      const notificationBadge = document.getElementById('notification-badge');
-      if (notificationBadge && Array.isArray(systemNotifications)) {
-        notificationBadge.innerText = systemNotifications.length;
-      }
-    }
-
-    function markInboxThreadRead(chatId, timestampMillis = Date.now()) {
-      if (!chatId) return;
-      inboxUnreadState[chatId] = { lastSeen: timestampMillis, unread: false };
-      saveInboxUnreadState();
-      renderInboxUnreadBadges();
-    }
-
-    function updateInboxUnreadStateForSnapshot(snapshot, notifyOnChanges = true) {
-      if (!currentUser) return;
-
-      const myIdentities = getMyChatIdentities();
-      let unreadCount = 0;
-
-      snapshot.forEach(doc => {
-        const data = doc.data() || {};
-        const participants = data.participants || doc.id.replace('chat-', '').split('-vs-');
-        const lowerParticipants = participants.map(p => String(p).toLowerCase());
-
-        const isParticipant = lowerParticipants.some(p => myIdentities.includes(p));
-        if (!currentUser.isAdmin && !isParticipant) return;
-
-        const lastUpdated = getTimestampMillis(data.updatedAt);
-        const lastSender = String(data.lastSender || '').trim().toLowerCase();
-        const wasSeen = Number(inboxUnreadState[doc.id]?.lastSeen || 0);
-        const isIncoming = !!lastSender && !myIdentities.includes(lastSender);
-
-        if (isIncoming && lastUpdated > wasSeen) {
-          const alreadyUnread = !!inboxUnreadState[doc.id]?.unread;
-
-          // The first snapshot establishes the baseline without treating
-          // existing conversations as newly received messages.
-          if (!inboxUnreadInitialized) {
-            inboxUnreadState[doc.id] = {
-              lastSeen: lastUpdated,
-              unread: false
-            };
-          } else {
-            if (notifyOnChanges && !alreadyUnread && doc.id !== currentChatContextId) {
-              const senderLabel = data.lastSender || 'Collector';
-              const preview = data.lastMessage || 'You received a new message.';
-              addNotification(
-                'New Inbox Message',
-                `${senderLabel}: ${preview}`,
-                'fa-comments text-indigo-400'
-              );
-            }
-
-            inboxUnreadState[doc.id] = {
-              lastSeen: wasSeen,
-              unread: doc.id !== currentChatContextId
-            };
-          }
-        } else if (!isIncoming) {
-          inboxUnreadState[doc.id] = {
-            lastSeen: Math.max(wasSeen, lastUpdated),
-            unread: false
-          };
-        }
-
-        if (inboxUnreadState[doc.id]?.unread) unreadCount++;
-      });
-
-      saveInboxUnreadState();
-      renderInboxUnreadBadges();
-    }
-
-    function startInboxNotificationListener() {
-      if (inboxUnsubscribe) {
-        inboxUnsubscribe();
-        inboxUnsubscribe = null;
-      }
-
-      if (!currentUser) {
-        inboxUnreadInitialized = false;
-        inboxUnreadState = {};
-        renderInboxUnreadBadges();
-        return;
-      }
-
-      loadInboxUnreadState();
-      inboxUnreadInitialized = false;
-
-      inboxUnsubscribe = db.collection("chats").onSnapshot(snapshot => {
-        updateInboxUnreadStateForSnapshot(snapshot, true);
-        inboxUnreadInitialized = true;
-      }, err => {
-        console.warn('Inbox notification listener error:', err);
-      });
-    }
-
     function loadUserInboxThreads() {
       const container = document.getElementById('inbox-threads-list');
       if (!container) return;
@@ -2031,8 +2451,6 @@
 
         const uniqueThreads = Array.from(threadsMap.values());
 
-        updateInboxUnreadStateForSnapshot(snapshot, false);
-
         if (uniqueThreads.length === 0) {
           container.innerHTML = `<p class="text-xs text-slate-500 text-center py-10">No chat messages in your inbox.</p>`;
           return;
@@ -2042,23 +2460,24 @@
           const otherUser = c.otherUser;
           const lastMsg = c.lastMessage || 'Click to view conversation';
           const isOtherAdmin = isUserAdmin(otherUser);
+          const chatKey = c.id || `chat-${String(otherUser).toLowerCase()}`;
+          const isUnread = !!inboxUnreadState[chatKey]?.unread;
           const otherUserAvatar = getCollectorAvatar(otherUser);
-          const isUnread = !!inboxUnreadState[c.id]?.unread;
 
           return `
             <div class="bg-slate-900 border ${isUnread ? 'border-indigo-500/60 bg-indigo-950/20' : (isOtherAdmin ? 'border-rose-500/30' : 'border-slate-800')} p-4 rounded-2xl flex justify-between items-center text-xs hover:border-indigo-500/40 transition-all">
-              <div class="flex items-center gap-3 min-w-0">
+              <div class="flex items-center gap-3">
                 <img src="${otherUserAvatar}" class="w-10 h-10 rounded-full object-cover border border-slate-700 bg-slate-950 shrink-0">
                 <div>
                   <div class="flex items-center gap-1.5">
                     <p class="font-extrabold ${isUnread ? 'text-white' : 'text-slate-200'} text-sm">${otherUser}</p>
-                    ${isOtherAdmin ? `<span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN</span>` : ''}
                     ${isUnread ? `<span class="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">NEW</span>` : ''}
+                    ${isOtherAdmin ? `<span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN</span>` : ''}
                   </div>
-                  <p class="text-xs ${isUnread ? 'text-slate-200 font-semibold' : 'text-slate-400'} truncate max-w-xs sm:max-w-md mt-0.5">${lastMsg}</p>
+                  <p class="text-xs text-slate-400 truncate max-w-xs sm:max-w-md mt-0.5">${lastMsg}</p>
                 </div>
               </div>
-              <button onclick="openDirectChat('${otherUser}', 'Direct Chat')" class="px-4 py-2 ${isUnread ? 'bg-indigo-500 hover:bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-500'} text-white font-black text-xs rounded-xl transition-all shadow shrink-0 flex items-center gap-1.5">
+              <button onclick="openDirectChat('${otherUser}', 'Direct Chat')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl transition-all shadow shrink-0 flex items-center gap-1.5">
                 <i class="fa-solid fa-comments"></i> Chat
               </button>
             </div>
@@ -2461,6 +2880,8 @@
         tradeRequestsList = [];
         snapshot.forEach(doc => tradeRequestsList.push({ id: doc.id, ...doc.data() }));
         renderTradeRequests();
+        markTradeRequestNotifications();
+        renderCollectorHub();
       } catch (e) {
         console.warn('Fetch trade requests error:', e);
       }
@@ -2490,6 +2911,8 @@
           }
         });
         updateAllViews();
+        snapshotWishlistPrices();
+        renderCollectorHub();
       });
 
       db.collection("listings").onSnapshot((snapshot) => {
@@ -2501,12 +2924,12 @@
       });
 
       db.collection("system").doc("activeAuction").onSnapshot((doc) => {
-        if (doc.exists) {
-          activeAuction = doc.data();
-        } else {
-          activeAuction = null;
-        }
+        const nextAuction = doc.exists ? doc.data() : null;
+        if (nextAuction) recordAuctionAlerts(nextAuction);
+        activeAuction = nextAuction;
         renderAuctionView();
+        renderSmartAlerts();
+        renderCollectorHub();
       });
 
       db.collection("transactions").onSnapshot((snapshot) => {
@@ -2528,6 +2951,8 @@
       updateCartTotals();
       renderAuctionView();
       renderTradeRequests();
+      renderCollectorHub();
+      renderInboxUnreadBadge();
     }
 
     function openAnalyticsPage() {
@@ -2643,15 +3068,11 @@
         if (user) {
           handleUserSession(user);
         } else {
-          if (inboxUnsubscribe) {
-            inboxUnsubscribe();
-            inboxUnsubscribe = null;
-          }
-          inboxUnreadInitialized = false;
-          inboxUnreadState = {};
+          if (inboxUnsubscribe) { inboxUnsubscribe(); inboxUnsubscribe = null; }
           currentUser = null;
+          inboxUnreadState = {};
           renderAuthHeader();
-          renderInboxUnreadBadges();
+          renderInboxUnreadBadge();
           updateAllViews();
         }
       });
@@ -2779,19 +3200,18 @@
       renderAuthHeader();
       updateAllViews();
       startInboxNotificationListener();
+      startAuctionAlertTimer();
+      renderCollectorHub();
     }
 
     async function logoutUser() {
-      if (inboxUnsubscribe) {
-        inboxUnsubscribe();
-        inboxUnsubscribe = null;
-      }
-      inboxUnreadInitialized = false;
+      if (inboxUnsubscribe) { inboxUnsubscribe(); inboxUnsubscribe = null; }
+      if (auctionAlertTimer) { clearInterval(auctionAlertTimer); auctionAlertTimer = null; }
       inboxUnreadState = {};
       await auth.signOut();
       currentUser = null;
       renderAuthHeader();
-      renderInboxUnreadBadges();
+      renderInboxUnreadBadge();
       switchTab('catalog');
       await loadAppState();
       showToast('Logged out.');
@@ -3278,6 +3698,16 @@
         container.innerHTML = `<button disabled class="w-full py-2.5 bg-slate-950 text-slate-600 font-bold text-xs rounded-xl cursor-not-allowed">${currentLanguage === 'ID' ? 'Sudah Dimiliki' : 'Already Owned'}</button>`;
       }
 
+      if (card.owner && currentUser && !getCollectorIdentities().includes(String(card.owner).toLowerCase())) {
+        container.innerHTML += renderTradeOfferButtonForCard(card);
+      }
+
+      activeDetailCardId = card.id;
+      const wishBtn = document.getElementById('detail-wishlist-action');
+      if (wishBtn) wishBtn.innerHTML = `<i class="fa-solid fa-heart mr-1"></i> ${wishlist.has(card.id) ? 'Saved' : 'Wishlist'}`;
+      const chatBtn = document.getElementById('detail-owner-chat-action');
+      if (chatBtn) chatBtn.classList.toggle('hidden', !card.owner || (currentUser && getCollectorIdentities().includes(String(card.owner).toLowerCase())));
+      renderCardHistory(card.id);
       document.getElementById('card-detail-modal').classList.remove('hidden');
     }
 
@@ -4074,7 +4504,7 @@
         return showToast('Admin access required.');
       }
 
-      ['catalog', 'dashboard', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history'].forEach(t => {
+      ['catalog', 'dashboard', 'collector-hub', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const nav = document.getElementById(`nav-${t}`);
         if (view) view.classList.add('hidden');
@@ -4096,6 +4526,7 @@
       }
 
       if (tabName === 'dashboard') renderOwnedCards();
+      if (tabName === 'collector-hub') renderCollectorHub();
       if (tabName === 'wishlist') renderWishlistPage();
       if (tabName === 'inventory') renderInventoryTable();
       if (tabName === 'admin') loadPendingTransactions();
