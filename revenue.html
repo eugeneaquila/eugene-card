@@ -50,14 +50,22 @@
           <i class="fa-solid fa-sack-dollar"></i>
         </div>
         <div>
-          <h1 class="font-extrabold text-xl text-white tracking-wider uppercase">ADMIN REVENUE & FINANCIAL HUB</h1>
-          <p class="text-xs text-slate-400 mt-0.5">Dedicated Financial & Profitability Analytics Engine</p>
+          <h1 class="font-extrabold text-xl text-white tracking-wider uppercase" data-i18n="revTitle">ADMIN REVENUE & FINANCIAL HUB</h1>
+          <p class="text-xs text-slate-400 mt-0.5" data-i18n="revSubtitle">Dedicated Financial & Profitability Analytics Engine</p>
         </div>
       </div>
 
-      <a href="index.html" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-2">
-        <i class="fa-solid fa-arrow-left"></i> Back to Marketplace
-      </a>
+      <div class="flex items-center gap-3">
+        <!-- Language Switcher Button -->
+        <button onclick="toggleRevenueLanguage()" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-emerald-400 font-mono font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-1.5" title="Switch Language / Ganti Bahasa">
+          <i class="fa-solid fa-globe"></i>
+          <span id="rev-lang-label">EN</span>
+        </button>
+
+        <a href="index.html" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs rounded-xl border border-slate-800 transition-all flex items-center gap-2">
+          <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btnBack">Back to Marketplace</span>
+        </a>
+      </div>
     </div>
   </header>
 
@@ -68,20 +76,20 @@
     <section class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-6 space-y-6 shadow-xl backdrop-blur-sm">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
         <div>
-          <h2 class="text-lg font-black text-white uppercase tracking-wide">FINANCIAL OVERVIEW</h2>
-          <p class="text-xs text-slate-400 mt-1">Calculates gross sales, 2% tax collection, and order volumes automatically in real-time.</p>
+          <h2 class="text-lg font-black text-white uppercase tracking-wide" data-i18n="overviewTitle">FINANCIAL OVERVIEW</h2>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="overviewSub">Calculates gross sales, 2% tax collection, and order volumes automatically in real-time.</p>
         </div>
 
         <div class="flex items-center gap-3 w-full sm:w-auto">
           <select id="time-filter" onchange="applyRevenueFilter()" class="bg-slate-950 border border-emerald-500/30 rounded-xl px-4 py-2 text-xs text-emerald-400 font-bold focus:outline-none focus:border-emerald-400 cursor-pointer">
-            <option value="ALL">All Time</option>
-            <option value="TODAY">Today</option>
-            <option value="WEEK">This Week</option>
-            <option value="MONTH">This Month</option>
+            <option value="ALL" data-i18n="optAllTime">All Time</option>
+            <option value="TODAY" data-i18n="optToday">Today</option>
+            <option value="WEEK" data-i18n="optWeek">This Week</option>
+            <option value="MONTH" data-i18n="optMonth">This Month</option>
           </select>
 
           <button onclick="triggerManualRefresh()" class="px-4 py-2 bg-slate-950 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 font-bold text-xs rounded-xl transition-all flex items-center gap-2">
-            <i class="fa-solid fa-rotate-right" id="refresh-icon"></i> Refresh
+            <i class="fa-solid fa-rotate-right" id="refresh-icon"></i> <span data-i18n="btnRefresh">Refresh</span>
           </button>
         </div>
       </div>
@@ -91,30 +99,30 @@
         
         <!-- GROSS SALES REVENUE -->
         <div class="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 space-y-2 shadow-inner">
-          <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">GROSS SALES REVENUE</p>
+          <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider" data-i18n="kpiGrossSales">GROSS SALES REVENUE</p>
           <p id="kpi-gross-sales" class="text-2xl font-black text-emerald-400 font-mono">Rp 0</p>
-          <p class="text-[10px] text-slate-500">Total volume of approved QRIS sales</p>
+          <p class="text-[10px] text-slate-500" data-i18n="kpiGrossSalesSub">Total volume of approved QRIS sales</p>
         </div>
 
         <!-- PLATFORM TAX (2%) -->
         <div class="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 space-y-2 shadow-inner">
-          <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">PLATFORM TAX (2%)</p>
+          <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider" data-i18n="kpiTax">PLATFORM TAX (2%)</p>
           <p id="kpi-platform-tax" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
-          <p class="text-[10px] text-slate-500">Net platform fee revenue generated</p>
+          <p class="text-[10px] text-slate-500" data-i18n="kpiTaxSub">Net platform fee revenue generated</p>
         </div>
 
         <!-- COMPLETED SALES -->
         <div class="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 space-y-2 shadow-inner">
-          <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">COMPLETED SALES</p>
+          <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider" data-i18n="kpiCompleted">COMPLETED SALES</p>
           <p id="kpi-completed-sales" class="text-2xl font-black text-white font-mono">0</p>
-          <p class="text-[10px] text-slate-500">Approved customer transactions</p>
+          <p class="text-[10px] text-slate-500" data-i18n="kpiCompletedSub">Approved customer transactions</p>
         </div>
 
         <!-- AVERAGE ORDER VALUE -->
         <div class="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 space-y-2 shadow-inner">
-          <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">AVERAGE ORDER VALUE</p>
+          <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider" data-i18n="kpiAov">AVERAGE ORDER VALUE</p>
           <p id="kpi-avg-order-value" class="text-2xl font-black text-emerald-400 font-mono">Rp 0</p>
-          <p class="text-[10px] text-slate-500">Average spend per successful sale</p>
+          <p class="text-[10px] text-slate-500" data-i18n="kpiAovSub">Average spend per successful sale</p>
         </div>
 
       </div>
@@ -122,23 +130,23 @@
 
     <!-- CARD-LEVEL PROFITABILITY BREAKDOWN -->
     <section class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-6 space-y-4 shadow-xl">
-      <h3 class="text-xs font-extrabold text-white uppercase tracking-wider">CARD-LEVEL PROFITABILITY BREAKDOWN</h3>
+      <h3 class="text-xs font-extrabold text-white uppercase tracking-wider" data-i18n="breakdownTitle">CARD-LEVEL PROFITABILITY BREAKDOWN</h3>
 
       <div class="bg-slate-950/80 border border-slate-800/80 rounded-2xl overflow-hidden">
         <div class="overflow-x-auto max-h-[500px]">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-950 text-slate-400 border-b border-slate-800/80 sticky top-0 z-10">
               <tr>
-                <th class="p-3.5 font-bold uppercase">Serial</th>
-                <th class="p-3.5 font-bold uppercase">Card Name</th>
-                <th class="p-3.5 font-bold uppercase">Base Price</th>
-                <th class="p-3.5 font-bold uppercase text-emerald-400">Total Sales Revenue</th>
-                <th class="p-3.5 font-bold uppercase">Current Status</th>
+                <th class="p-3.5 font-bold uppercase" data-i18n="thSerial">Serial</th>
+                <th class="p-3.5 font-bold uppercase" data-i18n="thName">Card Name</th>
+                <th class="p-3.5 font-bold uppercase" data-i18n="thBasePrice">Base Price</th>
+                <th class="p-3.5 font-bold uppercase text-emerald-400" data-i18n="thTotalSales">Total Sales Revenue</th>
+                <th class="p-3.5 font-bold uppercase" data-i18n="thStatus">Current Status</th>
               </tr>
             </thead>
             <tbody id="card-profitability-tbody" class="divide-y divide-slate-800/60">
               <tr>
-                <td colspan="5" class="p-8 text-center text-slate-500">Listening for database records...</td>
+                <td colspan="5" class="p-8 text-center text-slate-500" data-i18n="listeningDb">Listening for database records...</td>
               </tr>
             </tbody>
           </table>
@@ -148,7 +156,7 @@
 
   </main>
 
-  <!-- FIREBASE & REALTIME REVENUE LOGIC -->
+  <!-- FIREBASE & REALTIME REVENUE LOGIC WITH I18N -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCm13Nh6k6W9wsL0_OPpjKZNrbSg-pFsuA",
@@ -166,10 +174,85 @@
     const PLATFORM_TAX_RATE = 0.02; // 2%
     let rawTransactions = [];
     let rawCards = [];
+    let currentRevLang = localStorage.getItem('eugene_lang') || 'EN';
+
+    const revI18n = {
+      EN: {
+        revTitle: "ADMIN REVENUE & FINANCIAL HUB",
+        revSubtitle: "Dedicated Financial & Profitability Analytics Engine",
+        btnBack: "Back to Marketplace",
+        overviewTitle: "FINANCIAL OVERVIEW",
+        overviewSub: "Calculates gross sales, 2% tax collection, and order volumes automatically in real-time.",
+        optAllTime: "All Time",
+        optToday: "Today",
+        optWeek: "This Week",
+        optMonth: "This Month",
+        btnRefresh: "Refresh",
+        kpiGrossSales: "GROSS SALES REVENUE",
+        kpiGrossSalesSub: "Total volume of approved QRIS sales",
+        kpiTax: "PLATFORM TAX (2%)",
+        kpiTaxSub: "Net platform fee revenue generated",
+        kpiCompleted: "COMPLETED SALES",
+        kpiCompletedSub: "Approved customer transactions",
+        kpiAov: "AVERAGE ORDER VALUE",
+        kpiAovSub: "Average spend per successful sale",
+        breakdownTitle: "CARD-LEVEL PROFITABILITY BREAKDOWN",
+        thSerial: "Serial",
+        thName: "Card Name",
+        thBasePrice: "Base Price",
+        thTotalSales: "Total Sales Revenue",
+        thStatus: "Current Status",
+        listeningDb: "Listening for database records...",
+        noCardsDb: "No cards registered in database."
+      },
+      ID: {
+        revTitle: "PUSAT PENDAPATAN & KEUANGAN ADMIN",
+        revSubtitle: "Mesin Analitik Keuangan & Profitabilitas Khusus",
+        btnBack: "Kembali ke Pasar",
+        overviewTitle: "RINGKASAN KEUANGAN",
+        overviewSub: "Menghitung penjualan kotor, pajak 2%, dan volume pesanan secara otomatis dan real-time.",
+        optAllTime: "Semua Waktu",
+        optToday: "Hari Ini",
+        optWeek: "Minggu Ini",
+        optMonth: "Bulan Ini",
+        btnRefresh: "Muat Ulang",
+        kpiGrossSales: "PENDAPATAN PENJUALAN KOTOR",
+        kpiGrossSalesSub: "Total volume penjualan QRIS disetujui",
+        kpiTax: "PAJAK PLATFORM (2%)",
+        kpiTaxSub: "Pendapatan bersih biaya platform",
+        kpiCompleted: "PENJUALAN SELESAI",
+        kpiCompletedSub: "Transaksi pelanggan yang disetujui",
+        kpiAov: "RATA-RATA NILAI PESANAN",
+        kpiAovSub: "Rata-rata pengeluaran per penjualan sukses",
+        breakdownTitle: "RINCIAN PROFITABILITAS PER KARTU",
+        thSerial: "Serial",
+        thName: "Nama Kartu",
+        thBasePrice: "Harga Dasar",
+        thTotalSales: "Total Pendapatan Penjualan",
+        thStatus: "Status Saat Ini",
+        listeningDb: "Mendengarkan data dari database...",
+        noCardsDb: "Tidak ada kartu terdaftar di database."
+      }
+    };
+
+    function toggleRevenueLanguage() {
+      currentRevLang = currentRevLang === 'EN' ? 'ID' : 'EN';
+      localStorage.setItem('eugene_lang', currentRevLang);
+      document.getElementById('rev-lang-label').innerText = currentRevLang;
+      applyRevenueTranslations();
+      calculateAndRenderRevenue();
+    }
+
+    function applyRevenueTranslations() {
+      const dict = revI18n[currentRevLang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerText = dict[key];
+      });
+    }
 
     // Real-time Firestore Listeners Setup
     function initRealtimeRevenueListeners() {
-      // 1. Listen to Transactions Collection
       db.collection("transactions").onSnapshot((snapshot) => {
         rawTransactions = [];
         snapshot.forEach(doc => {
@@ -180,7 +263,6 @@
         console.error("Transactions realtime snapshot error:", error);
       });
 
-      // 2. Listen to Cards Collection for Card-Level Breakdown
       db.collection("cards").onSnapshot((snapshot) => {
         rawCards = [];
         snapshot.forEach(doc => {
@@ -196,10 +278,9 @@
       const selectedFilter = document.getElementById('time-filter').value;
       const now = new Date();
 
-      // Filter APPROVED transactions based on time window
       const approvedTx = rawTransactions.filter(tx => {
         if (tx.status !== 'APPROVED') return false;
-        if (!tx.created_at) return true; // Fallback if timestamp missing
+        if (!tx.created_at) return true;
 
         const txDate = new Date(tx.created_at);
         if (selectedFilter === 'TODAY') {
@@ -210,10 +291,9 @@
         } else if (selectedFilter === 'MONTH') {
           return txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
         }
-        return true; // ALL time
+        return true;
       });
 
-      // 1. KPI Calculations
       let totalGrossSales = 0;
       let completedSalesCount = approvedTx.length;
       const cardSalesRevenueMap = {};
@@ -222,7 +302,6 @@
         const amount = parseFloat(tx.total_amount) || 0;
         totalGrossSales += amount;
 
-        // Map sales to individual cards
         if (Array.isArray(tx.items)) {
           tx.items.forEach(item => {
             const cardId = item.id || item.serial;
@@ -237,13 +316,11 @@
       const totalPlatformTax = totalGrossSales * PLATFORM_TAX_RATE;
       const avgOrderValue = completedSalesCount > 0 ? totalGrossSales / completedSalesCount : 0;
 
-      // Update KPI DOM elements
       document.getElementById('kpi-gross-sales').innerText = formatIDR(totalGrossSales);
       document.getElementById('kpi-platform-tax').innerText = formatIDR(totalPlatformTax);
       document.getElementById('kpi-completed-sales').innerText = completedSalesCount;
       document.getElementById('kpi-avg-order-value').innerText = formatIDR(avgOrderValue);
 
-      // 2. Render Card-Level Breakdown
       renderCardProfitabilityTable(cardSalesRevenueMap);
     }
 
@@ -252,16 +329,16 @@
       if (!tbody) return;
 
       if (rawCards.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">No cards registered in database.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">${revI18n[currentRevLang].noCardsDb}</td></tr>`;
         return;
       }
 
-      // Sort cards numerically by serial code (*01, *02...)
       const sortedCards = [...rawCards].sort((a, b) => (a.serial || '').localeCompare(b.serial || '', undefined, { numeric: true }));
 
       tbody.innerHTML = sortedCards.map(card => {
         const totalRev = cardRevenueMap[card.id] || cardRevenueMap[card.serial] || 0;
         const isSold = card.status === 'SOLD';
+        const statusLabel = isSold ? (currentRevLang === 'ID' ? 'TERJUAL' : 'SOLD') : (currentRevLang === 'ID' ? 'TERSEDIA' : 'AVAILABLE');
 
         return `
           <tr class="hover:bg-slate-950/60 transition-colors">
@@ -271,7 +348,7 @@
             <td class="p-3.5 font-mono font-extrabold text-emerald-400">${formatIDR(totalRev)}</td>
             <td class="p-3.5">
               <span class="text-[9px] font-black px-2 py-0.5 rounded-full ${isSold ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
-                ${card.status || 'AVAILABLE'}
+                ${statusLabel}
               </span>
             </td>
           </tr>
@@ -298,8 +375,9 @@
       return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
     }
 
-    // Initialize real-time listeners on page load
     document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('rev-lang-label').innerText = currentRevLang;
+      applyRevenueTranslations();
       initRealtimeRevenueListeners();
     });
   </script>
