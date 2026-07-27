@@ -59,12 +59,35 @@
 .ecr-signal-dot { width:7px;height:7px;border-radius:999px;display:inline-block;box-shadow:0 0 12px currentColor; }
 @media(max-width:640px){.ecr-money{font-size:1.25rem!important}}
 
+
+/* Eugene Card 3.0 Admin Shell */
+body{background:radial-gradient(circle at 12% 0%,rgba(99,102,241,.12),transparent 30rem),radial-gradient(circle at 90% 5%,rgba(245,158,11,.08),transparent 24rem),#020617!important}
+.ec3a-side{position:fixed;left:0;top:0;bottom:0;width:244px;z-index:60;background:rgba(3,7,18,.94);border-right:1px solid rgba(148,163,184,.11);backdrop-filter:blur(20px);padding:18px 13px;display:flex;flex-direction:column;gap:18px}.ec3a-brand{display:flex;align-items:center;gap:10px;padding:8px 8px 15px;border-bottom:1px solid rgba(148,163,184,.1)}.ec3a-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#0f172a;border:1px solid rgba(99,102,241,.3)}.ec3a-title{font-size:11px;font-weight:950;letter-spacing:.12em;color:#fff}.ec3a-sub{font-size:8px;color:#64748b;margin-top:2px}.ec3a-label{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:#475569;font-weight:900;padding:0 9px}.ec3a-links{display:flex;flex-direction:column;gap:4px}.ec3a-link{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:11px;color:#94a3b8;font-size:10px;font-weight:850;border:1px solid transparent;text-decoration:none}.ec3a-link i{width:16px;text-align:center}.ec3a-link:hover{background:#0f172a;color:#fff}.ec3a-link.active{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.2);color:#c7d2fe;box-shadow:inset 3px 0 #6366f1}.ec3a-note{margin-top:auto;padding:11px;border-radius:14px;background:rgba(99,102,241,.04);border:1px solid rgba(99,102,241,.1);font-size:8px;line-height:1.5;color:#64748b}.ec3a-note strong{color:#a5b4fc}.ec3a-page{margin-left:244px;min-height:100vh}.ec3a-page>header{padding-left:32px!important;padding-right:32px!important}.ec3a-page>main{max-width:none!important;padding-left:32px!important;padding-right:32px!important}.ec3a-mobile{display:none}
+@media(max-width:850px){.ec3a-side{display:none}.ec3a-page{margin-left:0}.ec3a-page>header{padding-left:16px!important;padding-right:16px!important}.ec3a-page>main{padding-left:16px!important;padding-right:16px!important}.ec3a-mobile{display:flex;position:fixed;bottom:10px;left:10px;right:10px;z-index:80;gap:4px;padding:6px;border-radius:16px;background:rgba(2,6,23,.92);border:1px solid rgba(148,163,184,.14);backdrop-filter:blur(18px)}.ec3a-mobile a{flex:1;text-align:center;padding:8px 3px;border-radius:11px;color:#64748b;font-size:8px;font-weight:900;text-decoration:none}.ec3a-mobile a.active{background:rgba(99,102,241,.12);color:#a5b4fc}.ec3a-mobile i{display:block;font-size:13px;margin-bottom:3px}}
 </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black relative">
 
   <!-- Header Section -->
-  <header class="border-b border-slate-800/80 px-4 lg:px-8 py-6 bg-slate-950/60 backdrop-blur-md">
+  
+<aside class="ec3a-side">
+  <a href="index.html" class="ec3a-brand"><div class="ec3a-mark"><i class="fa-solid fa-layer-group text-indigo-400"></i></div><div><div class="ec3a-title">EUGENE CARD</div><div class="ec3a-sub">ADMIN CONTROL</div></div></a>
+  <div class="ec3a-label">Command Center</div>
+  <div class="ec3a-links">
+    <a href="admin-command-center.html" class="ec3a-link"><i class="fa-solid fa-gauge-high"></i>Overview</a>
+    <a href="analytics.html" class="ec3a-link "><i class="fa-solid fa-chart-line"></i>Analytics</a>
+    <a href="revenue.html" class="ec3a-link active"><i class="fa-solid fa-sack-dollar"></i>Revenue</a>
+    <a href="index.html" class="ec3a-link"><i class="fa-solid fa-boxes-stacked"></i>Inventory</a>
+    <a href="index.html" class="ec3a-link"><i class="fa-solid fa-handshake"></i>Trades</a>
+    <a href="index.html" class="ec3a-link"><i class="fa-solid fa-gavel"></i>Auctions</a>
+    <a href="index.html" class="ec3a-link"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
+  </div>
+  <div class="ec3a-note"><strong>3.0 Admin Layer</strong><br>Analytics and financial intelligence stay connected to the marketplace control center.</div>
+</aside>
+<div class="ec3a-mobile"><a href="admin-command-center.html"><i class="fa-solid fa-gauge-high"></i>Home</a><a href="analytics.html" class="ACTIVE_ANALYTICS"><i class="fa-solid fa-chart-line"></i>Analytics</a><a href="revenue.html" class="ACTIVE_REVENUE"><i class="fa-solid fa-sack-dollar"></i>Revenue</a><a href="index.html"><i class="fa-solid fa-store"></i>Market</a></div>
+
+<div class="ec3a-page">
+<header class="border-b border-slate-800/80 px-4 lg:px-8 py-6 bg-slate-950/60 backdrop-blur-md">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <div class="w-12 h-12 rounded-2xl bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl shadow-lg shadow-emerald-500/10">
@@ -621,5 +644,6 @@
     });
   }
   </script>
+</div>
 </body>
 </html>
