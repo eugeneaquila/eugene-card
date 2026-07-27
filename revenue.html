@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eugene Card Marketplace | Admin Revenue Hub</title>
+
+  <!-- Google Firebase Compatibility SDKs (v10.7.1) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { amber: { 400: '#fbbf24', 500: '#f59e0b' } }, fontFamily: { sans: ['Inter', 'sans-serif'] } } }
+    }
+  </script>
+
+  <!-- FontAwesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Inter', sans-serif; background-color: #030712; color: #f3f4f6; } </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
+
+  <header class="max-w-7xl w-full mx-auto flex items-center justify-between pb-6 border-b border-slate-800">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-slate-900 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+        <i class="fa-solid fa-sack-dollar text-lg"></i>
+      </div>
+      <div>
+        <h1 class="font-black text-white text-lg uppercase tracking-wider">Admin Revenue & Financial Hub</h1>
+        <p class="text-xs text-slate-400">Dedicated Financial & Profitability Analytics Engine</p>
+      </div>
+    </div>
+    <a href="index.html" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+      <i class="fa-solid fa-arrow-left"></i> Back to Marketplace
+    </a>
+  </header>
+
+  <main class="max-w-7xl w-full mx-auto py-6 space-y-6 flex-1">
+    
+    <!-- Controls & Timeframe Selector -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h2 class="text-lg font-black text-white uppercase">Financial Overview</h2>
+        <p class="text-xs text-slate-400">Calculates gross sales, 2% tax collection, and order volumes automatically.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <select id="rev-timeframe" onchange="loadRevenueData()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-400 focus:outline-none focus:border-emerald-500">
+          <option value="ALL">All Time</option>
+          <option value="MONTH">This Month</option>
+          <option value="TODAY">Today</option>
+        </select>
+        <button onclick="loadRevenueData()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-emerald-400 rounded-xl border border-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-rotate"></i> Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Financial KPI Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
+        <span class="text-slate-400 text-xs font-bold uppercase tracking-wider block">Gross Sales Revenue</span>
+        <p id="kpi-gross-sales" class="text-2xl font-black text-emerald-400 font-mono">Rp 0</p>
+        <p class="text-[10px] text-slate-500">Total volume of approved QRIS sales</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
+        <span class="text-slate-400 text-xs font-bold uppercase tracking-wider block">Platform Tax (2%)</span>
+        <p id="kpi-tax-collected" class="text-2xl font-black text-amber-400 font-mono">Rp 0</p>
+        <p class="text-[10px] text-slate-500">Net platform fee revenue generated</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
+        <span class="text-slate-400 text-xs font-bold uppercase tracking-wider block">Completed Sales</span>
+        <p id="kpi-order-count" class="text-2xl font-black text-white font-mono">0</p>
+        <p class="text-[10px] text-slate-500">Approved customer transactions</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-1">
+        <span class="text-slate-400 text-xs font-bold uppercase tracking-wider block">Average Order Value</span>
+        <p id="kpi-aov" class="text-2xl font-black text-cyan-400 font-mono">Rp 0</p>
+        <p class="text-[10px] text-slate-500">Average spend per successful sale</p>
+      </div>
+    </div>
+
+    <!-- Card-Level Financial Breakdown Table -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden p-6 space-y-4">
+      <h3 class="text-sm font-extrabold text-white uppercase tracking-wider">Card-Level Profitability Breakdown</h3>
+      <div class="overflow-x-auto max-h-[450px]">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0">
+            <tr>
+              <th class="p-3">Serial</th>
+              <th class="p-3">Card Name</th>
+              <th class="p-3">Base Price</th>
+              <th class="p-3 font-bold text-emerald-400">Total Sales Revenue</th>
+              <th class="p-3">Current Status</th>
+            </tr>
+          </thead>
+          <tbody id="card-revenue-table-body" class="divide-y divide-slate-800"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Revenue Script Module Integration -->
+  <script src="revenue.js"></script>
+</body>
+</html>
