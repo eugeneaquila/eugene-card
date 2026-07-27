@@ -436,36 +436,36 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
 <aside id="ec3-sidebar">
   <div class="ec3-brand" onclick="switchTab('home')" style="cursor:pointer">
     <div class="ec3-brand-mark"><svg viewBox="0 0 100 100" class="w-8 h-8"><use href="#eugene-logo-mark"/></svg></div>
-    <div><div class="ec3-brand-title">EUGENE CARD</div><div class="ec3-brand-sub">COLLECT • TRADE • OWN</div></div>
+    <div><div class="ec3-brand-title">EUGENE CARD</div><div class="ec3-brand-sub" data-i18n="ec3BrandSub">COLLECT • TRADE • OWN</div></div>
   </div>
-  <div class="ec3-section-label">Workspace</div>
+  <div class="ec3-section-label" data-i18n="ec3Workspace">Workspace</div>
   <div class="ec3-nav">
-    <button class="ec3-nav-btn ec3-active" id="ec3-nav-home" onclick="switchTab('home')"><i class="fa-solid fa-house"></i><span>Overview</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-catalog" onclick="switchTab('catalog')"><i class="fa-solid fa-store"></i><span>Marketplace</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-vault"></i><span>My Vault</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-wishlist" onclick="switchTab('wishlist')"><i class="fa-solid fa-heart"></i><span>Wishlist</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-trade" onclick="switchTab('trade')"><i class="fa-solid fa-right-left"></i><span>Trading</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-auction" onclick="switchTab('auction')"><i class="fa-solid fa-gavel"></i><span>Auctions</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-inbox" onclick="switchTab('inbox')"><i class="fa-solid fa-comments"></i><span>Inbox</span><span id="ec3-inbox-badge" class="ec3-nav-badge hidden">0</span></button>
+    <button class="ec3-nav-btn ec3-active" id="ec3-nav-home" onclick="switchTab('home')"><i class="fa-solid fa-house"></i><span data-i18n="ec3Overview">Overview</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-catalog" onclick="switchTab('catalog')"><i class="fa-solid fa-store"></i><span data-i18n="ec3Marketplace">Marketplace</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-vault"></i><span data-i18n="ec3Vault">My Vault</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-wishlist" onclick="switchTab('wishlist')"><i class="fa-solid fa-heart"></i><span data-i18n="ec3Wishlist">Wishlist</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-trade" onclick="switchTab('trade')"><i class="fa-solid fa-right-left"></i><span data-i18n="ec3Trading">Trading</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-auction" onclick="switchTab('auction')"><i class="fa-solid fa-gavel"></i><span data-i18n="ec3Auctions">Auctions</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-inbox" onclick="switchTab('inbox')"><i class="fa-solid fa-comments"></i><span data-i18n="ec3Inbox">Inbox</span><span id="ec3-inbox-badge" class="ec3-nav-badge hidden">0</span></button>
     <button class="ec3-nav-btn" id="ec3-nav-history" onclick="switchTab('history')"><i class="fa-solid fa-clock-rotate-left"></i><span>Activity</span></button>
     <button class="ec3-nav-btn" id="ec3-nav-holders" onclick="switchTab('holders')"><i class="fa-solid fa-users"></i><span>Collectors</span></button>
   </div>
   <div class="ec3-section-label">Admin</div>
   <div class="ec3-nav">
-    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-command-center" onclick="switchTab('command-center')"><i class="fa-solid fa-gauge-high"></i><span>Command Center</span></button>
-    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-admin" onclick="switchTab('admin')"><i class="fa-solid fa-shield-halved"></i><span>Admin Hub</span></button>
-    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-inventory" onclick="switchTab('inventory')"><i class="fa-solid fa-boxes-stacked"></i><span>Inventory</span></button>
-    <button class="ec3-nav-btn ec3-admin-only hidden" onclick="location.href='analytics.html'"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></button>
-    <button class="ec3-nav-btn ec3-admin-only hidden" onclick="location.href='revenue.html'"><i class="fa-solid fa-sack-dollar"></i><span>Revenue</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-command-center" onclick="switchTab('command-center')"><i class="fa-solid fa-gauge-high"></i><span data-i18n="ec3CommandCenter">Command Center</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-admin" onclick="switchTab('admin')"><i class="fa-solid fa-shield-halved"></i><span data-i18n="ec3AdminHub">Admin Hub</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-inventory" onclick="switchTab('inventory')"><i class="fa-solid fa-boxes-stacked"></i><span data-i18n="ec3Inventory">Inventory</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" onclick="location.href='analytics.html'"><i class="fa-solid fa-chart-line"></i><span data-i18n="ec3Analytics">Analytics</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" onclick="location.href='revenue.html'"><i class="fa-solid fa-sack-dollar"></i><span data-i18n="ec3Revenue">Revenue</span></button>
   </div>
-  <div class="ec3-admin-box"><p><strong>3.0 Control Layer</strong><br>Marketplace data, collector activity and admin operations in one workspace.</p></div>
+  <div class="ec3-admin-box"><p><strong data-i18n="ec3ControlLayer">3.0 Control Layer</strong><br><span data-i18n="ec3ControlSub">Marketplace data, collector activity and admin operations in one workspace.</span></p></div>
 </aside>
 <div class="ec3-mobile-nav">
-  <button class="ec3-mobile-btn ec3-active" id="ec3-mobile-home" onclick="switchTab('home')"><i class="fa-solid fa-house"></i>Home</button>
-  <button class="ec3-mobile-btn" id="ec3-mobile-market" onclick="switchTab('catalog')"><i class="fa-solid fa-store"></i>Market</button>
-  <button class="ec3-mobile-btn" id="ec3-mobile-trade" onclick="switchTab('trade')"><i class="fa-solid fa-right-left"></i>Trade</button>
-  <button class="ec3-mobile-btn" id="ec3-mobile-inbox" onclick="switchTab('inbox')"><i class="fa-solid fa-comments"></i>Inbox</button>
-  <button class="ec3-mobile-btn" id="ec3-mobile-vault" onclick="switchTab('dashboard')"><i class="fa-solid fa-vault"></i>Vault</button>
+  <button class="ec3-mobile-btn ec3-active" id="ec3-mobile-home" onclick="switchTab('home')"><i class="fa-solid fa-house"></i><span data-i18n="ec3HomeMobile">Home</span></button>
+  <button class="ec3-mobile-btn" id="ec3-mobile-market" onclick="switchTab('catalog')"><i class="fa-solid fa-store"></i><span data-i18n="ec3MarketMobile">Market</span></button>
+  <button class="ec3-mobile-btn" id="ec3-mobile-trade" onclick="switchTab('trade')"><i class="fa-solid fa-right-left"></i><span data-i18n="ec3TradeMobile">Trade</span></button>
+  <button class="ec3-mobile-btn" id="ec3-mobile-inbox" onclick="switchTab('inbox')"><i class="fa-solid fa-comments"></i><span data-i18n="ec3InboxMobile">Inbox</span></button>
+  <button class="ec3-mobile-btn" id="ec3-mobile-vault" onclick="switchTab('dashboard')"><i class="fa-solid fa-vault"></i><span data-i18n="ec3VaultMobile">Vault</span></button>
 </div>
 
 <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
@@ -539,7 +539,7 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
           <i class="fa-solid fa-boxes-stacked"></i> <span data-i18n="navInventory">Inventory</span>
         </button>
         <button id="nav-command-center" onclick="switchTab('command-center')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-violet-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-violet-950/30 border border-violet-500/20">
-          <i class="fa-solid fa-gauge-high"></i> <span>Command Center</span>
+          <i class="fa-solid fa-gauge-high"></i> <span data-i18n="ec3CommandCenter">Command Center</span>
         </button>
         <button id="nav-admin" onclick="switchTab('admin')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
           <i class="fa-solid fa-shield-halved"></i> <span data-i18n="navAdmin">Admin Hub</span>
@@ -638,16 +638,16 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
     <!-- 3.0 OVERVIEW -->
     <section id="view-home" class="space-y-5">
       <div class="ec3-page-head">
-        <div><div class="ec3-eyebrow">Eugene Card 3.0</div><h2 class="ec3-title">Your collection, at a glance.</h2><p class="ec3-subtitle">A unified command surface for your cards, market activity, conversations and collector progress.</p></div>
-        <div class="flex gap-2 flex-wrap"><button onclick="switchTab('catalog')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black"><i class="fa-solid fa-store mr-1.5"></i>Browse Market</button><button onclick="switchTab('inbox')" class="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-black"><i class="fa-solid fa-comments mr-1.5"></i>Open Inbox</button></div>
+        <div><div class="ec3-eyebrow">Eugene Card 3.0</div><h2 class="ec3-title" data-i18n="ec3PageTitle">Your collection, at a glance.</h2><p class="ec3-subtitle" data-i18n="ec3PageSub">A unified command surface for your cards, market activity, conversations and collector progress.</p></div>
+        <div class="flex gap-2 flex-wrap"><button onclick="switchTab('catalog')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black"><i class="fa-solid fa-store mr-1.5"></i><span data-i18n="ec3BrowseMarket">Browse Market</span></button><button onclick="switchTab('inbox')" class="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-black"><i class="fa-solid fa-comments mr-1.5"></i><span data-i18n="ec3OpenInbox">Open Inbox</span></button></div>
       </div>
-      <div class="ec3-hero"><div class="relative z-10 grid lg:grid-cols-[1.4fr_.6fr] gap-6 items-end"><div><span class="inline-flex px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[9px] font-black uppercase tracking-widest">Collector dashboard</span><h3 id="ec3-welcome" class="text-2xl md:text-3xl font-black text-white mt-4">Welcome back.</h3><p id="ec3-welcome-sub" class="text-xs text-slate-400 mt-2 max-w-xl">Track your collection, discover new cards and keep your trades moving.</p></div><div class="lg:text-right"><div class="text-[9px] uppercase tracking-widest font-black text-slate-500">Collector Level</div><div id="ec3-level" class="text-4xl font-black text-white mt-1">Lv. 1</div><div class="mt-3 h-2 rounded-full bg-slate-950 overflow-hidden"><div id="ec3-xp-bar" class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-400" style="width:0%"></div></div><div id="ec3-xp-label" class="text-[9px] text-slate-500 mt-1">0 XP</div></div></div></div>
-      <div class="ec3-kpi-grid"><div class="ec3-kpi"><div class="ec3-kpi-label">Portfolio Value</div><div id="ec3-kpi-value" class="ec3-kpi-value">$0</div><div class="ec3-kpi-meta">Estimated current card value</div></div><div class="ec3-kpi"><div class="ec3-kpi-label">Cards Owned</div><div id="ec3-kpi-cards" class="ec3-kpi-value">0</div><div class="ec3-kpi-meta">Cards in your vault</div></div><div class="ec3-kpi"><div class="ec3-kpi-label">Reputation</div><div id="ec3-kpi-rep" class="ec3-kpi-value">0</div><div class="ec3-kpi-meta">Server-authoritative score</div></div><div class="ec3-kpi"><div class="ec3-kpi-label">Unread</div><div id="ec3-kpi-unread" class="ec3-kpi-value">0</div><div class="ec3-kpi-meta">Conversations needing attention</div></div></div>
+      <div class="ec3-hero"><div class="relative z-10 grid lg:grid-cols-[1.4fr_.6fr] gap-6 items-end"><div><span class="inline-flex px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[9px] font-black uppercase tracking-widest"><span data-i18n="ec3CollectorDashboard">Collector Dashboard</span></span><h3 id="ec3-welcome" class="text-2xl md:text-3xl font-black text-white mt-4">Welcome back.</h3><p id="ec3-welcome-sub" class="text-xs text-slate-400 mt-2 max-w-xl">Track your collection, discover new cards and keep your trades moving.</p></div><div class="lg:text-right"><div class="text-[9px] uppercase tracking-widest font-black text-slate-500" data-i18n="ec3Level">Collector Level</div><div id="ec3-level" class="text-4xl font-black text-white mt-1">Lv. 1</div><div class="mt-3 h-2 rounded-full bg-slate-950 overflow-hidden"><div id="ec3-xp-bar" class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-400" style="width:0%"></div></div><div id="ec3-xp-label" class="text-[9px] text-slate-500 mt-1">0 XP</div></div></div></div>
+      <div class="ec3-kpi-grid"><div class="ec3-kpi"><div class="ec3-kpi-label" data-i18n="ec3Portfolio">Portfolio Value</div><div id="ec3-kpi-value" class="ec3-kpi-value">$0</div><div class="ec3-kpi-meta" data-i18n="ec3PortfolioSub">Estimated current card value</div></div><div class="ec3-kpi"><div class="ec3-kpi-label" data-i18n="ec3CardsOwned">Cards Owned</div><div id="ec3-kpi-cards" class="ec3-kpi-value">0</div><div class="ec3-kpi-meta" data-i18n="ec3CardsOwnedSub">Cards in your vault</div></div><div class="ec3-kpi"><div class="ec3-kpi-label" data-i18n="ec3Reputation">Reputation</div><div id="ec3-kpi-rep" class="ec3-kpi-value">0</div><div class="ec3-kpi-meta" data-i18n="ec3ReputationSub">Server-authoritative score</div></div><div class="ec3-kpi"><div class="ec3-kpi-label" data-i18n="ec3Unread">Unread</div><div id="ec3-kpi-unread" class="ec3-kpi-value">0</div><div class="ec3-kpi-meta" data-i18n="ec3UnreadSub">Conversations needing attention</div></div></div>
       <div class="ec3-dashboard-grid">
-        <div class="ec3-panel"><div class="flex items-center justify-between"><div><div class="ec3-panel-title">Quick actions</div><div class="ec3-panel-sub">Everything important is one click away.</div></div><span class="text-[9px] text-slate-600 font-black uppercase">Workspace</span></div><div class="ec3-action-grid"><button class="ec3-action" onclick="switchTab('catalog')"><div class="ec3-action-icon"><i class="fa-solid fa-store"></i></div><div class="ec3-action-title">Explore Marketplace</div><div class="ec3-action-sub">Browse cards, pricing and availability.</div></button><button class="ec3-action" onclick="switchTab('dashboard')"><div class="ec3-action-icon"><i class="fa-solid fa-vault"></i></div><div class="ec3-action-title">Open My Vault</div><div class="ec3-action-sub">See your owned cards and portfolio.</div></button><button class="ec3-action" onclick="switchTab('trade')"><div class="ec3-action-icon"><i class="fa-solid fa-right-left"></i></div><div class="ec3-action-title">Start a Trade</div><div class="ec3-action-sub">Find collectors and exchange cards.</div></button><button class="ec3-action" onclick="switchTab('auction')"><div class="ec3-action-icon"><i class="fa-solid fa-gavel"></i></div><div class="ec3-action-title">View Auctions</div><div class="ec3-action-sub">Watch, bid and discover rare listings.</div></button></div></div>
-        <div class="ec3-panel"><div class="ec3-panel-title">Collector snapshot</div><div class="ec3-panel-sub">Your current server-backed progress.</div><div class="mt-3"><div class="ec3-mini-stat"><span>Completed trades</span><strong id="ec3-mini-trades">0</strong></div><div class="ec3-mini-stat"><span>Auction wins</span><strong id="ec3-mini-auctions">0</strong></div><div class="ec3-mini-stat"><span>Purchases</span><strong id="ec3-mini-purchases">0</strong></div><div class="ec3-mini-stat"><span>Sales</span><strong id="ec3-mini-sales">0</strong></div></div></div>
+        <div class="ec3-panel"><div class="flex items-center justify-between"><div><div class="ec3-panel-title" data-i18n="ec3QuickActions">Quick Actions</div><div class="ec3-panel-sub" data-i18n="ec3QuickActionsSub">Everything important is one click away.</div></div><span class="text-[9px] text-slate-600 font-black uppercase" data-i18n="ec3WorkspaceLabel">WORKSPACE</span></div><div class="ec3-action-grid"><button class="ec3-action" onclick="switchTab('catalog')"><div class="ec3-action-icon"><i class="fa-solid fa-store"></i></div><div class="ec3-action-title" data-i18n="ec3ExploreMarket">Explore Marketplace</div><div class="ec3-action-sub" data-i18n="ec3ExploreMarketSub">Browse cards, pricing and availability.</div></button><button class="ec3-action" onclick="switchTab('dashboard')"><div class="ec3-action-icon"><i class="fa-solid fa-vault"></i></div><div class="ec3-action-title" data-i18n="ec3OpenVault">Open My Vault</div><div class="ec3-action-sub" data-i18n="ec3OpenVaultSub">See your owned cards and portfolio.</div></button><button class="ec3-action" onclick="switchTab('trade')"><div class="ec3-action-icon"><i class="fa-solid fa-right-left"></i></div><div class="ec3-action-title" data-i18n="ec3StartTrade">Start a Trade</div><div class="ec3-action-sub" data-i18n="ec3StartTradeSub">Find collectors and exchange cards.</div></button><button class="ec3-action" onclick="switchTab('auction')"><div class="ec3-action-icon"><i class="fa-solid fa-gavel"></i></div><div class="ec3-action-title" data-i18n="ec3ViewAuctions">View Auctions</div><div class="ec3-action-sub" data-i18n="ec3ViewAuctionsSub">Watch, bid and discover rare listings.</div></button></div></div>
+        <div class="ec3-panel"><div class="ec3-panel-title" data-i18n="ec3CollectorSnapshot">Collector Snapshot</div><div class="ec3-panel-sub" data-i18n="ec3SnapshotSub">Your current server-backed progress.</div><div class="mt-3"><div class="ec3-mini-stat"><span data-i18n="ec3CompletedTrades">Completed trades</span><strong id="ec3-mini-trades">0</strong></div><div class="ec3-mini-stat"><span data-i18n="ec3AuctionWins">Auction wins</span><strong id="ec3-mini-auctions">0</strong></div><div class="ec3-mini-stat"><span data-i18n="ec3Purchases">Purchases</span><strong id="ec3-mini-purchases">0</strong></div><div class="ec3-mini-stat"><span data-i18n="ec3Sales">Sales</span><strong id="ec3-mini-sales">0</strong></div></div></div>
       </div>
-      <div class="ec3-panel"><div class="flex items-center justify-between"><div><div class="ec3-panel-title">Recent activity</div><div class="ec3-panel-sub">Notifications and marketplace events.</div></div><button onclick="switchTab('history')" class="text-[9px] font-black text-indigo-300 hover:text-white">View history →</button></div><div id="ec3-recent-activity" class="mt-3"></div></div>
+      <div class="ec3-panel"><div class="flex items-center justify-between"><div><div class="ec3-panel-title" data-i18n="ec3RecentActivity">Recent Activity</div><div class="ec3-panel-sub" data-i18n="ec3RecentActivitySub">Latest marketplace events and notifications.</div></div><button onclick="switchTab('history')" class="text-[9px] font-black text-indigo-300 hover:text-white" data-i18n="ec3ViewHistory">View History →</button></div><div id="ec3-recent-activity" class="mt-3"></div></div>
     </section>
 
     <!-- CATALOG VIEW -->
@@ -1714,7 +1714,7 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
     const OFFICIAL_QRIS_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
     const ADMIN_EMAILS = ['eugene.aquila06@gmail.com', 'yujinybwork@gmail.com', 'eugene.aquila06', 'admin house'];
 
-    let currentLanguage = 'EN';
+    let currentLanguage = localStorage.getItem('eugene_lang') || 'EN';
     let currentUser = null;
     let cart = [];
     let wishlist = new Set();
@@ -1755,6 +1755,70 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
     // Comprehensive i18n Dictionary
     const i18nDict = {
       EN: {
+        ec3Workspace: "Workspace",
+        ec3Overview: "Overview",
+        ec3Marketplace: "Marketplace",
+        ec3Vault: "My Vault",
+        ec3Wishlist: "Wishlist",
+        ec3Trading: "Trading",
+        ec3Auctions: "Auctions",
+        ec3Inbox: "Inbox",
+        ec3Admin: "Admin",
+        ec3CommandCenter: "Command Center",
+        ec3AdminHub: "Admin Hub",
+        ec3Inventory: "Inventory",
+        ec3Analytics: "Analytics",
+        ec3Revenue: "Revenue",
+        ec3ControlLayer: "3.0 Control Layer",
+        ec3ControlSub: "Marketplace data, collector activity and admin operations in one workspace.",
+        ec3HomeMobile: "Home",
+        ec3MarketMobile: "Market",
+        ec3TradeMobile: "Trade",
+        ec3InboxMobile: "Inbox",
+        ec3VaultMobile: "Vault",
+        ec3PageTitle: "Your collection, at a glance.",
+        ec3PageSub: "A unified command surface for your cards, market activity, conversations and collector progress.",
+        ec3BrowseMarket: "Browse Market",
+        ec3OpenInbox: "Open Inbox",
+        ec3CollectorDashboard: "Collector Dashboard",
+        ec3WelcomeBack: "Welcome back, {name}.",
+        ec3WelcomeSub: "Your collection, market activity and collector progress are synced in real time.",
+        ec3SignInSub: "Sign in to unlock your vault, trades, auctions and server-backed collector progress.",
+        ec3Portfolio: "Portfolio Value",
+        ec3PortfolioSub: "Estimated current card value",
+        ec3CardsOwned: "Cards Owned",
+        ec3CardsOwnedSub: "Cards in your vault",
+        ec3Reputation: "Reputation",
+        ec3ReputationSub: "Server-authoritative score",
+        ec3Unread: "Unread",
+        ec3UnreadSub: "Conversations needing attention",
+        ec3QuickActions: "Quick Actions",
+        ec3QuickActionsSub: "Everything important is one click away.",
+        ec3WorkspaceLabel: "WORKSPACE",
+        ec3ExploreMarket: "Explore Marketplace",
+        ec3ExploreMarketSub: "Browse cards, pricing and availability.",
+        ec3OpenVault: "Open My Vault",
+        ec3OpenVaultSub: "See your owned cards and portfolio.",
+        ec3StartTrade: "Start Trading",
+        ec3StartTradeSub: "Find cards and make an offer.",
+        ec3ViewAuctions: "View Auctions",
+        ec3ViewAuctionsSub: "Watch live bidding and rare cards.",
+        ec3CollectorSnapshot: "Collector Snapshot",
+        ec3SnapshotSub: "Your current server-backed progress.",
+        ec3CompletedTrades: "Completed trades",
+        ec3AuctionWins: "Auction wins",
+        ec3Purchases: "Purchases",
+        ec3Sales: "Sales",
+        ec3RecentActivity: "Recent Activity",
+        ec3RecentActivitySub: "Latest marketplace events and notifications.",
+        ec3NoActivity: "No recent activity yet.",
+        ec3Featured: "Featured For You",
+        ec3FeaturedSub: "Cards worth keeping an eye on.",
+        ec3ViewMarket: "View Marketplace",
+        ec3SystemStatus: "System Status",
+        ec3Realtime: "Realtime sync active",
+        ec3Level: "Collector Level",
+
         brandTitle: "EUGENE CARD",
         betaEdition: "Beta Edition",
         brandSubtitle: "Trading Card Marketplace & Exchange Hub",
@@ -1941,6 +2005,72 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
         submitQrisOrderBtn: "Submit QRIS Order for Admin Approval"
       },
       ID: {
+        ec3Workspace: "Ruang Kerja",
+        ec3BrandSub: "KUMPULKAN • TUKAR • MILIKI",
+        ec3ViewHistory: "Lihat Riwayat →",
+        ec3Overview: "Beranda",
+        ec3Marketplace: "Marketplace",
+        ec3Vault: "Koleksi Saya",
+        ec3Wishlist: "Daftar Keinginan",
+        ec3Trading: "Pertukaran",
+        ec3Auctions: "Lelang",
+        ec3Inbox: "Kotak Masuk",
+        ec3Admin: "Admin",
+        ec3CommandCenter: "Pusat Kendali",
+        ec3AdminHub: "Panel Admin",
+        ec3Inventory: "Inventaris",
+        ec3Analytics: "Analitik",
+        ec3Revenue: "Pendapatan",
+        ec3ControlLayer: "Lapisan Kendali 3.0",
+        ec3ControlSub: "Data marketplace, aktivitas kolektor, dan operasi admin dalam satu ruang kerja.",
+        ec3HomeMobile: "Beranda",
+        ec3MarketMobile: "Pasar",
+        ec3TradeMobile: "Tukar",
+        ec3InboxMobile: "Pesan",
+        ec3VaultMobile: "Koleksi",
+        ec3PageTitle: "Koleksi Anda dalam satu tampilan.",
+        ec3PageSub: "Pusat terpadu untuk kartu, aktivitas pasar, percakapan, dan progres kolektor Anda.",
+        ec3BrowseMarket: "Jelajahi Marketplace",
+        ec3OpenInbox: "Buka Kotak Masuk",
+        ec3CollectorDashboard: "Dasbor Kolektor",
+        ec3WelcomeBack: "Selamat datang kembali, {name}.",
+        ec3WelcomeSub: "Koleksi, aktivitas pasar, dan progres kolektor Anda tersinkronisasi secara real-time.",
+        ec3SignInSub: "Masuk untuk membuka koleksi, pertukaran, lelang, dan progres kolektor berbasis server.",
+        ec3Portfolio: "Nilai Portofolio",
+        ec3PortfolioSub: "Estimasi nilai kartu saat ini",
+        ec3CardsOwned: "Kartu Dimiliki",
+        ec3CardsOwnedSub: "Kartu di koleksi Anda",
+        ec3Reputation: "Reputasi",
+        ec3ReputationSub: "Skor yang ditentukan server",
+        ec3Unread: "Belum Dibaca",
+        ec3UnreadSub: "Percakapan yang perlu diperhatikan",
+        ec3QuickActions: "Aksi Cepat",
+        ec3QuickActionsSub: "Semua hal penting dapat diakses dalam satu klik.",
+        ec3WorkspaceLabel: "RUANG KERJA",
+        ec3ExploreMarket: "Jelajahi Marketplace",
+        ec3ExploreMarketSub: "Lihat kartu, harga, dan ketersediaan.",
+        ec3OpenVault: "Buka Koleksi Saya",
+        ec3OpenVaultSub: "Lihat kartu yang Anda miliki dan portofolio.",
+        ec3StartTrade: "Mulai Bertukar",
+        ec3StartTradeSub: "Cari kartu dan ajukan penawaran.",
+        ec3ViewAuctions: "Lihat Lelang",
+        ec3ViewAuctionsSub: "Pantau penawaran langsung dan kartu langka.",
+        ec3CollectorSnapshot: "Ringkasan Kolektor",
+        ec3SnapshotSub: "Progres Anda yang tersimpan di server.",
+        ec3CompletedTrades: "Pertukaran selesai",
+        ec3AuctionWins: "Kemenangan lelang",
+        ec3Purchases: "Pembelian",
+        ec3Sales: "Penjualan",
+        ec3RecentActivity: "Aktivitas Terbaru",
+        ec3RecentActivitySub: "Aktivitas marketplace dan notifikasi terbaru.",
+        ec3NoActivity: "Belum ada aktivitas terbaru.",
+        ec3Featured: "Pilihan Untuk Anda",
+        ec3FeaturedSub: "Kartu yang layak Anda pantau.",
+        ec3ViewMarket: "Lihat Marketplace",
+        ec3SystemStatus: "Status Sistem",
+        ec3Realtime: "Sinkronisasi real-time aktif",
+        ec3Level: "Level Kolektor",
+
         brandTitle: "EUGENE CARD",
         betaEdition: "Edisi Beta",
         brandSubtitle: "Pasar Kartu Koleksi & Pusat Pertukaran",
@@ -2130,6 +2260,8 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
 
     function toggleLanguage() {
       currentLanguage = currentLanguage === 'EN' ? 'ID' : 'EN';
+      localStorage.setItem('eugene_lang', currentLanguage);
+      document.documentElement.lang = currentLanguage === 'ID' ? 'id' : 'en';
       const btnLabel = document.getElementById('current-lang-label');
       if (btnLabel) btnLabel.innerText = currentLanguage;
       applyTranslations();
@@ -4953,15 +5085,16 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
       const level = Number(stats.level || 1), xp = Number(stats.xp || 0);
       const xpForLevel = Math.max(100, level * 100), xpPct = Math.min(100, Math.round((xp % xpForLevel) / xpForLevel * 100));
       const name = currentUser?.name || currentUser?.username || 'Collector';
-      const welcome = document.getElementById('ec3-welcome'); if (welcome) welcome.textContent = `Welcome back, ${name.split(' ')[0]}.`;
-      const sub = document.getElementById('ec3-welcome-sub'); if (sub) sub.textContent = currentUser ? 'Your collection, market activity and collector progress are synced in real time.' : 'Sign in to unlock your vault, trades, auctions and server-backed collector progress.';
+      const dict = i18nDict[currentLanguage] || i18nDict.EN;
+      const welcome = document.getElementById('ec3-welcome'); if (welcome) welcome.textContent = (dict.ec3WelcomeBack || 'Welcome back, {name}.').replace('{name}', name.split(' ')[0]);
+      const sub = document.getElementById('ec3-welcome-sub'); if (sub) sub.textContent = currentUser ? (dict.ec3WelcomeSub || '') : (dict.ec3SignInSub || '');
       const set=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val};
       set('ec3-kpi-value',money(portfolio)); set('ec3-kpi-cards',owned.length.toLocaleString()); set('ec3-kpi-rep',Number(stats.reputation||0).toLocaleString()); set('ec3-kpi-unread',unread.toLocaleString());
       set('ec3-level',`Lv. ${level}`); set('ec3-xp-label',`${xp.toLocaleString()} XP`); set('ec3-mini-trades',Number(stats.completedTrades||0).toLocaleString()); set('ec3-mini-auctions',Number(stats.auctionWins||0).toLocaleString()); set('ec3-mini-purchases',Number(stats.purchases||0).toLocaleString()); set('ec3-mini-sales',Number(stats.sales||0).toLocaleString());
       const bar=document.getElementById('ec3-xp-bar'); if(bar) bar.style.width=`${xpPct}%`;
       const badge=document.getElementById('ec3-inbox-badge'); if(badge){badge.textContent=unread;badge.classList.toggle('hidden',unread===0)}
       const activity=document.getElementById('ec3-recent-activity');
-      if(activity){const rows=(systemNotifications||[]).slice(0,5); activity.innerHTML=rows.length?rows.map(n=>`<div class="ec3-activity"><div class="ec3-activity-icon"><i class="fa-solid ${n.iconClass||'fa-bell'}"></i></div><div><div class="ec3-activity-title">${n.title||'Notification'}</div><div class="ec3-activity-msg">${n.message||''}</div></div></div>`).join(''):`<div class="py-7 text-center text-[10px] text-slate-600">No recent activity yet.</div>`}
+      if(activity){const rows=(systemNotifications||[]).slice(0,5); activity.innerHTML=rows.length?rows.map(n=>`<div class="ec3-activity"><div class="ec3-activity-icon"><i class="fa-solid ${n.iconClass||'fa-bell'}"></i></div><div><div class="ec3-activity-title">${n.title||'Notification'}</div><div class="ec3-activity-msg">${n.message||''}</div></div></div>`).join(''):`<div class="py-7 text-center text-[10px] text-slate-600">${(i18nDict[currentLanguage]||i18nDict.EN).ec3NoActivity}</div>`}
     }
 
     function switchTab(tabName) {
@@ -5292,6 +5425,14 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
 
 <script>
 (function(){const sync=()=>{const l=localStorage.getItem('eugene_lang')||'EN';document.documentElement.lang=l==='ID'?'id':'en';};sync();window.addEventListener('storage',sync);})();
+
+    // Eugene Card 3.0 bilingual shell: apply the saved language to all static UI.
+    document.addEventListener('DOMContentLoaded', () => {
+      document.documentElement.lang = currentLanguage === 'ID' ? 'id' : 'en';
+      const label = document.getElementById('current-lang-label');
+      if (label) label.textContent = currentLanguage;
+      applyTranslations();
+    });
 </script>
 </body>
 </html>
