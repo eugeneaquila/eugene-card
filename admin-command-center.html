@@ -21,7 +21,7 @@ body{background:#020617;color:#f8fafc}
       <div>
         <span class="inline-flex px-2.5 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[10px] font-black uppercase tracking-widest">Eugene Card 3.0</span>
         <h1 class="text-3xl md:text-5xl font-black mt-4"><span data-i18n="Admin_Command_Center">Admin Command Center</span></h1>
-        <p class="text-sm text-slate-400 mt-2 max-w-2xl">Marketplace control room: operations, collectors, inventory, auctions, trades and finance.</p>
+        <p class="text-sm text-slate-400 mt-2 max-w-2xl"><span data-i18n="ControlRoomSub">Marketplace control room: operations, collectors, inventory, auctions, trades and finance.</span></p>
       </div>
       <div class="flex gap-2 flex-wrap items-center">
         <button id="lang-toggle" onclick="toggleLanguage()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-amber-300 text-xs font-black" title="Switch Language / Ganti Bahasa">EN</button>
@@ -48,7 +48,7 @@ body{background:#020617;color:#f8fafc}
       <div class="grid sm:grid-cols-2 gap-3 mt-4">
         <a href="index.html" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-violet-500/40"><b><span data-i18n="Marketplace_Operations">Marketplace Operations</span></b><p class="text-[10px] text-slate-500 mt-1"><span data-i18n="Inventory_auctions_trades_history_and_Inbox">Inventory, auctions, trades, history and Inbox.</span></p></a>
         <a href="analytics.html" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-500/40"><b><span data-i18n="Market_Analytics">Market Analytics</span></b><p class="text-[10px] text-slate-500 mt-1"><span data-i18n="Valuation_demand_and_market_signals">Valuation, demand and market signals.</span></p></a>
-        <a href="revenue.html" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-emerald-500/40"><b>Revenue</b><p class="text-[10px] text-slate-500 mt-1"><span data-i18n="Sales_fees_transaction_funnel_and_exports">Sales, fees, transaction funnel and exports.</span></p></a>
+        <a href="revenue.html" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-emerald-500/40"><b><span data-i18n="Revenue">Revenue</span></b><p class="text-[10px] text-slate-500 mt-1"><span data-i18n="Sales_fees_transaction_funnel_and_exports">Sales, fees, transaction funnel and exports.</span></p></a>
         <a href="index.html" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-cyan-500/40"><b><span data-i18n="Past_History">Past History</span></b><p class="text-[10px] text-slate-500 mt-1"><span data-i18n="Audit_transactions_and_marketplace_activity">Audit transactions and marketplace activity.</span></p></a>
       </div>
     </div>
@@ -116,7 +116,7 @@ auth.onAuthStateChanged(async user => {
 <script>
 (function(){
   const dict={
-    EN:{
+    EN:{ControlRoomSub:'Marketplace control room: operations, collectors, inventory, auctions, trades and finance.',
       Admin_Command_Center:'Admin Command Center',Marketplace:'Marketplace',Analytics:'Analytics',Revenue:'Revenue',
       Cards:'Cards',Inventory_Floor:'Inventory Floor',Collectors:'Collectors',Pending_Trades:'Pending Trades',
       Operations:'Operations',Open_the_area_that_needs_attention:'Open the area that needs attention.',
@@ -127,7 +127,7 @@ auth.onAuthStateChanged(async user => {
       Firestore:'Firestore',CONNECTED:'CONNECTED',Admin_Auth:'Admin Auth',CHECKING:'CHECKING',Realtime_Data:'Realtime Data',
       Admin_access_required:'Admin access required.'
     },
-    ID:{
+    ID:{ControlRoomSub:'Pusat kendali marketplace: kolektor, inventaris, lelang, pertukaran, dan keuangan.',
       Admin_Command_Center:'Pusat Kendali Admin',Marketplace:'Marketplace',Analytics:'Analitik',Revenue:'Pendapatan',
       Cards:'Kartu',Inventory_Floor:'Nilai Dasar Inventaris',Collectors:'Kolektor',Pending_Trades:'Tukar Tertunda',
       Operations:'Operasional',Open_the_area_that_needs_attention:'Buka area yang membutuhkan perhatian.',
