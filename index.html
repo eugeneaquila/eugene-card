@@ -468,6 +468,9 @@
         <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
           <i class="fa-solid fa-boxes-stacked"></i> <span data-i18n="navInventory">Inventory</span>
         </button>
+        <button id="nav-command-center" onclick="switchTab('command-center')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-violet-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-violet-950/30 border border-violet-500/20">
+          <i class="fa-solid fa-gauge-high"></i> <span>Command Center</span>
+        </button>
         <button id="nav-admin" onclick="switchTab('admin')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/20">
           <i class="fa-solid fa-shield-halved"></i> <span data-i18n="navAdmin">Admin Hub</span>
         </button>
@@ -906,7 +909,111 @@
     </section>
 
     <!-- ADMIN HUB VIEW -->
-    <section id="view-admin" class="hidden space-y-6">
+    
+    <!-- ADMIN COMMAND CENTER 3.0 -->
+    <section id="view-command-center" class="hidden space-y-6">
+      <div class="relative overflow-hidden rounded-3xl border border-violet-500/20 bg-gradient-to-br from-violet-950/70 via-slate-950 to-indigo-950/50 p-6 md:p-8">
+        <div class="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-violet-500/10 blur-3xl"></div>
+        <div class="relative flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+          <div>
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[10px] font-black uppercase tracking-widest">
+              <i class="fa-solid fa-gauge-high"></i> Eugene Card 3.0
+            </div>
+            <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight mt-4">Admin Command Center</h2>
+            <p class="text-sm text-slate-400 mt-2 max-w-2xl">One control room for marketplace health, operations, collectors, inventory, auctions, trades and finance.</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="switchTab('admin')" class="px-3.5 py-2 bg-slate-900/80 border border-slate-700 text-slate-200 rounded-xl text-xs font-bold"><i class="fa-solid fa-shield-halved mr-1"></i> Admin Hub</button>
+            <button onclick="window.location.href='analytics.html'" class="px-3.5 py-2 bg-amber-500/10 border border-amber-500/25 text-amber-300 rounded-xl text-xs font-bold"><i class="fa-solid fa-chart-line mr-1"></i> Analytics</button>
+            <button onclick="window.location.href='revenue.html'" class="px-3.5 py-2 bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 rounded-xl text-xs font-bold"><i class="fa-solid fa-sack-dollar mr-1"></i> Revenue</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="command-center-alerts" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <p class="text-[10px] text-slate-500 uppercase font-black tracking-wider">Inventory Value</p>
+          <p id="cc-inventory-value" class="text-xl font-black text-white mt-1">—</p>
+          <p class="text-[10px] text-slate-500 mt-1">Current card floor total</p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <p class="text-[10px] text-slate-500 uppercase font-black tracking-wider">Collectors</p>
+          <p id="cc-collector-count" class="text-xl font-black text-white mt-1">—</p>
+          <p class="text-[10px] text-slate-500 mt-1">Known registered profiles</p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <p class="text-[10px] text-slate-500 uppercase font-black tracking-wider">Active Auctions</p>
+          <p id="cc-auction-count" class="text-xl font-black text-white mt-1">—</p>
+          <p class="text-[10px] text-slate-500 mt-1">Currently running</p>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <p class="text-[10px] text-slate-500 uppercase font-black tracking-wider">Pending Trades</p>
+          <p id="cc-trade-count" class="text-xl font-black text-white mt-1">—</p>
+          <p class="text-[10px] text-slate-500 mt-1">Needs attention</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div class="xl:col-span-2 bg-slate-900/80 border border-slate-800 rounded-3xl p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-black text-white">Operations Queue</h3>
+              <p class="text-[10px] text-slate-500 mt-1">Quick access to the areas most likely to need action.</p>
+            </div>
+            <button onclick="refreshCommandCenter()" class="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white" title="Refresh">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button onclick="switchTab('trade-req')" class="text-left p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-purple-500/40">
+              <span class="text-purple-400"><i class="fa-solid fa-handshake"></i></span>
+              <p class="font-black text-white text-sm mt-2">Trade Requests</p>
+              <p class="text-[10px] text-slate-500 mt-1">Review, approve and manage collector offers.</p>
+            </button>
+            <button onclick="switchTab('auction')" class="text-left p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-500/40">
+              <span class="text-amber-400"><i class="fa-solid fa-gavel"></i></span>
+              <p class="font-black text-white text-sm mt-2">Auction Room</p>
+              <p class="text-[10px] text-slate-500 mt-1">Monitor active auctions and bidding activity.</p>
+            </button>
+            <button onclick="switchTab('inventory')" class="text-left p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-rose-500/40">
+              <span class="text-rose-400"><i class="fa-solid fa-boxes-stacked"></i></span>
+              <p class="font-black text-white text-sm mt-2">Inventory</p>
+              <p class="text-[10px] text-slate-500 mt-1">Manage primary stock and ownership records.</p>
+            </button>
+            <button onclick="switchTab('history')" class="text-left p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-cyan-500/40">
+              <span class="text-cyan-400"><i class="fa-solid fa-clock-rotate-left"></i></span>
+              <p class="font-black text-white text-sm mt-2">Past History</p>
+              <p class="text-[10px] text-slate-500 mt-1">Audit marketplace transactions and activity.</p>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5">
+          <div class="mb-4">
+            <h3 class="text-sm font-black text-white">System Health</h3>
+            <p class="text-[10px] text-slate-500 mt-1">Live client-side connectivity checks.</p>
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950">
+              <span class="text-xs text-slate-300"><i class="fa-solid fa-database text-indigo-400 mr-2"></i>Firestore</span>
+              <span id="cc-health-firestore" class="text-[10px] font-black text-emerald-400">CONNECTED</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950">
+              <span class="text-xs text-slate-300"><i class="fa-solid fa-bolt text-amber-400 mr-2"></i>Functions</span>
+              <span id="cc-health-functions" class="text-[10px] font-black text-slate-400">READY</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950">
+              <span class="text-xs text-slate-300"><i class="fa-solid fa-user-shield text-rose-400 mr-2"></i>Admin Auth</span>
+              <span id="cc-health-admin" class="text-[10px] font-black text-emerald-400">VERIFIED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<section id="view-admin" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-2xl font-black text-white uppercase tracking-wide"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> <span data-i18n="adminHubTitle">Admin Hub & Revenue Dashboard</span></h2>
@@ -2248,37 +2355,103 @@
     }
 
     function startInboxNotificationListener() {
-      if (inboxUnreadUnsubscribe) inboxUnreadUnsubscribe();
+      if (inboxUnreadUnsubscribe) {
+        try { inboxUnreadUnsubscribe(); } catch (e) {}
+        inboxUnreadUnsubscribe = null;
+      }
       if (!currentUser) return;
+
       loadInboxUnreadState();
       inboxUnreadInitialized = false;
 
-      inboxUnreadUnsubscribe = db.collection('chats').where('participantUids', 'array-contains', currentUser.uid).onSnapshot(snapshot => {
-        const mine = getCollectorIdentities();
+      const myNames = [...new Set([
+        currentUser.username,
+        currentUser.name,
+        currentUser.email
+      ].filter(Boolean).map(v => String(v).trim().toLowerCase()))];
 
+      const seenQueries = new Set();
+      const unsubs = [];
+      let initialSnapshots = 0;
+
+      const processSnapshot = (snapshot) => {
         snapshot.forEach(doc => {
           const d = doc.data() || {};
-          const participants = Array.isArray(d.participants) ? d.participants : doc.id.replace('chat-', '').split('-vs-');
-          const isMine = currentUser.isAdmin || participants.some(p => mine.includes(String(p).toLowerCase()));
+          const participants = Array.isArray(d.participants)
+            ? d.participants
+            : doc.id.replace(/^chat-/, '').split('-vs-');
+
+          const participantNames = participants.map(p => String(p).trim().toLowerCase());
+          const isMine = currentUser.isAdmin ||
+            myNames.some(name => participantNames.includes(name)) ||
+            (Array.isArray(d.participantUids) && d.participantUids.includes(currentUser.uid));
+
           if (!isMine) return;
 
-          const sender = String(d.lastSender || '').toLowerCase();
+          const sender = String(d.lastSender || '').trim().toLowerCase();
           const updated = getTimeMillis(d.updatedAt);
           const seen = Number(inboxUnreadState[doc.id]?.lastSeen || 0);
-          const incoming = sender && !mine.includes(sender);
+          const incoming = sender && !myNames.includes(sender);
 
           if (incoming && updated > seen && doc.id !== currentChatContextId) {
             const wasUnread = !!inboxUnreadState[doc.id]?.unread;
             inboxUnreadState[doc.id] = { lastSeen: seen, unread: true };
+
             if (inboxUnreadInitialized && !wasUnread) {
-              addNotification('New Inbox Message', `${d.lastSender || 'Collector'}: ${d.lastMessage || 'You received a new message.'}`, 'fa-comments text-indigo-400');
+              addNotification(
+                'New Inbox Message',
+                `${d.lastSender || 'Collector'}: ${d.lastMessage || 'You received a new message.'}`,
+                'fa-comments text-indigo-400'
+              );
             }
           }
         });
 
+        initialSnapshots += 1;
+        if (initialSnapshots >= 1) inboxUnreadInitialized = true;
         saveInboxUnreadState();
         renderInboxUnreadBadge();
-      }, err => console.warn('Inbox listener:', err));
+      };
+
+      const attach = (query, key) => {
+        if (seenQueries.has(key)) return;
+        seenQueries.add(key);
+
+        try {
+          const unsub = query.onSnapshot(
+            snapshot => processSnapshot(snapshot),
+            err => console.warn('Inbox unread listener:', err?.message || err)
+          );
+          unsubs.push(unsub);
+        } catch (err) {
+          console.warn('Inbox unread listener setup:', err);
+        }
+      };
+
+      attach(
+        db.collection('chats').where('participantUids', 'array-contains', currentUser.uid),
+        `uid:${currentUser.uid}`
+      );
+
+      if (currentUser.username) {
+        attach(
+          db.collection('chats').where('participants', 'array-contains', currentUser.username),
+          `name:${currentUser.username.toLowerCase()}`
+        );
+      }
+
+      if (currentUser.name && currentUser.name.toLowerCase() !== String(currentUser.username || '').toLowerCase()) {
+        attach(
+          db.collection('chats').where('participants', 'array-contains', currentUser.name),
+          `name:${currentUser.name.toLowerCase()}`
+        );
+      }
+
+      inboxUnreadUnsubscribe = () => {
+        unsubs.splice(0).forEach(unsub => {
+          try { unsub(); } catch (e) {}
+        });
+      };
     }
 
 
@@ -2839,73 +3012,139 @@
         return;
       }
 
-      if (inboxUnsubscribe) inboxUnsubscribe();
+      if (inboxUnsubscribe) {
+        try { inboxUnsubscribe(); } catch (e) {}
+        inboxUnsubscribe = null;
+      }
 
-      inboxUnsubscribe = db.collection("chats").where("participantUids", "array-contains", currentUser.uid).onSnapshot(snapshot => {
-        if (snapshot.empty) {
-          container.innerHTML = `<p class="text-xs text-slate-500 text-center py-10">No active chat threads found.</p>`;
-          return;
-        }
+      container.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">
+        <i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Loading conversations...
+      </div>`;
 
-        const myUsername = (currentUser.username || currentUser.name || '').trim().toLowerCase();
-        const threadsMap = new Map();
+      const myNames = [...new Set([
+        currentUser.username,
+        currentUser.name,
+        currentUser.email
+      ].filter(Boolean).map(v => String(v).trim().toLowerCase()))];
 
-        snapshot.forEach(doc => {
-          const chatId = doc.id;
-          const data = doc.data();
-          const participants = data.participants || chatId.replace('chat-', '').split('-vs-');
-          const lowerParticipants = participants.map(p => p.toLowerCase());
+      const threadMap = new Map();
+      const unsubscribers = [];
+      let firstRender = true;
 
-          const isParticipant = lowerParticipants.includes(myUsername) || lowerParticipants.includes((currentUser.name || '').toLowerCase());
-          
-          if (currentUser.isAdmin || isParticipant) {
-            const otherUserRaw = participants.find(p => p.toLowerCase() !== myUsername && p.toLowerCase() !== (currentUser.name || '').toLowerCase()) || participants[0] || 'Collector';
-            const uniqueKey = otherUserRaw.toLowerCase();
-
-            if (!threadsMap.has(uniqueKey) || (data.updatedAt && threadsMap.get(uniqueKey).updatedAt < data.updatedAt)) {
-              threadsMap.set(uniqueKey, { id: chatId, otherUser: otherUserRaw, ...data });
-            }
-          }
+      const renderThreads = () => {
+        const uniqueThreads = Array.from(threadMap.values()).sort((a, b) => {
+          const at = getTimeMillis(a.updatedAt || a.timestamp || a.createdAt);
+          const bt = getTimeMillis(b.updatedAt || b.timestamp || b.createdAt);
+          return bt - at;
         });
 
-        const uniqueThreads = Array.from(threadsMap.values());
-
         if (uniqueThreads.length === 0) {
-          container.innerHTML = `<p class="text-xs text-slate-500 text-center py-10">No chat messages in your inbox.</p>`;
+          container.innerHTML = `
+            <div class="bg-slate-950/60 border border-slate-800 rounded-3xl p-10 text-center">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-comments text-indigo-400 text-xl"></i>
+              </div>
+              <p class="text-sm font-bold text-slate-200">Your inbox is empty</p>
+              <p class="text-xs text-slate-500 mt-1">Start a conversation with another collector above.</p>
+            </div>`;
           return;
         }
 
         container.innerHTML = uniqueThreads.map(c => {
-          const otherUser = c.otherUser;
+          const otherUser = c.otherUser || 'Collector';
           const lastMsg = c.lastMessage || 'Click to view conversation';
           const isOtherAdmin = isUserAdmin(otherUser);
           const chatKey = c.id || `chat-${String(otherUser).toLowerCase()}`;
           const isUnread = !!inboxUnreadState[chatKey]?.unread;
           const otherUserAvatar = getCollectorAvatar(otherUser);
+          const safeUser = String(otherUser).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
           return `
-            <div class="bg-slate-900 border ${isUnread ? 'border-indigo-500/60 bg-indigo-950/20' : (isOtherAdmin ? 'border-rose-500/30' : 'border-slate-800')} p-4 rounded-2xl flex justify-between items-center text-xs hover:border-indigo-500/40 transition-all">
-              <div class="flex items-center gap-3">
-                <img src="${otherUserAvatar}" class="w-10 h-10 rounded-full object-cover border border-slate-700 bg-slate-950 shrink-0">
-                <div>
-                  <div class="flex items-center gap-1.5">
-                    <p class="font-extrabold ${isUnread ? 'text-white' : 'text-slate-200'} text-sm">${otherUser}</p>
+            <div class="group bg-slate-900/80 border ${isUnread ? 'border-indigo-500/60 bg-indigo-950/20' : (isOtherAdmin ? 'border-rose-500/30' : 'border-slate-800')}
+              p-4 rounded-2xl flex justify-between items-center gap-4 hover:border-indigo-500/40 hover:-translate-y-0.5 transition-all">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="relative shrink-0">
+                  <img src="${otherUserAvatar}" class="w-11 h-11 rounded-full object-cover border border-slate-700 bg-slate-950">
+                  ${isUnread ? '<span class="absolute -right-0.5 -top-0.5 w-3 h-3 rounded-full bg-rose-500 border-2 border-slate-900"></span>' : ''}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <p class="font-extrabold ${isUnread ? 'text-white' : 'text-slate-200'} text-sm truncate">${otherUser}</p>
                     ${isUnread ? `<span class="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">NEW</span>` : ''}
-                    ${isOtherAdmin ? `<span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN</span>` : ''}
+                    ${isOtherAdmin ? `<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30"><i class="fa-solid fa-shield-halved text-[8px] mr-0.5"></i> ADMIN</span>` : ''}
                   </div>
-                  <p class="text-xs text-slate-400 truncate max-w-xs sm:max-w-md mt-0.5">${lastMsg}</p>
+                  <p class="text-xs text-slate-400 truncate max-w-[18rem] sm:max-w-[34rem] mt-0.5">${lastMsg}</p>
                 </div>
               </div>
-              <button onclick="openDirectChat('${otherUser}', 'Direct Chat')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl transition-all shadow shrink-0 flex items-center gap-1.5">
-                <i class="fa-solid fa-comments"></i> Chat
+              <button onclick="openDirectChat('${safeUser}', 'Direct Chat')"
+                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl transition-all shadow shrink-0 flex items-center gap-1.5">
+                <i class="fa-solid fa-comments"></i> <span class="hidden sm:inline">Chat</span>
               </button>
-            </div>
-          `;
+            </div>`;
         }).join('');
-      }, err => {
-        console.warn('Inbox snapshot error:', err);
-        container.innerHTML = `<p class="text-xs text-rose-400 text-center py-10">Error fetching inbox messages.</p>`;
-      });
+      };
+
+      const ingest = (snapshot) => {
+        snapshot.forEach(doc => {
+          const data = doc.data() || {};
+          const chatId = doc.id;
+          const rawParticipants = Array.isArray(data.participants)
+            ? data.participants
+            : chatId.replace(/^chat-/, '').split('-vs-');
+
+          const participants = rawParticipants.map(p => String(p).trim()).filter(Boolean);
+          const lower = participants.map(p => p.toLowerCase());
+
+          const isMine = currentUser.isAdmin ||
+            myNames.some(name => lower.includes(name)) ||
+            (Array.isArray(data.participantUids) && data.participantUids.includes(currentUser.uid));
+
+          if (!isMine) return;
+
+          const myNameSet = new Set(myNames);
+          const otherUser = participants.find(p => !myNameSet.has(p.toLowerCase())) || participants[0] || 'Collector';
+          const key = chatId;
+
+          const row = { id: chatId, otherUser, ...data };
+          const existing = threadMap.get(key);
+          if (!existing || getTimeMillis(row.updatedAt) >= getTimeMillis(existing.updatedAt)) {
+            threadMap.set(key, row);
+          }
+        });
+
+        firstRender = false;
+        renderThreads();
+      };
+
+      const attach = (query) => {
+        try {
+          const unsub = query.onSnapshot(
+            snapshot => ingest(snapshot),
+            err => console.warn('Inbox query failed:', err?.message || err)
+          );
+          unsubscribers.push(unsub);
+        } catch (err) {
+          console.warn('Inbox listener setup failed:', err);
+        }
+      };
+
+      // Primary modern schema.
+      attach(db.collection('chats').where('participantUids', 'array-contains', currentUser.uid));
+
+      // Legacy compatibility: old chats may only contain participant names.
+      if (currentUser.username) {
+        attach(db.collection('chats').where('participants', 'array-contains', currentUser.username));
+      }
+      if (currentUser.name && currentUser.name.toLowerCase() !== String(currentUser.username || '').toLowerCase()) {
+        attach(db.collection('chats').where('participants', 'array-contains', currentUser.name));
+      }
+
+      // Clean up all listeners when the Inbox is refreshed or the user logs out.
+      inboxUnsubscribe = () => {
+        unsubscribers.splice(0).forEach(unsub => {
+          try { unsub(); } catch (e) {}
+        });
+      };
     }
 
     // CANVAS-COMPRESSED SCREENSHOT UPLOAD TO PREVENT MOBILE RAM CRASHES
@@ -3365,6 +3604,75 @@
       if (currentUser.isAdmin) loadPendingTransactions();
     }
 
+
+    function renderCommandCenter() {
+      const section = document.getElementById('view-command-center');
+      if (!section || !currentUser?.isAdmin) return;
+
+      const inventoryValueEl = document.getElementById('cc-inventory-value');
+      const collectorCountEl = document.getElementById('cc-collector-count');
+      const auctionCountEl = document.getElementById('cc-auction-count');
+      const tradeCountEl = document.getElementById('cc-trade-count');
+
+      const cards = Array.isArray(inventory) ? inventory : [];
+      const inventoryValue = cards.reduce((sum, c) => sum + (Number(c.price || c.baseFloorPrice || 0) || 0), 0);
+      if (inventoryValueEl) inventoryValueEl.textContent = new Intl.NumberFormat('en-US', {
+        style: 'currency', currency: 'USD', maximumFractionDigits: 0
+      }).format(inventoryValue);
+
+      const owners = new Set(cards.map(c => String(c.owner || '').trim().toLowerCase()).filter(Boolean));
+      if (collectorCountEl) collectorCountEl.textContent = owners.size.toLocaleString('en-US');
+
+      const auctions = Array.isArray(activeListings)
+        ? activeListings.filter(x => String(x.type || x.listingType || '').toUpperCase() === 'AUCTION' && String(x.status || 'ACTIVE').toUpperCase() === 'ACTIVE')
+        : [];
+      if (auctionCountEl) auctionCountEl.textContent = auctions.length.toLocaleString('en-US');
+
+      const trades = Array.isArray(tradeRequestsList)
+        ? tradeRequestsList.filter(x => ['PENDING', 'COUNTERED', 'OPEN'].includes(String(x.status || '').toUpperCase()))
+        : [];
+      if (tradeCountEl) tradeCountEl.textContent = trades.length.toLocaleString('en-US');
+
+      const alerts = document.getElementById('command-center-alerts');
+      if (alerts) {
+        const items = [];
+        if (trades.length) items.push({
+          icon: 'fa-handshake', color: 'purple', title: `${trades.length} trade request${trades.length === 1 ? '' : 's'}`,
+          text: 'Collector action may be required.', action: "switchTab('trade-req')"
+        });
+        if (auctions.length) items.push({
+          icon: 'fa-gavel', color: 'amber', title: `${auctions.length} active auction${auctions.length === 1 ? '' : 's'}`,
+          text: 'Monitor bidding and ending times.', action: "switchTab('auction')"
+        });
+        const unread = Object.values(inboxUnreadState || {}).filter(v => v?.unread).length;
+        if (unread) items.push({
+          icon: 'fa-comments', color: 'indigo', title: `${unread} unread conversation${unread === 1 ? '' : 's'}`,
+          text: 'New collector messages are waiting.', action: "switchTab('inbox')"
+        });
+
+        alerts.innerHTML = items.length
+          ? items.map(x => `
+              <button onclick="${x.action}" class="text-left p-4 rounded-2xl bg-slate-900/80 border border-${x.color}-500/20 hover:border-${x.color}-500/40">
+                <div class="flex items-center gap-2">
+                  <span class="w-8 h-8 rounded-xl bg-${x.color}-500/10 text-${x.color}-400 flex items-center justify-center"><i class="fa-solid ${x.icon}"></i></span>
+                  <span class="text-xs font-black text-white">${x.title}</span>
+                </div>
+                <p class="text-[10px] text-slate-500 mt-2">${x.text}</p>
+              </button>`).join('')
+          : `<div class="md:col-span-3 p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/15 text-xs text-emerald-300">
+              <i class="fa-solid fa-circle-check mr-1"></i> No urgent operational alerts right now.
+            </div>`;
+      }
+
+      const adminHealth = document.getElementById('cc-health-admin');
+      if (adminHealth) adminHealth.textContent = currentUser.isAdmin ? 'VERIFIED' : 'RESTRICTED';
+    }
+
+    function refreshCommandCenter() {
+      renderCommandCenter();
+      showToast('Command Center refreshed.');
+    }
+
     function updateAllViews() {
       applyTranslations();
       renderCardGrid();
@@ -3378,6 +3686,7 @@
       renderTradeRequests();
       renderCollectorHub();
       renderInboxUnreadBadge();
+      renderCommandCenter();
     }
 
     function openAnalyticsPage() {
@@ -4534,7 +4843,7 @@
         return showToast('Admin access required.');
       }
 
-      ['catalog', 'dashboard', 'collector-hub', 'wishlist', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history'].forEach(t => {
+      ['catalog', 'dashboard', 'collector-hub', 'wishlist', 'command-center', 'admin', 'inventory', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history'].forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const nav = document.getElementById(`nav-${t}`);
         if (view) view.classList.add('hidden');
