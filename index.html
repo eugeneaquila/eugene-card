@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#030712">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Beta Edition</title>
+  <title>Eugene Card</title>
 
   <!-- Browser Tab Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
@@ -2553,14 +2553,26 @@ function openAnalyticsPage() {
     function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
     function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
-    async function loginWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      try {
-        await auth.signInWithPopup(provider);
-      } catch (error) {
-        showToast('Google Login Error: ' + error.message);
-      }
-    }
+   import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
+
+async function handleGoogleLogin() {
+  try {
+    // 1. Trigger Native Android Google Account Picker
+    const googleUser = await GoogleSignIn.signIn({
+      clientId: '789014481646-7jk38802a2f4pnd917nv1culc2u8t14g.apps.googleusercontent.com'
+    });
+
+    // 2. Convert Google ID Token into Firebase Credential
+    const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.idToken);
+
+    // 3. Sign in to Firebase Auth inside the app
+    const authResult = await firebase.auth().signInWithCredential(credential);
+    console.log("Logged in user:", authResult.user);
+
+  } catch (error) {
+    console.error("Google native login failed:", error);
+  }
+}
 
     async function handleUserSession(user) {
       const email = user.email ? user.email.toLowerCase() : '';
