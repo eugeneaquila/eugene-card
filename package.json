@@ -3,10 +3,28 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
     "@vercel/speed-insights": "^2.0.0"
   },
   "devDependencies": {
     "npm-package-json-lint": "^8.0.0",
     "typescript": "^5.0.0"
-  }
+  },
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eugeneaquila/eugene-card.git"
+  },
+  "keywords": [],
+  "author": "",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/eugeneaquila/eugene-card/issues"
+  },
+  "homepage": "https://github.com/eugeneaquila/eugene-card#readme"
 }
