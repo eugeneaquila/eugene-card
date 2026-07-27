@@ -14,6 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
   <!-- Tailwind CSS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -38,7 +39,27 @@
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #030712; }
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
-  </style>
+  
+/* ===== Revenue 2.2 financial cockpit ===== */
+.ecr-hero {
+  position:relative; overflow:hidden;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(16,185,129,.13), transparent 25rem),
+    radial-gradient(circle at 10% 100%, rgba(59,130,246,.10), transparent 25rem),
+    rgba(15,23,42,.78);
+}
+.ecr-hero::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.04) 50%,transparent 72%); }
+.ecr-kpi { position:relative; overflow:hidden; }
+.ecr-kpi::after { content:""; position:absolute; right:-25px;bottom:-35px;width:100px;height:100px;border-radius:999px;background:rgba(255,255,255,.025); }
+.ecr-money { letter-spacing:-.045em; }
+.ecr-chart-card { background:linear-gradient(145deg,rgba(15,23,42,.86),rgba(2,6,23,.7)); }
+.ecr-search { background:rgba(2,6,23,.7)!important; border:1px solid rgba(148,163,184,.14)!important; }
+.ecr-search:focus { border-color:rgba(16,185,129,.55)!important; box-shadow:0 0 0 3px rgba(16,185,129,.08)!important; }
+.ecr-signal { border:1px solid rgba(148,163,184,.11); background:rgba(2,6,23,.42); }
+.ecr-signal-dot { width:7px;height:7px;border-radius:999px;display:inline-block;box-shadow:0 0 12px currentColor; }
+@media(max-width:640px){.ecr-money{font-size:1.25rem!important}}
+
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black relative">
 
@@ -71,6 +92,37 @@
 
   <!-- Main Body Content -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8">
+
+    <!-- FINANCIAL COMMAND HERO -->
+    <section class="ecr-hero border border-slate-800/80 rounded-[28px] p-6 md:p-7 shadow-2xl">
+      <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest">
+              <span class="ecr-signal-dot text-emerald-400 bg-emerald-400"></span>
+              <span data-i18n="revenuePulse">REVENUE PULSE</span>
+            </span>
+            <span class="text-[10px] text-slate-500 font-semibold">LIVE</span>
+          </div>
+          <h2 class="text-2xl md:text-3xl font-black tracking-tight text-white">Your marketplace, at a glance.</h2>
+          <p class="text-sm text-slate-400 mt-2" data-i18n="revenuePulseSub">Real-time financial health from approved QRIS sales</p>
+        </div>
+        <div class="grid grid-cols-3 gap-2 sm:gap-3 lg:min-w-[430px]">
+          <div class="ecr-signal rounded-2xl p-3.5">
+            <p class="text-[9px] uppercase tracking-wider font-black text-slate-500" data-i18n="netRevenue">Net Platform Revenue</p>
+            <p id="pulse-net-revenue" class="text-lg font-black text-emerald-300 mt-1">Rp 0</p>
+          </div>
+          <div class="ecr-signal rounded-2xl p-3.5">
+            <p class="text-[9px] uppercase tracking-wider font-black text-slate-500" data-i18n="conversion">Approval Rate</p>
+            <p id="pulse-approval-rate" class="text-lg font-black text-indigo-300 mt-1">0%</p>
+          </div>
+          <div class="ecr-signal rounded-2xl p-3.5">
+            <p class="text-[9px] uppercase tracking-wider font-black text-slate-500" data-i18n="topSeller">Top Revenue Card</p>
+            <p id="pulse-top-card" class="text-lg font-black text-amber-300 mt-1 truncate">—</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- FINANCIAL OVERVIEW BLOCK -->
     <section class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-6 space-y-6 shadow-xl backdrop-blur-sm">
@@ -128,9 +180,61 @@
       </div>
     </section>
 
+    <!-- FINANCIAL VISUALS -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="ecr-chart-card lg:col-span-2 border border-slate-800/80 rounded-3xl p-6 shadow-xl">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-sm font-black text-white tracking-wider" data-i18n="salesTrend">SALES TREND</h3>
+            <p class="text-xs text-slate-500 mt-1" data-i18n="salesTrendSub">Approved sales volume over the selected period</p>
+          </div>
+          <span class="text-[9px] font-black uppercase px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">QRIS</span>
+        </div>
+        <div class="h-64 relative"><canvas id="revenueTrendChart"></canvas></div>
+      </div>
+
+      <div class="ecr-chart-card border border-slate-800/80 rounded-3xl p-6 shadow-xl">
+        <div class="mb-4">
+          <h3 class="text-sm font-black text-white tracking-wider" data-i18n="salesMix">REVENUE MIX</h3>
+          <p class="text-xs text-slate-500 mt-1" data-i18n="salesMixSub">Gross sales vs. platform fee</p>
+        </div>
+        <div class="h-48 relative"><canvas id="revenueMixChart"></canvas></div>
+        <div id="revenue-mix-legend" class="grid grid-cols-2 gap-2 mt-3"></div>
+      </div>
+    </section>
+
+    <section class="bg-slate-900/70 border border-slate-800/80 rounded-3xl p-5 shadow-xl">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h3 class="text-xs font-black text-white tracking-wider" data-i18n="operations">OPERATIONS</h3>
+          <p class="text-[10px] text-slate-500 mt-1">Transaction status distribution</p>
+        </div>
+        <span class="text-[9px] uppercase tracking-wider font-black text-slate-600">LIVE</span>
+      </div>
+      <div class="grid grid-cols-3 gap-3">
+        <div class="ecr-signal rounded-2xl p-4"><p class="text-[9px] uppercase font-black text-slate-500" data-i18n="approved">Approved</p><p id="ops-approved" class="text-xl font-black text-emerald-300 mt-1">0</p></div>
+        <div class="ecr-signal rounded-2xl p-4"><p class="text-[9px] uppercase font-black text-slate-500" data-i18n="pending">Pending</p><p id="ops-pending" class="text-xl font-black text-amber-300 mt-1">0</p></div>
+        <div class="ecr-signal rounded-2xl p-4"><p class="text-[9px] uppercase font-black text-slate-500" data-i18n="rejected">Rejected</p><p id="ops-rejected" class="text-xl font-black text-rose-300 mt-1">0</p></div>
+      </div>
+    </section>
+
     <!-- CARD-LEVEL PROFITABILITY BREAKDOWN -->
     <section class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-6 space-y-4 shadow-xl">
-      <h3 class="text-xs font-extrabold text-white uppercase tracking-wider" data-i18n="breakdownTitle">CARD-LEVEL PROFITABILITY BREAKDOWN</h3>
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h3 class="text-xs font-extrabold text-white uppercase tracking-wider" data-i18n="breakdownTitle">CARD-LEVEL PROFITABILITY BREAKDOWN</h3>
+          <p id="revenue-table-count" class="text-[10px] text-slate-500 mt-1">0 cards</p>
+        </div>
+        <div class="flex gap-2 w-full md:w-auto">
+          <div class="relative flex-1 md:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input id="revenue-card-search" oninput="renderCardProfitabilityTable(window.__lastCardRevenueMap || {})" class="ecr-search w-full rounded-xl pl-9 pr-3 py-2.5 text-xs text-white" data-i18n-placeholder="searchCards" placeholder="Search by serial or card name...">
+          </div>
+          <button onclick="exportRevenueCSV()" class="px-3 py-2.5 rounded-xl border border-emerald-500/25 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-300 text-[10px] font-black whitespace-nowrap">
+            <i class="fa-solid fa-file-csv mr-1"></i><span data-i18n="exportCsv">Export CSV</span>
+          </button>
+        </div>
+      </div>
 
       <div class="bg-slate-950/80 border border-slate-800/80 rounded-2xl overflow-hidden">
         <div class="overflow-x-auto max-h-[500px]">
@@ -179,6 +283,22 @@
     const revI18n = {
       EN: {
         revTitle: "ADMIN REVENUE & FINANCIAL HUB",
+        revenuePulse: "REVENUE PULSE",
+        revenuePulseSub: "Real-time financial health from approved QRIS sales",
+        netRevenue: "Net Platform Revenue",
+        conversion: "Approval Rate",
+        topSeller: "Top Revenue Card",
+        salesTrend: "SALES TREND",
+        salesTrendSub: "Approved sales volume over the selected period",
+        salesMix: "REVENUE MIX",
+        salesMixSub: "Gross sales vs. platform fee",
+        operations: "OPERATIONS",
+        approved: "Approved",
+        pending: "Pending",
+        rejected: "Rejected",
+        searchCards: "Search by serial or card name...",
+        exportCsv: "Export CSV",
+        noMatches: "No cards match your search." ,
         revSubtitle: "Dedicated Financial & Profitability Analytics Engine",
         btnBack: "Back to Marketplace",
         overviewTitle: "FINANCIAL OVERVIEW",
@@ -207,6 +327,22 @@
       },
       ID: {
         revTitle: "PUSAT PENDAPATAN & KEUANGAN ADMIN",
+        revenuePulse: "PANTAUAN PENDAPATAN",
+        revenuePulseSub: "Kesehatan keuangan real-time dari penjualan QRIS yang disetujui",
+        netRevenue: "Pendapatan Bersih Platform",
+        conversion: "Tingkat Persetujuan",
+        topSeller: "Kartu Pendapatan Tertinggi",
+        salesTrend: "TREN PENJUALAN",
+        salesTrendSub: "Volume penjualan disetujui pada periode terpilih",
+        salesMix: "KOMPOSISI PENDAPATAN",
+        salesMixSub: "Penjualan kotor vs biaya platform",
+        operations: "OPERASIONAL",
+        approved: "Disetujui",
+        pending: "Menunggu",
+        rejected: "Ditolak",
+        searchCards: "Cari berdasarkan serial atau nama kartu...",
+        exportCsv: "Ekspor CSV",
+        noMatches: "Tidak ada kartu yang cocok." ,
         revSubtitle: "Mesin Analitik Keuangan & Profitabilitas Khusus",
         btnBack: "Kembali ke Pasar",
         overviewTitle: "RINGKASAN KEUANGAN",
@@ -245,6 +381,10 @@
 
     function applyRevenueTranslations() {
       const dict = revI18n[currentRevLang];
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) el.placeholder = dict[key];
+      });
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (dict[key]) el.innerText = dict[key];
@@ -274,41 +414,122 @@
       });
     }
 
-    function calculateAndRenderRevenue() {
+
+    let revenueTrendChartInstance = null;
+    let revenueMixChartInstance = null;
+    window.__lastCardRevenueMap = {};
+
+    function getTxDate(tx) {
+      if (!tx || !tx.created_at) return null;
+      if (tx.created_at.toDate) return tx.created_at.toDate();
+      const d = new Date(tx.created_at);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function getFilteredApprovedTransactions() {
       const selectedFilter = document.getElementById('time-filter').value;
       const now = new Date();
-
-      const approvedTx = rawTransactions.filter(tx => {
+      return rawTransactions.filter(tx => {
         if (tx.status !== 'APPROVED') return false;
-        if (!tx.created_at) return true;
-
-        const txDate = new Date(tx.created_at);
-        if (selectedFilter === 'TODAY') {
-          return txDate.toDateString() === now.toDateString();
-        } else if (selectedFilter === 'WEEK') {
-          const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          return txDate >= sevenDaysAgo;
-        } else if (selectedFilter === 'MONTH') {
-          return txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
-        }
+        const txDate = getTxDate(tx);
+        if (!txDate) return true;
+        if (selectedFilter === 'TODAY') return txDate.toDateString() === now.toDateString();
+        if (selectedFilter === 'WEEK') return txDate >= new Date(now.getTime() - 7*24*60*60*1000);
+        if (selectedFilter === 'MONTH') return txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
         return true;
       });
+    }
+
+    function renderRevenueDashboardCharts(approvedTx, gross, tax) {
+      const trendCanvas = document.getElementById('revenueTrendChart');
+      const mixCanvas = document.getElementById('revenueMixChart');
+      if (!trendCanvas || !mixCanvas) return;
+
+      const labels = [];
+      const values = [];
+      const now = new Date();
+      const filter = document.getElementById('time-filter').value;
+
+      if (filter === 'TODAY') {
+        for (let h=0; h<24; h++) { labels.push(`${String(h).padStart(2,'0')}:00`); values.push(0); }
+        approvedTx.forEach(tx => { const d=getTxDate(tx); if(d) values[d.getHours()] += parseFloat(tx.total_amount)||0; });
+      } else if (filter === 'WEEK') {
+        for (let i=6; i>=0; i--) { const d=new Date(now); d.setDate(now.getDate()-i); labels.push(d.toLocaleDateString('en-US',{weekday:'short'})); values.push(0); }
+        approvedTx.forEach(tx => { const d=getTxDate(tx); if(d){ const days=Math.floor((new Date(now.toDateString())-new Date(d.toDateString()))/86400000); if(days>=0&&days<=6) values[6-days]+=parseFloat(tx.total_amount)||0; }});
+      } else {
+        const months = [];
+        for (let i=5;i>=0;i--) { const d=new Date(now.getFullYear(),now.getMonth()-i,1); months.push(d); labels.push(d.toLocaleDateString('en-US',{month:'short'})); values.push(0); }
+        approvedTx.forEach(tx => { const d=getTxDate(tx); if(d){ const idx=months.findIndex(m=>m.getFullYear()===d.getFullYear()&&m.getMonth()===d.getMonth()); if(idx>=0) values[idx]+=parseFloat(tx.total_amount)||0; }});
+      }
+
+      if (revenueTrendChartInstance) revenueTrendChartInstance.destroy();
+      revenueTrendChartInstance = new Chart(trendCanvas.getContext('2d'), {
+        type:'line',
+        data:{labels,datasets:[{label:'Approved Sales',data:values,borderColor:'#34d399',backgroundColor:'rgba(52,211,153,.10)',fill:true,tension:.35,pointRadius:3,pointBackgroundColor:'#34d399'}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>formatIDR(c.raw)}}},scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'rgba(255,255,255,.035)'}},y:{beginAtZero:true,ticks:{color:'#64748b',font:{size:10},callback:v=>formatIDR(v)},grid:{color:'rgba(255,255,255,.035)'}}}}
+      });
+
+      if (revenueMixChartInstance) revenueMixChartInstance.destroy();
+      revenueMixChartInstance = new Chart(mixCanvas.getContext('2d'), {
+        type:'doughnut',
+        data:{labels:['Gross Sales','Platform Fee'],datasets:[{data:[Math.max(gross,0),Math.max(tax,0)],backgroundColor:['#34d399','#fbbf24'],borderWidth:0}]},
+        options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${formatIDR(c.raw)}`}}}}
+      });
+      document.getElementById('revenue-mix-legend').innerHTML = `
+        <div class="rounded-xl bg-emerald-500/5 border border-emerald-500/10 p-2.5"><p class="text-[9px] text-slate-500 uppercase font-black">Gross</p><p class="text-xs text-emerald-300 font-bold mt-1">${formatIDR(gross)}</p></div>
+        <div class="rounded-xl bg-amber-500/5 border border-amber-500/10 p-2.5"><p class="text-[9px] text-slate-500 uppercase font-black">Fee</p><p class="text-xs text-amber-300 font-bold mt-1">${formatIDR(tax)}</p></div>`;
+    }
+
+    function renderRevenuePulse(approvedTx, gross, tax) {
+      const approved = rawTransactions.filter(t=>t.status==='APPROVED').length;
+      const pending = rawTransactions.filter(t=>['PENDING','WAITING','AWAITING_PAYMENT'].includes(String(t.status||'').toUpperCase())).length;
+      const rejected = rawTransactions.filter(t=>['REJECTED','CANCELLED','DECLINED'].includes(String(t.status||'').toUpperCase())).length;
+      const total = rawTransactions.length;
+      document.getElementById('pulse-net-revenue').innerText = formatIDR(tax);
+      document.getElementById('pulse-approval-rate').innerText = `${total ? Math.round(approved/total*100) : 0}%`;
+      document.getElementById('ops-approved').innerText = approved;
+      document.getElementById('ops-pending').innerText = pending;
+      document.getElementById('ops-rejected').innerText = rejected;
+
+      const cardTotals = {};
+      approvedTx.forEach(tx => (tx.items||[]).forEach(item => {
+        const id=item.id||item.serial; if(id) cardTotals[id]=(cardTotals[id]||0)+(parseFloat(item.price)||0);
+      }));
+      const top = Object.entries(cardTotals).sort((a,b)=>b[1]-a[1])[0];
+      let label = '—';
+      if (top) {
+        const card = rawCards.find(c=>c.id===top[0] || c.serial===top[0]);
+        label = card?.serial || card?.name || top[0];
+      }
+      document.getElementById('pulse-top-card').innerText = label;
+    }
+
+    function exportRevenueCSV() {
+      const map = window.__lastCardRevenueMap || {};
+      const query = (document.getElementById('revenue-card-search')?.value || '').trim().toLowerCase();
+      const rows = [['Serial','Card Name','Base Price','Sales Revenue','Status']];
+      rawCards.filter(card => !query || String(card.serial||'').toLowerCase().includes(query) || String(card.name||'').toLowerCase().includes(query))
+        .forEach(card => rows.push([card.serial||'',card.name||'',card.price||0,map[card.id]||map[card.serial]||0,card.status||'AVAILABLE']));
+      const csv = rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`eugene-card-revenue-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    function calculateAndRenderRevenue() {
+      const approvedTx = getFilteredApprovedTransactions();
 
       let totalGrossSales = 0;
-      let completedSalesCount = approvedTx.length;
+      const completedSalesCount = approvedTx.length;
       const cardSalesRevenueMap = {};
 
       approvedTx.forEach(tx => {
         const amount = parseFloat(tx.total_amount) || 0;
         totalGrossSales += amount;
-
         if (Array.isArray(tx.items)) {
           tx.items.forEach(item => {
             const cardId = item.id || item.serial;
             const itemPrice = parseFloat(item.price) || 0;
-            if (cardId) {
-              cardSalesRevenueMap[cardId] = (cardSalesRevenueMap[cardId] || 0) + itemPrice;
-            }
+            if (cardId) cardSalesRevenueMap[cardId] = (cardSalesRevenueMap[cardId] || 0) + itemPrice;
           });
         }
       });
@@ -321,6 +542,9 @@
       document.getElementById('kpi-completed-sales').innerText = completedSalesCount;
       document.getElementById('kpi-avg-order-value').innerText = formatIDR(avgOrderValue);
 
+      window.__lastCardRevenueMap = cardSalesRevenueMap;
+      renderRevenuePulse(approvedTx, totalGrossSales, totalPlatformTax);
+      renderRevenueDashboardCharts(approvedTx, totalGrossSales, totalPlatformTax);
       renderCardProfitabilityTable(cardSalesRevenueMap);
     }
 
@@ -333,26 +557,34 @@
         return;
       }
 
-      const sortedCards = [...rawCards].sort((a, b) => (a.serial || '').localeCompare(b.serial || '', undefined, { numeric: true }));
+      const query = (document.getElementById('revenue-card-search')?.value || '').trim().toLowerCase();
+      const sortedCards = [...rawCards]
+        .map(card => ({...card, _revenue: cardRevenueMap[card.id] || cardRevenueMap[card.serial] || 0}))
+        .filter(card => !query || String(card.serial||'').toLowerCase().includes(query) || String(card.name||'').toLowerCase().includes(query))
+        .sort((a,b) => b._revenue - a._revenue || (a.serial||'').localeCompare(b.serial||'', undefined, {numeric:true}));
+
+      document.getElementById('revenue-table-count').innerText = `${sortedCards.length} cards`;
+
+      if (!sortedCards.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">${revI18n[currentRevLang].noMatches}</td></tr>`;
+        return;
+      }
 
       tbody.innerHTML = sortedCards.map(card => {
-        const totalRev = cardRevenueMap[card.id] || cardRevenueMap[card.serial] || 0;
         const isSold = card.status === 'SOLD';
         const statusLabel = isSold ? (currentRevLang === 'ID' ? 'TERJUAL' : 'SOLD') : (currentRevLang === 'ID' ? 'TERSEDIA' : 'AVAILABLE');
-
         return `
           <tr class="hover:bg-slate-950/60 transition-colors">
             <td class="p-3.5 font-mono font-bold text-amber-400">${card.serial || '*--'}</td>
             <td class="p-3.5 font-bold text-white">${card.name || 'Unnamed Card'}</td>
             <td class="p-3.5 font-mono text-slate-300">${formatIDR(card.price || 0)}</td>
-            <td class="p-3.5 font-mono font-extrabold text-emerald-400">${formatIDR(totalRev)}</td>
+            <td class="p-3.5 font-mono font-extrabold text-emerald-400">${formatIDR(card._revenue)}</td>
             <td class="p-3.5">
               <span class="text-[9px] font-black px-2 py-0.5 rounded-full ${isSold ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
                 ${statusLabel}
               </span>
             </td>
-          </tr>
-        `;
+          </tr>`;
       }).join('');
     }
 
