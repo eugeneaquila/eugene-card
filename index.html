@@ -101,8 +101,13 @@
           <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navRequests">Trade Requests</span>
         </button>
         
-        <!-- Analytics Navigation Button -->
-        <button onclick="openAnalyticsPage()" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30 transition-all">
+       <!-- Revenue Navigation Button (Opens revenue.html in a new tab) -->
+        <button onclick="openRevenuePage()" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-emerald-950/40 border border-emerald-500/40 transition-all">
+          <i class="fa-solid fa-sack-dollar text-emerald-400"></i> <span data-i18n="navRevenue">Revenue</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-0.5 opacity-70"></i>
+        </button>
+
+        <!-- Analytics Navigation Button (Opens analytics.html in a new tab) -->
+        <button onclick="openAnalyticsPage()" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/40 border border-amber-500/40 transition-all">
           <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-0.5 opacity-70"></i>
         </button>
 
@@ -1425,6 +1430,12 @@
       const lower = identifier.toLowerCase().trim();
       return ADMIN_EMAILS.some(e => e.toLowerCase() === lower || e.split('@')[0].toLowerCase() === lower);
     }
+
+function openAnalyticsPage() {
+  if (!currentUser || !currentUser.isAdmin) {
+    return showToast('Analytics Hub is restricted exclusively to Admins.');
+  }
+  window.open('analytics.html', '_blank');
 
     async function loadCollectorProfiles() {
       try {
