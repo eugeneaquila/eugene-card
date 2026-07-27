@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#030712">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card</title>
+  <title>Eugene Card Marketplace | Beta Edition</title>
 
   <!-- Browser Tab Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
@@ -103,9 +101,9 @@
           <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navRequests">Trade Requests</span>
         </button>
         
-        <!-- Revenue Navigation Button (Opens revenue.html in a new tab) -->
-        <button onclick="openRevenuePage()" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-emerald-950/40 border border-emerald-500/40 transition-all">
-          <i class="fa-solid fa-sack-dollar text-emerald-400"></i> <span data-i18n="navRevenue">Revenue</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-0.5 opacity-70"></i>
+        <!-- Analytics Navigation Button -->
+        <button onclick="openAnalyticsPage()" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30 transition-all">
+          <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-0.5 opacity-70"></i>
         </button>
 
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
@@ -114,11 +112,6 @@
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-users text-teal-400"></i> <span data-i18n="navHolders">Holders</span>
         </button>
-		
-		<!-- Analytics Navigation Button (Admin Only) -->
-<button onclick="openAnalyticsPage()" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/40 border border-amber-500/40 transition-all">
-  <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px] ml-0.5 opacity-70"></i>
-</button>
         <button id="nav-history" onclick="switchTab('history')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
           <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span data-i18n="navHistory">History</span>
         </button>
@@ -1042,7 +1035,7 @@
         navTrade: "Trade",
         navAuction: "Auction",
         navRequests: "Trade Requests",
-        navRevenue: "Revenue",
+        navAnalytics: "Analytics",
         navInbox: "Inbox",
         navHolders: "Holders",
         navHistory: "History",
@@ -1227,7 +1220,7 @@
         navTrade: "Perdagangan",
         navAuction: "Lelang",
         navRequests: "Permintaan Tukar",
-        navRevenue: "Pendapatan",
+        navAnalytics: "Analitik",
         navInbox: "Pesan",
         navHolders: "Kolektor",
         navHistory: "Riwayat",
@@ -2363,19 +2356,12 @@
       renderTradeRequests();
     }
 
-    function openRevenuePage() {
+    function openAnalyticsPage() {
       if (!currentUser || !currentUser.isAdmin) {
-        return showToast('Revenue Hub is restricted exclusively to Admins.');
+        return showToast('Market Analytics is restricted exclusively to Admins.');
       }
-      window.open('revenue.html', '_blank');
+      window.open('analytics.html', '_blank');
     }
-
-function openAnalyticsPage() {
-  if (!currentUser || !currentUser.isAdmin) {
-    return showToast('Analytics Hub is restricted exclusively to Admins.');
-  }
-  window.open('analytics.html', '_blank');
-}
 
     function renderAuctionView() {
       const titleEl = document.getElementById('auction-card-title');
@@ -2553,26 +2539,14 @@ function openAnalyticsPage() {
     function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
     function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
-   import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
-
-async function handleGoogleLogin() {
-  try {
-    // 1. Trigger Native Android Google Account Picker
-    const googleUser = await GoogleSignIn.signIn({
-      clientId: '789014481646-7jk38802a2f4pnd917nv1culc2u8t14g.apps.googleusercontent.com'
-    });
-
-    // 2. Convert Google ID Token into Firebase Credential
-    const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.idToken);
-
-    // 3. Sign in to Firebase Auth inside the app
-    const authResult = await firebase.auth().signInWithCredential(credential);
-    console.log("Logged in user:", authResult.user);
-
-  } catch (error) {
-    console.error("Google native login failed:", error);
-  }
-}
+    async function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        await auth.signInWithPopup(provider);
+      } catch (error) {
+        showToast('Google Login Error: ' + error.message);
+      }
+    }
 
     async function handleUserSession(user) {
       const email = user.email ? user.email.toLowerCase() : '';
@@ -4236,25 +4210,31 @@ async function handleGoogleLogin() {
       return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
     }
 
+    // The native file-input button text ("Choose File") is browser UI chrome —
+    // it follows the browser's own language setting and cannot be translated
+    // via CSS or JS. These file inputs are visually hidden and triggered by a
+    // <label for="..."> styled as a button instead, with this function keeping
+    // the "selected filename" text next to it in sync and in the right language.
+    function updateFileNameDisplay(inputEl, displayElId) {
+      const displayEl = document.getElementById(displayElId);
+      if (!displayEl) return;
+      if (inputEl.files && inputEl.files.length > 0) {
+        displayEl.textContent = inputEl.files[0].name;
+        displayEl.classList.remove('text-slate-500');
+        displayEl.classList.add('text-emerald-400');
+      } else {
+        displayEl.textContent = currentLanguage === 'ID' ? 'Belum ada file dipilih' : 'No file chosen';
+        displayEl.classList.remove('text-emerald-400');
+        displayEl.classList.add('text-slate-500');
+      }
+    }
+
     function showToast(msg) {
       const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toast-msg');
-      if (!toast || !toastMsg) return;
-      toastMsg.innerText = msg;
-      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
-      setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
-      }, 3000);
+      document.getElementById('toast-msg').innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
     }
-	
-	if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('Service Worker registered successfully! Scope:', reg.scope))
-        .catch(err => console.error('Service Worker registration failed:', err));
-    });
-  }
   </script>
-  
 </body>
 </html>
