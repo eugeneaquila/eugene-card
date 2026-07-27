@@ -1030,13 +1030,6 @@
     const CARDS_PER_BATCH = 10;
     let scrollObserver = null;
 
-function openAnalyticsPage() {
-  if (!currentUser || !currentUser.isAdmin) {
-    return showToast('Analytics Hub is restricted exclusively to Admins.');
-  }
-  window.open('analytics.html', '_blank');
-}
-
     // Comprehensive i18n Dictionary
     const i18nDict = {
       EN: {
@@ -2374,6 +2367,13 @@ function openAnalyticsPage() {
       }
       window.open('revenue.html', '_blank');
     }
+
+function openAnalyticsPage() {
+  if (!currentUser || !currentUser.isAdmin) {
+    return showToast('Analytics Hub is restricted exclusively to Admins.');
+  }
+  window.open('analytics.html', '_blank');
+}
 
     function renderAuctionView() {
       const titleEl = document.getElementById('auction-card-title');
