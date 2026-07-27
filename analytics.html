@@ -6,7 +6,7 @@
   <title>Eugene Card Marketplace | Advanced Predictive Analytics</title>
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%234f46e5' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%236366f1'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
 
   <!-- Google Firebase Compatibility SDKs (v10.7.1) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -165,24 +165,24 @@
         </div>
       </div>
 
-      <!-- CARD FUTURE VALUE TABLE -->
-      <div class="overflow-x-auto max-h-[550px]">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0 z-10">
+      <!-- REFINED CARD FUTURE VALUE TABLE -->
+      <div class="overflow-x-auto max-h-[550px] rounded-2xl border border-slate-800/80">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0 z-10 font-bold uppercase tracking-wider">
             <tr>
-              <th class="p-3" data-i18n="thSerial">Serial</th>
-              <th class="p-3" data-i18n="thName">Card Name</th>
-              <th class="p-3" data-i18n="thType">Type</th>
-              <th class="p-3" data-i18n="thCurrentPrice">Current Floor</th>
-              <th class="p-3 text-emerald-400 font-extrabold" data-i18n="thNextTradePrice">Est. Price After Next Trade</th>
-              <th class="p-3 text-emerald-400" data-i18n="thTradeDelta">Post-Trade Gain ($\Delta$)</th>
-              <th class="p-3" data-i18n="th6mEst">6-Mo. Est.</th>
-              <th class="p-3" data-i18n="th12mEst">12-Mo. Est.</th>
-              <th class="p-3 text-right" data-i18n="thRating">Stability & Rating</th>
+              <th class="p-3.5 whitespace-nowrap" data-i18n="thSerial">Serial</th>
+              <th class="p-3.5 whitespace-nowrap" data-i18n="thName">Card Name</th>
+              <th class="p-3.5 whitespace-nowrap" data-i18n="thType">Type</th>
+              <th class="p-3.5 whitespace-nowrap" data-i18n="thCurrentPrice">Current Floor</th>
+              <th class="p-3.5 whitespace-nowrap text-emerald-400" data-i18n="thNextTradePrice">Est. Price After Next Trade</th>
+              <th class="p-3.5 whitespace-nowrap text-emerald-400" data-i18n="thTradeDelta">Post-Trade Gain</th>
+              <th class="p-3.5 whitespace-nowrap text-indigo-300" data-i18n="th6mEst">6-Mo. Est. Price</th>
+              <th class="p-3.5 whitespace-nowrap text-indigo-400" data-i18n="th12mEst">12-Mo. Est. Price</th>
+              <th class="p-3.5 whitespace-nowrap text-right" data-i18n="thRating">Stability & Rating</th>
             </tr>
           </thead>
-          <tbody id="predictive-table-body" class="divide-y divide-slate-800">
-            <tr><td colspan="9" class="p-6 text-center text-slate-500" data-i18n="listeningRealtime">Listening to real-time database updates...</td></tr>
+          <tbody id="predictive-table-body" class="divide-y divide-slate-800/60 bg-slate-950/40">
+            <tr><td colspan="9" class="p-8 text-center text-slate-500" data-i18n="listeningRealtime">Listening to real-time database updates...</td></tr>
           </tbody>
         </table>
       </div>
@@ -244,9 +244,9 @@
         thType: "Type",
         thCurrentPrice: "Current Floor",
         thNextTradePrice: "Est. Price After Next Trade",
-        thTradeDelta: "Post-Trade Gain (Δ)",
-        th6mEst: "6-Mo. Est.",
-        th12mEst: "12-Mo. Est.",
+        thTradeDelta: "Post-Trade Gain",
+        th6mEst: "6-Mo. Est. Price",
+        th12mEst: "12-Mo. Est. Price",
         thRating: "Stability & Rating",
         listeningRealtime: "Listening to real-time database updates...",
         noCardsDb: "No card inventory found in database.",
@@ -283,9 +283,9 @@
         thType: "Tipe",
         thCurrentPrice: "Harga Dasar",
         thNextTradePrice: "Est. Harga Pasca-Transaksi",
-        thTradeDelta: "Kenaikan Pasca-Transaksi (Δ)",
-        th6mEst: "Est. 6-Bln",
-        th12mEst: "Est. 12-Bln",
+        thTradeDelta: "Kenaikan Pasca-Transaksi",
+        th6mEst: "Est. Harga 6-Bln",
+        th12mEst: "Est. Harga 12-Bln",
         thRating: "Peringkat Stabilitas",
         listeningRealtime: "Mendengarkan pembaruan database real-time...",
         noCardsDb: "Tidak ada inventaris kartu di database.",
@@ -484,16 +484,25 @@
         const pctGain12m = Math.round(((c.est12m - c.currentPrice) / c.currentPrice) * 100);
 
         return `
-          <tr class="hover:bg-slate-950/60 transition-colors">
-            <td class="p-3 font-mono font-bold text-amber-400">${c.serial || '*0001'}</td>
-            <td class="p-3 font-bold text-white">${c.name || 'Card'}</td>
-            <td class="p-3 font-mono ${c.type === 'PREMIUM' ? 'text-amber-400 font-bold' : 'text-blue-400'}">${c.type || 'STANDARD'}</td>
-            <td class="p-3 font-mono text-slate-300">${formatIDR(c.currentPrice)}</td>
-            <td class="p-3 font-mono text-emerald-400 font-black">${formatIDR(c.estNextTradePrice)}</td>
-            <td class="p-3 font-mono text-emerald-400 font-bold">+${formatIDR(c.nextTradeDelta)} (<span class="text-amber-400">+${c.nextTradePctGain}%</span>)</td>
-            <td class="p-3 font-mono text-indigo-300 font-bold">${formatIDR(c.est6m)} <span class="text-xs text-amber-400 font-normal">(+${pctGain6m}%)</span></td>
-            <td class="p-3 font-mono text-indigo-400 font-black">${formatIDR(c.est12m)} <span class="text-xs text-amber-400 font-normal">(+${pctGain12m}%)</span></td>
-            <td class="p-3 text-right space-x-1">
+          <tr class="hover:bg-slate-900/60 transition-colors border-b border-slate-800/40 last:border-0">
+            <td class="p-3.5 font-mono font-bold text-amber-400 whitespace-nowrap">${c.serial || '*0001'}</td>
+            <td class="p-3.5 font-bold text-white whitespace-nowrap">${c.name || 'Card'}</td>
+            <td class="p-3.5 font-mono whitespace-nowrap ${c.type === 'PREMIUM' ? 'text-amber-400 font-bold' : 'text-blue-400'}">${c.type || 'STANDARD'}</td>
+            <td class="p-3.5 font-mono text-slate-300 whitespace-nowrap">${formatIDR(c.currentPrice)}</td>
+            <td class="p-3.5 font-mono text-emerald-400 font-black whitespace-nowrap">${formatIDR(c.estNextTradePrice)}</td>
+            <td class="p-3.5 font-mono whitespace-nowrap">
+              <span class="text-emerald-400 font-bold">+${formatIDR(c.nextTradeDelta)}</span>
+              <span class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">+${c.nextTradePctGain}%</span>
+            </td>
+            <td class="p-3.5 font-mono whitespace-nowrap">
+              <span class="text-indigo-300 font-bold">${formatIDR(c.est6m)}</span>
+              <span class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/10 text-amber-400 border border-amber-500/20">+${pctGain6m}%</span>
+            </td>
+            <td class="p-3.5 font-mono whitespace-nowrap">
+              <span class="text-indigo-400 font-black">${formatIDR(c.est12m)}</span>
+              <span class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/10 text-amber-400 border border-amber-500/20">+${pctGain12m}%</span>
+            </td>
+            <td class="p-3.5 text-right whitespace-nowrap space-x-1">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">${c.stabilityScore}% ${dict.stableLabel}</span>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">${c.liquidityRating}</span>
             </td>
