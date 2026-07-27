@@ -151,7 +151,7 @@
       </div>
     </div>
 
-    <!-- FORECAST SCENARIO SIMULATOR WITH POST-TRADE ESTIMATES -->
+    <!-- FORECAST SCENARIO SIMULATOR -->
     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
         <div>
@@ -165,7 +165,7 @@
         </div>
       </div>
 
-      <!-- CARD FUTURE VALUE & STABILITY PREDICTION TABLE -->
+      <!-- CARD FUTURE VALUE TABLE -->
       <div class="overflow-x-auto max-h-[550px]">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 sticky top-0 z-10">
@@ -176,8 +176,8 @@
               <th class="p-3" data-i18n="thCurrentPrice">Current Floor</th>
               <th class="p-3 text-emerald-400 font-extrabold" data-i18n="thNextTradePrice">Est. Price After Next Trade</th>
               <th class="p-3 text-emerald-400" data-i18n="thTradeDelta">Post-Trade Gain ($\Delta$)</th>
-              <th class="p-3" data-i18n="th6mEst">6-Mo. Est. Price</th>
-              <th class="p-3" data-i18n="th12mEst">12-Mo. Est. Price</th>
+              <th class="p-3" data-i18n="th6mEst">6-Mo. Est.</th>
+              <th class="p-3" data-i18n="th12mEst">12-Mo. Est.</th>
               <th class="p-3 text-right" data-i18n="thRating">Stability & Rating</th>
             </tr>
           </thead>
@@ -421,8 +421,6 @@
         const mult6m = isPremium ? sc.prem6m : sc.std6m;
         const mult12m = isPremium ? sc.prem12m : sc.std12m;
 
-        // Post-Trade Floor Price Estimation Formula
-        const cardTrades = rawTradeCountsMap[c.id] || rawTradeCountsMap[c.serial] || 0;
         const baseBump = isPremium ? (sc.tradeBump + 0.02) : sc.tradeBump;
         const estNextTradePrice = Math.round(currentPrice * baseBump);
         const nextTradeDelta = estNextTradePrice - currentPrice;
@@ -431,7 +429,6 @@
         const est6m = Math.round(currentPrice * mult6m);
         const est12m = Math.round(currentPrice * mult12m);
         const delta12m = est12m - currentPrice;
-        const pctGain12m = Math.round(((est12m - currentPrice) / currentPrice) * 100);
 
         const hasOwner = c.owner && c.owner !== 'Admin House' && c.owner !== 'Unowned';
         const stabilityScore = isPremium 
@@ -450,11 +447,9 @@
           estNextTradePrice,
           nextTradeDelta,
           nextTradePctGain,
-          cardTrades,
           est6m,
           est12m,
           delta12m,
-          pctGain12m,
           stabilityScore,
           liquidityRating
         };
@@ -484,22 +479,27 @@
       const dict = analyticsI18n[currentAnalyticsLang];
       predictiveCards.sort((a, b) => (a.serial || a.id || '').localeCompare(b.serial || b.id || '', undefined, { numeric: true }));
 
-      tbody.innerHTML = predictiveCards.map(c => `
-        <tr class="hover:bg-slate-950/60 transition-colors">
-          <td class="p-3 font-mono font-bold text-amber-400">${c.serial || '*0001'}</td>
-          <td class="p-3 font-bold text-white">${c.name || 'Card'}</td>
-          <td class="p-3 font-mono ${c.type === 'PREMIUM' ? 'text-amber-400 font-bold' : 'text-blue-400'}">${c.type || 'STANDARD'}</td>
-          <td class="p-3 font-mono text-slate-300">${formatIDR(c.currentPrice)}</td>
-          <td class="p-3 font-mono text-emerald-400 font-black">${formatIDR(c.estNextTradePrice)}</td>
-          <td class="p-3 font-mono text-emerald-400 font-bold">+${formatIDR(c.nextTradeDelta)} (<span class="text-amber-400">+${c.nextTradePctGain}%</span>)</td>
-          <td class="p-3 font-mono text-indigo-300 font-bold">${formatIDR(c.est6m)}</td>
-          <td class="p-3 font-mono text-indigo-400 font-black">${formatIDR(c.est12m)}</td>
-          <td class="p-3 text-right space-x-1">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">${c.stabilityScore}% ${dict.stableLabel}</span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">${c.liquidityRating}</span>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = predictiveCards.map(c => {
+        const pctGain6m = Math.round(((c.est6m - c.currentPrice) / c.currentPrice) * 100);
+        const pctGain12m = Math.round(((c.est12m - c.currentPrice) / c.currentPrice) * 100);
+
+        return `
+          <tr class="hover:bg-slate-950/60 transition-colors">
+            <td class="p-3 font-mono font-bold text-amber-400">${c.serial || '*0001'}</td>
+            <td class="p-3 font-bold text-white">${c.name || 'Card'}</td>
+            <td class="p-3 font-mono ${c.type === 'PREMIUM' ? 'text-amber-400 font-bold' : 'text-blue-400'}">${c.type || 'STANDARD'}</td>
+            <td class="p-3 font-mono text-slate-300">${formatIDR(c.currentPrice)}</td>
+            <td class="p-3 font-mono text-emerald-400 font-black">${formatIDR(c.estNextTradePrice)}</td>
+            <td class="p-3 font-mono text-emerald-400 font-bold">+${formatIDR(c.nextTradeDelta)} (<span class="text-amber-400">+${c.nextTradePctGain}%</span>)</td>
+            <td class="p-3 font-mono text-indigo-300 font-bold">${formatIDR(c.est6m)} <span class="text-xs text-amber-400 font-normal">(+${pctGain6m}%)</span></td>
+            <td class="p-3 font-mono text-indigo-400 font-black">${formatIDR(c.est12m)} <span class="text-xs text-amber-400 font-normal">(+${pctGain12m}%)</span></td>
+            <td class="p-3 text-right space-x-1">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">${c.stabilityScore}% ${dict.stableLabel}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">${c.liquidityRating}</span>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function renderTrendAndForecastChart(currentVal, futureVal) {
