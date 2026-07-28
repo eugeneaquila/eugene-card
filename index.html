@@ -412,6 +412,40 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
 .ec3-activity{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid rgba(148,163,184,.07)}.ec3-activity:last-child{border-bottom:0}.ec3-activity-icon{width:30px;height:30px;border-radius:10px;background:rgba(99,102,241,.08);display:grid;place-items:center;color:#818cf8;flex:none}.ec3-activity-title{font-size:10px;font-weight:800;color:#cbd5e1}.ec3-activity-msg{font-size:9px;color:#64748b;margin-top:2px;line-height:1.45}.ec3-mini-stat{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(148,163,184,.07)}.ec3-mini-stat:last-child{border-bottom:0}.ec3-mini-stat span{font-size:9px;color:#64748b}.ec3-mini-stat strong{font-size:10px;color:#e2e8f0}
 @media(max-width:1100px){#ec3-sidebar{width:220px}header,main{margin-left:220px}.ec3-kpi-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:820px){#ec3-sidebar{display:none}header,main{margin-left:0}header>div{padding-right:1rem}main{padding:20px 15px 96px!important}.ec3-mobile-nav{position:fixed;display:grid;grid-template-columns:repeat(5,1fr);left:10px;right:10px;bottom:10px;z-index:70;padding:7px;background:rgba(2,6,23,.9);border:1px solid rgba(148,163,184,.14);border-radius:18px;backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(0,0,0,.45)}.ec3-mobile-btn{border:0;background:transparent;color:#64748b;padding:8px 3px;border-radius:12px;font-size:9px;font-weight:900}.ec3-mobile-btn i{display:block;font-size:14px;margin-bottom:4px}.ec3-mobile-btn.ec3-active{background:rgba(99,102,241,.12);color:#a5b4fc}.ec3-page-head{align-items:flex-start;flex-direction:column}.ec3-dashboard-grid{grid-template-columns:1fr}.ec3-action-grid{grid-template-columns:1fr 1fr}}
+
+/* Sidebar collapse/expand toggle */
+.ec3-sidebar-toggle{position:absolute;top:20px;right:-13px;width:26px;height:26px;border-radius:50%;background:#0f172a;border:1px solid rgba(148,163,184,.28);color:#94a3b8;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:61;transition:background .2s,color .2s,border-color .2s;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.ec3-sidebar-toggle:hover{background:#1e293b;color:#fff;border-color:rgba(99,102,241,.45)}
+.ec3-sidebar-toggle i{font-size:10px;transition:transform .25s ease}
+@media(max-width:820px){.ec3-sidebar-toggle{display:none}}
+
+body.ec3-collapsed #ec3-sidebar{width:76px;padding:18px 10px}
+body.ec3-collapsed header,body.ec3-collapsed main{margin-left:76px}
+body.ec3-collapsed .ec3-brand{justify-content:center;padding:8px 0 16px}
+body.ec3-collapsed .ec3-brand>div:last-child{display:none}
+body.ec3-collapsed .ec3-section-label{display:none}
+body.ec3-collapsed .ec3-admin-box{display:none}
+body.ec3-collapsed .ec3-nav-btn{justify-content:center;gap:0;position:relative}
+body.ec3-collapsed .ec3-nav-btn span:not(.ec3-nav-badge){display:none}
+body.ec3-collapsed .ec3-nav-badge{position:absolute;top:6px;right:8px;min-width:9px;width:9px;height:9px;padding:0;font-size:0}
+body.ec3-collapsed .ec3-sidebar-toggle i{transform:rotate(180deg)}
+
+.ec3-mobile-more-overlay{display:none}
+@media(max-width:820px){
+  .ec3-mobile-more-overlay{position:fixed;inset:0;z-index:80;background:rgba(2,6,23,.72);backdrop-filter:blur(6px);display:flex;align-items:flex-end}
+  .ec3-mobile-more-overlay.hidden{display:none}
+  .ec3-mobile-more-sheet{width:100%;max-height:78vh;background:#0b1220;border:1px solid rgba(148,163,184,.16);border-bottom:none;border-radius:22px 22px 0 0;padding:10px 16px 22px;display:flex;flex-direction:column;box-shadow:0 -20px 60px rgba(0,0,0,.55);animation:ec3SheetUp .22s ease}
+  @keyframes ec3SheetUp{from{transform:translateY(24px);opacity:.4}to{transform:translateY(0);opacity:1}}
+  .ec3-mobile-more-handle{width:38px;height:4px;border-radius:99px;background:rgba(148,163,184,.3);margin:2px auto 12px}
+  .ec3-mobile-more-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(148,163,184,.1);margin-bottom:6px;font-size:12px;font-weight:900;color:#fff}
+  .ec3-mobile-more-close{width:28px;height:28px;border-radius:50%;background:rgba(30,41,59,.7);color:#94a3b8;border:0;display:flex;align-items:center;justify-content:center}
+  .ec3-mobile-more-list{overflow-y:auto;padding-bottom:6px}
+  .ec3-mobile-more-list .ec3-section-label{padding:12px 4px 6px}
+  .ec3-mobile-more-btn{width:100%;display:flex;align-items:center;gap:13px;padding:12px 10px;border-radius:13px;color:#cbd5e1;font-size:12px;font-weight:800;text-align:left;border:1px solid transparent;background:transparent}
+  .ec3-mobile-more-btn i{width:18px;text-align:center;font-size:13px;color:#818cf8}
+  .ec3-mobile-more-btn.ec3-active{background:rgba(99,102,241,.14);border-color:rgba(99,102,241,.25);color:#fff}
+  #ec3-mobile-more.ec3-active{color:#a5b4fc}
+}
 @media(max-width:520px){.ec3-kpi-grid{grid-template-columns:1fr 1fr;gap:8px}.ec3-kpi{padding:13px;min-height:96px}.ec3-kpi-value{font-size:20px}.ec3-hero{padding:20px}.ec3-action-grid{grid-template-columns:1fr}.ec3-title{font-size:28px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
 
@@ -434,29 +468,32 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
   
 <!-- EUGENE CARD 3.0 APP SHELL -->
 <aside id="ec3-sidebar">
+  <button type="button" class="ec3-sidebar-toggle" onclick="toggleSidebarCollapse()" id="ec3-sidebar-toggle-btn" title="Collapse sidebar">
+    <i class="fa-solid fa-chevron-left"></i>
+  </button>
   <div class="ec3-brand" onclick="switchTab('home')" style="cursor:pointer">
     <div class="ec3-brand-mark"><svg viewBox="0 0 100 100" class="w-8 h-8"><use href="#eugene-logo-mark"/></svg></div>
     <div><div class="ec3-brand-title">EUGENE CARD</div><div class="ec3-brand-sub" data-i18n="ec3BrandSub">COLLECT • TRADE • OWN</div></div>
   </div>
   <div class="ec3-section-label" data-i18n="ec3Workspace">Workspace</div>
   <div class="ec3-nav">
-    <button class="ec3-nav-btn ec3-active" id="ec3-nav-home" onclick="switchTab('home')"><i class="fa-solid fa-house"></i><span data-i18n="ec3Overview">Overview</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-catalog" onclick="switchTab('catalog')"><i class="fa-solid fa-store"></i><span data-i18n="ec3Marketplace">Marketplace</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-dashboard" onclick="switchTab('dashboard')"><i class="fa-solid fa-vault"></i><span data-i18n="ec3Vault">My Vault</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-wishlist" onclick="switchTab('wishlist')"><i class="fa-solid fa-heart"></i><span data-i18n="ec3Wishlist">Wishlist</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-trade" onclick="switchTab('trade')"><i class="fa-solid fa-right-left"></i><span data-i18n="ec3Trading">Trading</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-auction" onclick="switchTab('auction')"><i class="fa-solid fa-gavel"></i><span data-i18n="ec3Auctions">Auctions</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-inbox" onclick="switchTab('inbox')"><i class="fa-solid fa-comments"></i><span data-i18n="ec3Inbox">Inbox</span><span id="ec3-inbox-badge" class="ec3-nav-badge hidden">0</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-history" onclick="switchTab('history')"><i class="fa-solid fa-clock-rotate-left"></i><span>Activity</span></button>
-    <button class="ec3-nav-btn" id="ec3-nav-holders" onclick="switchTab('holders')"><i class="fa-solid fa-users"></i><span>Collectors</span></button>
+    <button class="ec3-nav-btn ec3-active" id="ec3-nav-home" onclick="switchTab('home')" title="Overview"><i class="fa-solid fa-house"></i><span data-i18n="ec3Overview">Overview</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-catalog" onclick="switchTab('catalog')" title="Marketplace"><i class="fa-solid fa-store"></i><span data-i18n="ec3Marketplace">Marketplace</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-dashboard" onclick="switchTab('dashboard')" title="My Vault"><i class="fa-solid fa-vault"></i><span data-i18n="ec3Vault">My Vault</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-wishlist" onclick="switchTab('wishlist')" title="Wishlist"><i class="fa-solid fa-heart"></i><span data-i18n="ec3Wishlist">Wishlist</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-trade" onclick="switchTab('trade')" title="Trading"><i class="fa-solid fa-right-left"></i><span data-i18n="ec3Trading">Trading</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-auction" onclick="switchTab('auction')" title="Auctions"><i class="fa-solid fa-gavel"></i><span data-i18n="ec3Auctions">Auctions</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-inbox" onclick="switchTab('inbox')" title="Inbox"><i class="fa-solid fa-comments"></i><span data-i18n="ec3Inbox">Inbox</span><span id="ec3-inbox-badge" class="ec3-nav-badge hidden">0</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-history" onclick="switchTab('history')" title="Activity"><i class="fa-solid fa-clock-rotate-left"></i><span>Activity</span></button>
+    <button class="ec3-nav-btn" id="ec3-nav-holders" onclick="switchTab('holders')" title="Collectors"><i class="fa-solid fa-users"></i><span>Collectors</span></button>
   </div>
   <div class="ec3-section-label">Admin</div>
   <div class="ec3-nav">
-    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-command-center" onclick="switchTab('command-center')"><i class="fa-solid fa-gauge-high"></i><span data-i18n="ec3CommandCenter">Command Center</span></button>
-    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-admin" onclick="switchTab('admin')"><i class="fa-solid fa-shield-halved"></i><span data-i18n="ec3AdminHub">Admin Hub</span></button>
-    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-inventory" onclick="switchTab('inventory')"><i class="fa-solid fa-boxes-stacked"></i><span data-i18n="ec3Inventory">Inventory</span></button>
-    <button class="ec3-nav-btn ec3-admin-only hidden" onclick="location.href='analytics.html'"><i class="fa-solid fa-chart-line"></i><span data-i18n="ec3Analytics">Analytics</span></button>
-    <button class="ec3-nav-btn ec3-admin-only hidden" onclick="location.href='revenue.html'"><i class="fa-solid fa-sack-dollar"></i><span data-i18n="ec3Revenue">Revenue</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-command-center" onclick="switchTab('command-center')" title="Command Center"><i class="fa-solid fa-gauge-high"></i><span data-i18n="ec3CommandCenter">Command Center</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-admin" onclick="switchTab('admin')" title="Admin Hub"><i class="fa-solid fa-shield-halved"></i><span data-i18n="ec3AdminHub">Admin Hub</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" id="ec3-nav-inventory" onclick="switchTab('inventory')" title="Inventory"><i class="fa-solid fa-boxes-stacked"></i><span data-i18n="ec3Inventory">Inventory</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" onclick="location.href='analytics.html'" title="Analytics"><i class="fa-solid fa-chart-line"></i><span data-i18n="ec3Analytics">Analytics</span></button>
+    <button class="ec3-nav-btn ec3-admin-only hidden" onclick="location.href='revenue.html'" title="Revenue"><i class="fa-solid fa-sack-dollar"></i><span data-i18n="ec3Revenue">Revenue</span></button>
   </div>
   <div class="ec3-admin-box"><p><strong data-i18n="ec3ControlLayer">3.0 Control Layer</strong><br><span data-i18n="ec3ControlSub">Marketplace data, collector activity and admin operations in one workspace.</span></p></div>
 </aside>
@@ -465,7 +502,33 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
   <button class="ec3-mobile-btn" id="ec3-mobile-market" onclick="switchTab('catalog')"><i class="fa-solid fa-store"></i><span data-i18n="ec3MarketMobile">Market</span></button>
   <button class="ec3-mobile-btn" id="ec3-mobile-trade" onclick="switchTab('trade')"><i class="fa-solid fa-right-left"></i><span data-i18n="ec3TradeMobile">Trade</span></button>
   <button class="ec3-mobile-btn" id="ec3-mobile-inbox" onclick="switchTab('inbox')"><i class="fa-solid fa-comments"></i><span data-i18n="ec3InboxMobile">Inbox</span></button>
-  <button class="ec3-mobile-btn" id="ec3-mobile-vault" onclick="switchTab('dashboard')"><i class="fa-solid fa-vault"></i><span data-i18n="ec3VaultMobile">Vault</span></button>
+  <button class="ec3-mobile-btn" id="ec3-mobile-more" onclick="toggleMobileMoreMenu()"><i class="fa-solid fa-bars"></i><span data-i18n="ec3MoreMobile">More</span></button>
+</div>
+
+<!-- MOBILE "MORE" MENU: every tab that doesn't fit in the 5-slot bottom bar -->
+<div id="ec3-mobile-more-overlay" class="ec3-mobile-more-overlay hidden" onclick="if(event.target===this)toggleMobileMoreMenu()">
+  <div class="ec3-mobile-more-sheet">
+    <div class="ec3-mobile-more-handle"></div>
+    <div class="ec3-mobile-more-header">
+      <span data-i18n="ec3MoreMenuTitle">Menu</span>
+      <button onclick="toggleMobileMoreMenu()" class="ec3-mobile-more-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="ec3-mobile-more-list">
+      <div class="ec3-section-label" data-i18n="ec3Workspace">Workspace</div>
+      <button class="ec3-mobile-more-btn" id="ec3-more-dashboard" onclick="navigateFromMobileMore('dashboard')"><i class="fa-solid fa-vault"></i><span data-i18n="ec3Vault">My Vault</span></button>
+      <button class="ec3-mobile-more-btn" id="ec3-more-wishlist" onclick="navigateFromMobileMore('wishlist')"><i class="fa-solid fa-heart"></i><span data-i18n="ec3Wishlist">Wishlist</span></button>
+      <button class="ec3-mobile-more-btn" id="ec3-more-auction" onclick="navigateFromMobileMore('auction')"><i class="fa-solid fa-gavel"></i><span data-i18n="ec3Auctions">Auctions</span></button>
+      <button class="ec3-mobile-more-btn" id="ec3-more-history" onclick="navigateFromMobileMore('history')"><i class="fa-solid fa-clock-rotate-left"></i><span>Activity</span></button>
+      <button class="ec3-mobile-more-btn" id="ec3-more-holders" onclick="navigateFromMobileMore('holders')"><i class="fa-solid fa-users"></i><span>Collectors</span></button>
+      <div class="ec3-section-label ec3-admin-only hidden">Admin</div>
+      <button class="ec3-mobile-more-btn ec3-admin-only hidden" id="ec3-more-command-center" onclick="navigateFromMobileMore('command-center')"><i class="fa-solid fa-gauge-high"></i><span data-i18n="ec3CommandCenter">Command Center</span></button>
+      <button class="ec3-mobile-more-btn ec3-admin-only hidden" id="ec3-more-admin" onclick="navigateFromMobileMore('admin')"><i class="fa-solid fa-shield-halved"></i><span data-i18n="ec3AdminHub">Admin Hub</span></button>
+      <button class="ec3-mobile-more-btn ec3-admin-only hidden" id="ec3-more-inventory" onclick="navigateFromMobileMore('inventory')"><i class="fa-solid fa-boxes-stacked"></i><span data-i18n="ec3Inventory">Inventory</span></button>
+      <button class="ec3-mobile-more-btn ec3-admin-only hidden" onclick="toggleMobileMoreMenu();location.href='analytics.html'"><i class="fa-solid fa-chart-line"></i><span data-i18n="ec3Analytics">Analytics</span></button>
+      <button class="ec3-mobile-more-btn ec3-admin-only hidden" onclick="toggleMobileMoreMenu();location.href='revenue.html'"><i class="fa-solid fa-sack-dollar"></i><span data-i18n="ec3Revenue">Revenue</span></button>
+    </div>
+  </div>
+</div>
 </div>
 
 <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
@@ -1776,6 +1839,8 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
         ec3TradeMobile: "Trade",
         ec3InboxMobile: "Inbox",
         ec3VaultMobile: "Vault",
+        ec3MoreMobile: "More",
+        ec3MoreMenuTitle: "Menu",
         ec3PageTitle: "Your collection, at a glance.",
         ec3PageSub: "A unified command surface for your cards, market activity, conversations and collector progress.",
         ec3BrowseMarket: "Browse Market",
@@ -2028,6 +2093,8 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
         ec3TradeMobile: "Tukar",
         ec3InboxMobile: "Pesan",
         ec3VaultMobile: "Koleksi",
+        ec3MoreMobile: "Lainnya",
+        ec3MoreMenuTitle: "Menu",
         ec3PageTitle: "Koleksi Anda dalam satu tampilan.",
         ec3PageSub: "Pusat terpadu untuk kartu, aktivitas pasar, percakapan, dan progres kolektor Anda.",
         ec3BrowseMarket: "Jelajahi Marketplace",
@@ -4201,11 +4268,33 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
       const newTwitter = document.getElementById('profile-edit-twitter-input').value.trim();
       const newTiktok = document.getElementById('profile-edit-tiktok-input').value.trim();
       const newWeb = document.getElementById('profile-edit-web-input').value.trim();
+      const profilePayload = { name: newName, username: newUsername, avatarUrl: newAvatar, bio: newBio, socialIg: newIg, socialTwitter: newTwitter, socialTiktok: newTiktok, socialWeb: newWeb };
+
       try {
-        const result = await callServer('syncProfile', { name: newName, username: newUsername, avatarUrl: newAvatar, bio: newBio, socialIg: newIg, socialTwitter: newTwitter, socialTiktok: newTiktok, socialWeb: newWeb });
-        currentUser = { ...currentUser, ...(result.data?.profile || {}), isAdmin: currentUser.isAdmin };
+        const result = await callServer('syncProfile', profilePayload);
+        currentUser = { ...currentUser, ...(result.data?.profile || profilePayload), isAdmin: currentUser.isAdmin };
         closeProfileManagerModal(); renderAuthHeader(); updateAllViews(); showToast('Profile updated securely.');
-      } catch (e) { showToast('Profile update error: ' + e.message); }
+        return;
+      } catch (e) {
+        console.warn('syncProfile Cloud Function failed, falling back to local save:', e);
+      }
+
+      // FALLBACK: same resilience pattern handleUserSession() already relies on at
+      // login — if the server-side sync is unavailable, don't lose the edit, save
+      // it directly (localStorage + cookie + best-effort Firestore write) instead.
+      try {
+        currentUser = { ...currentUser, ...profilePayload };
+        localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
+        setCookie(`profile_${currentUser.email}`, profilePayload, 30);
+        if (typeof db !== 'undefined' && db) {
+          await db.collection("profiles").doc(currentUser.email).set(profilePayload, { merge: true });
+        }
+        closeProfileManagerModal(); renderAuthHeader(); updateAllViews();
+        showToast('Profile saved (server sync unavailable — saved locally instead).');
+      } catch (e2) {
+        console.error('Local profile save also failed:', e2);
+        showToast('Profile update error: ' + e2.message);
+      }
     }
     function renderCardGrid() {
       const grid = document.getElementById('card-grid');
@@ -5066,11 +5155,29 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
     function syncEc3Navigation(tabName) {
       document.querySelectorAll('.ec3-nav-btn').forEach(el => el.classList.remove('ec3-active'));
       document.querySelectorAll('.ec3-mobile-btn').forEach(el => el.classList.remove('ec3-active'));
+      document.querySelectorAll('.ec3-mobile-more-btn').forEach(el => el.classList.remove('ec3-active'));
       const map = { home:'home', catalog:'catalog', dashboard:'dashboard', wishlist:'wishlist', trade:'trade', auction:'auction', inbox:'inbox', history:'history', holders:'holders', 'command-center':'command-center', admin:'admin', inventory:'inventory' };
       const key = map[tabName] || tabName;
       document.getElementById(`ec3-nav-${key}`)?.classList.add('ec3-active');
-      const mobileMap = {home:'home',catalog:'market',trade:'trade',inbox:'inbox',dashboard:'vault'};
-      document.getElementById(`ec3-mobile-${mobileMap[tabName] || ''}`)?.classList.add('ec3-active');
+      const mobileMap = {home:'home',catalog:'market',trade:'trade',inbox:'inbox'};
+      const mobileKey = mobileMap[tabName];
+      if (mobileKey) {
+        document.getElementById(`ec3-mobile-${mobileKey}`)?.classList.add('ec3-active');
+      } else {
+        // Tab lives inside the "More" menu, not the 5-slot bar — highlight
+        // the More trigger itself and the matching row inside the sheet.
+        document.getElementById('ec3-mobile-more')?.classList.add('ec3-active');
+        document.getElementById(`ec3-more-${key}`)?.classList.add('ec3-active');
+      }
+    }
+
+    function toggleMobileMoreMenu() {
+      document.getElementById('ec3-mobile-more-overlay')?.classList.toggle('hidden');
+    }
+
+    function navigateFromMobileMore(tabName) {
+      switchTab(tabName);
+      document.getElementById('ec3-mobile-more-overlay')?.classList.add('hidden');
     }
 
     function renderHomeDashboard() {
@@ -5432,7 +5539,25 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
       const label = document.getElementById('current-lang-label');
       if (label) label.textContent = currentLanguage;
       applyTranslations();
+
+      // Restore the sidebar's collapsed/expanded state from last visit.
+      try {
+        if (localStorage.getItem('ec3_sidebar_collapsed') === '1') {
+          document.body.classList.add('ec3-collapsed');
+          const btn = document.getElementById('ec3-sidebar-toggle-btn');
+          if (btn) btn.title = currentLanguage === 'ID' ? 'Perluas sidebar' : 'Expand sidebar';
+        }
+      } catch (e) {}
     });
+
+    function toggleSidebarCollapse() {
+      const collapsed = document.body.classList.toggle('ec3-collapsed');
+      try { localStorage.setItem('ec3_sidebar_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+      const btn = document.getElementById('ec3-sidebar-toggle-btn');
+      if (btn) btn.title = collapsed
+        ? (currentLanguage === 'ID' ? 'Perluas sidebar' : 'Expand sidebar')
+        : (currentLanguage === 'ID' ? 'Ciutkan sidebar' : 'Collapse sidebar');
+    }
 </script>
 </body>
 </html>
