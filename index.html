@@ -372,6 +372,15 @@
       }
     }
 
+/* Fix main content positioning relative to fixed sidebar */
+@media (min-width: 1024px) {
+  #ec3-main-content,
+  .ec3-main-wrapper {
+    margin-left: 260px; /* Match your sidebar's exact width */
+    width: calc(100% - 260px);
+    box-sizing: border-box;
+  }
+}
   
     .ec-unread-badge {
       box-shadow: 0 0 0 3px rgba(244,63,94,.08), 0 0 18px rgba(244,63,94,.28);
@@ -634,6 +643,12 @@ main{margin-left:264px;max-width:none!important;width:auto!important;padding:28p
   <!-- Main Body -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8">
 
+<!-- Update your main workspace/content wrapper div -->
+<main class="lg:pl-64 xl:pl-72 w-full transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Marketplace Content Header & Card Grid -->
+  </div>
+</main>
 
     <!-- 3.0 OVERVIEW -->
     <section id="view-home" class="space-y-5">
