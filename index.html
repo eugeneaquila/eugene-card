@@ -4268,11 +4268,33 @@ body.ec3-collapsed .ec3-sidebar-toggle i{transform:rotate(180deg)}
       const newTwitter = document.getElementById('profile-edit-twitter-input').value.trim();
       const newTiktok = document.getElementById('profile-edit-tiktok-input').value.trim();
       const newWeb = document.getElementById('profile-edit-web-input').value.trim();
+      const profilePayload = { name: newName, username: newUsername, avatarUrl: newAvatar, bio: newBio, socialIg: newIg, socialTwitter: newTwitter, socialTiktok: newTiktok, socialWeb: newWeb };
+
       try {
-        const result = await callServer('syncProfile', { name: newName, username: newUsername, avatarUrl: newAvatar, bio: newBio, socialIg: newIg, socialTwitter: newTwitter, socialTiktok: newTiktok, socialWeb: newWeb });
-        currentUser = { ...currentUser, ...(result.data?.profile || {}), isAdmin: currentUser.isAdmin };
+        const result = await callServer('syncProfile', profilePayload);
+        currentUser = { ...currentUser, ...(result.data?.profile || profilePayload), isAdmin: currentUser.isAdmin };
         closeProfileManagerModal(); renderAuthHeader(); updateAllViews(); showToast('Profile updated securely.');
-      } catch (e) { showToast('Profile update error: ' + e.message); }
+        return;
+      } catch (e) {
+        console.warn('syncProfile Cloud Function failed, falling back to local save:', e);
+      }
+
+      // FALLBACK: same resilience pattern handleUserSession() already relies on at
+      // login — if the server-side sync is unavailable, don't lose the edit, save
+      // it directly (localStorage + cookie + best-effort Firestore write) instead.
+      try {
+        currentUser = { ...currentUser, ...profilePayload };
+        localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(profilePayload));
+        setCookie(`profile_${currentUser.email}`, profilePayload, 30);
+        if (typeof db !== 'undefined' && db) {
+          await db.collection("profiles").doc(currentUser.email).set(profilePayload, { merge: true });
+        }
+        closeProfileManagerModal(); renderAuthHeader(); updateAllViews();
+        showToast('Profile saved (server sync unavailable — saved locally instead).');
+      } catch (e2) {
+        console.error('Local profile save also failed:', e2);
+        showToast('Profile update error: ' + e2.message);
+      }
     }
     function renderCardGrid() {
       const grid = document.getElementById('card-grid');
