@@ -1,33 +1,19 @@
 {
-  "name": "eugene-card-marketplace",
-  "version": "1.0.0",
-  "license": "MIT",
-  "dependencies": {
-    "@capacitor/android": "^8.4.2",
-    "@capacitor/cli": "^8.4.2",
-    "@capacitor/core": "^8.4.2",
-    "@capacitor/ios": "^8.4.2",
-    "@capawesome/capacitor-google-sign-in": "^0.1.2",
-    "@vercel/speed-insights": "^2.0.0"
+  "name": "eugene-card",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "npm-package-json-lint": "^8.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1"
   },
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/eugeneaquila/eugene-card.git"
-  },
-  "keywords": [],
-  "author": "",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/eugeneaquila/eugene-card/issues"
-  },
-  "homepage": "https://github.com/eugeneaquila/eugene-card#readme"
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
 }
