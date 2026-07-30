@@ -1,0 +1,82 @@
+body{font-family:Arial;background:#111;color:#fff;margin:0;padding:20px}a{color:#7cf}.hero{padding:40px;background:#222;border-radius:12px}.card{border:1px solid #444;padding:10px;margin:10px;border-radius:8px}
+
+/* Eugene Card Premium UI Layer */
+:root{--bg:#060816;--panel:#111827cc;--gold:#f5b942;--purple:#8b5cf6;--text:#f8fafc;}
+body{background:radial-gradient(circle at top,#1e1b4b 0,#060816 45%,#020617 100%) !important;color:var(--text);min-height:100vh;}
+button,.btn{border-radius:14px!important;transition:.25s ease;}
+button:hover,.btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.card,.card-holo-premium,.card-holo-standard{border-radius:22px!important;overflow:hidden;backdrop-filter:blur(14px)}
+input{background:#ffffff12!important;border:1px solid #ffffff18!important;color:white!important;border-radius:14px!important;padding:12px!important}
+.glass-panel{background:#ffffff0d;border:1px solid #ffffff14;backdrop-filter:blur(18px);border-radius:24px}
+
+
+/* ================================
+   Eugene Card UI Refresh v2
+   Visual only - no feature changes
+   ================================ */
+
+:root{
+ --ec-glass:rgba(15,23,42,.72);
+ --ec-border:rgba(148,163,184,.18);
+ --ec-accent:#34d399;
+ --ec-accent2:#818cf8;
+}
+
+body{
+ background:
+ radial-gradient(circle at 15% 0%,rgba(52,211,153,.16),transparent 32rem),
+ radial-gradient(circle at 90% 10%,rgba(129,140,248,.16),transparent 30rem),
+ #020617 !important;
+}
+
+.card,
+[class*="card"],
+[class*="Card"]{
+ transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.card:hover,
+[class*="card"]:hover,
+[class*="Card"]:hover{
+ transform:translateY(-5px);
+ box-shadow:0 20px 45px rgba(0,0,0,.35);
+ border-color:rgba(52,211,153,.45);
+}
+
+button,.btn{
+ backdrop-filter:blur(12px);
+ transition:all .2s ease;
+}
+
+button:hover,.btn:hover{
+ transform:translateY(-2px);
+ filter:brightness(1.08);
+}
+
+input,select,textarea{
+ background:rgba(15,23,42,.8)!important;
+ border-color:rgba(148,163,184,.2)!important;
+ border-radius:14px!important;
+}
+
+table{
+ border-collapse:separate!important;
+ border-spacing:0 8px!important;
+}
+
+tr{
+ background:rgba(15,23,42,.55);
+}
+
+img{
+ border-radius:16px;
+}
+
+::-webkit-scrollbar{
+ width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+ background:linear-gradient(#34d399,#818cf8);
+ border-radius:999px;
+}

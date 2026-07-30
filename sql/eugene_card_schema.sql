@@ -1,0 +1,6 @@
+create table if not exists cards(id uuid primary key default gen_random_uuid(), name text, price numeric default 0, image text, owner_id uuid, created_at timestamptz default now());
+create table if not exists auctions(id uuid primary key default gen_random_uuid(), card_id uuid references cards(id), seller_id uuid, starting_price numeric default 0, current_bid numeric default 0, status text default 'open', end_time timestamptz);
+create table if not exists trades(id uuid primary key default gen_random_uuid(), from_user uuid, to_user uuid, offer_card uuid, request_card uuid, status text default 'pending', created_at timestamptz default now());
+create table if not exists trade_requests(id uuid primary key default gen_random_uuid(), sender_id uuid, receiver_id uuid, offered_cards jsonb, requested_cards jsonb, message text, status text default 'pending', created_at timestamptz default now());
+create table if not exists messages(id uuid primary key default gen_random_uuid(), sender_id uuid, receiver_id uuid, content text, created_at timestamptz default now());
+create table if not exists transactions(id uuid primary key default gen_random_uuid(), user_id uuid, type text, amount numeric default 0, status text, created_at timestamptz default now());

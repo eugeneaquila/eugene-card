@@ -1,0 +1,42 @@
+
+/* Eugene Card UI 3.0 Command Center */
+:root{
+ --ec-bg:#04050d;
+ --ec-panel:rgba(15,18,35,.78);
+ --ec-purple:#7c3cff;
+ --ec-violet:#b45cff;
+ --ec-gold:#f6c453;
+ --ec-text:#f7f5ff;
+}
+body{
+ background:
+ radial-gradient(circle at 75% 10%,rgba(124,60,255,.22),transparent 35%),
+ radial-gradient(circle at 20% 90%,rgba(246,196,83,.08),transparent 30%),
+ var(--ec-bg)!important;
+ color:var(--ec-text);
+}
+.ec3-panel,.panel,.card,.dashboard-card,.stat-card{
+ background:var(--ec-panel);
+ border:1px solid rgba(180,92,255,.18);
+ box-shadow:0 25px 70px rgba(0,0,0,.45);
+ backdrop-filter:blur(20px);
+}
+.ec3-sidebar{
+ position:sticky;top:0;
+ min-height:100vh;
+ background:linear-gradient(180deg,rgba(10,8,25,.96),rgba(4,5,13,.96));
+ border-right:1px solid rgba(180,92,255,.18);
+}
+.ec3-glow{
+ box-shadow:0 0 35px rgba(124,60,255,.45);
+}
+h1,h2,h3{letter-spacing:-.02em}
+button,.btn{
+ border-radius:14px!important;
+ background:linear-gradient(135deg,#7c3cff,#4f20d8);
+ border:1px solid rgba(255,255,255,.12);
+}
+button:hover,.btn:hover{
+ transform:translateY(-2px);
+ box-shadow:0 12px 30px rgba(124,60,255,.35);
+}

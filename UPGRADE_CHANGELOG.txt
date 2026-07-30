@@ -1,0 +1,19 @@
+Eugene Card Final Upgrade Patch
+
+Fixed:
+- Supabase client is now exposed globally for Sell Back flow.
+- Sell Back scripts are loaded by the marketplace page.
+- Added Supabase SDK loading for browser runtime.
+
+Added:
+- Better compatibility between existing Firebase UI and Supabase services.
+- Safer frontend initialization order.
+
+Preserved:
+- Existing auction logic.
+- Existing trade logic.
+- Existing database structure.
+- Existing UI/features.
+
+Recommended next migration:
+- Remove remaining Firebase transaction calls and move Admin Hub fully to Supabase.

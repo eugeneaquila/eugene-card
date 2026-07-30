@@ -1,0 +1,9 @@
+-- Verify these tables exist:
+-- profiles
+-- cards
+-- auctions
+-- bids
+-- trade_requests
+-- sell_back_requests
+-- transactions
+-- analytics

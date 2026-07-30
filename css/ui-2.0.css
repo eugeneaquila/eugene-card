@@ -1,0 +1,55 @@
+/* Eugene Card UI 2.0 visual layer - no feature logic changes */
+:root{
+ --ec-bg:#050817;
+ --ec-panel:#10152b;
+ --ec-gold:#f4c76b;
+ --ec-purple:#8b5cf6;
+ --ec-cyan:#22d3ee;
+}
+body{background:radial-gradient(circle at top,#1b1640 0,#050817 45%);}
+.card,.panel,.dashboard-card,.stat-card{border-radius:18px!important;backdrop-filter:blur(12px);border:1px solid rgba(244,199,107,.25);box-shadow:0 18px 45px rgba(0,0,0,.35);}
+button,.btn{border-radius:999px!important;transition:.2s ease;}
+button:hover,.btn:hover{transform:translateY(-2px);filter:brightness(1.12);}
+.card img{transition:.35s ease;}
+.card:hover img{transform:scale(1.04);}
+.nav-item,.tab{transition:.2s ease;}
+.nav-item:hover,.tab:hover{background:rgba(139,92,246,.15);}
+.price,.amount{color:var(--ec-gold)!important;font-weight:800;}
+.badge,.tag{border-radius:999px!important;}
+
+/* Eugene Card UI 2.0 Navbar Upgrade */
+.navbar, header, .top-nav, nav {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+.navbar a, nav a {
+  transition: .25s ease;
+  position: relative;
+}
+
+.navbar a:hover, nav a:hover {
+  transform: translateY(-2px);
+  text-shadow: 0 0 14px rgba(190,160,255,.8);
+}
+
+.navbar a.active::after, nav a.active::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: -8px;
+  height: 3px;
+  border-radius: 99px;
+  background: linear-gradient(90deg,#d4af37,#9b5cff);
+}
+
+.user-menu, .profile-menu, .dropdown {
+  border: 1px solid rgba(255,255,255,.15);
+  box-shadow: 0 18px 45px rgba(0,0,0,.35);
+}
+
+@media(max-width:768px){
+  nav { position: sticky; top:0; z-index:1000; }
+}
