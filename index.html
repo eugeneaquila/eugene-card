@@ -213,7 +213,7 @@
 
       <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
         <i class="fa-solid fa-upload text-amber-400"></i>
-        <h3 class="text-base font-bold text-white">Approve Payout (2% Tax Deducted)</h3>
+        <h3 class="text-base font-bold text-white">Approve Payout</h3>
       </div>
 
       <div id="admin-approval-summary" class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 text-xs text-slate-300 space-y-1">
@@ -276,9 +276,19 @@
       <div id="cart-items-list" class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y divide-slate-800">
       </div>
 
-      <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
-        <span class="text-xs text-slate-400 font-bold uppercase">Total Due</span>
-        <span id="cart-total-price" class="text-base font-mono font-bold text-emerald-400">IDR 0</span>
+      <div class="pt-2 border-t border-slate-800 space-y-1">
+        <div class="flex justify-between items-center text-xs text-slate-400">
+          <span>Subtotal</span>
+          <span id="cart-subtotal-price" class="font-mono">IDR 0</span>
+        </div>
+        <div class="flex justify-between items-center text-xs text-amber-400">
+          <span>Platform Tax (2%)</span>
+          <span id="cart-tax-price" class="font-mono">IDR 0</span>
+        </div>
+        <div class="flex justify-between items-center text-sm font-bold text-white pt-1">
+          <span>Total Due</span>
+          <span id="cart-total-price" class="font-mono text-emerald-400">IDR 0</span>
+        </div>
       </div>
 
       <button onclick="checkoutCartQRIS()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
@@ -446,8 +456,9 @@
           </div>
 
           <div class="space-y-1 bg-slate-800/50 p-3 rounded-xl border border-slate-800">
-            <p class="text-[10px] uppercase font-bold text-slate-400">Market Value</p>
-            <p id="detail-card-price" class="text-lg font-mono font-bold text-emerald-400">IDR 0</p>
+            <p class="text-[10px] uppercase font-bold text-slate-400">Market Value (Base)</p>
+            <p id="detail-card-price" class="text-lg font-mono font-bold text-white">IDR 0</p>
+            <p id="detail-card-total-price" class="text-xs font-mono font-bold text-emerald-400">+ 2% Platform Tax = IDR 0</p>
           </div>
 
           <div class="space-y-2 pt-2">
@@ -487,7 +498,9 @@
       <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700 text-left space-y-1">
         <div class="flex justify-between text-xs"><span class="text-slate-400">Merchant Name:</span> <span class="font-bold text-white">Eugene Card, Toko Kartu</span></div>
         <div class="flex justify-between text-xs"><span class="text-slate-400">Location:</span> <span class="font-bold text-white">TORAJA UTARA</span></div>
-        <div class="flex justify-between text-xs"><span class="text-slate-400">Amount Due:</span> <span id="qris-amount-due" class="font-mono font-bold text-emerald-400">IDR 0</span></div>
+        <div class="flex justify-between text-xs"><span class="text-slate-400">Base Price:</span> <span id="qris-base-due" class="font-mono text-slate-300">IDR 0</span></div>
+        <div class="flex justify-between text-xs"><span class="text-amber-400">Platform Tax (2%):</span> <span id="qris-tax-due" class="font-mono text-amber-400">IDR 0</span></div>
+        <div class="flex justify-between text-xs pt-1 border-t border-slate-700"><span class="font-bold text-white">Total Amount Due:</span> <span id="qris-amount-due" class="font-mono font-bold text-emerald-400">IDR 0</span></div>
       </div>
 
       <div class="space-y-2 pt-2">
@@ -609,7 +622,7 @@
           <div>
             <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-wider">LIMITED EDITION</span>
             <h2 class="text-base font-bold text-white mt-0.5">Beta Edition Card Stock</h2>
-            <p class="text-xs text-slate-400">Official Primary Market Availability (2% Tax Included)</p>
+            <p class="text-xs text-slate-400">Official Primary Market Availability (+ 2% Platform Tax on Purchase)</p>
           </div>
         </div>
         
@@ -799,7 +812,7 @@
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub</h2>
-          <p class="text-xs text-slate-400 mt-1">Verify payment submissions and process payouts with a 2% platform tax.</p>
+          <p class="text-xs text-slate-400 mt-1">Verify payment submissions and process payouts.</p>
         </div>
       </div>
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3">
@@ -916,6 +929,7 @@
 
     let shoppingCart = new Set();
     let activeCardForAction = null;
+    let activePurchaseAmount = 0;
     let selectedOwner = null;
 
     let chatThreads = [
@@ -1567,10 +1581,14 @@
 
       activeCardForAction = card;
 
+      const taxAmount = card.price * 0.02;
+      const totalAmount = card.price + taxAmount;
+
       document.getElementById('detail-card-img').src = card.imgUrl;
       document.getElementById('detail-card-serial').innerText = card.serial;
       document.getElementById('detail-card-name').innerText = card.name;
       document.getElementById('detail-card-price').innerText = `IDR ${card.price.toLocaleString()}`;
+      document.getElementById('detail-card-total-price').innerText = `+ 2% Tax = IDR ${totalAmount.toLocaleString()}`;
       document.getElementById('detail-card-edition').innerText = card.edition || 'Beta Edition: #0';
       
       const typeSpan = document.getElementById('detail-card-type');
@@ -1588,7 +1606,7 @@
       } else {
         buyBtn.disabled = false;
         buyBtn.className = "w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2";
-        buyBtn.innerHTML = `<i class="fa-solid fa-qrcode"></i> Buy / Order via QRIS`;
+        buyBtn.innerHTML = `<i class="fa-solid fa-qrcode"></i> Buy / Order via QRIS (IDR ${totalAmount.toLocaleString()})`;
       }
 
       document.getElementById('card-details-modal').classList.remove('hidden');
@@ -1605,8 +1623,15 @@
 
       closeCardDetailsModal();
 
+      const basePrice = activeCardForAction.price;
+      const taxAmount = basePrice * 0.02;
+      const totalAmount = basePrice + taxAmount;
+      activePurchaseAmount = totalAmount;
+
       document.getElementById('qris-card-title').innerText = `${activeCardForAction.name} (${activeCardForAction.serial})`;
-      document.getElementById('qris-amount-due').innerText = `IDR ${activeCardForAction.price.toLocaleString()}`;
+      document.getElementById('qris-base-due').innerText = `IDR ${basePrice.toLocaleString()}`;
+      document.getElementById('qris-tax-due').innerText = `IDR ${taxAmount.toLocaleString()}`;
+      document.getElementById('qris-amount-due').innerText = `IDR ${totalAmount.toLocaleString()}`;
 
       const canvasContainer = document.getElementById('qris-canvas');
       canvasContainer.innerHTML = '';
@@ -1638,15 +1663,16 @@
 
       reader.onload = function(e) {
         const proofImageDataUrl = e.target.result;
+        const grossAmount = activePurchaseAmount || activeCardForAction.price * 1.02;
 
         pendingOrders.push({
           id: `ord-${Date.now()}`,
           card: activeCardForAction,
           type: 'PURCHASE',
           buyer: currentUser.name,
-          grossAmount: activeCardForAction.price,
+          grossAmount: grossAmount,
           taxAmount: activeCardForAction.price * 0.02,
-          payoutAmount: activeCardForAction.price * 0.98,
+          payoutAmount: activeCardForAction.price,
           proofImg: proofImageDataUrl,
           timestamp: new Date().toLocaleTimeString()
         });
@@ -1880,7 +1906,7 @@
       container.innerHTML = pendingOrders.map((ord, idx) => {
         const isTradePayout = ord.type === 'TRADE_PAYOUT';
         const isSellBack = ord.type === 'SELL_BACK';
-        const netAmt = ord.payoutAmount || (ord.grossAmount ? ord.grossAmount * 0.98 : 0);
+        const netAmt = ord.grossAmount || (ord.card ? ord.card.price * 1.02 : 0);
 
         return `
           <div class="bg-slate-800 p-3 rounded-xl flex items-center justify-between gap-4">
@@ -1893,12 +1919,12 @@
               <div>
                 <div class="flex items-center gap-2">
                   <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${isTradePayout ? 'bg-purple-500/20 text-purple-300' : isSellBack ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-400'}">
-                    ${isTradePayout ? 'TRADE CASH PAYOUT (2% TAX)' : isSellBack ? 'SELL BACK (2% TAX)' : 'QRIS PURCHASE'}
+                    ${isTradePayout ? 'TRADE CASH PAYOUT' : isSellBack ? 'SELL BACK' : 'QRIS PURCHASE (+2% TAX)'}
                   </span>
                   <p class="text-xs font-bold text-white">${ord.card.name} (${ord.card.serial})</p>
                 </div>
                 <p class="text-[10px] text-slate-400 mt-0.5">
-                  Buyer/Recipient: ${ord.seller || ord.buyer} • Net Due: <strong class="text-emerald-400 font-mono">IDR ${netAmt.toLocaleString()}</strong> • ${ord.timestamp}
+                  Buyer/Recipient: ${ord.seller || ord.buyer} • Total Due: <strong class="text-emerald-400 font-mono">IDR ${netAmt.toLocaleString()}</strong> • ${ord.timestamp}
                 </p>
               </div>
             </div>
@@ -2189,7 +2215,7 @@
       document.getElementById('admin-approval-summary').innerHTML = `
         <p><strong>Item:</strong> ${ord.card.name} (${ord.card.serial})</p>
         <p><strong>Recipient:</strong> ${ord.seller || ord.buyer}</p>
-        <p><strong>Net Transfer Due:</strong> <span class="text-emerald-400 font-mono font-bold">IDR ${(ord.payoutAmount||0).toLocaleString()}</span></p>
+        <p><strong>Total Amount Due:</strong> <span class="text-emerald-400 font-mono font-bold">IDR ${(ord.grossAmount||0).toLocaleString()}</span></p>
       `;
 
       document.getElementById('admin-proof-modal').classList.remove('hidden');
@@ -2250,17 +2276,21 @@
     function showCartModal() {
       const modal = document.getElementById('cart-modal');
       const list = document.getElementById('cart-items-list');
-      const priceTag = document.getElementById('cart-total-price');
+      const subtotalTag = document.getElementById('cart-subtotal-price');
+      const taxTag = document.getElementById('cart-tax-price');
+      const totalTag = document.getElementById('cart-total-price');
 
       const items = inventory.filter(c => shoppingCart.has(c.id));
 
       if (items.length === 0) {
         list.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">Your shopping cart is empty.</p>`;
-        priceTag.innerText = `IDR 0`;
+        subtotalTag.innerText = `IDR 0`;
+        taxTag.innerText = `IDR 0`;
+        totalTag.innerText = `IDR 0`;
       } else {
-        let total = 0;
+        let subtotal = 0;
         list.innerHTML = items.map(card => {
-          total += card.price;
+          subtotal += card.price;
           return `
             <div class="flex items-center justify-between py-2">
               <div class="flex items-center gap-2">
@@ -2277,7 +2307,13 @@
             </div>
           `;
         }).join('');
-        priceTag.innerText = `IDR ${total.toLocaleString()}`;
+
+        const tax = subtotal * 0.02;
+        const total = subtotal + tax;
+
+        subtotalTag.innerText = `IDR ${subtotal.toLocaleString()}`;
+        taxTag.innerText = `IDR ${tax.toLocaleString()}`;
+        totalTag.innerText = `IDR ${total.toLocaleString()}`;
       }
 
       modal.classList.remove('hidden');
@@ -2292,11 +2328,17 @@
       if (shoppingCart.size === 0) return showToast('Cart is empty!');
 
       const items = inventory.filter(c => shoppingCart.has(c.id));
-      const total = items.reduce((acc, c) => acc + c.price, 0);
+      const subtotal = items.reduce((acc, c) => acc + c.price, 0);
+      const tax = subtotal * 0.02;
+      const total = subtotal + tax;
+
+      activePurchaseAmount = total;
 
       closeCartModal();
 
       document.getElementById('qris-card-title').innerText = `${items.length} Eugene Cards Cart Bundle`;
+      document.getElementById('qris-base-due').innerText = `IDR ${subtotal.toLocaleString()}`;
+      document.getElementById('qris-tax-due').innerText = `IDR ${tax.toLocaleString()}`;
       document.getElementById('qris-amount-due').innerText = `IDR ${total.toLocaleString()}`;
 
       const canvasContainer = document.getElementById('qris-canvas');
