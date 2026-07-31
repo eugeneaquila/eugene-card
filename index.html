@@ -1020,6 +1020,45 @@
     ];
     let activeChatThreadId = 't1';
 
+    // Normalizes row data from Supabase DB to JS camelCase format
+    function normalizeCardData(raw) {
+      return {
+        id: raw.id || `card-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        serial: raw.serial || raw.serial_number || '*00',
+        name: raw.name || raw.card_name || 'Unnamed Card',
+        type: raw.type || raw.card_type || 'STANDARD',
+        price: Number(raw.price) || 0,
+        baseFloorPrice: Number(raw.baseFloorPrice || raw.base_floor_price || raw.price || 0),
+        owner: raw.owner || raw.owner_name || null,
+        status: raw.status || (raw.owner ? 'SOLD' : 'AVAILABLE'),
+        imgUrl: raw.imgUrl || raw.img_url || raw.image_url || 'https://placehold.co/1080x1350/1e293b/3b82f6?text=No+Image',
+        edition: raw.edition || 'Beta Edition: #0',
+        sn: raw.sn || raw.serial_tag || (raw.serial ? String(raw.serial).replace('*', '') : '00'),
+        tier: raw.tier || '100',
+        printing: raw.printing || '1x'
+      };
+    }
+
+    // Normalizes JS camelCase card back to Supabase DB schema column names
+    function mapCardToSupabaseRow(card) {
+      const norm = normalizeCardData(card);
+      return {
+        id: norm.id,
+        serial: norm.serial,
+        name: norm.name,
+        type: norm.type,
+        price: norm.price,
+        base_floor_price: norm.baseFloorPrice,
+        owner: norm.owner,
+        status: norm.status,
+        img_url: norm.imgUrl,
+        edition: norm.edition,
+        sn: norm.sn,
+        tier: norm.tier,
+        printing: norm.printing
+      };
+    }
+
     // FETCH DATABASE INVENTORY WITH SUPABASE & BROADCAST REAL-TIME TO EVERYONE
     async function fetchDatabaseInventory() {
       if (window.supabaseClient) {
@@ -1028,8 +1067,8 @@
           .select('*')
           .order('id', { ascending: true });
 
-        if (!error && data) {
-          inventory = data;
+        if (!error && data && data.length > 0) {
+          inventory = data.map(normalizeCardData);
           saveInventoryLocalCache();
           renderCardGrid();
           renderInventoryTable();
@@ -1041,9 +1080,14 @@
 
       const storedInventory = localStorage.getItem('eugene_inventory_data');
       if (storedInventory) {
-        try { inventory = JSON.parse(storedInventory); } catch(e) { inventory = [...INITIAL_JSON_BACKUP.cards]; }
+        try { 
+          const parsed = JSON.parse(storedInventory);
+          inventory = parsed.map(normalizeCardData);
+        } catch(e) { 
+          inventory = INITIAL_JSON_BACKUP.cards.map(normalizeCardData); 
+        }
       } else {
-        inventory = [...INITIAL_JSON_BACKUP.cards];
+        inventory = INITIAL_JSON_BACKUP.cards.map(normalizeCardData);
       }
       renderCardGrid();
       renderInventoryTable();
@@ -1664,33 +1708,31 @@
       const imgUrl = document.getElementById('edit-card-img').value;
       const status = document.getElementById('edit-card-status').value;
 
-      const cardPayload = {
+      const cardPayload = normalizeCardData({
+        id: cardId || `card-${Date.now()}`,
         serial, sn, name, edition, printing, type, price, baseFloorPrice, imgUrl, status, owner: selectedOwner
-      };
+      });
 
       if (cardId) {
-        cardPayload.id = cardId;
         const idx = inventory.findIndex(c => c.id === cardId);
         if (idx !== -1) {
-          inventory[idx] = { ...inventory[idx], ...cardPayload };
+          inventory[idx] = cardPayload;
         }
         
         if (window.supabaseClient) {
           await supabaseClient
             .from('inventory')
-            .upsert([cardPayload]);
+            .upsert([mapCardToSupabaseRow(cardPayload)]);
         }
         addHistoryRecord('ADMIN_UPDATE', serial, `Admin updated specs for ${serial}`);
         showToast(`Updated ${serial} details live for everyone!`);
       } else {
-        const newId = `card-${Date.now()}`;
-        cardPayload.id = newId;
         inventory.unshift(cardPayload);
 
         if (window.supabaseClient) {
           await supabaseClient
             .from('inventory')
-            .insert([cardPayload]);
+            .insert([mapCardToSupabaseRow(cardPayload)]);
         }
         addHistoryRecord('MINT_CARD', serial, `Newly minted card ${serial} added to network.`);
         showToast(`Minted new card ${serial} live!`);
@@ -1724,7 +1766,7 @@
       showToast('Card deleted live from database.');
     }
 
-    // JSON IMPORT & EXPORT
+    // JSON IMPORT & EXPORT (FIXED IMPORTER)
     function exportInventoryJSON() {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
 
@@ -1756,20 +1798,40 @@
       reader.onload = async function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
-          const newCards = Array.isArray(parsed.cards) ? parsed.cards : parsed;
+          let rawCards = [];
 
-          if (window.supabaseClient && newCards.length > 0) {
-            await supabaseClient.from('inventory').upsert(newCards);
+          if (Array.isArray(parsed)) {
+            rawCards = parsed;
+          } else if (parsed && Array.isArray(parsed.cards)) {
+            rawCards = parsed.cards;
+          } else if (parsed && typeof parsed === 'object') {
+            rawCards = Object.values(parsed).filter(item => typeof item === 'object');
+          }
+
+          if (!rawCards.length) {
+            throw new Error('No card objects found in backup JSON file.');
+          }
+
+          const normalizedCards = rawCards.map(normalizeCardData);
+
+          if (window.supabaseClient) {
+            const supabaseRows = normalizedCards.map(mapCardToSupabaseRow);
+            const { error } = await supabaseClient.from('inventory').upsert(supabaseRows);
+            if (error) {
+              console.warn('Supabase backup upsert warning:', error.message);
+            }
             await fetchDatabaseInventory();
           } else {
-            inventory = newCards;
+            inventory = normalizedCards;
             saveInventoryLocalCache();
             renderCardGrid();
             renderInventoryTable();
             updateRemainingCardCount();
+            renderHoldersLeaderboard();
           }
-          addHistoryRecord('IMPORT_JSON', 'SYSTEM', `Admin imported ${newCards.length} cards into inventory.`);
-          showToast(`Imported ${newCards.length} cards into inventory live!`);
+
+          addHistoryRecord('IMPORT_JSON', 'SYSTEM', `Admin imported ${normalizedCards.length} cards into inventory.`);
+          showToast(`Successfully imported ${normalizedCards.length} cards!`);
         } catch (err) {
           showToast('Failed to parse JSON file: ' + err.message);
         }
