@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Enterprise Edition</title>
+  <title>Eugene Card Marketplace | Complete Rebuild</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%233b82f6' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%233b82f6'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
@@ -20,8 +20,7 @@
               dark: '#080d1a',
               card: '#111827',
               border: '#1f2937',
-              accent: '#3b82f6',
-              accentHover: '#2563eb'
+              accent: '#3b82f6'
             }
           },
           fontFamily: { sans: ['Inter', 'sans-serif'] }
@@ -36,49 +35,39 @@
 
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #080d1a; color: #f3f4f6; }
-
+    
     .card-glow-premium {
       background: linear-gradient(145deg, #1e1b4b 0%, #111827 100%);
       border: 1px solid rgba(99, 102, 241, 0.35);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .card-glow-premium:hover {
-      border-color: rgba(129, 140, 248, 0.8);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25);
+    .card-glow-premium:hover { 
+      border-color: rgba(129, 140, 248, 0.8); 
+      transform: translateY(-4px); 
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25); 
     }
-
+    
     .card-glow-standard {
       background: linear-gradient(145deg, #1f2937 0%, #0f172a 100%);
       border: 1px solid #374151;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .card-glow-standard:hover {
-      border-color: #4b5563;
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    .card-glow-standard:hover { 
+      border-color: #4b5563; 
+      transform: translateY(-4px); 
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6); 
     }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #080d1a; }
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
-
-    .live-dot {
-      width: 6px; height: 6px; border-radius: 9999px; background: #34d399; display: inline-block;
-      animation: livePulse 1.6s infinite;
-    }
-    @keyframes livePulse {
-      0% { box-shadow: 0 0 0 0 rgba(52,211,153,0.6); }
-      70% { box-shadow: 0 0 0 6px rgba(52,211,153,0); }
-      100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
 
-  <!-- Embedded SVG Logo -->
+  <!-- Embedded Logo SVG -->
   <svg style="display: none;">
     <defs>
       <g id="eugene-logo-mark">
@@ -89,10 +78,10 @@
     </defs>
   </svg>
 
-  <!-- Navigation Header -->
+  <!-- Header -->
   <header class="sticky top-0 z-40 bg-gray-900/90 backdrop-blur-md border-b border-gray-800/80 px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-
+      
       <!-- Brand Logo -->
       <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('catalog')">
         <div class="w-9 h-9 rounded-xl overflow-hidden bg-gray-800 border border-gray-700 p-1.5 flex items-center justify-center">
@@ -101,14 +90,12 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-sm tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-              <i class="fa-solid fa-shield-halved text-[8px]"></i> Secured
-            </span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">Reset Build</span>
           </div>
         </div>
       </div>
 
-      <!-- Navigation Bar -->
+      <!-- Navigation Tabs -->
       <nav class="flex items-center gap-1 bg-gray-800/60 p-1.5 rounded-2xl border border-gray-700/60 overflow-x-auto max-w-full">
         <button id="nav-catalog" onclick="switchTab('catalog')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white bg-blue-600 flex items-center gap-1.5 whitespace-nowrap transition-all shadow-sm">
           <i class="fa-solid fa-layer-group"></i> <span>Collection</span>
@@ -132,24 +119,24 @@
           <i class="fa-solid fa-vault text-amber-400"></i> <span>My Vault</span>
         </button>
 
-        <!-- Admin Navigation Divider -->
+        <!-- Admin Nav Separator -->
         <div id="admin-nav-separator" class="h-4 w-px bg-gray-700/80 mx-1 self-center hidden"></div>
 
-        <button id="nav-analytics" onclick="switchTab('analytics')" class="admin-only-nav hidden px-3.5 py-1.5 rounded-xl text-xs font-medium text-emerald-300 hover:text-white flex items-center gap-1.5 bg-emerald-950/40 border border-emerald-500/30">
-          <i class="fa-solid fa-chart-line text-emerald-400"></i> <span>Analytics</span>
+        <button id="nav-ai-prediction" onclick="switchTab('ai-prediction')" class="admin-only-nav hidden px-3.5 py-1.5 rounded-xl text-xs font-medium text-emerald-300 hover:text-white flex items-center gap-1.5 bg-emerald-950/40 border border-emerald-500/30">
+          <i class="fa-solid fa-brain text-emerald-400"></i> <span>AI Analytics</span>
         </button>
         <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav hidden px-3.5 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 bg-amber-950/40 border border-amber-500/30">
           <i class="fa-solid fa-boxes-stacked text-amber-400"></i> <span>Inventory Studio</span>
         </button>
       </nav>
 
-      <!-- User Auth Pill -->
+      <!-- User Auth Header Button -->
       <div id="auth-header-container"></div>
     </div>
   </header>
 
-  <!-- AUTHENTICATION MODAL (CUSTOM + GOOGLE AUTH) -->
-  <div id="auth-modal" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <!-- AUTHENTICATION MODAL -->
+  <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-6 space-y-5 relative shadow-2xl">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-gray-800 text-gray-400 hover:text-white text-xs flex items-center justify-center">
         <i class="fa-solid fa-xmark"></i>
@@ -163,14 +150,14 @@
         <p id="auth-modal-sub" class="text-xs text-gray-400">Secure access to your card vault & trading ledger.</p>
       </div>
 
-      <!-- Google OAuth Option -->
+      <!-- Google OAuth -->
       <button onclick="loginWithGoogleOAuth()" class="w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all border border-gray-200">
         <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Sign In with Google</span>
       </button>
 
       <div class="flex items-center gap-3">
         <div class="h-px bg-gray-800 flex-1"></div>
-        <span class="text-[10px] text-gray-500 font-bold uppercase">or custom handle</span>
+        <span class="text-[10px] text-gray-500 font-bold uppercase">or use handle</span>
         <div class="h-px bg-gray-800 flex-1"></div>
       </div>
 
@@ -184,17 +171,11 @@
         <div class="space-y-1">
           <label class="text-[10px] font-bold text-gray-400 uppercase">Username Handle</label>
           <input type="text" id="auth-input-username" required placeholder="eugene_master" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-          <p class="text-[9px] text-gray-500">Letters, numbers, underscores only. 3-20 characters.</p>
         </div>
 
         <div class="space-y-1">
           <label class="text-[10px] font-bold text-gray-400 uppercase">Password</label>
-          <div class="relative">
-            <input type="password" id="auth-input-password" required placeholder="••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-3.5 pr-10 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs">
-              <i id="pass-toggle-icon" class="fa-solid fa-eye"></i>
-            </button>
-          </div>
+          <input type="password" id="auth-input-password" required placeholder="••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
         </div>
 
         <button type="submit" id="auth-submit-btn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all mt-2">
@@ -211,7 +192,7 @@
   </div>
 
   <!-- CARD DETAILS MODAL -->
-  <div id="card-details-modal" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="card-details-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl space-y-5">
       <button onclick="closeCardDetailsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-gray-800 text-gray-400 hover:text-white text-xs flex items-center justify-center z-10">
         <i class="fa-solid fa-xmark"></i>
@@ -235,7 +216,7 @@
           <div class="space-y-1 bg-gray-800/50 p-3 rounded-xl border border-gray-800">
             <p class="text-[10px] uppercase font-bold text-gray-400">Price Tag</p>
             <p id="detail-card-price" class="text-lg font-mono font-bold text-emerald-400">IDR 0</p>
-            <p class="text-[9px] text-gray-400 mt-0.5">+ 2% Marketplace Tax added at checkout</p>
+            <p class="text-[9px] text-gray-400 mt-0.5">+ 2% Tax added at checkout</p>
           </div>
 
           <div id="detail-action-container" class="space-y-2 pt-2"></div>
@@ -244,92 +225,10 @@
     </div>
   </div>
 
-  <!-- LIST ON TRADE MARKET MODAL -->
-  <div id="list-trade-modal" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeListTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-gray-800 text-gray-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <div>
-        <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-right-left text-purple-400"></i> List on Trade Market</h3>
-        <p class="text-xs text-gray-400 mt-1">Set a fixed asking price. Buyers pay price + 2% platform tax.</p>
-      </div>
-      <form onsubmit="submitListTrade(event)" class="space-y-3">
-        <div>
-          <label class="text-[10px] font-bold text-gray-400 uppercase">Card</label>
-          <select id="list-trade-card-select" onchange="updateListTradePricePlaceholder()" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"></select>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-gray-400 uppercase">Asking Price (IDR)</label>
-          <input type="number" id="list-trade-price" required min="1" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-purple-500">
-        </div>
-        <button type="submit" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow transition-all">List Card</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- START AUCTION MODAL -->
-  <div id="start-auction-modal" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeStartAuctionModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-gray-800 text-gray-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <div>
-        <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-gavel text-emerald-400"></i> Start an Auction</h3>
-        <p class="text-xs text-gray-400 mt-1">Collectors bid live. The highest bid wins when the timer ends.</p>
-      </div>
-      <form onsubmit="submitStartAuction(event)" class="space-y-3">
-        <div>
-          <label class="text-[10px] font-bold text-gray-400 uppercase">Card</label>
-          <select id="start-auction-card-select" onchange="updateStartAuctionPricePlaceholder()" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></select>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-gray-400 uppercase">Starting Bid (IDR)</label>
-          <input type="number" id="start-auction-price" required min="1" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-gray-400 uppercase">Duration</label>
-          <select id="start-auction-duration" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-            <option value="10m">10 minutes (demo)</option>
-            <option value="1h" selected>1 hour</option>
-            <option value="6h">6 hours</option>
-            <option value="24h">24 hours</option>
-            <option value="3d">3 days</option>
-          </select>
-        </div>
-        <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">Start Auction</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- PROPOSE TRADE MODAL -->
-  <div id="propose-trade-modal" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeProposeTradeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-gray-800 text-gray-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <div>
-        <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-handshake text-purple-400"></i> Propose a Trade</h3>
-        <p class="text-xs text-gray-400 mt-1">Offer a card to <span id="propose-trade-partner" class="text-white font-semibold"></span>, optionally requesting one back.</p>
-      </div>
-      <form onsubmit="submitProposeTrade(event)" class="space-y-3">
-        <div>
-          <label class="text-[10px] font-bold text-gray-400 uppercase">You Offer</label>
-          <select id="propose-offer-select" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"></select>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-gray-400 uppercase">You Request (optional)</label>
-          <select id="propose-request-select" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"></select>
-        </div>
-        <button type="submit" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow transition-all">Send Proposal</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- MAIN CONTENT AREA -->
+  <!-- MAIN BODY CONTENT -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8">
-
-    <!-- CATALOG / COLLECTION TAB -->
+    
+    <!-- COLLECTION VIEW -->
     <section id="view-catalog" class="space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div class="flex items-center gap-4">
@@ -337,12 +236,12 @@
             <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
           </div>
           <div>
-            <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-wider">LIMITED EDITION STOCK</span>
-            <h2 class="text-base font-bold text-white mt-0.5">Primary Collection Cards</h2>
-            <p class="text-xs text-gray-400">Browse official mint availability (+2% tax added at checkout).</p>
+            <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-wider">PRIMARY COLLECTION</span>
+            <h2 class="text-base font-bold text-white mt-0.5">Available Card Inventory</h2>
+            <p class="text-xs text-gray-400">Official card releases and public mint status.</p>
           </div>
         </div>
-
+        
         <div class="bg-gray-800/80 px-5 py-2.5 rounded-xl border border-gray-700 text-center sm:text-right w-full sm:w-auto">
           <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Remaining Cards</p>
           <p class="text-xl font-bold font-mono text-blue-400"><span id="remaining-cards-count">0</span> <span class="text-gray-400 text-xs font-normal">Available</span></p>
@@ -352,12 +251,8 @@
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-gray-900 p-2.5 rounded-xl border border-gray-800">
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-          <input type="text" id="search-input" oninput="renderCardGrid()" placeholder="Search serial (*01) or card name..." class="w-full bg-gray-800 border border-gray-700 rounded-lg pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+          <input type="text" id="search-input" oninput="renderCardGrid()" placeholder="Search serial (*01) or card title..." class="w-full bg-gray-800 border border-gray-700 rounded-lg pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
         </div>
-        <label class="flex items-center gap-1.5 text-[11px] text-gray-400 px-1 cursor-pointer whitespace-nowrap select-none">
-          <input type="checkbox" id="hide-sold-toggle" onchange="toggleHideSold()" class="accent-blue-600 w-3.5 h-3.5">
-          Hide sold
-        </label>
         <div class="flex items-center gap-1.5">
           <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition-all">All</button>
           <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800 text-gray-400 hover:text-white transition-all">Premium</button>
@@ -368,215 +263,129 @@
       <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </section>
 
-    <!-- TRADE MARKET TAB -->
+    <!-- TRADE MARKET VIEW -->
     <section id="view-trade" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-right-left text-blue-400 mr-2"></i> Secondary Trade Market</h2>
-          <p class="text-xs text-gray-400 mt-1">Collectors reselling owned cards at a fixed price, plus 2% platform tax.</p>
-        </div>
-        <button onclick="openListTradeModal()" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-2 whitespace-nowrap">
-          <i class="fa-solid fa-plus"></i> List a Card
-        </button>
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-right-left text-blue-400 mr-2"></i> Secondary Trade Market</h2>
+        <p class="text-xs text-gray-400 mt-1">Peer-to-peer trading room.</p>
       </div>
-
-      <div class="relative">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-        <input type="text" id="trade-search-input" oninput="renderTradeListings()" placeholder="Search listings by serial or name..." class="w-full bg-gray-900 border border-gray-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
-      </div>
-
       <div id="trade-listings-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- AUCTIONS TAB -->
+    <!-- AUCTIONS VIEW -->
     <section id="view-auction" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
-          <p class="text-xs text-gray-400 mt-1">Bid live on serial cards. Highest bid wins when the clock runs out.</p>
-        </div>
-        <button onclick="openStartAuctionModal()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-2 whitespace-nowrap">
-          <i class="fa-solid fa-plus"></i> Start an Auction
-        </button>
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
+        <p class="text-xs text-gray-400 mt-1">Realtime bids on high-tier cards.</p>
       </div>
-
       <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
     </section>
 
-    <!-- MESSENGER / CHAT TAB -->
+    <!-- MESSENGER VIEW -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
-          <i class="fa-solid fa-comments text-indigo-400"></i> MESSENGER & DIRECT CHAT
+          <i class="fa-solid fa-comments text-indigo-400"></i> MESSENGER & CHAT
         </h2>
-        <p class="text-xs text-gray-400 mt-1">Select any collector handle on the left to start a direct trading conversation.</p>
+        <p class="text-xs text-gray-400 mt-1">Select a handle to message or propose trade offers.</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Directory Sidebar -->
         <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-4">
-          <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-            <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Filter collector handles..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-          </div>
-
-          <div class="space-y-1.5">
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-1">COLLECTOR DIRECTORY</p>
-            <div id="user-search-list" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
-          </div>
+          <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search collectors..." class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+          <div id="user-search-list" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
         </div>
 
-        <!-- Dynamic Chat Pane -->
         <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between min-h-[420px]">
           <div id="chat-header" class="border-b border-gray-800 pb-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-blue-400 font-bold text-xs">
-                <i class="fa-solid fa-user"></i>
-              </div>
-              <div>
-                <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a collector</h4>
-                <p id="chat-active-badge" class="text-[10px] text-gray-500">Encrypted Direct Channel</p>
-              </div>
+            <div>
+              <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a collector</h4>
+              <p id="chat-active-badge" class="text-[10px] text-gray-500">Direct Channel</p>
             </div>
-
-            <button onclick="sendTradePromptInChat()" class="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all">
-              <i class="fa-solid fa-handshake"></i> Propose Trade
-            </button>
+            <button onclick="sendTradePromptInChat()" class="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold transition-all">Propose Trade</button>
           </div>
 
-          <!-- Chat Messages Container -->
           <div id="chat-messages" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-72 text-xs text-gray-400 flex flex-col justify-center items-center">
             <i class="fa-solid fa-paper-plane text-3xl text-gray-800 mb-2"></i>
-            <span>Select a user handle from the left to start direct chatting.</span>
+            <span>Select a user handle to start chatting.</span>
           </div>
 
-          <!-- Input Bar -->
           <div class="flex items-center gap-2 border-t border-gray-800 pt-3">
-            <input type="text" id="chat-message-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMessage();}" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
+            <input type="text" id="chat-message-input" placeholder="Type a message..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
             <button onclick="sendChatMessage()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Send</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- COLLECTORS / HOLDERS TAB -->
+    <!-- COLLECTORS VIEW -->
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Community Collectors</h2>
-        <p class="text-xs text-gray-400 mt-1">Registered collectors and what they hold.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Active Collectors</h2>
       </div>
       <div id="holders-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- LEDGER / HISTORY TAB -->
+    <!-- LEDGER VIEW -->
     <section id="view-history" class="hidden space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Marketplace Ledger</h2>
-        <p class="text-xs text-gray-400 mt-1">Completed transaction audit log — purchases, trades, auctions, and swaps.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Audit Ledger</h2>
       </div>
-
       <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-gray-300">
-            <thead class="bg-gray-800/80 text-[10px] uppercase text-gray-400 font-semibold border-b border-gray-800">
-              <tr>
-                <th class="p-3">Timestamp</th>
-                <th class="p-3">Action</th>
-                <th class="p-3">Item Serial</th>
-                <th class="p-3">User Handle</th>
-                <th class="p-3 font-mono text-right">Base</th>
-                <th class="p-3 font-mono text-right">Tax (2%)</th>
-                <th class="p-3 font-mono text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody id="history-table-body" class="divide-y divide-gray-800"></tbody>
-          </table>
-        </div>
+        <table class="w-full text-left text-xs text-gray-300">
+          <thead class="bg-gray-800/80 text-[10px] uppercase text-gray-400 font-semibold border-b border-gray-800">
+            <tr><th class="p-3">Time</th><th class="p-3">Type</th><th class="p-3">Serial</th><th class="p-3">User</th><th class="p-3 text-right">Value</th></tr>
+          </thead>
+          <tbody id="history-table-body" class="divide-y divide-gray-800"></tbody>
+        </table>
       </div>
     </section>
 
-    <!-- MY VAULT TAB -->
+    <!-- MY VAULT VIEW -->
     <section id="view-dashboard" class="hidden space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Private Vault</h2>
-        <p class="text-xs text-gray-400 mt-1">Cards linked to your active profile session.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Personal Vault</h2>
       </div>
       <div id="owned-cards-grid" class="bg-gray-900 border border-gray-800 rounded-2xl p-6"></div>
     </section>
 
-    <!-- ANALYTICS TAB -->
-    <section id="view-analytics" class="hidden space-y-6">
+    <!-- AI ANALYTICS VIEW -->
+    <section id="view-ai-prediction" class="hidden space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
-          <i class="fa-solid fa-chart-line text-emerald-400"></i> Marketplace Analytics
-        </h2>
-        <p class="text-xs text-gray-400 mt-1">Live figures computed from the actual catalog and transaction ledger.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-brain text-emerald-400 mr-2"></i> Revenue Analytics</h2>
       </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Unsold Catalog Value</p>
-          <p id="an-catalog-value" class="text-xl font-bold font-mono text-blue-400 mt-1">IDR 0</p>
-        </div>
-        <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Total Sales Volume</p>
-          <p id="an-sold-volume" class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 0</p>
+          <p class="text-[10px] uppercase font-bold text-gray-400">Total Market Value</p>
+          <p id="ai-projected-volume" class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 0</p>
         </div>
         <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Platform Tax Collected</p>
-          <p id="an-tax-collected" class="text-xl font-bold font-mono text-amber-400 mt-1">IDR 0</p>
-        </div>
-        <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Sell-Through Rate</p>
-          <p id="an-sell-through" class="text-xl font-bold font-mono text-purple-400 mt-1">0%</p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-          <h3 class="text-xs font-bold text-white uppercase tracking-wider">Tier Breakdown</h3>
-          <div id="an-tier-breakdown" class="space-y-4"></div>
-        </div>
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-2">Top Collectors</h3>
-          <div id="an-leaderboard"></div>
-        </div>
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-2">Recent Activity</h3>
-          <div id="an-recent-activity"></div>
+          <p class="text-[10px] uppercase font-bold text-gray-400">Est. 2% Revenue</p>
+          <p id="ai-projected-tax" class="text-xl font-bold font-mono text-blue-400 mt-1">IDR 0</p>
         </div>
       </div>
     </section>
 
-    <!-- INVENTORY STUDIO TAB (2-COLUMN REWORK) -->
+    <!-- INVENTORY CONTROL STUDIO VIEW -->
     <section id="view-inventory" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
-            <i class="fa-solid fa-boxes-stacked text-amber-400"></i> INVENTORY CONTROL STUDIO
-          </h2>
-          <p class="text-xs text-gray-400 mt-1">Mint new cards, edit prices, and update image links. Ownership is only set through Buy / Trade / Auction / Swap.</p>
-        </div>
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-2"></i> Inventory Control Studio</h2>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Mint / Edit Form -->
         <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-          <h3 id="inv-form-title" class="text-xs font-bold text-white uppercase tracking-wider">Mint New Card</h3>
+          <h3 id="inv-form-title" class="text-xs font-bold text-white uppercase">Mint / Edit Card</h3>
 
           <form id="inventory-editor-form" onsubmit="handleInventorySubmit(event)" class="space-y-3">
             <input type="hidden" id="inv-input-id">
-
             <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Serial Code Tag (*01)</label>
+              <label class="text-[10px] font-bold text-gray-400 uppercase">Serial Code (*01)</label>
               <input type="text" id="inv-input-serial" required placeholder="*01" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
             </div>
-
             <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Card Name Title</label>
+              <label class="text-[10px] font-bold text-gray-400 uppercase">Card Name</label>
               <input type="text" id="inv-input-name" required placeholder="Eugene Card #01" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
             </div>
-
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="text-[10px] font-bold text-gray-400 uppercase">Tier</label>
@@ -587,43 +396,35 @@
               </div>
               <div>
                 <label class="text-[10px] font-bold text-gray-400 uppercase">Price (IDR)</label>
-                <input type="number" id="inv-input-price" required min="1" placeholder="500000" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
+                <input type="number" id="inv-input-price" required min="0" placeholder="500000" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
               </div>
             </div>
-
             <div>
               <label class="text-[10px] font-bold text-gray-400 uppercase">Image URL Link</label>
               <input type="url" id="inv-input-img" required placeholder="https://..." class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
             </div>
-
-            <p id="inv-status-note" class="hidden text-[10px] text-gray-500 bg-gray-800/50 border border-gray-800 rounded-xl px-3 py-2"></p>
-
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase">Status</label>
+              <select id="inv-input-status" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="OWNED">OWNED</option>
+              </select>
+            </div>
             <div class="pt-2 flex gap-2">
-              <button type="submit" id="inv-submit-btn" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">
-                Mint Card
-              </button>
-              <button type="button" onclick="resetInventoryForm()" class="px-3 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs rounded-xl transition-all">
-                Clear
-              </button>
+              <button type="submit" id="inv-submit-btn" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Mint Card</button>
+              <button type="button" onclick="resetInventoryForm()" class="px-3 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs rounded-xl transition-all">Reset</button>
             </div>
           </form>
         </div>
 
-        <!-- Inventory List Table -->
         <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-          <div class="p-4 border-b border-gray-800 flex justify-between items-center">
-            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Inventory Catalog (<span id="inv-total-count">0</span>)</h3>
+          <div class="p-4 border-b border-gray-800">
+            <h3 class="text-xs font-bold text-white uppercase">Inventory Catalog (<span id="inv-total-count">0</span>)</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs text-gray-300">
               <thead class="bg-gray-800/80 text-[10px] uppercase text-gray-400 font-semibold border-b border-gray-800">
-                <tr>
-                  <th class="p-3">Card</th>
-                  <th class="p-3">Tier</th>
-                  <th class="p-3">Price</th>
-                  <th class="p-3">Status</th>
-                  <th class="p-3 text-right">Actions</th>
-                </tr>
+                <tr><th class="p-3">Card</th><th class="p-3">Tier</th><th class="p-3">Price</th><th class="p-3">Status</th><th class="p-3 text-right">Actions</th></tr>
               </thead>
               <tbody id="inventory-table-body" class="divide-y divide-gray-800"></tbody>
             </table>
@@ -635,314 +436,157 @@
   </main>
 
   <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-6 right-6 z-[10000] bg-gray-900 border border-blue-500/40 text-blue-400 text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all pointer-events-none max-w-xs">
+  <div id="toast" class="fixed bottom-6 right-6 z-[10000] bg-gray-900 border border-blue-500/40 text-blue-400 text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all pointer-events-none">
     <span id="toast-msg">Action completed.</span>
   </div>
 
   <script>
-    /* ============================================================
-       CONFIG & STATE
-    ============================================================ */
     const ADMIN_HANDLES = ['admin', 'eugene_admin', 'yujin_admin'];
-    const PLATFORM_TAX_RATE = 0.02;
-    const AUCTION_DURATIONS = { '10m': 10*60*1000, '1h': 60*60*1000, '6h': 6*60*60*1000, '24h': 24*60*60*1000, '3d': 3*24*60*60*1000 };
 
     let currentUser = null;
     let isSignUpMode = false;
     let inventory = [];
     let customAccounts = [];
     let historyLogs = [];
-    let tradeListings = [];
-    let auctions = [];
-    let chatThreads = {};
     let currentFilter = 'ALL';
-    let hideSold = false;
-    let activeDetailCardId = null;
-    let activeChatPartner = null;
-    let failedAuthAttempts = 0;
 
-    /* ============================================================
-       UTILITIES
-    ============================================================ */
-    // Escape for HTML text/attribute output. Always store RAW input,
-    // and only escape at render time -- escaping at both ends double-encodes
-    // characters like & and breaks names such as "Rock & Roll".
     function escapeHTML(str) {
       if (typeof str !== 'string') return str;
-      return str.replace(/[&<>'"]/g,
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
-    function formatIDR(n) { return 'IDR ' + Math.round(n || 0).toLocaleString('id-ID'); }
-    function calcTax(base) { return Math.round(base * PLATFORM_TAX_RATE); }
-    function genId(prefix) { return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`; }
-    function getCard(id) { return inventory.find(c => c.id === id); }
-    function getUser(username) { return customAccounts.find(u => u.username === username); }
-    function threadKey(a, b) { return [a, b].sort().join('::'); }
-    function isAdmin() { return !!(currentUser && currentUser.isAdmin); }
-
-    function timeLeftLabel(ms) {
-      if (ms <= 0) return 'Ended';
-      const s = Math.floor(ms / 1000);
-      const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-      if (d > 0) return `${d}d ${h}h ${m}m`;
-      if (h > 0) return `${h}h ${m}m ${sec}s`;
-      return `${m}m ${sec}s`;
-    }
-
-    // SHA-256 password hashing via Web Crypto (falls back gracefully if
-    // the page is opened outside a secure context, e.g. plain file://).
-    async function hashPassword(pw) {
-      if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
-        try {
-          const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-          return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-        } catch (e) { /* fall through to the fallback below */ }
-      }
-      let hash = 0;
-      for (let i = 0; i < pw.length; i++) { hash = ((hash << 5) - hash + pw.charCodeAt(i)) | 0; }
-      return 'fallback_' + Math.abs(hash).toString(16);
-    }
-
-    /* ============================================================
-       PERSISTENCE
-    ============================================================ */
-    function persist(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
-
-    async function loadAppData() {
+    function loadAppData() {
       const savedAccs = localStorage.getItem('eugene_custom_accounts');
       if (savedAccs) {
-        try { customAccounts = JSON.parse(savedAccs); } catch (e) { customAccounts = []; }
-      }
-      if (!customAccounts || customAccounts.length === 0) {
+        try { customAccounts = JSON.parse(savedAccs); } catch(e) { customAccounts = []; }
+      } else {
         customAccounts = [
-          { username: 'admin', name: 'Yujin Admin', passHash: await hashPassword('admin123'), isAdmin: true, authType: 'custom', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=admin' },
-          { username: 'alex_collector', name: 'Alex Johnson', passHash: await hashPassword('pass123'), isAdmin: false, authType: 'custom', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=alex' }
+          { username: 'admin', name: 'Yujin Admin', pass: 'admin123', isAdmin: true, authType: 'custom', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=admin' },
+          { username: 'alex_collector', name: 'Alex Johnson', pass: 'pass123', isAdmin: false, authType: 'custom', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=alex' }
         ];
-        persist('eugene_custom_accounts', customAccounts);
+        localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
       }
 
       const savedSession = localStorage.getItem('eugene_active_user');
       if (savedSession) {
-        try {
-          const parsed = JSON.parse(savedSession);
-          currentUser = customAccounts.find(u => u.username === parsed.username) || null;
-        } catch (e) { currentUser = null; }
+        try { currentUser = JSON.parse(savedSession); } catch(e) { currentUser = null; }
       }
 
       const savedInv = localStorage.getItem('eugene_inventory');
       if (savedInv) {
-        try { inventory = JSON.parse(savedInv); } catch (e) { inventory = []; }
+        try { inventory = JSON.parse(savedInv); } catch(e) { inventory = []; }
       }
       if (!inventory || inventory.length === 0) {
-        inventory = Array.from({ length: 20 }, (_, i) => {
+        inventory = Array.from({ length: 15 }, (_, i) => {
           const num = String(i + 1).padStart(2, '0');
-          const isPrem = i < 10;
+          const isPrem = i < 8;
           return {
             id: `card-${i + 1}`,
             serial: `*${num}`,
             name: isPrem ? `Eugene Premium #${num}` : `Eugene Standard #${num}`,
             type: isPrem ? 'PREMIUM' : 'STANDARD',
             price: isPrem ? 500000 : 100000,
-            status: i === 2 ? 'OWNED' : 'AVAILABLE',
-            owner: i === 2 ? 'alex_collector' : null,
-            listedStatus: null,
+            status: i === 1 ? 'OWNED' : 'AVAILABLE',
+            owner: i === 1 ? 'alex_collector' : null,
             imgUrl: `https://placehold.co/1080x1350/111827/3b82f6?text=*${num}`
           };
         });
-        persist('eugene_inventory', inventory);
-      } else {
-        inventory.forEach(c => { if (c.listedStatus === undefined) c.listedStatus = null; });
+        localStorage.setItem('eugene_inventory', JSON.stringify(inventory));
       }
 
       const savedHistory = localStorage.getItem('eugene_history');
-      if (savedHistory) { try { historyLogs = JSON.parse(savedHistory); } catch (e) { historyLogs = []; } }
-
-      const savedTrade = localStorage.getItem('eugene_trade_listings');
-      if (savedTrade) { try { tradeListings = JSON.parse(savedTrade); } catch (e) { tradeListings = []; } }
-
-      const savedAuctions = localStorage.getItem('eugene_auctions');
-      if (savedAuctions) { try { auctions = JSON.parse(savedAuctions); } catch (e) { auctions = []; } }
-
-      const savedChats = localStorage.getItem('eugene_chat_threads');
-      if (savedChats) { try { chatThreads = JSON.parse(savedChats); } catch (e) { chatThreads = {}; } }
+      if (savedHistory) {
+        try { historyLogs = JSON.parse(savedHistory); } catch(e) { historyLogs = []; }
+      }
     }
 
-    function saveAccounts() { persist('eugene_custom_accounts', customAccounts); }
-    function saveChatThreads() { persist('eugene_chat_threads', chatThreads); }
-
     function saveInventoryState() {
-      persist('eugene_inventory', inventory);
+      localStorage.setItem('eugene_inventory', JSON.stringify(inventory));
       renderCardGrid();
       renderInventoryTable();
       renderVaultGrid();
-      renderAnalytics();
-    }
-    function saveTradeListings() {
-      persist('eugene_trade_listings', tradeListings);
-      renderTradeListings();
-      renderVaultGrid();
-    }
-    function saveAuctions() {
-      persist('eugene_auctions', auctions);
-      renderAuctions();
-      renderVaultGrid();
-    }
-    function saveHistory() {
-      persist('eugene_history', historyLogs);
-      renderHistoryTable();
-      renderAnalytics();
+      updateAIPrediction();
     }
 
-    /* ============================================================
-       INIT
-    ============================================================ */
-    document.addEventListener('DOMContentLoaded', async () => {
-      await loadAppData();
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAppData();
       renderAuthHeader();
       renderCardGrid();
       renderInventoryTable();
       renderVaultGrid();
       renderHoldersList();
       renderHistoryTable();
-      renderTradeListings();
-      renderAuctions();
       searchUsersForChat();
-      renderAnalytics();
-      setupModalBackdrops();
-      switchTab('catalog');
-      setInterval(tickAuctions, 1000);
+      updateAIPrediction();
     });
 
-    function setupModalBackdrops() {
-      document.querySelectorAll('.modal-backdrop').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-          if (e.target === modal) modal.classList.add('hidden');
-        });
-      });
-    }
-
-    // Delegated click handler for the chat directory list -- avoids
-    // interpolating free-text usernames/names into inline onclick
-    // attributes, which could otherwise break out of the handler string.
-    document.addEventListener('click', (e) => {
-      const entry = e.target.closest('.chat-directory-entry');
-      if (entry) startChatWithUser(entry.dataset.username);
-    });
-
-    /* ============================================================
-       AUTHENTICATION
-    ============================================================ */
-    function togglePasswordVisibility() {
-      const input = document.getElementById('auth-input-password');
-      const icon = document.getElementById('pass-toggle-icon');
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fa-solid fa-eye-slash';
-      } else {
-        input.type = 'password';
-        icon.className = 'fa-solid fa-eye';
-      }
-    }
-
-    async function loginWithGoogleOAuth() {
-      // Reuse a stable mock identity per browser instead of spawning a
-      // brand new ghost account on every click.
-      let googleUsername = localStorage.getItem('eugene_google_identity');
-      let acc = googleUsername ? getUser(googleUsername) : null;
-
-      if (!acc) {
-        const suffix = Math.floor(1000 + Math.random() * 9000);
-        acc = {
-          username: `google_collector_${suffix}`,
-          name: 'Google Collector',
-          passHash: null,
-          isAdmin: false,
-          authType: 'google',
-          avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=google_${suffix}`
-        };
-        customAccounts.push(acc);
-        saveAccounts();
-        localStorage.setItem('eugene_google_identity', acc.username);
-      }
-
-      currentUser = acc;
-      persist('eugene_active_user', currentUser);
+    function loginWithGoogleOAuth() {
+      const googleUser = {
+        username: 'google_collector_' + Math.floor(1000 + Math.random() * 9000),
+        name: 'Google Collector',
+        pass: 'oauth_' + Date.now(),
+        isAdmin: false,
+        authType: 'google',
+        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=google_' + Date.now()
+      };
+      customAccounts.push(googleUser);
+      localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
+      currentUser = googleUser;
+      localStorage.setItem('eugene_active_user', JSON.stringify(currentUser));
       closeAuthModal();
-      renderAuthHeader(); renderVaultGrid(); renderHoldersList(); searchUsersForChat(); renderAnalytics();
-      showToast(`Signed in with Google as @${acc.username}.`);
+      renderAuthHeader();
+      renderVaultGrid();
+      renderHoldersList();
+      searchUsersForChat();
+      showToast('Signed in via Google OAuth!');
     }
 
     function toggleAuthMode() {
       isSignUpMode = !isSignUpMode;
-      document.getElementById('auth-modal-title').innerText = isSignUpMode ? "Create Custom Account" : "Sign In to Eugene Card";
+      document.getElementById('auth-modal-title').innerText = isSignUpMode ? "Create Account" : "Sign In to Eugene Card";
       document.getElementById('auth-name-field').classList.toggle('hidden', !isSignUpMode);
-      document.getElementById('auth-submit-btn').innerText = isSignUpMode ? "Register Account" : "Sign In";
-      document.getElementById('auth-toggle-btn').innerText = isSignUpMode ? "Already have an account? Sign In" : "Don't have an account? Create one";
+      document.getElementById('auth-submit-btn').innerText = isSignUpMode ? "Register" : "Sign In";
+      document.getElementById('auth-toggle-btn').innerText = isSignUpMode ? "Already have an account? Sign In" : "Need an account? Register";
     }
 
-    async function handleCustomAuthSubmit(e) {
+    function handleCustomAuthSubmit(e) {
       e.preventDefault();
-
-      if (failedAuthAttempts >= 5) {
-        return showToast('Too many failed attempts. Please wait and try again.');
-      }
-
-      const rawUsername = document.getElementById('auth-input-username').value.trim();
-      const rawPassword = document.getElementById('auth-input-password').value;
+      const rawUser = document.getElementById('auth-input-username').value.trim();
+      const rawPass = document.getElementById('auth-input-password').value;
       const rawName = document.getElementById('auth-input-name').value.trim();
 
-      const username = rawUsername.toLowerCase().replace(/\s+/g, '_');
-      const name = rawName || username;
-
-      if (!username || !rawPassword) return showToast('Please enter both a username and password.');
-      if (!/^[a-z0-9_]{3,20}$/.test(username)) {
-        return showToast('Usernames must be 3-20 characters: letters, numbers, underscores only.');
-      }
+      const username = escapeHTML(rawUser.toLowerCase().replace(/\s+/g, '_'));
+      const password = rawPass;
+      const name = escapeHTML(rawName || username);
 
       if (isSignUpMode) {
-        if (rawPassword.length < 6) return showToast('Password must be at least 6 characters.');
-        if (customAccounts.some(u => u.username === username)) return showToast('That username is already taken.');
-        const newAcc = {
-          username, name,
-          passHash: await hashPassword(rawPassword),
-          authType: 'custom',
-          isAdmin: ADMIN_HANDLES.includes(username),
-          avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`
-        };
+        if (customAccounts.some(u => u.username === username)) return showToast('Handle already exists.');
+        const newAcc = { username, name, pass: password, authType: 'custom', isAdmin: ADMIN_HANDLES.includes(username), avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${username}` };
         customAccounts.push(newAcc);
-        saveAccounts();
+        localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
         currentUser = newAcc;
-        failedAuthAttempts = 0;
-        showToast('Account created! Welcome to Eugene Card.');
+        showToast('Registered & logged in!');
       } else {
-        const enteredHash = await hashPassword(rawPassword);
-        const acc = customAccounts.find(u => u.username === username && u.passHash === enteredHash);
-        if (!acc) {
-          failedAuthAttempts++;
-          return showToast(`Incorrect username or password (${failedAuthAttempts}/5 attempts).`);
-        }
+        const acc = customAccounts.find(u => u.username === username && u.pass === password);
+        if (!acc) return showToast('Invalid credentials.');
         currentUser = acc;
-        failedAuthAttempts = 0;
         showToast(`Welcome back, @${currentUser.username}!`);
       }
 
-      persist('eugene_active_user', currentUser);
+      localStorage.setItem('eugene_active_user', JSON.stringify(currentUser));
       closeAuthModal();
-      document.getElementById('custom-auth-form').reset();
-      renderAuthHeader(); renderVaultGrid(); renderHoldersList(); searchUsersForChat(); renderAnalytics();
+      renderAuthHeader();
+      renderVaultGrid();
+      renderHoldersList();
+      searchUsersForChat();
     }
 
     function logoutUser() {
       currentUser = null;
-      activeChatPartner = null;
       localStorage.removeItem('eugene_active_user');
       renderAuthHeader();
       renderVaultGrid();
-      renderChatMessages();
-      switchTab('catalog');
-      showToast('Logged out successfully.');
+      showToast('Logged out.');
     }
 
     function renderAuthHeader() {
@@ -959,19 +603,14 @@
           if (adminSep) adminSep.classList.add('hidden');
         }
 
-        const isGoogle = currentUser.authType === 'google';
-
         container.innerHTML = `
           <div class="flex items-center gap-2 bg-gray-800/90 border border-gray-700/80 rounded-xl p-1.5 pl-2.5">
-            <img src="${escapeHTML(currentUser.avatar)}" class="w-6 h-6 rounded-full object-cover bg-gray-900 border border-gray-700">
+            <img src="${currentUser.avatar}" class="w-6 h-6 rounded-full bg-gray-900 border border-gray-700">
             <div class="flex flex-col text-left">
-              <div class="flex items-center gap-1">
-                <span class="text-xs font-bold text-white leading-tight">${escapeHTML(currentUser.name)}</span>
-                ${isGoogle ? '<i class="fa-brands fa-google text-[9px] text-red-400" title="Google Verified"></i>' : ''}
-              </div>
+              <span class="text-xs font-bold text-white leading-tight">${escapeHTML(currentUser.name)}</span>
               <span class="text-[9px] font-semibold text-blue-400 font-mono">@${escapeHTML(currentUser.username)}</span>
             </div>
-            <button onclick="logoutUser()" title="Log Out" class="p-1.5 bg-gray-900 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-lg ml-1 transition-all">
+            <button onclick="logoutUser()" title="Log Out" class="p-1.5 bg-gray-900 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-lg ml-1">
               <i class="fa-solid fa-right-from-bracket text-xs"></i>
             </button>
           </div>
@@ -988,893 +627,31 @@
       }
     }
 
-    /* ============================================================
-       CATALOG (search + filter actually work now)
-    ============================================================ */
-    function renderCardGrid() {
-      const grid = document.getElementById('card-grid');
-      if (!grid) return;
-
-      document.getElementById('remaining-cards-count').innerText = inventory.filter(c => c.status === 'AVAILABLE').length;
-
-      const query = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
-      const list = inventory.filter(card => {
-        if (currentFilter !== 'ALL' && card.type !== currentFilter) return false;
-        if (hideSold && card.status === 'OWNED') return false;
-        if (query && !(card.serial.toLowerCase().includes(query) || card.name.toLowerCase().includes(query))) return false;
-        return true;
-      });
-
-      if (list.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-gray-500">
-          <i class="fa-solid fa-magnifying-glass text-2xl mb-2 block"></i>
-          No cards match your search or filters.
-        </div>`;
-        return;
-      }
-
-      grid.innerHTML = list.map(card => `
-        <div onclick="openCardDetailsModal('${card.id}')" class="${card.type === 'PREMIUM' ? 'card-glow-premium' : 'card-glow-standard'} relative rounded-xl p-3 flex flex-col justify-between cursor-pointer">
-          ${card.status === 'OWNED' ? `<span class="absolute top-2 right-2 z-10 text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-600/90 text-white">SOLD</span>` : ''}
-          ${card.listedStatus === 'AUCTION' ? `<span class="absolute top-2 left-2 z-10 text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/90 text-white flex items-center gap-1"><i class="fa-solid fa-gavel"></i> LIVE</span>` : ''}
-          ${card.listedStatus === 'TRADE' ? `<span class="absolute top-2 left-2 z-10 text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/90 text-white flex items-center gap-1"><i class="fa-solid fa-right-left"></i> TRADE</span>` : ''}
-          <div class="w-full aspect-[4/5] bg-gray-950 rounded-lg border border-gray-800 p-1 mb-2 overflow-hidden flex items-center justify-center">
-            <img src="${escapeHTML(card.imgUrl)}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=Image+Unavailable'">
-          </div>
-          <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${escapeHTML(card.serial)}</p>
-          <p class="text-[11px] font-bold text-white truncate text-center">${escapeHTML(card.name)}</p>
-          <p class="text-[10px] font-mono text-emerald-400 text-center mt-0.5">${formatIDR(card.price)}</p>
-        </div>
-      `).join('');
-    }
-
-    function setFilter(type) {
-      currentFilter = type;
-      ['ALL', 'PREMIUM', 'STANDARD'].forEach(t => {
-        const btn = document.getElementById(`filter-${t}`);
-        if (!btn) return;
-        btn.className = t === type
-          ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition-all'
-          : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800 text-gray-400 hover:text-white transition-all';
-      });
-      renderCardGrid();
-    }
-
-    function toggleHideSold() {
-      hideSold = document.getElementById('hide-sold-toggle').checked;
-      renderCardGrid();
-    }
-
-    /* ============================================================
-       CARD DETAILS MODAL
-    ============================================================ */
-    function openCardDetailsModal(cardId) {
-      const card = getCard(cardId);
-      if (!card) return;
-      activeDetailCardId = card.id;
-
-      document.getElementById('detail-card-img').src = card.imgUrl;
-      document.getElementById('detail-card-serial').innerText = card.serial;
-      document.getElementById('detail-card-name').innerText = card.name;
-      document.getElementById('detail-card-price').innerText = formatIDR(card.price);
-      document.getElementById('detail-card-type').innerText = card.type;
-      document.getElementById('detail-card-type').className = `text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/10 text-indigo-300' : 'bg-gray-700/60 text-gray-300'}`;
-
-      let statusLine = `Status: ${card.status}`;
-      if (card.owner) statusLine += ` (Owner: @${card.owner})`;
-      if (card.listedStatus === 'TRADE') statusLine += ' — Listed on Trade Market';
-      if (card.listedStatus === 'AUCTION') statusLine += ' — Live in Auction House';
-      document.getElementById('detail-card-status').innerText = statusLine;
-
-      document.getElementById('detail-action-container').innerHTML = buildDetailActions(card);
-      document.getElementById('card-details-modal').classList.remove('hidden');
-    }
-
-    function buildDetailActions(card) {
-      const isMine = currentUser && currentUser.username === card.owner;
-
-      if (card.listedStatus === 'AUCTION') {
-        return `
-          <button onclick="closeCardDetailsModal(); switchTab('auction');" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-gavel"></i> View Live Auction
-          </button>`;
-      }
-      if (card.listedStatus === 'TRADE') {
-        return `
-          <button onclick="closeCardDetailsModal(); switchTab('trade');" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-right-left"></i> View on Trade Market
-          </button>`;
-      }
-      if (card.status === 'AVAILABLE') {
-        let html = `
-          <button onclick="buyCardAction('${card.id}')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-qrcode"></i> Buy Card Now
-          </button>`;
-        if (isAdmin()) {
-          html += `
-          <button onclick="closeCardDetailsModal(); openStartAuctionModal('${card.id}')" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-amber-300 font-bold text-[11px] rounded-xl border border-amber-500/30 transition-all flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-gavel"></i> Admin: Move to Auction Instead
-          </button>`;
-        }
-        return html;
-      }
-      // OWNED and not listed
-      if (isMine) {
-        return `
-          <div class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-vault"></i> In your private vault</div>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="closeCardDetailsModal(); openListTradeModal('${card.id}')" class="py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-right-left"></i> List for Trade
-            </button>
-            <button onclick="closeCardDetailsModal(); openStartAuctionModal('${card.id}')" class="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-gavel"></i> Start Auction
-            </button>
-          </div>`;
-      }
-      return `
-        <button disabled class="w-full py-2.5 bg-gray-800 text-gray-500 font-bold text-xs rounded-xl border border-gray-700 cursor-not-allowed flex items-center justify-center gap-2">
-          <i class="fa-solid fa-lock"></i> Owned by @${escapeHTML(card.owner || 'unknown')}
-        </button>`;
-    }
-
-    function buyCardAction(cardId) {
-      if (!currentUser) return openAuthModal();
-      const card = getCard(cardId);
-      if (!card || card.status !== 'AVAILABLE' || card.listedStatus) return;
-
-      const tax = calcTax(card.price);
-      const total = card.price + tax;
-
-      card.status = 'OWNED';
-      card.owner = currentUser.username;
-      saveInventoryState();
-
-      historyLogs.unshift({ timestamp: new Date().toLocaleString('id-ID'), type: 'PURCHASE', serial: card.serial, user: currentUser.username, base: card.price, tax, total });
-      saveHistory();
-
-      closeCardDetailsModal();
-      showToast(`Success! ${card.serial} added to your vault for ${formatIDR(total)}.`);
-    }
-
-    function closeCardDetailsModal() { document.getElementById('card-details-modal').classList.add('hidden'); }
-    function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
-    function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
-
-    /* ============================================================
-       TRADE MARKET (secondary, fixed-price listings)
-    ============================================================ */
-    function eligibleCardsForListing(username) {
-      return inventory.filter(c => c.owner === username && c.status === 'OWNED' && !c.listedStatus);
-    }
-
-    function openListTradeModal(cardId = null) {
-      if (!currentUser) return openAuthModal();
-      const eligible = eligibleCardsForListing(currentUser.username);
-      if (eligible.length === 0) return showToast("You don't have any unlisted cards to trade.");
-
-      const select = document.getElementById('list-trade-card-select');
-      select.innerHTML = eligible.map(c => `<option value="${c.id}" data-price="${c.price}">${escapeHTML(c.serial)} — ${escapeHTML(c.name)}</option>`).join('');
-      select.value = (cardId && eligible.some(c => c.id === cardId)) ? cardId : eligible[0].id;
-      updateListTradePricePlaceholder();
-      document.getElementById('list-trade-modal').classList.remove('hidden');
-    }
-    function updateListTradePricePlaceholder() {
-      const select = document.getElementById('list-trade-card-select');
-      const opt = select.options[select.selectedIndex];
-      if (opt) document.getElementById('list-trade-price').value = opt.dataset.price;
-    }
-    function closeListTradeModal() { document.getElementById('list-trade-modal').classList.add('hidden'); }
-
-    function submitListTrade(e) {
-      e.preventDefault();
-      if (!currentUser) return openAuthModal();
-      const cardId = document.getElementById('list-trade-card-select').value;
-      const price = parseInt(document.getElementById('list-trade-price').value, 10);
-      const card = getCard(cardId);
-      if (!card || card.owner !== currentUser.username || card.listedStatus) return showToast('This card is no longer eligible.');
-      if (!price || price <= 0) return showToast('Enter a valid asking price.');
-
-      card.listedStatus = 'TRADE';
-      tradeListings.unshift({ id: genId('trade'), cardId, sellerUsername: currentUser.username, price, createdAt: Date.now(), status: 'ACTIVE' });
-      saveTradeListings();
-      saveInventoryState();
-      closeListTradeModal();
-      showToast(`${card.serial} listed on the Trade Market for ${formatIDR(price)}.`);
-    }
-
-    function renderTradeListings() {
-      const grid = document.getElementById('trade-listings-grid');
-      if (!grid) return;
-      const query = (document.getElementById('trade-search-input')?.value || '').trim().toLowerCase();
-      const active = tradeListings.filter(l => {
-        if (l.status !== 'ACTIVE') return false;
-        const card = getCard(l.cardId);
-        if (!card) return false;
-        if (query && !(card.serial.toLowerCase().includes(query) || card.name.toLowerCase().includes(query))) return false;
-        return true;
-      });
-
-      if (active.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-14 text-xs text-gray-500 bg-gray-900 border border-gray-800 rounded-2xl">
-          <i class="fa-solid fa-right-left text-3xl mb-3 block text-gray-700"></i>
-          No active listings right now. Own a card? List it for other collectors to buy.
-        </div>`;
-        return;
-      }
-
-      grid.innerHTML = active.map(l => {
-        const card = getCard(l.cardId);
-        const total = l.price + calcTax(l.price);
-        const mine = currentUser && currentUser.username === l.sellerUsername;
-        const seller = getUser(l.sellerUsername);
-        return `
-          <div class="${card.type === 'PREMIUM' ? 'card-glow-premium' : 'card-glow-standard'} rounded-xl p-4 flex flex-col gap-3">
-            <div class="flex gap-3">
-              <div class="w-16 h-20 bg-gray-950 rounded-lg border border-gray-800 p-1 flex-shrink-0 overflow-hidden">
-                <img src="${escapeHTML(card.imgUrl)}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=N/A'">
-              </div>
-              <div class="min-w-0">
-                <p class="font-bold text-blue-400 font-mono text-xs">${escapeHTML(card.serial)}</p>
-                <p class="text-xs font-bold text-white truncate">${escapeHTML(card.name)}</p>
-                <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
-                  <img src="${seller ? escapeHTML(seller.avatar) : ''}" class="w-4 h-4 rounded-full">
-                  Seller: @${escapeHTML(l.sellerUsername)}
-                </p>
-              </div>
-            </div>
-            <div class="bg-gray-800/50 rounded-lg p-2.5 border border-gray-800 flex items-center justify-between">
-              <span class="text-[10px] text-gray-400">Total (incl. 2% tax)</span>
-              <span class="font-mono font-bold text-emerald-400 text-sm">${formatIDR(total)}</span>
-            </div>
-            ${mine
-              ? `<button onclick="cancelTradeListing('${l.id}')" class="w-full py-2 bg-gray-800 hover:bg-rose-500/20 text-rose-400 font-bold text-xs rounded-xl transition-all">Cancel Listing</button>`
-              : `<button onclick="buyTradeListing('${l.id}')" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Buy Now</button>`}
-          </div>`;
-      }).join('');
-    }
-
-    function buyTradeListing(listingId) {
-      if (!currentUser) return openAuthModal();
-      const listing = tradeListings.find(l => l.id === listingId && l.status === 'ACTIVE');
-      if (!listing) return showToast('This listing is no longer available.');
-      if (listing.sellerUsername === currentUser.username) return showToast("You can't buy your own listing.");
-      const card = getCard(listing.cardId);
-      if (!card) return;
-
-      const tax = calcTax(listing.price);
-      const total = listing.price + tax;
-      const prevOwner = card.owner;
-
-      card.owner = currentUser.username;
-      card.listedStatus = null;
-      listing.status = 'SOLD';
-
-      saveInventoryState();
-      saveTradeListings();
-
-      historyLogs.unshift({ timestamp: new Date().toLocaleString('id-ID'), type: 'TRADE_SALE', serial: card.serial, user: currentUser.username, base: listing.price, tax, total });
-      saveHistory();
-
-      showToast(`Bought ${card.serial} from @${prevOwner} for ${formatIDR(total)}.`);
-    }
-
-    function cancelTradeListing(listingId) {
-      const listing = tradeListings.find(l => l.id === listingId);
-      if (!listing || !currentUser || listing.sellerUsername !== currentUser.username) return;
-      listing.status = 'CANCELLED';
-      const card = getCard(listing.cardId);
-      if (card) card.listedStatus = null;
-      saveTradeListings();
-      saveInventoryState();
-      showToast('Listing cancelled.');
-    }
-
-    /* ============================================================
-       AUCTIONS
-    ============================================================ */
-    function eligibleCardsForAuction(user) {
-      return inventory.filter(c => !c.listedStatus && (
-        (c.status === 'OWNED' && c.owner === user.username) ||
-        (c.status === 'AVAILABLE' && user.isAdmin)
-      ));
-    }
-
-    function openStartAuctionModal(cardId = null) {
-      if (!currentUser) return openAuthModal();
-      const eligible = eligibleCardsForAuction(currentUser);
-      if (eligible.length === 0) return showToast('No eligible cards to auction right now.');
-
-      const select = document.getElementById('start-auction-card-select');
-      select.innerHTML = eligible.map(c => `<option value="${c.id}" data-price="${c.price}">${escapeHTML(c.serial)} — ${escapeHTML(c.name)}</option>`).join('');
-      select.value = (cardId && eligible.some(c => c.id === cardId)) ? cardId : eligible[0].id;
-      updateStartAuctionPricePlaceholder();
-      document.getElementById('start-auction-modal').classList.remove('hidden');
-    }
-    function updateStartAuctionPricePlaceholder() {
-      const select = document.getElementById('start-auction-card-select');
-      const opt = select.options[select.selectedIndex];
-      if (opt) document.getElementById('start-auction-price').value = opt.dataset.price;
-    }
-    function closeStartAuctionModal() { document.getElementById('start-auction-modal').classList.add('hidden'); }
-
-    function submitStartAuction(e) {
-      e.preventDefault();
-      if (!currentUser) return openAuthModal();
-      const cardId = document.getElementById('start-auction-card-select').value;
-      const startingBid = parseInt(document.getElementById('start-auction-price').value, 10);
-      const duration = document.getElementById('start-auction-duration').value;
-      const card = getCard(cardId);
-      if (!card || card.listedStatus) return showToast('This card is no longer eligible.');
-      if (!startingBid || startingBid <= 0) return showToast('Enter a valid starting bid.');
-
-      card.listedStatus = 'AUCTION';
-      auctions.unshift({
-        id: genId('auction'),
-        cardId,
-        sellerUsername: card.owner || null,
-        startingBid,
-        currentBid: 0,
-        currentBidder: null,
-        bidHistory: [],
-        endTime: Date.now() + (AUCTION_DURATIONS[duration] || AUCTION_DURATIONS['1h']),
-        status: 'LIVE'
-      });
-      saveAuctions();
-      saveInventoryState();
-      closeStartAuctionModal();
-      switchTab('auction');
-      showToast(`Auction started for ${card.serial}!`);
-    }
-
-    function minNextBid(auction) {
-      return auction.currentBid > 0 ? auction.currentBid + Math.max(1000, Math.round(auction.currentBid * 0.05)) : auction.startingBid;
-    }
-
-    function renderAuctions() {
-      const grid = document.getElementById('auctions-grid');
-      if (!grid) return;
-      const live = auctions.filter(a => a.status === 'LIVE');
-
-      if (live.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-14 text-xs text-gray-500 bg-gray-900 border border-gray-800 rounded-2xl">
-          <i class="fa-solid fa-gavel text-3xl mb-3 block text-gray-700"></i>
-          No live auctions right now. Own a card? Start one for other collectors to bid on.
-        </div>`;
-        return;
-      }
-
-      grid.innerHTML = live.map(a => {
-        const card = getCard(a.cardId);
-        if (!card) return '';
-        const minBid = minNextBid(a);
-        const remaining = a.endTime - Date.now();
-        const seller = a.sellerUsername ? `@${escapeHTML(a.sellerUsername)}` : 'Eugene Card (Official)';
-        return `
-          <div class="${card.type === 'PREMIUM' ? 'card-glow-premium' : 'card-glow-standard'} rounded-xl p-4 flex flex-col gap-3" id="auction-card-${a.id}">
-            <div class="flex gap-3">
-              <div class="w-20 h-24 bg-gray-950 rounded-lg border border-gray-800 p-1 flex-shrink-0 overflow-hidden">
-                <img src="${escapeHTML(card.imgUrl)}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=N/A'">
-              </div>
-              <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-1.5">
-                  <span class="live-dot"></span>
-                  <span class="text-[9px] font-bold uppercase text-emerald-400 tracking-wider">Live</span>
-                </div>
-                <p class="font-bold text-blue-400 font-mono text-xs mt-0.5">${escapeHTML(card.serial)}</p>
-                <p class="text-xs font-bold text-white truncate">${escapeHTML(card.name)}</p>
-                <p class="text-[10px] text-gray-400 mt-1">Seller: ${seller}</p>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div class="bg-gray-800/50 rounded-lg p-2.5 border border-gray-800">
-                <p class="text-[9px] text-gray-400 uppercase">Current Bid</p>
-                <p class="font-mono font-bold text-emerald-400 text-sm">${a.currentBid > 0 ? formatIDR(a.currentBid) : formatIDR(a.startingBid) + ' (start)'}</p>
-              </div>
-              <div class="bg-gray-800/50 rounded-lg p-2.5 border border-gray-800">
-                <p class="text-[9px] text-gray-400 uppercase">Time Left</p>
-                <p class="font-mono font-bold text-white text-sm" id="auction-timer-${a.id}">${timeLeftLabel(remaining)}</p>
-              </div>
-            </div>
-
-            ${a.bidHistory.length > 0 ? `<p class="text-[10px] text-gray-500">${a.bidHistory.length} bid${a.bidHistory.length > 1 ? 's' : ''} • highest by @${escapeHTML(a.currentBidder)}</p>` : `<p class="text-[10px] text-gray-500">No bids yet — be the first.</p>`}
-
-            <div class="flex items-center gap-2">
-              <input type="number" id="bid-input-${a.id}" min="${minBid}" placeholder="Min ${minBid.toLocaleString('id-ID')}" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
-              <button onclick="placeBid('${a.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all whitespace-nowrap">Place Bid</button>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    function placeBid(auctionId) {
-      if (!currentUser) return openAuthModal();
-      const auction = auctions.find(a => a.id === auctionId && a.status === 'LIVE');
-      if (!auction) return showToast('This auction has ended.');
-      if (auction.endTime <= Date.now()) return showToast('This auction has just ended.');
-      if (auction.sellerUsername === currentUser.username) return showToast("You can't bid on your own auction.");
-
-      const input = document.getElementById(`bid-input-${auctionId}`);
-      const amount = parseInt(input.value, 10);
-      const minBid = minNextBid(auction);
-
-      if (!amount || amount < minBid) return showToast(`Bid must be at least ${formatIDR(minBid)}.`);
-
-      auction.currentBid = amount;
-      auction.currentBidder = currentUser.username;
-      auction.bidHistory.push({ username: currentUser.username, amount, time: Date.now() });
-      saveAuctions();
-      showToast(`Bid placed: ${formatIDR(amount)} on ${getCard(auction.cardId)?.serial || ''}.`);
-    }
-
-    function tickAuctions() {
-      let changed = false;
-      auctions.filter(a => a.status === 'LIVE').forEach(a => {
-        const remaining = a.endTime - Date.now();
-        const timerEl = document.getElementById(`auction-timer-${a.id}`);
-        if (timerEl) timerEl.innerText = timeLeftLabel(remaining);
-        if (remaining <= 0) { settleAuction(a); changed = true; }
-      });
-      if (changed) renderAuctions();
-    }
-
-    function settleAuction(auction) {
-      auction.status = 'ENDED';
-      const card = getCard(auction.cardId);
-      if (!card) return;
-
-      if (auction.currentBidder) {
-        const tax = calcTax(auction.currentBid);
-        const total = auction.currentBid + tax;
-        card.owner = auction.currentBidder;
-        card.status = 'OWNED';
-        card.listedStatus = null;
-        historyLogs.unshift({ timestamp: new Date().toLocaleString('id-ID'), type: 'AUCTION_WIN', serial: card.serial, user: auction.currentBidder, base: auction.currentBid, tax, total });
-        saveHistory();
-        if (currentUser && currentUser.username === auction.currentBidder) showToast(`You won the auction for ${card.serial} at ${formatIDR(total)}!`);
-      } else {
-        card.listedStatus = null;
-      }
-      saveAuctions();
-      saveInventoryState();
-    }
-
-    /* ============================================================
-       MESSENGER + DIRECT TRADE OFFERS
-    ============================================================ */
-    function searchUsersForChat() {
-      const listContainer = document.getElementById('user-search-list');
-      if (!listContainer) return;
-
-      const query = (document.getElementById('user-search-chat')?.value || '').toLowerCase();
-      const filtered = customAccounts.filter(u =>
-        (!currentUser || u.username !== currentUser.username) &&
-        (u.username.includes(query) || u.name.toLowerCase().includes(query))
-      );
-
-      if (filtered.length === 0) {
-        listContainer.innerHTML = `<p class="text-[11px] text-gray-500 text-center py-4">No collectors found.</p>`;
-        return;
-      }
-
-      listContainer.innerHTML = filtered.map(u => `
-        <div class="chat-directory-entry p-2.5 bg-gray-800/80 hover:bg-gray-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-gray-700/60 transition-all" data-username="${escapeHTML(u.username)}">
-          <div class="flex items-center gap-2.5">
-            <img src="${escapeHTML(u.avatar)}" class="w-7 h-7 rounded-full bg-gray-900 border border-gray-700">
-            <div>
-              <p class="text-xs font-bold text-white leading-tight flex items-center gap-1">
-                ${escapeHTML(u.name)}
-                ${u.authType === 'google' ? '<i class="fa-brands fa-google text-[8px] text-red-400"></i>' : ''}
-              </p>
-              <p class="text-[10px] text-gray-400 font-mono">@${escapeHTML(u.username)}</p>
-            </div>
-          </div>
-          <i class="fa-solid fa-chevron-right text-[10px] text-gray-500"></i>
-        </div>
-      `).join('');
-    }
-
-    function startChatWithUser(username) {
-      if (!currentUser) return openAuthModal();
-      const user = getUser(username);
-      if (!user) return;
-      activeChatPartner = username;
-
-      document.getElementById('chat-active-username').innerText = `${user.name} (@${user.username})`;
-      document.getElementById('chat-active-badge').innerText = user.authType === 'google' ? 'Google Verified Account' : 'Custom Verified Account';
-
-      renderChatMessages();
-    }
-
-    function renderChatMessages() {
-      const container = document.getElementById('chat-messages');
-      if (!container) return;
-
-      if (!currentUser || !activeChatPartner) {
-        container.className = 'flex-1 my-4 space-y-3 overflow-y-auto max-h-72 text-xs text-gray-400 flex flex-col justify-center items-center';
-        container.innerHTML = `<i class="fa-solid fa-paper-plane text-3xl text-gray-800 mb-2"></i><span>Select a user handle from the left to start direct chatting.</span>`;
-        return;
-      }
-
-      const key = threadKey(currentUser.username, activeChatPartner);
-      const messages = chatThreads[key] || [];
-
-      if (messages.length === 0) {
-        container.className = 'flex-1 my-4 space-y-3 overflow-y-auto max-h-72 text-xs text-gray-400 flex flex-col justify-center items-center';
-        container.innerHTML = `<i class="fa-solid fa-comment-dots text-3xl text-gray-800 mb-2"></i><span>No messages yet. Say hi to @${escapeHTML(activeChatPartner)}!</span>`;
-        return;
-      }
-
-      container.className = 'flex-1 my-4 space-y-3 overflow-y-auto max-h-72 text-xs flex flex-col';
-      container.innerHTML = messages.map(m => renderChatMessage(m, key)).join('');
-      container.scrollTop = container.scrollHeight;
-    }
-
-    function renderChatMessage(m, key) {
-      const mine = m.from === currentUser.username;
-      const timeLabel = new Date(m.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      if (m.type === 'trade_offer') {
-        const offerCard = getCard(m.tradeOffer.offerCardId);
-        const requestCard = m.tradeOffer.requestCardId ? getCard(m.tradeOffer.requestCardId) : null;
-        const statusColor = {
-          PENDING: 'text-amber-300 border-amber-500/30',
-          ACCEPTED: 'text-emerald-300 border-emerald-500/30',
-          DECLINED: 'text-rose-300 border-rose-500/30',
-          WITHDRAWN: 'text-gray-400 border-gray-700'
-        }[m.tradeOffer.status] || 'text-gray-400 border-gray-700';
-
-        let actions = '';
-        if (m.tradeOffer.status === 'PENDING') {
-          if (!mine && m.to === currentUser.username) {
-            actions = `
-              <div class="flex gap-2 mt-2">
-                <button onclick="respondToTradeOffer('${key}','${m.id}','accept')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] rounded-lg">Accept</button>
-                <button onclick="respondToTradeOffer('${key}','${m.id}','decline')" class="flex-1 py-1.5 bg-gray-700 hover:bg-gray-600 text-white font-bold text-[10px] rounded-lg">Decline</button>
-              </div>`;
-          } else if (mine) {
-            actions = `<button onclick="respondToTradeOffer('${key}','${m.id}','withdraw')" class="mt-2 w-full py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold text-[10px] rounded-lg">Withdraw Offer</button>`;
-          }
-        }
-
-        return `
-          <div class="p-3 rounded-xl border ${statusColor} max-w-xs ${mine ? 'self-end' : 'self-start'} bg-gray-800/60">
-            <p class="font-bold text-[10px] mb-1.5 flex items-center gap-1"><i class="fa-solid fa-handshake"></i> Trade Proposal — ${m.tradeOffer.status}</p>
-            <div class="flex items-center gap-2 text-[10px]">
-              <div class="text-center">
-                <img src="${offerCard ? escapeHTML(offerCard.imgUrl) : ''}" class="w-10 h-12 object-contain rounded bg-gray-950 border border-gray-800 mx-auto">
-                <p class="mt-1 font-mono text-blue-300">${escapeHTML(offerCard ? offerCard.serial : '—')}</p>
-              </div>
-              <i class="fa-solid fa-arrow-right-arrow-left text-gray-500"></i>
-              <div class="text-center">
-                ${requestCard
-                  ? `<img src="${escapeHTML(requestCard.imgUrl)}" class="w-10 h-12 object-contain rounded bg-gray-950 border border-gray-800 mx-auto"><p class="mt-1 font-mono text-blue-300">${escapeHTML(requestCard.serial)}</p>`
-                  : `<p class="text-gray-500 italic px-2">nothing<br>(gift)</p>`}
-              </div>
-            </div>
-            ${actions}
-            <span class="text-[8px] text-gray-500 mt-1.5 block">${timeLabel}</span>
-          </div>`;
-      }
-
-      return `
-        <div class="p-3 rounded-xl text-xs shadow-md max-w-xs ${mine ? 'self-end bg-blue-600 text-white text-right' : 'self-start bg-gray-800/80 border border-gray-700/80 text-gray-200'}">
-          ${!mine ? `<p class="text-blue-400 font-bold text-[10px] mb-0.5">@${escapeHTML(m.from)}</p>` : ''}
-          <p>${escapeHTML(m.text)}</p>
-          <span class="text-[8px] ${mine ? 'text-blue-200' : 'text-gray-500'} mt-1 block">${timeLabel}</span>
-        </div>`;
-    }
-
-    function sendChatMessage() {
-      if (!currentUser) return openAuthModal();
-      if (!activeChatPartner) return showToast('Select a collector to message first.');
-      const input = document.getElementById('chat-message-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const key = threadKey(currentUser.username, activeChatPartner);
-      if (!chatThreads[key]) chatThreads[key] = [];
-      chatThreads[key].push({ id: genId('msg'), from: currentUser.username, to: activeChatPartner, type: 'text', text, time: Date.now() });
-      saveChatThreads();
-      input.value = '';
-      renderChatMessages();
-    }
-
-    function sendTradePromptInChat() {
-      if (!currentUser) return openAuthModal();
-      if (!activeChatPartner) return showToast('Select a collector to trade with first.');
-
-      const myCards = eligibleCardsForListing(currentUser.username);
-      if (myCards.length === 0) return showToast("You don't have any unlisted cards to offer.");
-
-      const theirCards = inventory.filter(c => c.owner === activeChatPartner && c.status === 'OWNED' && !c.listedStatus);
-
-      document.getElementById('propose-trade-partner').innerText = `@${activeChatPartner}`;
-      document.getElementById('propose-offer-select').innerHTML = myCards.map(c => `<option value="${c.id}">${escapeHTML(c.serial)} — ${escapeHTML(c.name)}</option>`).join('');
-      document.getElementById('propose-request-select').innerHTML = `<option value="">— Nothing, just an offer —</option>` +
-        theirCards.map(c => `<option value="${c.id}">${escapeHTML(c.serial)} — ${escapeHTML(c.name)}</option>`).join('');
-
-      document.getElementById('propose-trade-modal').classList.remove('hidden');
-    }
-    function closeProposeTradeModal() { document.getElementById('propose-trade-modal').classList.add('hidden'); }
-
-    function submitProposeTrade(e) {
-      e.preventDefault();
-      if (!currentUser || !activeChatPartner) return;
-      const offerCardId = document.getElementById('propose-offer-select').value;
-      const requestCardId = document.getElementById('propose-request-select').value || null;
-
-      const offerCard = getCard(offerCardId);
-      if (!offerCard || offerCard.owner !== currentUser.username || offerCard.listedStatus) return showToast('That card is no longer eligible.');
-      if (requestCardId) {
-        const reqCard = getCard(requestCardId);
-        if (!reqCard || reqCard.owner !== activeChatPartner || reqCard.listedStatus) return showToast('Their card is no longer eligible.');
-      }
-
-      const key = threadKey(currentUser.username, activeChatPartner);
-      if (!chatThreads[key]) chatThreads[key] = [];
-      chatThreads[key].push({
-        id: genId('msg'), from: currentUser.username, to: activeChatPartner, type: 'trade_offer', time: Date.now(),
-        tradeOffer: { offerCardId, requestCardId, status: 'PENDING' }
-      });
-      saveChatThreads();
-      renderChatMessages();
-      closeProposeTradeModal();
-      showToast('Trade proposal sent!');
-    }
-
-    function respondToTradeOffer(key, messageId, action) {
-      const thread = chatThreads[key];
-      if (!thread) return;
-      const msg = thread.find(m => m.id === messageId);
-      if (!msg || msg.type !== 'trade_offer' || msg.tradeOffer.status !== 'PENDING') return;
-
-      if (action === 'withdraw') {
-        if (msg.from !== currentUser.username) return;
-        msg.tradeOffer.status = 'WITHDRAWN';
-      } else if (action === 'decline') {
-        if (msg.to !== currentUser.username) return;
-        msg.tradeOffer.status = 'DECLINED';
-      } else if (action === 'accept') {
-        if (msg.to !== currentUser.username) return;
-        const offerCard = getCard(msg.tradeOffer.offerCardId);
-        const requestCard = msg.tradeOffer.requestCardId ? getCard(msg.tradeOffer.requestCardId) : null;
-        if (!offerCard || offerCard.owner !== msg.from || offerCard.listedStatus) return showToast('This offer is no longer valid — the card changed hands.');
-        if (requestCard && (requestCard.owner !== msg.to || requestCard.listedStatus)) return showToast('This offer is no longer valid — your card changed hands.');
-
-        offerCard.owner = msg.to;
-        historyLogs.unshift({ timestamp: new Date().toLocaleString('id-ID'), type: 'DIRECT_SWAP', serial: offerCard.serial, user: msg.to, base: 0, tax: 0, total: 0 });
-        if (requestCard) {
-          requestCard.owner = msg.from;
-          historyLogs.unshift({ timestamp: new Date().toLocaleString('id-ID'), type: 'DIRECT_SWAP', serial: requestCard.serial, user: msg.from, base: 0, tax: 0, total: 0 });
-        }
-        msg.tradeOffer.status = 'ACCEPTED';
-        saveInventoryState();
-        saveHistory();
-        showToast('Trade accepted! Cards have swapped vaults.');
-      }
-
-      saveChatThreads();
-      renderChatMessages();
-    }
-
-    /* ============================================================
-       COLLECTORS / HOLDERS
-    ============================================================ */
-    function renderHoldersList() {
-      const container = document.getElementById('holders-content');
-      if (!container) return;
-
-      container.innerHTML = customAccounts.map(u => {
-        const owned = inventory.filter(c => c.owner === u.username);
-        const value = owned.reduce((s, c) => s + c.price, 0);
-        return `
-          <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <img src="${escapeHTML(u.avatar)}" class="w-9 h-9 rounded-full bg-gray-950 border border-gray-800">
-              <div>
-                <h4 class="text-xs font-bold text-white flex items-center gap-1">
-                  ${escapeHTML(u.name)}
-                  ${u.authType === 'google' ? '<i class="fa-brands fa-google text-[8px] text-red-400"></i>' : ''}
-                </h4>
-                <p class="text-[10px] text-gray-400 font-mono">@${escapeHTML(u.username)}</p>
-                <p class="text-[10px] text-gray-500 mt-0.5">${owned.length} card${owned.length !== 1 ? 's' : ''} • ${formatIDR(value)}</p>
-              </div>
-            </div>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${u.isAdmin ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-teal-500/10 text-teal-400 border border-teal-500/30'}">${u.isAdmin ? 'Admin' : 'Collector'}</span>
-          </div>`;
-      }).join('');
-    }
-
-    /* ============================================================
-       LEDGER
-    ============================================================ */
-    function renderHistoryTable() {
-      const tbody = document.getElementById('history-table-body');
-      if (!tbody) return;
-
-      if (historyLogs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-500">No transactions yet.</td></tr>`;
-        return;
-      }
-
-      const typeStyles = {
-        PURCHASE: 'bg-blue-500/10 text-blue-400',
-        TRADE_SALE: 'bg-purple-500/10 text-purple-300',
-        AUCTION_WIN: 'bg-emerald-500/10 text-emerald-400',
-        DIRECT_SWAP: 'bg-indigo-500/10 text-indigo-300'
-      };
-      const typeLabels = { PURCHASE: 'PURCHASE', TRADE_SALE: 'TRADE', AUCTION_WIN: 'AUCTION', DIRECT_SWAP: 'SWAP' };
-
-      tbody.innerHTML = historyLogs.map(log => `
-        <tr>
-          <td class="p-3 text-gray-400 font-mono whitespace-nowrap">${escapeHTML(log.timestamp || 'Just now')}</td>
-          <td class="p-3"><span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${typeStyles[log.type] || 'bg-gray-700/40 text-gray-300'}">${typeLabels[log.type] || log.type}</span></td>
-          <td class="p-3 font-mono text-blue-400 font-bold">${escapeHTML(log.serial)}</td>
-          <td class="p-3 text-white">@${escapeHTML(log.user)}</td>
-          <td class="p-3 font-mono text-gray-300 text-right">${log.total > 0 ? formatIDR(log.base) : '—'}</td>
-          <td class="p-3 font-mono text-gray-500 text-right">${log.total > 0 ? formatIDR(log.tax) : '—'}</td>
-          <td class="p-3 font-mono text-emerald-400 text-right font-bold">${log.total > 0 ? formatIDR(log.total) : 'Swap'}</td>
-        </tr>
-      `).join('');
-    }
-
-    /* ============================================================
-       MY VAULT
-    ============================================================ */
-    function renderVaultGrid() {
-      const container = document.getElementById('owned-cards-grid');
-      if (!container) return;
-
-      if (!currentUser) {
-        container.innerHTML = `<p class="text-center text-xs text-gray-400">Log in to view cards stored inside your private vault.</p>`;
-        return;
-      }
-
-      const owned = inventory.filter(c => c.owner === currentUser.username);
-      if (owned.length === 0) {
-        container.innerHTML = `<p class="text-center text-xs text-gray-400">Your vault is empty. Visit the Collection tab to purchase your first card!</p>`;
-        return;
-      }
-
-      const totalValue = owned.reduce((s, c) => s + c.price, 0);
-
-      container.innerHTML = `
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-gray-800">
-          <div>
-            <p class="text-[10px] text-gray-400 uppercase font-bold">Vault Summary</p>
-            <p class="text-sm text-white font-bold">${owned.length} card${owned.length !== 1 ? 's' : ''} • ${formatIDR(totalValue)} total value</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          ${owned.map(card => `
-            <div class="${card.type === 'PREMIUM' ? 'card-glow-premium' : 'card-glow-standard'} relative rounded-xl p-3 flex flex-col justify-between">
-              ${card.listedStatus === 'TRADE' ? `<span class="absolute top-2 left-2 z-10 text-[8px] font-bold px-2 py-0.5 rounded-full bg-purple-500/90 text-white">TRADE</span>` : ''}
-              ${card.listedStatus === 'AUCTION' ? `<span class="absolute top-2 left-2 z-10 text-[8px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/90 text-white">AUCTION</span>` : ''}
-              <div onclick="openCardDetailsModal('${card.id}')" class="cursor-pointer">
-                <div class="w-full aspect-[4/5] bg-gray-950 rounded-lg border border-gray-800 p-1 mb-2 overflow-hidden flex items-center justify-center">
-                  <img src="${escapeHTML(card.imgUrl)}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=Image+Unavailable'">
-                </div>
-                <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${escapeHTML(card.serial)}</p>
-                <p class="text-[11px] font-bold text-white truncate text-center">${escapeHTML(card.name)}</p>
-                <p class="text-[10px] font-mono text-emerald-400 text-center mt-0.5">${formatIDR(card.price)}</p>
-              </div>
-              ${!card.listedStatus ? `
-                <div class="grid grid-cols-2 gap-1.5 mt-2">
-                  <button onclick="openListTradeModal('${card.id}')" class="py-1.5 bg-gray-800 hover:bg-purple-500/20 text-purple-300 text-[9px] font-bold rounded-lg">Trade</button>
-                  <button onclick="openStartAuctionModal('${card.id}')" class="py-1.5 bg-gray-800 hover:bg-emerald-500/20 text-emerald-300 text-[9px] font-bold rounded-lg">Auction</button>
-                </div>` : `<p class="text-center text-[9px] text-gray-500 mt-2">Currently listed</p>`}
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    /* ============================================================
-       ANALYTICS (honest, computed from real data)
-    ============================================================ */
-    function renderAnalytics() {
-      const totalCards = inventory.length;
-      const availableCards = inventory.filter(c => c.status === 'AVAILABLE');
-      const ownedCards = inventory.filter(c => c.status === 'OWNED');
-      const catalogValue = availableCards.reduce((s, c) => s + c.price, 0);
-
-      const cashDeals = historyLogs.filter(l => l.total > 0);
-      const soldVolume = cashDeals.reduce((s, l) => s + l.total, 0);
-      const taxCollected = cashDeals.reduce((s, l) => s + l.tax, 0);
-      const sellThrough = totalCards > 0 ? Math.round((ownedCards.length / totalCards) * 100) : 0;
-
-      const catalogValEl = document.getElementById('an-catalog-value');
-      if (!catalogValEl) return; // Analytics view not present for this session
-
-      catalogValEl.innerText = formatIDR(catalogValue);
-      document.getElementById('an-sold-volume').innerText = formatIDR(soldVolume);
-      document.getElementById('an-tax-collected').innerText = formatIDR(taxCollected);
-      document.getElementById('an-sell-through').innerText = `${sellThrough}%`;
-
-      const premiumTotal = inventory.filter(c => c.type === 'PREMIUM').length;
-      const standardTotal = inventory.filter(c => c.type === 'STANDARD').length;
-      const premiumSold = inventory.filter(c => c.type === 'PREMIUM' && c.status === 'OWNED').length;
-      const standardSold = inventory.filter(c => c.type === 'STANDARD' && c.status === 'OWNED').length;
-
-      document.getElementById('an-tier-breakdown').innerHTML = [
-        { label: 'Premium', sold: premiumSold, total: premiumTotal, color: 'bg-indigo-500' },
-        { label: 'Standard', sold: standardSold, total: standardTotal, color: 'bg-gray-500' }
-      ].map(t => {
-        const pct = t.total > 0 ? Math.round((t.sold / t.total) * 100) : 0;
-        return `
-          <div>
-            <div class="flex justify-between text-[10px] text-gray-400 mb-1">
-              <span>${t.label}</span><span>${t.sold}/${t.total} sold (${pct}%)</span>
-            </div>
-            <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
-              <div class="${t.color} h-full rounded-full" style="width:${pct}%"></div>
-            </div>
-          </div>`;
-      }).join('');
-
-      const holdersMap = {};
-      ownedCards.forEach(c => {
-        if (!holdersMap[c.owner]) holdersMap[c.owner] = { count: 0, value: 0 };
-        holdersMap[c.owner].count++;
-        holdersMap[c.owner].value += c.price;
-      });
-      const top = Object.entries(holdersMap).sort((a, b) => b[1].value - a[1].value).slice(0, 5);
-      document.getElementById('an-leaderboard').innerHTML = top.length === 0
-        ? `<p class="text-[11px] text-gray-500">No cards owned yet.</p>`
-        : top.map(([username, stats], i) => {
-            const u = getUser(username);
-            return `
-              <div class="flex items-center justify-between py-2 ${i > 0 ? 'border-t border-gray-800' : ''}">
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-bold text-gray-500 w-4">#${i + 1}</span>
-                  <img src="${u ? escapeHTML(u.avatar) : ''}" class="w-6 h-6 rounded-full bg-gray-900 border border-gray-800">
-                  <span class="text-xs font-bold text-white">@${escapeHTML(username)}</span>
-                </div>
-                <span class="text-[10px] text-gray-400">${stats.count} cards • ${formatIDR(stats.value)}</span>
-              </div>`;
-          }).join('');
-
-      const recent = historyLogs.slice(0, 8);
-      document.getElementById('an-recent-activity').innerHTML = recent.length === 0
-        ? `<p class="text-[11px] text-gray-500">No activity yet.</p>`
-        : recent.map(log => `
-            <div class="flex items-center justify-between py-2 border-t border-gray-800 first:border-t-0 text-[11px]">
-              <span class="text-gray-400">@${escapeHTML(log.user)} — ${escapeHTML(log.serial)}</span>
-              <span class="text-gray-500">${escapeHTML(log.timestamp)}</span>
-            </div>`).join('');
-    }
-
-    /* ============================================================
-       INVENTORY STUDIO (admin) -- ownership is only ever set by
-       Buy / Trade / Auction / Swap actions, never fabricated here.
-    ============================================================ */
     function handleInventorySubmit(e) {
       e.preventDefault();
-      if (!isAdmin()) return showToast('Unauthorized action: Admin privileges required.');
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
 
       const cardId = document.getElementById('inv-input-id').value;
-      const serial = document.getElementById('inv-input-serial').value.trim();
-      const name = document.getElementById('inv-input-name').value.trim();
+      const serial = escapeHTML(document.getElementById('inv-input-serial').value.trim());
+      const name = escapeHTML(document.getElementById('inv-input-name').value.trim());
       const type = document.getElementById('inv-input-type').value;
       const price = parseInt(document.getElementById('inv-input-price').value, 10);
       const imgUrl = document.getElementById('inv-input-img').value.trim();
+      const status = document.getElementById('inv-input-status').value;
 
       if (!imgUrl.startsWith('http://') && !imgUrl.startsWith('https://')) {
-        return showToast('Invalid Image URL. Must start with http:// or https://');
+        return showToast('Image URL must start with http:// or https://');
       }
-      if (!price || price <= 0) return showToast('Enter a valid price.');
 
       if (cardId) {
         const idx = inventory.findIndex(c => c.id === cardId);
         if (idx !== -1) {
-          if (inventory[idx].listedStatus) return showToast('Cancel its active listing/auction before editing.');
-          inventory[idx] = { ...inventory[idx], serial, name, type, price, imgUrl };
+          inventory[idx] = { ...inventory[idx], serial, name, type, price, imgUrl, status };
         }
-        showToast(`Updated card ${serial} successfully.`);
+        showToast(`Updated ${serial}.`);
       } else {
-        inventory.unshift({ id: genId('card'), serial, name, type, price, imgUrl, status: 'AVAILABLE', owner: null, listedStatus: null });
-        showToast(`Minted new card ${serial}!`);
+        inventory.unshift({ id: `card-${Date.now()}`, serial, name, type, price, imgUrl, status, owner: null });
+        showToast(`Minted ${serial}!`);
       }
 
       saveInventoryState();
@@ -1882,8 +659,8 @@
     }
 
     function editInventoryCard(cardId) {
-      if (!isAdmin()) return showToast('Admin privileges required.');
-      const card = getCard(cardId);
+      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+      const card = inventory.find(c => c.id === cardId);
       if (!card) return;
 
       document.getElementById('inv-form-title').innerText = `Edit ${card.serial}`;
@@ -1893,45 +670,16 @@
       document.getElementById('inv-input-type').value = card.type;
       document.getElementById('inv-input-price').value = card.price;
       document.getElementById('inv-input-img').value = card.imgUrl;
-      document.getElementById('inv-submit-btn').innerText = "Update Changes";
-
-      const note = document.getElementById('inv-status-note');
-      if (card.status === 'OWNED' || card.listedStatus) {
-        note.classList.remove('hidden');
-        note.innerText = `Status: ${card.status}${card.owner ? ' — owned by @' + card.owner : ''}${card.listedStatus ? ' — currently on ' + (card.listedStatus === 'TRADE' ? 'the Trade Market' : 'a live auction') : ''}. Ownership can only change through Buy / Trade / Auction / Swap.`;
-      } else {
-        note.classList.add('hidden');
-      }
+      document.getElementById('inv-input-status').value = card.status;
+      document.getElementById('inv-submit-btn').innerText = "Update";
     }
 
     function deleteInventoryCard(cardId) {
-      if (!isAdmin()) return showToast('Admin privileges required.');
-      const card = getCard(cardId);
-      if (card && card.listedStatus) return showToast('Cancel its active listing/auction before deleting.');
-      if (!confirm('Are you sure you want to permanently delete this card?')) return;
-
+      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+      if (!confirm('Permanently delete card?')) return;
       inventory = inventory.filter(c => c.id !== cardId);
       saveInventoryState();
-      showToast('Card removed from inventory.');
-    }
-
-    function forceUnlistCard(cardId) {
-      if (!isAdmin()) return;
-      const card = getCard(cardId);
-      if (!card || !card.listedStatus) return;
-      const label = card.listedStatus === 'TRADE' ? 'the Trade Market' : 'its live auction';
-      if (!confirm(`Force-remove ${card.serial} from ${label}?`)) return;
-
-      if (card.listedStatus === 'TRADE') {
-        const listing = tradeListings.find(l => l.cardId === cardId && l.status === 'ACTIVE');
-        if (listing) { listing.status = 'CANCELLED'; saveTradeListings(); }
-      } else if (card.listedStatus === 'AUCTION') {
-        const auction = auctions.find(a => a.cardId === cardId && a.status === 'LIVE');
-        if (auction) { auction.status = 'ENDED'; saveAuctions(); }
-      }
-      card.listedStatus = null;
-      saveInventoryState();
-      showToast(`${card.serial} removed from listing.`);
+      showToast('Card deleted.');
     }
 
     function resetInventoryForm() {
@@ -1939,7 +687,6 @@
       document.getElementById('inventory-editor-form').reset();
       document.getElementById('inv-input-id').value = '';
       document.getElementById('inv-submit-btn').innerText = "Mint Card";
-      document.getElementById('inv-status-note').classList.add('hidden');
     }
 
     function renderInventoryTable() {
@@ -1949,77 +696,243 @@
       document.getElementById('inv-total-count').innerText = inventory.length;
 
       tbody.innerHTML = inventory.map(card => `
-        <tr class="hover:bg-gray-800/40 transition-all">
+        <tr class="hover:bg-gray-800/40">
           <td class="p-3 font-mono font-bold text-blue-400 flex items-center gap-2">
-            <img src="${escapeHTML(card.imgUrl)}" class="w-6 h-8 object-contain rounded bg-gray-950 border border-gray-800" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=N/A'">
+            <img src="${card.imgUrl}" class="w-6 h-8 object-contain rounded bg-gray-950 border border-gray-800" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=N/A'">
             <span>${escapeHTML(card.serial)} (${escapeHTML(card.name)})</span>
           </td>
           <td class="p-3 font-semibold text-gray-300">${card.type}</td>
-          <td class="p-3 font-mono text-emerald-400">${formatIDR(card.price)}</td>
-          <td class="p-3">
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span>
-            ${card.listedStatus ? `<span class="ml-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-gray-700/50 text-gray-300">${card.listedStatus}</span>` : ''}
-          </td>
-          <td class="p-3 text-right space-x-1 whitespace-nowrap">
-            ${card.listedStatus ? `<button onclick="forceUnlistCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-amber-500/20 text-amber-300 rounded-lg transition-all" title="Force Unlist"><i class="fa-solid fa-ban"></i></button>` : ''}
-            <button onclick="editInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-gray-700 text-amber-300 rounded-lg transition-all" title="Edit"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-all" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
+          <td class="p-3"><span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span></td>
+          <td class="p-3 text-right space-x-1">
+            <button onclick="editInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-gray-700 text-amber-300 rounded-lg"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-rose-500/20 text-rose-400 rounded-lg"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
       `).join('');
     }
 
-    /* ============================================================
-       TAB SWITCHING & TOAST
-    ============================================================ */
+    function searchUsersForChat() {
+      const listContainer = document.getElementById('user-search-list');
+      if (!listContainer) return;
+
+      const query = document.getElementById('user-search-chat').value.toLowerCase();
+      const filtered = customAccounts.filter(u => u.username.includes(query) || u.name.toLowerCase().includes(query));
+
+      listContainer.innerHTML = filtered.map(u => `
+        <div onclick="startChatWithUser('${u.username}', '${escapeHTML(u.name)}')" class="p-2.5 bg-gray-800/80 hover:bg-gray-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-gray-700/60">
+          <div class="flex items-center gap-2.5">
+            <img src="${u.avatar}" class="w-7 h-7 rounded-full bg-gray-900 border border-gray-700">
+            <div>
+              <p class="text-xs font-bold text-white leading-tight">${escapeHTML(u.name)}</p>
+              <p class="text-[10px] text-gray-400 font-mono">@${escapeHTML(u.username)}</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-500"></i>
+        </div>
+      `).join('');
+    }
+
+    function startChatWithUser(username, name) {
+      document.getElementById('chat-active-username').innerText = `${name} (@${username})`;
+      document.getElementById('chat-messages').innerHTML = `
+        <div class="p-3 bg-gray-800/80 rounded-xl text-left max-w-xs self-start border border-gray-700/80 shadow-sm">
+          <p class="text-blue-400 font-bold text-[10px] mb-0.5">@${escapeHTML(username)}</p>
+          <p class="text-xs text-gray-200">Hello! Let's arrange a card trade.</p>
+        </div>
+      `;
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chat-message-input');
+      const text = escapeHTML(input.value.trim());
+      if (!text) return;
+
+      const chatContainer = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'p-3 bg-blue-600 rounded-xl text-right max-w-xs self-end text-white text-xs shadow-md';
+      msgDiv.innerText = text;
+      chatContainer.appendChild(msgDiv);
+
+      input.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function sendTradePromptInChat() {
+      if (!currentUser) return openAuthModal();
+      const chatContainer = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'p-3 bg-purple-950/80 border border-purple-500/40 rounded-xl text-right max-w-xs self-end text-purple-200 text-xs shadow-md space-y-1';
+      msgDiv.innerHTML = `<p class="font-bold flex items-center justify-end gap-1"><i class="fa-solid fa-handshake"></i> Direct Trade Proposal</p><p class="text-[11px]">User @${currentUser.username} requested a trade.</p>`;
+      chatContainer.appendChild(msgDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function openCardDetailsModal(cardId) {
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+
+      document.getElementById('detail-card-img').src = card.imgUrl;
+      document.getElementById('detail-card-serial').innerText = card.serial;
+      document.getElementById('detail-card-name').innerText = card.name;
+      document.getElementById('detail-card-price').innerText = `IDR ${card.price.toLocaleString()}`;
+      document.getElementById('detail-card-type').innerText = card.type;
+      document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owner: @${card.owner})` : ''}`;
+
+      const actionBox = document.getElementById('detail-action-container');
+
+      if (card.status === 'OWNED') {
+        const isMyCard = currentUser && currentUser.username === card.owner;
+        actionBox.innerHTML = `
+          <button disabled class="w-full py-2.5 bg-gray-800 text-gray-500 font-bold text-xs rounded-xl border border-gray-700 cursor-not-allowed flex items-center justify-center gap-2">
+            <i class="fa-solid fa-lock"></i> ${isMyCard ? "In Your Vault" : `Owned by @${card.owner}`}
+          </button>
+        `;
+      } else {
+        actionBox.innerHTML = `
+          <button onclick="buyCardAction('${card.id}')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-qrcode"></i> Buy Card Now
+          </button>
+        `;
+      }
+
+      document.getElementById('card-details-modal').classList.remove('hidden');
+    }
+
+    function buyCardAction(cardId) {
+      if (!currentUser) return openAuthModal();
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+
+      card.status = 'OWNED';
+      card.owner = currentUser.username;
+      saveInventoryState();
+
+      historyLogs.unshift({
+        timestamp: new Date().toLocaleTimeString(),
+        type: 'PURCHASE',
+        serial: card.serial,
+        user: currentUser.username,
+        amount: card.price
+      });
+      localStorage.setItem('eugene_history', JSON.stringify(historyLogs));
+      renderHistoryTable();
+
+      closeCardDetailsModal();
+      showToast(`Success! ${card.serial} added to your vault.`);
+    }
+
+    function closeCardDetailsModal() { document.getElementById('card-details-modal').classList.add('hidden'); }
+
+    function renderCardGrid() {
+      const grid = document.getElementById('card-grid');
+      if (!grid) return;
+
+      document.getElementById('remaining-cards-count').innerText = inventory.filter(c => c.status === 'AVAILABLE').length;
+
+      grid.innerHTML = inventory.map(card => `
+        <div onclick="openCardDetailsModal('${card.id}')" class="${card.type === 'PREMIUM' ? 'card-glow-premium' : 'card-glow-standard'} rounded-xl p-3 flex flex-col justify-between cursor-pointer">
+          <div class="w-full aspect-[4/5] bg-gray-950 rounded-lg border border-gray-800 p-1 mb-2 overflow-hidden flex items-center justify-center">
+            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=Image+Unavailable'">
+          </div>
+          <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${escapeHTML(card.serial)}</p>
+          <p class="text-[11px] font-bold text-white truncate text-center">${escapeHTML(card.name)}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderVaultGrid() {
+      const container = document.getElementById('owned-cards-grid');
+      if (!container) return;
+
+      if (!currentUser) {
+        container.innerHTML = `<p class="text-center text-xs text-gray-400">Log in to view your private vault cards.</p>`;
+        return;
+      }
+
+      const owned = inventory.filter(c => c.owner === currentUser.username);
+      if (owned.length === 0) {
+        container.innerHTML = `<p class="text-center text-xs text-gray-400">Your vault is empty. Visit the Collection tab to purchase cards!</p>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          ${owned.map(card => `
+            <div class="${card.type === 'PREMIUM' ? 'card-glow-premium' : 'card-glow-standard'} rounded-xl p-3 flex flex-col justify-between">
+              <div class="w-full aspect-[4/5] bg-gray-950 rounded-lg border border-gray-800 p-1 mb-2">
+                <img src="${card.imgUrl}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=Image+Unavailable'">
+              </div>
+              <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${escapeHTML(card.serial)}</p>
+              <p class="text-[11px] font-bold text-white truncate text-center">${escapeHTML(card.name)}</p>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderHoldersList() {
+      const container = document.getElementById('holders-content');
+      if (!container) return;
+
+      container.innerHTML = customAccounts.map(u => `
+        <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img src="${u.avatar}" class="w-9 h-9 rounded-full bg-gray-950 border border-gray-800">
+            <div>
+              <h4 class="text-xs font-bold text-white">${escapeHTML(u.name)}</h4>
+              <p class="text-[10px] text-gray-400 font-mono">@${escapeHTML(u.username)}</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-teal-400">Collector</span>
+        </div>
+      `).join('');
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('history-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = historyLogs.map(log => `
+        <tr>
+          <td class="p-3 text-gray-400 font-mono">${log.timestamp || 'Just now'}</td>
+          <td class="p-3"><span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">${log.type || 'TRADE'}</span></td>
+          <td class="p-3 font-mono text-blue-400 font-bold">${escapeHTML(log.serial)}</td>
+          <td class="p-3 text-white">@${escapeHTML(log.user)}</td>
+          <td class="p-3 font-mono text-emerald-400 text-right">IDR ${(log.amount || 0).toLocaleString()}</td>
+        </tr>
+      `).join('');
+    }
+
+    function updateAIPrediction() {
+      const total = inventory.length * 250000;
+      document.getElementById('ai-projected-volume').innerText = `IDR ${total.toLocaleString()}`;
+      document.getElementById('ai-projected-tax').innerText = `IDR ${Math.round(total * 0.02).toLocaleString()}`;
+    }
+
+    function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
+    function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+
     function switchTab(tabName) {
-      const allTabs = ['catalog', 'trade', 'auction', 'inbox', 'holders', 'history', 'dashboard', 'analytics', 'inventory'];
+      const allTabs = ['catalog', 'trade', 'auction', 'inbox', 'holders', 'history', 'dashboard', 'ai-prediction', 'inventory'];
       allTabs.forEach(t => {
         const view = document.getElementById(`view-${t}`);
         if (view) view.classList.add('hidden');
       });
       const activeView = document.getElementById(`view-${tabName}`);
       if (activeView) activeView.classList.remove('hidden');
-
-      setActiveNav(tabName);
-
-      if (tabName === 'trade') renderTradeListings();
-      if (tabName === 'auction') renderAuctions();
-      if (tabName === 'analytics') renderAnalytics();
-      if (tabName === 'dashboard') renderVaultGrid();
-      if (tabName === 'holders') renderHoldersList();
-      if (tabName === 'history') renderHistoryTable();
-      if (tabName === 'inventory') renderInventoryTable();
     }
 
-    function setActiveNav(tabName) {
-      const standardIds = ['catalog', 'trade', 'auction', 'inbox', 'holders', 'history', 'dashboard'];
-      standardIds.forEach(t => {
-        const btn = document.getElementById(`nav-${t}`);
-        if (!btn) return;
-        if (t === tabName) {
-          btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
-          btn.classList.remove('text-gray-400');
-        } else {
-          btn.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
-          btn.classList.add('text-gray-400');
-        }
-      });
-      ['analytics', 'inventory'].forEach(t => {
-        const btn = document.getElementById(`nav-${t}`);
-        if (!btn) return;
-        if (t === tabName) btn.classList.add('ring-2', 'ring-white/50');
-        else btn.classList.remove('ring-2', 'ring-white/50');
-      });
+    function setFilter(type) {
+      currentFilter = type;
+      renderCardGrid();
     }
 
-    let toastTimer = null;
     function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toast-msg').innerText = msg;
       toast.classList.remove('translate-y-20', 'opacity-0');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+      setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
     }
   </script>
 </body>
