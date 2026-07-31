@@ -164,6 +164,32 @@
     </div>
   </header>
 
+  <!-- STRICT GOOGLE AUTH ONLY MODAL -->
+  <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-6 relative shadow-2xl text-center">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="space-y-2">
+        <div class="w-14 h-14 rounded-2xl mx-auto bg-slate-800 border border-slate-700 p-2.5 flex items-center justify-center shadow-inner">
+          <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
+        </div>
+        <h3 class="text-base font-bold text-white">Google Sign-In Required</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">To ensure account security, user authentication on Eugene Card is strictly handled through Google.</p>
+      </div>
+
+      <div class="pt-2">
+        <button onclick="loginWithGoogleSupabase()" class="w-full py-3.5 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all">
+          <i class="fa-brands fa-google text-red-500 text-base"></i>
+          <span>Continue with Google</span>
+        </button>
+      </div>
+
+      <p class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Protected by Supabase Auth</p>
+    </div>
+  </div>
+
   <!-- SELL BACK CONFIRMATION MODAL -->
   <div id="sellback-confirm-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
@@ -480,29 +506,6 @@
           Submit Trade Proposal
         </button>
       </form>
-    </div>
-  </div>
-
-  <!-- AUTH MODAL -->
-  <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-5 relative shadow-2xl">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="text-center space-y-2">
-        <div class="w-12 h-12 rounded-xl mx-auto bg-slate-800 border border-slate-700 p-2 flex items-center justify-center">
-          <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
-        </div>
-        <h3 class="text-base font-bold text-white">Log In to Eugene Card</h3>
-        <p class="text-xs text-slate-400">Sign in securely with Google to trade cards, manage your vault, and access admin features.</p>
-      </div>
-
-      <div class="pt-2">
-        <button onclick="loginWithGoogleSupabase()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all">
-          <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Sign In with Google</span>
-        </button>
-      </div>
     </div>
   </div>
 
@@ -833,10 +836,10 @@
             </div>
             <div class="space-y-1">
               <div class="flex items-center gap-2">
-                <h2 id="profile-display-name" class="text-lg font-bold text-white">Guest Collector</h2>
-                <span id="profile-username-tag" class="text-xs font-mono text-blue-400">@guest</span>
+                <h2 id="profile-display-name" class="text-lg font-bold text-white">Google User</h2>
+                <span id="profile-username-tag" class="text-xs font-mono text-blue-400">@google_user</span>
               </div>
-              <p id="profile-bio-text" class="text-xs text-slate-400 max-w-md">No bio added yet. Click customize to complete your profile.</p>
+              <p id="profile-bio-text" class="text-xs text-slate-400 max-w-md">Sign in via Google to customize your collector profile.</p>
               
               <div id="profile-socials-container" class="flex items-center gap-3 pt-1 text-xs"></div>
             </div>
@@ -853,7 +856,7 @@
         <p class="text-xs text-slate-400 mt-1">Manage, trade, launch live auctions, or sell back your owned cards to Admin at floor price.</p>
       </div>
       <div id="owned-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
-        Log in with Google to view your owned cards inside your private binder.
+        Sign in with Google to view your owned cards inside your private binder.
       </div>
     </section>
 
@@ -1254,6 +1257,7 @@
       return 'catalog';
     }
 
+    // MANDATORY GOOGLE OAUTH LOG-IN
     async function loginWithGoogleSupabase() {
       try {
         const activeTab = getCurrentActiveTab();
@@ -1268,7 +1272,7 @@
 
         if (error) throw error;
       } catch (error) {
-        showToast('Supabase Auth Error: ' + error.message);
+        showToast('Supabase Google Auth Error: ' + error.message);
       }
     }
 
@@ -1282,7 +1286,7 @@
         email: email,
         name: name,
         username: name.toLowerCase().replace(/\s+/g, '_'),
-        bio: 'Official owner and administrator of Eugene Card Marketplace.',
+        bio: 'Official collector authenticated via Google.',
         instagram: 'eugene_collector',
         tiktok: '',
         x: '',
@@ -1328,7 +1332,7 @@
       renderUserProfileUI();
       renderChatThreads();
       switchTab('catalog');
-      showToast('Logged out.');
+      showToast('Logged out of Google account.');
     }
 
     function renderAuthHeader() {
@@ -1367,7 +1371,7 @@
 
         container.innerHTML = `
           <button onclick="openAuthModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-right-to-bracket"></i> <span>Log In / Sign In</span>
+            <i class="fa-brands fa-google"></i> <span>Google Sign In</span>
           </button>
         `;
       }
@@ -1445,9 +1449,9 @@
 
       if (!currentUser) {
         if (avatarImg) avatarImg.src = 'https://api.dicebear.com/7.x/identicon/svg?seed=guest';
-        if (displayName) displayName.innerText = 'Guest Collector';
-        if (usernameTag) usernameTag.innerText = '@guest';
-        if (bioText) bioText.innerText = 'Log in to edit your custom profile details and social handlers.';
+        if (displayName) displayName.innerText = 'Google User';
+        if (usernameTag) usernameTag.innerText = '@google_user';
+        if (bioText) bioText.innerText = 'Sign in with Google to edit your custom profile details and social handlers.';
         if (socialsContainer) socialsContainer.innerHTML = '';
         return;
       }
@@ -1766,7 +1770,7 @@
       showToast('Card deleted live from database.');
     }
 
-    // JSON IMPORT & EXPORT (FIXED IMPORTER)
+    // JSON IMPORT & EXPORT
     function exportInventoryJSON() {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
 
@@ -2099,7 +2103,7 @@
     function renderVaultGrid() {
       const container = document.getElementById('owned-cards-grid');
       if (!currentUser) {
-        container.innerHTML = "Log in with Google to view your owned cards inside your private binder.";
+        container.innerHTML = "Sign in with Google to view your owned cards inside your private binder.";
         return;
       }
 
