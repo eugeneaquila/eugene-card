@@ -1018,10 +1018,6 @@
       { id: 't1', user: 'Eugene Admin', participant1: 'Eugene', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Eugene', messages: [{ sender: 'Eugene Admin', text: 'Welcome to Eugene Card Private Messenger.' }] },
       { id: 't2', user: 'Yujin Aquila', participant1: 'Yujin Aquila', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Yujin', messages: [{ sender: 'Yujin Aquila', text: 'Is Eugene Premium #05 available?' }] }
     ];
-    const storedChats = localStorage.getItem('eugene_chat_threads');
-    if (storedChats) {
-      try { chatThreads = JSON.parse(storedChats); } catch(e) {}
-    }
     let activeChatThreadId = 't1';
 
     // FETCH DATABASE INVENTORY WITH SUPABASE & BROADCAST REAL-TIME TO EVERYONE
@@ -1032,12 +1028,13 @@
           .select('*')
           .order('id', { ascending: true });
 
-        if (!error && data && data.length > 0) {
+        if (!error && data) {
           inventory = data;
           saveInventoryLocalCache();
           renderCardGrid();
           renderInventoryTable();
           updateRemainingCardCount();
+          renderHoldersLeaderboard();
           return;
         }
       }
@@ -1051,6 +1048,54 @@
       renderCardGrid();
       renderInventoryTable();
       updateRemainingCardCount();
+      renderHoldersLeaderboard();
+    }
+
+    // FETCH REAL-TIME PRIVATE CHAT MESSAGES FROM SUPABASE
+    async function fetchDatabaseChats() {
+      if (!window.supabaseClient) {
+        const storedChats = localStorage.getItem('eugene_chat_threads');
+        if (storedChats) {
+          try { chatThreads = JSON.parse(storedChats); } catch(e) {}
+        }
+        renderChatThreads();
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from('chat_messages')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (!error && data) {
+        const threadMap = {};
+
+        data.forEach(msg => {
+          const threadId = msg.thread_id || 't1';
+          if (!threadMap[threadId]) {
+            threadMap[threadId] = {
+              id: threadId,
+              user: msg.thread_title || msg.sender_name || 'Collector',
+              participant1: msg.sender_name,
+              participant2: 'Admin',
+              avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(msg.sender_name || 'user')}`,
+              messages: []
+            };
+          }
+          threadMap[threadId].messages.push({
+            sender: msg.sender_name,
+            text: msg.message_text
+          });
+        });
+
+        const fetchedThreads = Object.values(threadMap);
+        if (fetchedThreads.length > 0) {
+          chatThreads = fetchedThreads;
+          saveChatsState();
+        }
+      }
+
+      renderChatThreads(document.getElementById('chat-search-input')?.value || '');
     }
 
     function saveInventoryLocalCache() {
@@ -1097,6 +1142,7 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       await fetchDatabaseInventory();
+      await fetchDatabaseChats();
 
       if (window.supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -1114,17 +1160,24 @@
           }
         });
 
-        // Live Real-Time Updates Across Devices
+        // Real-Time Inventory Channel Subscriptions for Multi-User Live Sync
         supabaseClient
           .channel('public:inventory')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, () => {
             fetchDatabaseInventory();
           })
           .subscribe();
+
+        // Real-Time Chat Channel Subscriptions for Live Messaging
+        supabaseClient
+          .channel('public:chat_messages')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, () => {
+            fetchDatabaseChats();
+          })
+          .subscribe();
       }
 
       renderAuthHeader();
-      renderChatThreads();
       renderHistoryLedger();
       renderAdminOrdersQueue();
       renderTradeProposals();
@@ -1208,7 +1261,7 @@
       renderUserProfileUI();
       renderCardGrid();
       renderInventoryTable();
-      renderChatThreads();
+      fetchDatabaseChats();
     }
 
     function returnToPreviousStatePostLogin() {
@@ -1625,8 +1678,7 @@
         if (window.supabaseClient) {
           await supabaseClient
             .from('inventory')
-            .update(cardPayload)
-            .eq('id', cardId);
+            .upsert([cardPayload]);
         }
         addHistoryRecord('ADMIN_UPDATE', serial, `Admin updated specs for ${serial}`);
         showToast(`Updated ${serial} details live for everyone!`);
@@ -1938,7 +1990,7 @@
 
       if (tabName === 'wishlist') renderWishlistGrid();
       if (tabName === 'dashboard') renderVaultGrid();
-      if (tabName === 'inbox') renderChatThreads();
+      if (tabName === 'inbox') fetchDatabaseChats();
       if (tabName === 'holders') renderHoldersLeaderboard();
       if (tabName === 'history') renderHistoryLedger();
       if (tabName === 'analytics') renderAnalyticsView();
@@ -2584,7 +2636,7 @@
       document.getElementById('holder-vault-modal').classList.add('hidden');
     }
 
-    // PRIVATE MESSENGER WITH ACCOUNT SEARCH
+    // PRIVATE MESSENGER WITH ACCOUNT SEARCH & REALTIME DB PERSISTENCE
     function renderChatThreads(searchQuery = '') {
       const container = document.getElementById('chat-threads-list');
       if (!container) return;
@@ -2670,7 +2722,7 @@
       }
     }
 
-    function sendChatMessage(e) {
+    async function sendChatMessage(e) {
       e.preventDefault();
       if (!currentUser) return openAuthModal();
 
@@ -2680,10 +2732,22 @@
 
       const activeThread = chatThreads.find(t => t.id === activeChatThreadId);
       if (activeThread) {
+        const msgObj = {
+          thread_id: activeThread.id,
+          thread_title: activeThread.user,
+          sender_name: currentUser.name,
+          message_text: text
+        };
+
+        if (window.supabaseClient) {
+          await supabaseClient.from('chat_messages').insert([msgObj]);
+        }
+
         activeThread.messages.push({
           sender: currentUser.name,
           text: text
         });
+
         input.value = '';
         saveChatsState();
         renderChatThreads(document.getElementById('chat-search-input')?.value || '');
