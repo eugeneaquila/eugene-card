@@ -104,53 +104,59 @@
       <!-- Navigation Tabs -->
       <nav class="flex items-center gap-1 bg-slate-800/80 p-1 rounded-2xl border border-slate-700 overflow-x-auto max-w-full">
         <button id="nav-catalog" onclick="switchTab('catalog')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-white bg-slate-700 flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-layer-group text-blue-400"></i> Collection
+          <i class="fa-solid fa-layer-group text-blue-400"></i> <span data-i18n="navCollection">Collection</span>
         </button>
         <button id="nav-trade" onclick="switchTab('trade')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-right-left text-blue-400"></i> Trade
+          <i class="fa-solid fa-right-left text-blue-400"></i> <span data-i18n="navTrade">Trade</span>
         </button>
         <button id="nav-auction" onclick="switchTab('auction')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-gavel text-emerald-400"></i> Auction
+          <i class="fa-solid fa-gavel text-emerald-400"></i> <span data-i18n="navAuction">Auction</span>
         </button>
         <button id="nav-trade-req" onclick="switchTab('trade-req')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-handshake text-purple-400"></i> Trade Requests
+          <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navTradeReq">Trade Requests</span>
         </button>
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-comments text-indigo-400"></i> Inbox
+          <i class="fa-solid fa-comments text-indigo-400"></i> <span data-i18n="navInbox">Inbox</span>
         </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-users text-teal-400"></i> Holders
+          <i class="fa-solid fa-users text-teal-400"></i> <span data-i18n="navHolders">Holders</span>
         </button>
         <button id="nav-history" onclick="switchTab('history')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> History
+          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span data-i18n="navHistory">History</span>
         </button>
 
         <div class="h-4 w-px bg-slate-700 mx-1 self-center hidden sm:block"></div>
 
         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-vault text-blue-400"></i> My Vault
+          <i class="fa-solid fa-vault text-blue-400"></i> <span data-i18n="navVault">My Vault</span>
         </button>
         <button id="nav-wishlist" onclick="switchTab('wishlist')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-heart text-rose-400"></i> Wishlist
+          <i class="fa-solid fa-heart text-rose-400"></i> <span data-i18n="navWishlist">Wishlist</span> (<span id="wishlist-count">0</span>)
         </button>
 
         <!-- Admin Features Section -->
         <div id="admin-nav-separator" class="h-4 w-px bg-slate-700 mx-1 self-center hidden"></div>
 
         <button id="nav-analytics" onclick="switchTab('analytics')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
-          <i class="fa-solid fa-chart-line text-amber-400"></i> Analytics
+          <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span>
         </button>
         <button id="nav-admin" onclick="switchTab('admin')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/30">
-          <i class="fa-solid fa-shield-halved"></i> Admin Hub
+          <i class="fa-solid fa-shield-halved"></i> <span data-i18n="navAdmin">Admin Hub</span>
         </button>
         <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
-          <i class="fa-solid fa-boxes-stacked"></i> Inventory
+          <i class="fa-solid fa-boxes-stacked"></i> <span data-i18n="navInventory">Inventory</span>
         </button>
       </nav>
 
-      <!-- Auth Header Container -->
+      <!-- Auth & Lang Header Container -->
       <div class="flex items-center gap-2 shrink-0">
-        <button id="notif-toggle-btn" onclick="openNotifications()" class="relative p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700 flex items-center justify-center transition-all">
+        <!-- Language Switcher Toggle -->
+        <button onclick="toggleLanguage()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-globe text-blue-400"></i>
+          <span id="lang-label">EN</span>
+        </button>
+
+        <button id="notif-toggle-btn" onclick="openNotifications()" class="relative p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700 flex items-center justify-center transition-all">
           <i class="fa-solid fa-bell text-xs text-blue-400"></i>
           <span id="notification-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 text-white font-bold text-[9px] rounded-full flex items-center justify-center">0</span>
         </button>
@@ -184,6 +190,29 @@
     </div>
   </div>
 
+  <!-- HOLDER BINDER MODAL -->
+  <div id="holder-binder-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full p-6 relative shadow-2xl space-y-4">
+      <button onclick="closeHolderBinderModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center z-10">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+        <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-blue-400 font-bold">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div>
+          <h3 id="holder-binder-title" class="text-base font-bold text-white">Collector's Binder</h3>
+          <p id="holder-binder-subtitle" class="text-xs text-slate-400">Inspecting owned cards collection.</p>
+        </div>
+      </div>
+
+      <div id="holder-binder-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[60vh] overflow-y-auto p-1">
+        <!-- Cards rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
   <!-- CARD DETAILS MODAL -->
   <div id="card-details-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl space-y-5">
@@ -207,20 +236,21 @@
           </div>
 
           <div class="space-y-1 bg-slate-800/50 p-3 rounded-xl border border-slate-800">
-            <p class="text-[10px] uppercase font-bold text-slate-400">Price Tag</p>
+            <p class="text-[10px] uppercase font-bold text-slate-400" data-i18n="priceTag">Price Tag</p>
             <p id="detail-card-price" class="text-lg font-mono font-bold text-emerald-400">IDR 0</p>
+            <p class="text-[9px] text-slate-400 mt-0.5">+ 2% Marketplace Tax added at checkout</p>
           </div>
 
           <div class="space-y-2 pt-2">
             <button onclick="openQRISPaymentModal()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-qrcode"></i> Buy / Order via QRIS
+              <i class="fa-solid fa-qrcode"></i> <span data-i18n="buyQrisBtn">Buy / Order via QRIS</span>
             </button>
             <div class="grid grid-cols-2 gap-2">
-              <button onclick="wishlistActiveDetailCard()" class="py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-heart"></i> Wishlist
+              <button onclick="toggleWishlistActiveDetailCard()" class="py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-heart"></i> <span id="detail-wishlist-text" data-i18n="wishlist">Wishlist</span>
               </button>
               <button onclick="tradeActiveDetailCard()" class="py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-right-left"></i> Trade
+                <i class="fa-solid fa-right-left"></i> <span data-i18n="trade">Trade</span>
               </button>
             </div>
           </div>
@@ -229,7 +259,7 @@
     </div>
   </div>
 
-  <!-- QRIS PAYMENT & RECEIPT UPLOAD MODAL -->
+  <!-- QRIS PAYMENT & RECEIPT UPLOAD MODAL WITH 2% TAX -->
   <div id="qris-payment-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl text-center">
       <button onclick="closeQRISPaymentModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
@@ -237,32 +267,41 @@
       </button>
 
       <div class="space-y-1">
-        <h3 class="text-base font-bold text-white">QRIS Payment</h3>
-        <p class="text-xs text-slate-400">Scan to pay and upload your transfer receipt.</p>
+        <h3 class="text-base font-bold text-white" data-i18n="qrisTitle">QRIS Payment</h3>
+        <p class="text-xs text-slate-400" data-i18n="qrisDesc">Scan to pay and upload your transfer receipt.</p>
       </div>
 
       <div class="bg-white p-3 rounded-xl inline-block shadow-inner">
         <img id="qris-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=EUGENE_CARD_QRIS_PAYMENT" class="w-40 h-40 mx-auto">
       </div>
 
-      <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700 text-left space-y-1">
-        <div class="flex justify-between text-xs">
+      <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 text-left space-y-1 text-xs">
+        <div class="flex justify-between">
           <span class="text-slate-400">Item:</span>
           <span id="qris-modal-item" class="font-bold text-white">---</span>
         </div>
-        <div class="flex justify-between text-xs">
-          <span class="text-slate-400">Amount Due:</span>
-          <span id="qris-modal-amount" class="font-mono font-bold text-emerald-400">IDR 0</span>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Base Price:</span>
+          <span id="qris-modal-base-price" class="font-mono text-slate-300">IDR 0</span>
+        </div>
+        <div class="flex justify-between text-amber-400 font-semibold">
+          <span>Tax (+2%):</span>
+          <span id="qris-modal-tax" class="font-mono">IDR 0</span>
+        </div>
+        <div class="h-px bg-slate-700 my-1"></div>
+        <div class="flex justify-between text-sm font-bold">
+          <span class="text-slate-300">Total Payment:</span>
+          <span id="qris-modal-total" class="font-mono text-emerald-400">IDR 0</span>
         </div>
       </div>
 
       <div class="text-left space-y-1.5">
-        <label class="text-[11px] font-bold text-slate-400 uppercase">Upload Payment Receipt</label>
+        <label class="text-[11px] font-bold text-slate-400 uppercase" data-i18n="uploadReceipt">Upload Payment Receipt</label>
         <input type="file" id="qris-receipt-file" accept="image/*" class="w-full text-xs text-slate-300 bg-slate-800 border border-slate-700 rounded-xl p-2 focus:outline-none">
       </div>
 
       <button onclick="submitQRISOrder()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-        <i class="fa-solid fa-paper-plane"></i> Submit Order & Receipt
+        <i class="fa-solid fa-paper-plane"></i> <span data-i18n="submitOrder">Submit Order & Receipt</span>
       </button>
     </div>
   </div>
@@ -393,14 +432,14 @@
           </div>
           <div>
             <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-wider">LIMITED EDITION</span>
-            <h2 class="text-base font-bold text-white mt-0.5">Beta Edition Card Stock</h2>
-            <p class="text-xs text-slate-400">Official Primary Market Availability (2% Tax Included)</p>
+            <h2 class="text-base font-bold text-white mt-0.5" data-i18n="catalogTitle">Beta Edition Card Stock</h2>
+            <p class="text-xs text-slate-400" data-i18n="catalogSub">Official Primary Market Availability (+2% Tax Included at Checkout)</p>
           </div>
         </div>
         
         <div class="bg-slate-800/80 px-5 py-2.5 rounded-xl border border-slate-700 text-center sm:text-right w-full sm:w-auto">
-          <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Remaining Cards</p>
-          <p class="text-xl font-bold font-mono text-blue-400"><span id="remaining-cards-count">50</span> <span class="text-slate-400 text-xs font-normal">/ 50 Available</span></p>
+          <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider" data-i18n="remainingCards">Remaining Cards</p>
+          <p class="text-xl font-bold font-mono text-blue-400"><span id="remaining-cards-count">0</span> <span class="text-slate-400 text-xs font-normal">Available</span></p>
         </div>
       </div>
 
@@ -512,13 +551,13 @@
       </div>
     </section>
 
-    <!-- HOLDERS VIEW -->
+    <!-- HOLDERS VIEW WITH BINDER CLICK FEATURE -->
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Top Card Holders</h2>
-        <p class="text-xs text-slate-400 mt-1">Community leaderboard and collection ranks.</p>
+        <p class="text-xs text-slate-400 mt-1">Community leaderboard. Click on any collector to inspect their binder.</p>
       </div>
-      <div id="holders-content"></div>
+      <div id="holders-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </section>
 
     <!-- HISTORY VIEW -->
@@ -547,8 +586,8 @@
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> Saved Wishlist</h2>
         <p class="text-xs text-slate-400 mt-1">Keep track of cards you want to acquire.</p>
       </div>
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
-        No wishlisted cards saved yet. Click the heart icon on any card in the Collection tab!
+      <div id="wishlist-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <p class="text-center text-xs text-slate-400 py-8">No wishlisted cards saved yet. Click the heart icon on any card in the Collection tab!</p>
       </div>
     </section>
 
@@ -595,7 +634,7 @@
                 <th class="p-3">Order ID</th>
                 <th class="p-3">Buyer</th>
                 <th class="p-3">Card Tag</th>
-                <th class="p-3">Amount</th>
+                <th class="p-3">Total Amount (+2% Tax)</th>
                 <th class="p-3">Receipt Proof</th>
                 <th class="p-3 text-right">Actions</th>
               </tr>
@@ -669,37 +708,131 @@
     ];
 
     const MOCK_USERS = [
-      { username: 'alex_collector', name: 'Alex Johnson' },
-      { username: 'card_master99', name: 'Samantha Lee' },
-      { username: 'eugene_fan', name: 'David Miller' },
-      { username: 'vault_king', name: 'Elena Rostova' }
+      { username: 'alex_collector', name: 'Alex Johnson', email: 'alex@example.com' },
+      { username: 'card_master99', name: 'Samantha Lee', email: 'samantha@example.com' },
+      { username: 'eugene_fan', name: 'David Miller', email: 'david@example.com' },
+      { username: 'vault_king', name: 'Elena Rostova', email: 'elena@example.com' }
     ];
 
+    // Language Dictionary (EN & ID)
+    const I18N = {
+      en: {
+        navCollection: "Collection",
+        navTrade: "Trade",
+        navAuction: "Auction",
+        navTradeReq: "Trade Requests",
+        navInbox: "Inbox",
+        navHolders: "Holders",
+        navHistory: "History",
+        navVault: "My Vault",
+        navWishlist: "Wishlist",
+        navAnalytics: "Analytics",
+        navAdmin: "Admin Hub",
+        navInventory: "Inventory",
+        catalogTitle: "Beta Edition Card Stock",
+        catalogSub: "Official Primary Market Availability (+2% Tax Included at Checkout)",
+        remainingCards: "Remaining Cards",
+        priceTag: "Price Tag",
+        buyQrisBtn: "Buy / Order via QRIS",
+        wishlist: "Wishlist",
+        wishlisted: "Wishlisted",
+        trade: "Trade",
+        qrisTitle: "QRIS Payment",
+        qrisDesc: "Scan to pay and upload your transfer receipt.",
+        uploadReceipt: "Upload Payment Receipt",
+        submitOrder: "Submit Order & Receipt"
+      },
+      id: {
+        navCollection: "Koleksi",
+        navTrade: "Tukar",
+        navAuction: "Lelang",
+        navTradeReq: "Permintaan Tukar",
+        navInbox: "Pesan",
+        navHolders: "Pemilik",
+        navHistory: "Riwayat",
+        navVault: "Brankas Saya",
+        navWishlist: "Keinginan",
+        navAnalytics: "Analistik",
+        navAdmin: "Pusat Admin",
+        navInventory: "Inventaris",
+        catalogTitle: "Stok Kartu Edisi Beta",
+        catalogSub: "Ketersediaan Pasar Resmi (+Pajak 2% Ditambahkan Saat Checkout)",
+        remainingCards: "Sisa Kartu",
+        priceTag: "Label Harga",
+        buyQrisBtn: "Beli / Pesan via QRIS",
+        wishlist: "Keinginan",
+        wishlisted: "Tersimpan",
+        trade: "Tukar",
+        qrisTitle: "Pembayaran QRIS",
+        qrisDesc: "Pindai untuk membayar dan unggah bukti transfer Anda.",
+        uploadReceipt: "Unggah Bukti Pembayaran",
+        submitOrder: "Kirim Pesanan & Bukti"
+      }
+    };
+
+    let currentLang = localStorage.getItem('eugene_lang') || 'en';
     let currentUser = null;
     let currentFilter = 'ALL';
     let inventory = [];
+    let wishlist = [];
+    let qrisOrders = [];
     let activeDetailCardId = null;
     let sellbackCardTarget = null;
-    let qrisOrders = [];
     let activeChatUser = null;
 
-    // Initialize mock card inventory
-    for (let i = 1; i <= 50; i++) {
-      const isPremium = i <= 25;
-      const numStr = String(i).padStart(2, '0');
-      inventory.push({
-        id: `card-${i}`,
-        serial: `*${numStr}`,
-        name: isPremium ? `Eugene Premium #${numStr}` : `Eugene Standard #${numStr}`,
-        type: isPremium ? 'PREMIUM' : 'STANDARD',
-        price: isPremium ? 500000 : 100000,
-        owner: null,
-        status: 'AVAILABLE',
-        imgUrl: `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${numStr}`
-      });
+    // --- INITIALIZATION & LOCALSTORAGE PERSISTENCE ---
+    function loadSavedState() {
+      const savedInv = localStorage.getItem('eugene_inventory');
+      if (savedInv) {
+        try { inventory = JSON.parse(savedInv); } catch(e) { inventory = []; }
+      }
+      
+      if (!inventory || inventory.length === 0) {
+        inventory = [];
+        for (let i = 1; i <= 50; i++) {
+          const isPremium = i <= 25;
+          const numStr = String(i).padStart(2, '0');
+          inventory.push({
+            id: `card-${i}`,
+            serial: `*${numStr}`,
+            name: isPremium ? `Eugene Premium #${numStr}` : `Eugene Standard #${numStr}`,
+            type: isPremium ? 'PREMIUM' : 'STANDARD',
+            price: isPremium ? 500000 : 100000,
+            owner: i === 5 ? 'alex@example.com' : i === 12 ? 'samantha@example.com' : null,
+            status: (i === 5 || i === 12) ? 'OWNED' : 'AVAILABLE',
+            imgUrl: `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${numStr}`
+          });
+        }
+        saveInventoryState();
+      }
+
+      const savedWish = localStorage.getItem('eugene_wishlist');
+      if (savedWish) {
+        try { wishlist = JSON.parse(savedWish); } catch(e) { wishlist = []; }
+      }
+
+      const savedOrders = localStorage.getItem('eugene_qris_orders');
+      if (savedOrders) {
+        try { qrisOrders = JSON.parse(savedOrders); } catch(e) { qrisOrders = []; }
+      }
+    }
+
+    function saveInventoryState() {
+      localStorage.setItem('eugene_inventory', JSON.stringify(inventory));
+    }
+
+    function saveWishlistState() {
+      localStorage.setItem('eugene_wishlist', JSON.stringify(wishlist));
+      updateWishlistBadge();
+    }
+
+    function saveQRISOrdersState() {
+      localStorage.setItem('eugene_qris_orders', JSON.stringify(qrisOrders));
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      loadSavedState();
+
       if (window.supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session?.user) {
@@ -717,12 +850,34 @@
         });
       }
 
+      applyLanguageTranslations();
       renderAuthHeader();
       renderCardGrid();
       renderInventoryTable();
       renderVaultGrid();
+      renderWishlistGrid();
       renderQRISOrdersTable();
+      renderHoldersList();
+      updateWishlistBadge();
     });
+
+    // --- LANGUAGE TRANSLATIONS ---
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'id' : 'en';
+      localStorage.setItem('eugene_lang', currentLang);
+      document.getElementById('lang-label').innerText = currentLang.toUpperCase();
+      applyLanguageTranslations();
+      renderCardGrid();
+    }
+
+    function applyLanguageTranslations() {
+      document.getElementById('lang-label').innerText = currentLang.toUpperCase();
+      const dict = I18N[currentLang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerText = dict[key];
+      });
+    }
 
     function isAdminEmail(email) {
       if (!email) return false;
@@ -786,6 +941,7 @@
       renderAuthHeader();
       renderVaultGrid();
       renderQRISOrdersTable();
+      renderHoldersList();
     }
 
     function returnToPreviousStatePostLogin() {
@@ -881,14 +1037,20 @@
       }
     }
 
-    // --- QRIS ORDER FLOW & RECEIPT UPLOAD ---
+    // --- QRIS ORDER FLOW & 2% TAX ---
     function openQRISPaymentModal() {
       if (!currentUser) return openAuthModal();
       const card = inventory.find(c => c.id === activeDetailCardId);
       if (!card) return;
 
+      const basePrice = card.price;
+      const taxAmount = Math.round(basePrice * 0.02);
+      const totalAmount = basePrice + taxAmount;
+
       document.getElementById('qris-modal-item').innerText = `${card.name} (${card.serial})`;
-      document.getElementById('qris-modal-amount').innerText = `IDR ${card.price.toLocaleString()}`;
+      document.getElementById('qris-modal-base-price').innerText = `IDR ${basePrice.toLocaleString()}`;
+      document.getElementById('qris-modal-tax').innerText = `IDR ${taxAmount.toLocaleString()}`;
+      document.getElementById('qris-modal-total').innerText = `IDR ${totalAmount.toLocaleString()}`;
       document.getElementById('qris-receipt-file').value = '';
       
       closeCardDetailsModal();
@@ -911,6 +1073,10 @@
       const reader = new FileReader();
 
       reader.onload = function(e) {
+        const basePrice = card.price;
+        const taxAmount = Math.round(basePrice * 0.02);
+        const totalAmount = basePrice + taxAmount;
+
         const newOrder = {
           id: `ORD-${Date.now().toString().slice(-6)}`,
           cardId: card.id,
@@ -918,13 +1084,18 @@
           cardName: card.name,
           buyerEmail: currentUser.email,
           buyerUsername: currentUser.username,
-          amount: card.price,
+          basePrice: basePrice,
+          taxAmount: taxAmount,
+          totalAmount: totalAmount,
           receiptImg: e.target.result,
           status: 'PENDING'
         };
 
         qrisOrders.unshift(newOrder);
         card.status = 'RESERVED';
+
+        saveInventoryState();
+        saveQRISOrdersState();
 
         renderCardGrid();
         renderInventoryTable();
@@ -950,10 +1121,10 @@
           <td class="p-3 font-mono font-bold text-slate-400">${ord.id}</td>
           <td class="p-3 text-white">@${ord.buyerUsername}</td>
           <td class="p-3 font-mono font-bold text-blue-400">${ord.serial}</td>
-          <td class="p-3 font-mono text-emerald-400">IDR ${ord.amount.toLocaleString()}</td>
+          <td class="p-3 font-mono text-emerald-400">IDR ${(ord.totalAmount || ord.amount).toLocaleString()}</td>
           <td class="p-3">
             <button onclick="viewReceiptImage('${ord.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-blue-400 font-semibold rounded-lg border border-slate-700 flex items-center gap-1">
-              <i class="fa-solid fa-image"></i> View Proof
+              <i class="fa-solid fa-image"></i> Proof
             </button>
           </td>
           <td class="p-3 text-right space-x-1">
@@ -989,10 +1160,14 @@
         card.owner = ord.buyerEmail;
       }
 
+      saveInventoryState();
+      saveQRISOrdersState();
+
       renderCardGrid();
       renderInventoryTable();
       renderVaultGrid();
       renderQRISOrdersTable();
+      renderHoldersList();
       showToast(`Approved Order ${ord.id}! Card assigned to @${ord.buyerUsername}`);
     }
 
@@ -1006,10 +1181,145 @@
         card.status = 'AVAILABLE';
       }
 
+      saveInventoryState();
+      saveQRISOrdersState();
+
       renderCardGrid();
       renderInventoryTable();
       renderQRISOrdersTable();
       showToast(`Rejected Order ${ord.id}.`);
+    }
+
+    // --- HOLDERS & BINDER MODAL FEATURE ---
+    function renderHoldersList() {
+      const container = document.getElementById('holders-content');
+      if (!container) return;
+
+      const holderMap = {};
+      inventory.forEach(card => {
+        if (card.owner) {
+          holderMap[card.owner] = (holderMap[card.owner] || 0) + 1;
+        }
+      });
+
+      MOCK_USERS.forEach(u => {
+        if (!holderMap[u.email]) holderMap[u.email] = 2; // Default mock holdings
+      });
+
+      if (currentUser && !holderMap[currentUser.email]) {
+        const userCardCount = inventory.filter(c => c.owner === currentUser.email).length;
+        if (userCardCount > 0) holderMap[currentUser.email] = userCardCount;
+      }
+
+      const holderEntries = Object.entries(holderMap).sort((a, b) => b[1] - a[1]);
+
+      container.innerHTML = holderEntries.map(([email, count]) => {
+        const mockMatch = MOCK_USERS.find(u => u.email === email);
+        const name = email === currentUser?.email ? currentUser.name : mockMatch ? mockMatch.name : email.split('@')[0];
+        const username = email === currentUser?.email ? currentUser.username : mockMatch ? mockMatch.username : email.split('@')[0];
+
+        return `
+          <div onclick="openHolderBinderModal('${email}', '${name}')" class="bg-slate-900 border border-slate-800 hover:border-slate-700 p-4 rounded-2xl cursor-pointer transition-all flex items-center justify-between shadow-sm hover:translate-y-[-2px]">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-teal-400 font-bold text-lg">
+                <i class="fa-solid fa-book-open"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-white">${name}</h4>
+                <p class="text-[10px] text-slate-400 font-mono">@${username}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-mono font-bold text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2.5 py-1 rounded-full">${count} Cards</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openHolderBinderModal(email, name) {
+      const grid = document.getElementById('holder-binder-grid');
+      document.getElementById('holder-binder-title').innerText = `${name}'s Binder`;
+      document.getElementById('holder-binder-subtitle').innerText = `Viewing collection owned by ${email}`;
+
+      const ownedCards = inventory.filter(c => c.owner === email);
+
+      if (ownedCards.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-center text-xs text-slate-500 py-8">This collector currently holds no cards in their binder.</p>`;
+      } else {
+        grid.innerHTML = ownedCards.map(card => `
+          <div class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-2.5 flex flex-col justify-between">
+            <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 mb-2">
+              <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
+            </div>
+            <p class="text-center font-bold text-blue-400 font-mono text-[10px] mb-0.5">${card.serial}</p>
+            <p class="text-[10px] font-bold text-white truncate text-center">${card.name}</p>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('holder-binder-modal').classList.remove('hidden');
+    }
+
+    function closeHolderBinderModal() {
+      document.getElementById('holder-binder-modal').classList.add('hidden');
+    }
+
+    // --- WISHLIST TAB & PERSISTENCE ---
+    function toggleWishlistActiveDetailCard() {
+      if (!activeDetailCardId) return;
+      const idx = wishlist.indexOf(activeDetailCardId);
+      if (idx > -1) {
+        wishlist.splice(idx, 1);
+        showToast('Removed from Wishlist');
+      } else {
+        wishlist.push(activeDetailCardId);
+        showToast('Saved to Wishlist!');
+      }
+
+      saveWishlistState();
+      updateWishlistModalText();
+      renderWishlistGrid();
+    }
+
+    function updateWishlistBadge() {
+      const badge = document.getElementById('wishlist-count');
+      if (badge) badge.innerText = wishlist.length;
+    }
+
+    function updateWishlistModalText() {
+      const isWishlisted = wishlist.includes(activeDetailCardId);
+      const txt = document.getElementById('detail-wishlist-text');
+      if (txt) txt.innerText = isWishlisted ? (I18N[currentLang].wishlisted || "Wishlisted") : (I18N[currentLang].wishlist || "Wishlist");
+    }
+
+    function renderWishlistGrid() {
+      const container = document.getElementById('wishlist-cards-grid');
+      if (!container) return;
+
+      const wishCards = inventory.filter(c => wishlist.includes(c.id));
+
+      if (wishCards.length === 0) {
+        container.innerHTML = `<p class="text-center text-xs text-slate-400 py-8">No wishlisted cards saved yet. Click the heart icon on any card in the Collection tab!</p>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          ${wishCards.map(card => `
+            <div class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between">
+              <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 mb-2">
+                <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
+              </div>
+              <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${card.serial}</p>
+              <p class="text-[11px] font-bold text-white truncate text-center mb-2">${card.name}</p>
+              <button onclick="openCardDetailsModal('${card.id}')" class="w-full py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition-all">
+                View Item
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
     }
 
     // --- VAULT & SELL BACK WITH CONFIRMATION ---
@@ -1070,9 +1380,12 @@
       sellbackCardTarget.owner = null;
       sellbackCardTarget.status = 'AVAILABLE';
 
+      saveInventoryState();
+
       renderCardGrid();
       renderInventoryTable();
       renderVaultGrid();
+      renderHoldersList();
       closeSellbackModal();
       showToast('Card sold back to market successfully.');
     }
@@ -1166,9 +1479,11 @@
           const importedData = JSON.parse(e.target.result);
           if (Array.isArray(importedData)) {
             inventory = importedData;
+            saveInventoryState();
             renderCardGrid();
             renderInventoryTable();
             renderVaultGrid();
+            renderHoldersList();
             showToast(`Successfully imported ${importedData.length} cards.`);
           } else {
             showToast('Import Failed: JSON root must be an array.');
@@ -1186,6 +1501,9 @@
       const grid = document.getElementById('card-grid');
       if (!grid) return;
       
+      const availableCards = inventory.filter(c => c.status === 'AVAILABLE').length;
+      document.getElementById('remaining-cards-count').innerText = availableCards;
+
       const searchVal = (document.getElementById('search-input')?.value || '').toLowerCase();
       const filtered = inventory.filter(card => {
         const matchesFilter = currentFilter === 'ALL' ? true : card.type === currentFilter;
@@ -1224,6 +1542,7 @@
       
       document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owner: ${card.owner})` : ''}`;
 
+      updateWishlistModalText();
       document.getElementById('card-details-modal').classList.remove('hidden');
     }
 
@@ -1326,16 +1645,20 @@
         showToast(`Minted new card ${serial}!`);
       }
 
+      saveInventoryState();
       renderCardGrid();
       renderInventoryTable();
+      renderHoldersList();
       closeCardEditorModal();
     }
 
     function deleteCard(cardId) {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
       inventory = inventory.filter(c => c.id !== cardId);
+      saveInventoryState();
       renderCardGrid();
       renderInventoryTable();
+      renderHoldersList();
       showToast('Card deleted from inventory.');
     }
 
