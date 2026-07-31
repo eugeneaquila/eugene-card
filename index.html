@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Beta Edition</title>
+  <title>Eugene Card Marketplace | Custom Account Edition</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%233b82f6' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%233b82f6'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
@@ -67,9 +67,6 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white relative">
 
-  <!-- Hidden File Input for Chat Attachment -->
-  <input type="file" id="chat-file-input" accept="image/*,.pdf,.doc,.docx" class="hidden" onchange="handleChatFileSelect(event)">
-
   <!-- Embedded Logo SVG -->
   <svg style="display: none;">
     <defs>
@@ -93,7 +90,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-bold text-sm tracking-wide text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">Beta Edition</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">Custom Auth</span>
           </div>
         </div>
       </div>
@@ -124,9 +121,6 @@
         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
           <i class="fa-solid fa-vault text-blue-400"></i> <span>My Vault</span>
         </button>
-        <button id="nav-wishlist" onclick="switchTab('wishlist')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-heart text-rose-400"></i> <span>Wishlist</span> ( <span id="wishlist-count">0</span> )
-        </button>
 
         <!-- Admin Only Tabs -->
         <div id="admin-nav-separator" class="h-4 w-px bg-slate-700 mx-1 self-center hidden"></div>
@@ -150,25 +144,80 @@
     </div>
   </header>
 
-  <!-- GOOGLE AUTH MODAL -->
+  <!-- CUSTOM ACCOUNT AUTH MODAL (LOGIN / SIGN UP) -->
   <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-5 relative shadow-2xl">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div class="text-center space-y-2">
-        <div class="w-12 h-12 rounded-xl mx-auto bg-slate-800 border border-slate-700 p-2 flex items-center justify-center">
-          <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
-        </div>
-        <h3 class="text-base font-bold text-white">Log In to Eugene Card</h3>
-        <p class="text-xs text-slate-400">Authentication is strictly powered by Google accounts for verified trade security.</p>
+      <div class="text-center space-y-1">
+        <h3 id="auth-modal-title" class="text-base font-bold text-white">Custom Account Login</h3>
+        <p id="auth-modal-sub" class="text-xs text-slate-400">Access your custom collector profile & vault.</p>
       </div>
 
-      <div class="pt-2">
-        <button onclick="loginWithGoogleSupabase()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all">
-          <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Sign In with Google</span>
+      <form id="custom-auth-form" onsubmit="handleCustomAuthSubmit(event)" class="space-y-3">
+        <div id="auth-name-field" class="hidden space-y-1">
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Full Display Name</label>
+          <input type="text" id="auth-input-name" placeholder="Eugene Collector" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Username / Handle</label>
+          <input type="text" id="auth-input-username" required placeholder="eugene_master" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Password</label>
+          <input type="password" id="auth-input-password" required placeholder="••••••••" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all mt-2">
+          Sign In
         </button>
+      </form>
+
+      <div class="text-center pt-2 border-t border-slate-800">
+        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-blue-400 hover:underline">
+          Don't have an account? Create one
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD DETAILS MODAL -->
+  <div id="card-details-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl space-y-5">
+      <button onclick="closeCardDetailsModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center z-10">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="bg-slate-950 rounded-xl border border-slate-800 p-2 flex items-center justify-center overflow-hidden min-h-[200px]">
+          <img id="detail-card-img" src="" class="w-full h-auto max-h-64 object-contain rounded-lg" onerror="this.src='https://placehold.co/1080x1350/1e293b/94a3b8?text=Image+Not+Found'">
+        </div>
+
+        <div class="space-y-3 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span id="detail-card-type" class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full"></span>
+              <span id="detail-card-serial" class="text-xs font-mono font-bold text-blue-400"></span>
+            </div>
+            <h3 id="detail-card-name" class="text-lg font-bold text-white leading-tight"></h3>
+            <p id="detail-card-status" class="text-[11px] text-slate-400 mt-1"></p>
+          </div>
+
+          <div class="space-y-1 bg-slate-800/50 p-3 rounded-xl border border-slate-800">
+            <p class="text-[10px] uppercase font-bold text-slate-400">Price Tag</p>
+            <p id="detail-card-price" class="text-lg font-mono font-bold text-emerald-400">IDR 0</p>
+            <p class="text-[9px] text-slate-400 mt-0.5">+ 2% Marketplace Tax added at checkout</p>
+          </div>
+
+          <!-- DYNAMIC BUY / TRADE BUTTON AREA -->
+          <div id="detail-action-container" class="space-y-2 pt-2">
+            <!-- Rendered dynamically by openCardDetailsModal -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -213,8 +262,8 @@
         </div>
 
         <div>
-          <label class="text-[11px] font-bold text-slate-400 uppercase">Image URL (Syncs across all devices)</label>
-          <input type="text" id="edit-card-img" required class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+          <label class="text-[11px] font-bold text-slate-400 uppercase">Image URL Link</label>
+          <input type="url" id="edit-card-img" required placeholder="https://..." class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
         </div>
 
         <div>
@@ -228,7 +277,7 @@
 
         <div class="pt-2 flex items-center justify-end gap-2">
           <button type="button" onclick="closeCardEditorModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Save & Sync Global</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Save & Update</button>
         </div>
       </form>
     </div>
@@ -276,7 +325,7 @@
     <section id="view-trade" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-right-left text-blue-400 mr-2"></i> Secondary Trade Market</h2>
-        <p class="text-xs text-slate-400 mt-1">Live listings posted by collectors on the network.</p>
+        <p class="text-xs text-slate-400 mt-1">Direct card offer exchanges between custom registered accounts.</p>
       </div>
 
       <div id="trade-listings-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
@@ -286,74 +335,47 @@
     <section id="view-auction" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
-        <p class="text-xs text-slate-400 mt-1">Realtime bids on rare serial cards.</p>
+        <p class="text-xs text-slate-400 mt-1">Realtime competitive bids on rare cards.</p>
       </div>
 
       <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
     </section>
 
-    <!-- INBOX VIEW (WITH ATTACHMENT SUPPORT) -->
+    <!-- INBOX VIEW -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase tracking-wide flex items-center gap-2">
           <i class="fa-solid fa-comments text-indigo-400"></i> MESSENGER & CHAT
         </h2>
-        <p class="text-xs text-slate-400 mt-1">Direct message buyers and send file/image attachments in realtime.</p>
+        <p class="text-xs text-slate-400 mt-1">Direct chat between active registered accounts.</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Inbox Sidebar -->
         <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-4 space-y-4">
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search collectors..." class="w-full bg-slate-800/70 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+            <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search handles..." class="w-full bg-slate-800/70 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
           </div>
 
-          <div id="user-search-results" class="space-y-1.5">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1">COMMUNITY GOOGLE USERS</p>
+          <div class="space-y-1.5">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1">REGISTERED ACCOUNTS</p>
             <div id="user-search-list" class="space-y-1.5"></div>
           </div>
         </div>
 
-        <!-- Chat Window -->
-        <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between min-h-[440px]">
+        <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between min-h-[400px]">
           <div id="chat-header" class="border-b border-slate-800/80 pb-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 text-xs">
-                <i class="fa-solid fa-user"></i>
-              </div>
-              <div>
-                <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a user to chat</h4>
-                <p class="text-[10px] text-slate-500">Realtime Direct Messenger</p>
-              </div>
-            </div>
+            <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a user to chat</h4>
           </div>
 
           <div id="chat-messages" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-80 text-xs text-slate-400 flex flex-col justify-center items-center">
             <i class="fa-solid fa-paper-plane text-3xl text-slate-800 mb-2"></i>
-            <span class="text-slate-400 font-medium">Select a user to view messages or attach files.</span>
+            <span>Select a user to begin conversation.</span>
           </div>
 
-          <!-- Selected Attachment Preview Box -->
-          <div id="attachment-preview-box" class="hidden mb-2 p-2 bg-slate-800/90 border border-slate-700 rounded-xl flex items-center justify-between">
-            <div class="flex items-center gap-2 overflow-hidden">
-              <i class="fa-solid fa-paperclip text-blue-400 text-xs"></i>
-              <span id="attachment-filename" class="text-xs text-white truncate max-w-[200px]">filename.png</span>
-            </div>
-            <button onclick="clearChatAttachment()" class="text-slate-400 hover:text-rose-400 text-xs px-2">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-
-          <!-- Chat Bar Input & Attachment Controls -->
           <div class="flex items-center gap-2 border-t border-slate-800/80 pt-3">
-            <button onclick="triggerChatFileSelect()" title="Attach File or Image" class="p-2.5 bg-slate-800/90 hover:bg-slate-700 text-blue-400 rounded-xl border border-slate-700/80 transition-all">
-              <i class="fa-solid fa-paperclip text-xs"></i>
-            </button>
             <input type="text" id="chat-message-input" placeholder="Type a message..." class="flex-1 bg-slate-800/70 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
-            <button onclick="sendChatMessage()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-md">
-              Send
-            </button>
+            <button onclick="sendChatMessage()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md transition-all">Send</button>
           </div>
         </div>
       </div>
@@ -362,19 +384,17 @@
     <!-- HOLDERS VIEW -->
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Community Collectors</h2>
-        <p class="text-xs text-slate-400 mt-1">Live active user binder list.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Registered Collectors</h2>
+        <p class="text-xs text-slate-400 mt-1">Custom active user accounts leaderboard.</p>
       </div>
       <div id="holders-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </section>
 
     <!-- HISTORY VIEW -->
     <section id="view-history" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
-        <div>
-          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Marketplace Ledger</h2>
-          <p class="text-xs text-slate-400 mt-1">Live primary and secondary market ledger logs.</p>
-        </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Marketplace Ledger</h2>
+        <p class="text-xs text-slate-400 mt-1">Live market transaction logs.</p>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
@@ -398,19 +418,10 @@
     <!-- MY VAULT VIEW -->
     <section id="view-dashboard" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-blue-400 mr-2"></i> My Personal Vault</h2>
-        <p class="text-xs text-slate-400 mt-1">Cards linked to your active Google profile.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-blue-400 mr-2"></i> My Vault</h2>
+        <p class="text-xs text-slate-400 mt-1">Cards registered to your logged-in custom account.</p>
       </div>
       <div id="owned-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-6"></div>
-    </section>
-
-    <!-- WISHLIST VIEW -->
-    <section id="view-wishlist" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> Saved Wishlist</h2>
-        <p class="text-xs text-slate-400 mt-1">Saved cards wishlist.</p>
-      </div>
-      <div id="wishlist-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-6"></div>
     </section>
 
     <!-- AI REVENUE PREDICTION VIEW -->
@@ -418,29 +429,20 @@
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
         <div>
           <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
-            <i class="fa-solid fa-brain text-emerald-400"></i> AI Financial Revenue Prediction
+            <i class="fa-solid fa-brain text-emerald-400"></i> AI Revenue Prediction
           </h2>
-          <p class="text-xs text-slate-400 mt-1">Realtime projected 30-day volume and fee calculations based on live database state.</p>
+          <p class="text-xs text-slate-400 mt-1">Projected revenue based on current inventory pricing.</p>
         </div>
-        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold px-3 py-1 rounded-full uppercase">Predictive Intelligence</span>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Projected 30-Day Volume</p>
+          <p class="text-[10px] uppercase font-bold text-slate-400">Projected Volume</p>
           <p id="ai-projected-volume" class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 0</p>
         </div>
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Est. 2% Tax Earnings</p>
+          <p class="text-[10px] uppercase font-bold text-slate-400">Est. 2% Revenue</p>
           <p id="ai-projected-tax" class="text-xl font-bold font-mono text-blue-400 mt-1">IDR 0</p>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Predicted Mint Sellouts</p>
-          <p id="ai-projected-sellouts" class="text-xl font-bold font-mono text-amber-400 mt-1">0 Cards</p>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Market Health Index</p>
-          <p class="text-xl font-bold font-mono text-purple-400 mt-1">96.8 / 100</p>
         </div>
       </div>
     </section>
@@ -448,25 +450,7 @@
     <!-- ADMIN HUB VIEW -->
     <section id="view-admin" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub</h2>
-        <p class="text-xs text-slate-400 mt-1">Pending order receipts verification.</p>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-800/80 text-[10px] uppercase text-slate-400 font-semibold border-b border-slate-800">
-              <tr>
-                <th class="p-3">Order ID</th>
-                <th class="p-3">Buyer</th>
-                <th class="p-3">Card Tag</th>
-                <th class="p-3">Total Amount</th>
-                <th class="p-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="qris-orders-table-body" class="divide-y divide-slate-800"></tbody>
-          </table>
-        </div>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Control Panel</h2>
       </div>
     </section>
 
@@ -475,7 +459,7 @@
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-2"></i> Global Inventory Control</h2>
-          <p class="text-xs text-slate-400 mt-1">All edits refresh live across all devices globally.</p>
+          <p class="text-xs text-slate-400 mt-1">Manage card details and image links permanently.</p>
         </div>
         <button onclick="openCardEditorModal()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow">
           <i class="fa-solid fa-plus"></i> Mint Card
@@ -508,163 +492,142 @@
     <span id="toast-msg">Action completed.</span>
   </div>
 
-  <!-- Supabase JS Client Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-init.js"></script>
-
   <script>
-    const ADMIN_EMAILS = ['eugene.aquila06@gmail.com', 'yujinybwork@gmail.com'];
+    const ADMIN_ACCOUNTS = ['admin', 'eugene_admin', 'yujin_admin'];
 
     let currentUser = null;
+    let isSignUpMode = false;
     let inventory = [];
-    let googleProfiles = [];
+    let customAccounts = [];
     let historyLogs = [];
-    let qrisOrders = [];
     let currentFilter = 'ALL';
-    let currentChatAttachment = null;
-    let activeChatUser = null;
+    let activeDetailCardId = null;
 
-    // --- FULL DATABASE & REALTIME SYNC REFRESH FIX ---
-    async function refreshAllViews() {
-      if (!window.supabaseClient) return;
+    // --- INITIALIZATION & LOCALSTORAGE FALLBACKS ---
+    function loadAppData() {
+      // Load Custom Accounts
+      const savedAccs = localStorage.getItem('eugene_custom_accounts');
+      if (savedAccs) {
+        try { customAccounts = JSON.parse(savedAccs); } catch(e) { customAccounts = []; }
+      } else {
+        customAccounts = [
+          { username: 'admin', name: 'Yujin Admin', pass: 'admin123', isAdmin: true, avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=admin' },
+          { username: 'alex_collector', name: 'Alex Johnson', pass: 'pass123', isAdmin: false, avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=alex' }
+        ];
+        localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
+      }
 
-      // 1. Refresh Cards
-      const { data: cards } = await supabaseClient.from('cards').select('*').order('created_at', { ascending: true });
-      if (cards && cards.length > 0) inventory = cards;
+      // Load Active User Session
+      const savedSession = localStorage.getItem('eugene_active_user');
+      if (savedSession) {
+        try { currentUser = JSON.parse(savedSession); } catch(e) { currentUser = null; }
+      }
 
-      // 2. Refresh Profiles
-      const { data: profiles } = await supabaseClient.from('profiles').select('*');
-      if (profiles) googleProfiles = profiles;
+      // Load Inventory
+      const savedInv = localStorage.getItem('eugene_inventory');
+      if (savedInv) {
+        try { inventory = JSON.parse(savedInv); } catch(e) { inventory = []; }
+      }
+      
+      if (!inventory || inventory.length === 0) {
+        inventory = Array.from({ length: 50 }, (_, i) => {
+          const num = String(i + 1).padStart(2, '0');
+          const isPrem = i < 25;
+          return {
+            id: `card-${i + 1}`,
+            serial: `*${num}`,
+            name: isPrem ? `Eugene Premium #${num}` : `Eugene Standard #${num}`,
+            type: isPrem ? 'PREMIUM' : 'STANDARD',
+            price: isPrem ? 500000 : 100000,
+            status: i === 4 ? 'OWNED' : 'AVAILABLE',
+            owner: i === 4 ? 'alex_collector' : null,
+            imgUrl: `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${num}`
+          };
+        });
+        localStorage.setItem('eugene_inventory', JSON.stringify(inventory));
+      }
 
-      // 3. Refresh Orders
-      const { data: orders } = await supabaseClient.from('orders').select('*');
-      if (orders) qrisOrders = orders;
+      // Load History Logs
+      const savedHistory = localStorage.getItem('eugene_history');
+      if (savedHistory) {
+        try { historyLogs = JSON.parse(savedHistory); } catch(e) { historyLogs = []; }
+      }
+    }
 
-      // 4. Refresh History Logs
-      const { data: logs } = await supabaseClient.from('history_logs').select('*').order('created_at', { ascending: false });
-      if (logs) historyLogs = logs;
+    function saveInventoryState() {
+      localStorage.setItem('eugene_inventory', JSON.stringify(inventory));
+      renderCardGrid();
+      renderInventoryTable();
+      renderVaultGrid();
+      updateAIPrediction();
+    }
 
-      // Trigger UI Rerenders across all tabs
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAppData();
+      renderAuthHeader();
       renderCardGrid();
       renderInventoryTable();
       renderVaultGrid();
       renderHoldersList();
       renderHistoryTable();
-      renderQRISOrdersTable();
+      searchUsersForChat();
       updateAIPrediction();
+    });
+
+    // --- CUSTOM ACCOUNT LOGIC ---
+    function toggleAuthMode() {
+      isSignUpMode = !isSignUpMode;
+      document.getElementById('auth-modal-title').innerText = isSignUpMode ? "Create Custom Account" : "Custom Account Login";
+      document.getElementById('auth-modal-sub').innerText = isSignUpMode ? "Register a new username and password." : "Access your custom collector profile & vault.";
+      document.getElementById('auth-name-field').classList.toggle('hidden', !isSignUpMode);
+      document.getElementById('auth-submit-btn').innerText = isSignUpMode ? "Register Account" : "Sign In";
+      document.getElementById('auth-toggle-btn').innerText = isSignUpMode ? "Already have an account? Sign In" : "Don't have an account? Create one";
+    }
+
+    function handleCustomAuthSubmit(e) {
+      e.preventDefault();
+      const username = document.getElementById('auth-input-username').value.trim().toLowerCase().replace(/\s+/g, '_');
+      const password = document.getElementById('auth-input-password').value;
+      const name = document.getElementById('auth-input-name').value.trim() || username;
+
+      if (!username || !password) return showToast('Please enter username and password.');
+
+      if (isSignUpMode) {
+        if (customAccounts.some(u => u.username === username)) {
+          return showToast('Username handle already taken.');
+        }
+        const newAcc = {
+          username,
+          name,
+          pass: password,
+          isAdmin: ADMIN_ACCOUNTS.includes(username),
+          avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`
+        };
+        customAccounts.push(newAcc);
+        localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
+        currentUser = newAcc;
+        showToast('Account registered and logged in!');
+      } else {
+        const acc = customAccounts.find(u => u.username === username && u.pass === password);
+        if (!acc) return showToast('Invalid handle or password.');
+        currentUser = acc;
+        showToast(`Welcome back, @${username}!`);
+      }
+
+      localStorage.setItem('eugene_active_user', JSON.stringify(currentUser));
+      closeAuthModal();
+      renderAuthHeader();
+      renderVaultGrid();
+      renderHoldersList();
       searchUsersForChat();
     }
 
-    function subscribeToRealtimeDatabase() {
-      if (!window.supabaseClient) return;
-
-      supabaseClient
-        .channel('global-sync')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => refreshAllViews())
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => refreshAllViews())
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'history_logs' }, () => refreshAllViews())
-        .subscribe();
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (window.supabaseClient) {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session?.user) await handleSupabaseUserSession(session.user);
-
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-          if (session?.user) await handleSupabaseUserSession(session.user);
-          else { currentUser = null; renderAuthHeader(); }
-        });
-      }
-
-      await refreshAllViews();
-      subscribeToRealtimeDatabase();
-    });
-
-    // --- CHAT FILE ATTACHMENT HANDLERS ---
-    function triggerChatFileSelect() {
-      document.getElementById('chat-file-input').click();
-    }
-
-    function handleChatFileSelect(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        currentChatAttachment = {
-          name: file.name,
-          type: file.type.startsWith('image/') ? 'image' : 'file',
-          dataUrl: e.target.result
-        };
-
-        document.getElementById('attachment-filename').innerText = file.name;
-        document.getElementById('attachment-preview-box').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function clearChatAttachment() {
-      currentChatAttachment = null;
-      document.getElementById('chat-file-input').value = '';
-      document.getElementById('attachment-preview-box').classList.add('hidden');
-    }
-
-    function sendChatMessage() {
-      const input = document.getElementById('chat-message-input');
-      const text = input.value.trim();
-
-      if (!text && !currentChatAttachment) return;
-
-      const chatContainer = document.getElementById('chat-messages');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'p-3 bg-blue-600 rounded-xl text-right max-w-xs self-end text-white text-xs shadow-md space-y-2';
-
-      let innerContent = '';
-      if (currentChatAttachment) {
-        if (currentChatAttachment.type === 'image') {
-          innerContent += `<img src="${currentChatAttachment.dataUrl}" class="max-h-36 rounded-lg object-cover mb-1 border border-blue-400/40">`;
-        } else {
-          innerContent += `<div class="p-2 bg-blue-700/60 rounded-lg flex items-center gap-2 border border-blue-400/40"><i class="fa-solid fa-file"></i> <span class="truncate">${currentChatAttachment.name}</span></div>`;
-        }
-      }
-
-      if (text) innerContent += `<p>${text}</p>`;
-
-      msgDiv.innerHTML = innerContent;
-      chatContainer.appendChild(msgDiv);
-
-      input.value = '';
-      clearChatAttachment();
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    // --- AUTHENTICATION & HEADERS ---
-    async function handleSupabaseUserSession(user) {
-      const email = user.email ? user.email.toLowerCase() : '';
-      const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
-      const avatarUrl = user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
-      const isAdmin = ADMIN_EMAILS.some(a => email === a || email.startsWith(a));
-
-      currentUser = { id: user.id, email, name, avatarUrl, isAdmin };
-
-      if (window.supabaseClient) {
-        await supabaseClient.from('profiles').upsert({ id: user.id, email, name, avatar_url: avatarUrl });
-      }
-
-      renderAuthHeader();
-    }
-
-    async function loginWithGoogleSupabase() {
-      if (!window.supabaseClient) return showToast('Supabase Client missing');
-      await supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
-    }
-
-    async function logoutUser() {
-      if (window.supabaseClient) await supabaseClient.auth.signOut();
+    function logoutUser() {
       currentUser = null;
+      localStorage.removeItem('eugene_active_user');
       renderAuthHeader();
-      showToast('Logged out');
+      renderVaultGrid();
+      showToast('Logged out successfully.');
     }
 
     function renderAuthHeader() {
@@ -683,10 +646,10 @@
 
         container.innerHTML = `
           <div class="flex items-center gap-2 bg-slate-800/90 border border-slate-700/80 rounded-xl p-1.5 pl-2.5">
-            <img src="${currentUser.avatarUrl}" class="w-6 h-6 rounded-full object-cover">
+            <img src="${currentUser.avatar}" class="w-6 h-6 rounded-full object-cover bg-slate-900 border border-slate-700">
             <div class="flex flex-col text-left">
               <span class="text-xs font-bold text-white leading-tight">${currentUser.name}</span>
-              <span class="text-[8px] font-semibold text-emerald-400">Google Verified</span>
+              <span class="text-[9px] font-semibold text-blue-400 font-mono">@${currentUser.username}</span>
             </div>
             <button onclick="logoutUser()" title="Log Out" class="p-1.5 bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-lg ml-1">
               <i class="fa-solid fa-right-from-bracket text-xs"></i>
@@ -699,154 +662,80 @@
 
         container.innerHTML = `
           <button onclick="openAuthModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
-            <i class="fa-brands fa-google"></i> <span>Google Login</span>
+            <i class="fa-solid fa-user"></i> <span>Custom Login</span>
           </button>
         `;
       }
     }
 
-    // --- AI PREDICTION COMPUTATION ---
-    function updateAIPrediction() {
-      const totalCards = inventory.length;
-      const baseVal = totalCards * 250000;
-      document.getElementById('ai-projected-volume').innerText = `IDR ${baseVal.toLocaleString()}`;
-      document.getElementById('ai-projected-tax').innerText = `IDR ${Math.round(baseVal * 0.02).toLocaleString()}`;
-      document.getElementById('ai-projected-sellouts').innerText = `${Math.round(totalCards * 0.4)} Cards`;
-    }
+    // --- CARD DETAILS & BUY / TRADE LOGIC FIX ---
+    function openCardDetailsModal(cardId) {
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
 
-    // --- SAVE EDITS & SYNC ---
-    async function saveCardEdit(event) {
-      event.preventDefault();
-      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+      activeDetailCardId = card.id;
 
-      const cardId = document.getElementById('edit-card-id').value;
-      const cardPayload = {
-        serial: document.getElementById('edit-card-serial').value,
-        name: document.getElementById('edit-card-name').value,
-        type: document.getElementById('edit-card-type').value,
-        price: parseInt(document.getElementById('edit-card-price').value, 10),
-        imgUrl: document.getElementById('edit-card-img').value,
-        status: document.getElementById('edit-card-status').value
-      };
+      const img = document.getElementById('detail-card-img');
+      img.src = card.imgUrl;
 
-      if (window.supabaseClient) {
-        if (cardId) {
-          await supabaseClient.from('cards').update(cardPayload).eq('id', cardId);
-        } else {
-          await supabaseClient.from('cards').insert([{ ...cardPayload, id: `card-${Date.now()}` }]);
-        }
+      document.getElementById('detail-card-serial').innerText = card.serial;
+      document.getElementById('detail-card-name').innerText = card.name;
+      document.getElementById('detail-card-price').innerText = `IDR ${card.price.toLocaleString()}`;
+      document.getElementById('detail-card-type').innerText = card.type;
+      document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owner: @${card.owner})` : ''}`;
+
+      const actionBox = document.getElementById('detail-action-container');
+
+      if (card.status === 'OWNED') {
+        const isMyCard = currentUser && currentUser.username === card.owner;
+        actionBox.innerHTML = `
+          <button disabled class="w-full py-2.5 bg-slate-800 text-slate-500 font-bold text-xs rounded-xl border border-slate-700 cursor-not-allowed flex items-center justify-center gap-2">
+            <i class="fa-solid fa-lock"></i> ${isMyCard ? "Already In Your Vault" : `Owned by @${card.owner}`}
+          </button>
+          <button onclick="closeCardDetailsModal(); switchTab('trade');" class="w-full py-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 font-bold text-xs rounded-xl border border-purple-500/30 transition-all flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-handshake"></i> Offer Direct Trade
+          </button>
+        `;
+      } else {
+        actionBox.innerHTML = `
+          <button onclick="buyCardAction('${card.id}')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-qrcode"></i> Buy / Order via QRIS
+          </button>
+        `;
       }
 
-      await refreshAllViews();
-      closeCardEditorModal();
-      showToast('Changes updated & synced globally!');
+      document.getElementById('card-details-modal').classList.remove('hidden');
     }
 
-    // --- VIEW RENDERING HELPERS ---
-    function renderCardGrid() {
-      const grid = document.getElementById('card-grid');
-      if (!grid) return;
-      document.getElementById('remaining-cards-count').innerText = inventory.filter(c => c.status === 'AVAILABLE').length;
+    function buyCardAction(cardId) {
+      if (!currentUser) return openAuthModal();
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
 
-      grid.innerHTML = inventory.map(card => `
-        <div class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between relative">
-          <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 mb-2">
-            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-          </div>
-          <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${card.serial}</p>
-          <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
-        </div>
-      `).join('');
+      card.status = 'OWNED';
+      card.owner = currentUser.username;
+      saveInventoryState();
+
+      historyLogs.unshift({
+        timestamp: new Date().toLocaleTimeString(),
+        type: 'PURCHASE',
+        serial: card.serial,
+        user: currentUser.username,
+        amount: card.price
+      });
+      localStorage.setItem('eugene_history', JSON.stringify(historyLogs));
+      renderHistoryTable();
+
+      closeCardDetailsModal();
+      showToast(`Success! ${card.serial} added to your vault.`);
     }
 
-    function renderInventoryTable() {
-      const tbody = document.getElementById('inventory-table-body');
-      if (!tbody) return;
+    function closeCardDetailsModal() { document.getElementById('card-details-modal').classList.add('hidden'); }
 
-      tbody.innerHTML = inventory.map(card => `
-        <tr class="hover:bg-slate-800/40">
-          <td class="p-3 font-mono text-blue-400 font-bold">${card.serial}</td>
-          <td class="p-3 text-white flex items-center gap-2"><img src="${card.imgUrl}" class="w-6 h-8 object-contain"> ${card.name}</td>
-          <td class="p-3">${card.type}</td>
-          <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
-          <td class="p-3">${card.status}</td>
-          <td class="p-3 text-right">
-            <button onclick="openCardEditorModal('${card.id}')" class="p-1.5 bg-slate-800 text-amber-300 rounded"><i class="fa-solid fa-pen"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderVaultGrid() {
-      const container = document.getElementById('owned-cards-grid');
-      if (!container) return;
-      container.innerHTML = `<p class="text-center text-xs text-slate-400">Log in with Google to view your owned cards inside your private binder.</p>`;
-    }
-
-    function renderHoldersList() {
-      const container = document.getElementById('holders-content');
-      if (!container) return;
-
-      container.innerHTML = googleProfiles.map(u => `
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <img src="${u.avatar_url}" class="w-9 h-9 rounded-full">
-            <div>
-              <h4 class="text-xs font-bold text-white">${u.name}</h4>
-              <p class="text-[10px] text-slate-400">${u.email}</p>
-            </div>
-          </div>
-          <span class="text-xs font-bold text-teal-400">Collector</span>
-        </div>
-      `).join('');
-    }
-
-    function renderHistoryTable() {
-      const tbody = document.getElementById('history-table-body');
-      if (!tbody) return;
-      tbody.innerHTML = historyLogs.map(log => `
-        <tr>
-          <td class="p-3 text-slate-400 font-mono">${log.timestamp || 'Just now'}</td>
-          <td class="p-3">${log.type || 'SALE'}</td>
-          <td class="p-3 font-mono text-blue-400">${log.serial || '*01'}</td>
-          <td class="p-3 text-white">${log.user || 'Collector'}</td>
-          <td class="p-3 font-mono text-emerald-400">IDR ${(log.amount || 0).toLocaleString()}</td>
-        </tr>
-      `).join('');
-    }
-
-    function renderQRISOrdersTable() {
-      const tbody = document.getElementById('qris-orders-table-body');
-      if (!tbody) return;
-      tbody.innerHTML = qrisOrders.length === 0 ? `<tr><td colspan="5" class="p-4 text-center text-slate-500">No pending orders.</td></tr>` : '';
-    }
-
-    function searchUsersForChat() {
-      const listContainer = document.getElementById('user-search-list');
-      if (!listContainer) return;
-      listContainer.innerHTML = googleProfiles.map(u => `
-        <div onclick="startChatWithUser('${u.name}')" class="p-3 bg-slate-800/80 hover:bg-slate-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-slate-700/60">
-          <div class="flex items-center gap-3">
-            <img src="${u.avatar_url}" class="w-7 h-7 rounded-full">
-            <p class="text-xs font-bold text-white">${u.name}</p>
-          </div>
-          <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
-        </div>
-      `).join('');
-    }
-
-    function startChatWithUser(name) {
-      document.getElementById('chat-active-username').innerText = `${name} (Google User)`;
-      document.getElementById('chat-messages').innerHTML = `
-        <div class="p-3 bg-slate-800/80 rounded-xl text-left max-w-xs self-start border border-slate-700/80">
-          <p class="text-blue-400 font-bold text-[10px] mb-0.5">${name}</p>
-          <p class="text-xs text-slate-200">Hello! Let's arrange a trade.</p>
-        </div>
-      `;
-    }
-
+    // --- INVENTORY EDIT & IMAGE SAVING FIX ---
     function openCardEditorModal(cardId = null) {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+
       if (cardId) {
         const card = inventory.find(c => c.id === cardId);
         if (!card) return;
@@ -861,12 +750,199 @@
       document.getElementById('card-editor-modal').classList.remove('hidden');
     }
 
+    function saveCardEdit(event) {
+      event.preventDefault();
+      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+
+      const cardId = document.getElementById('edit-card-id').value;
+      const serial = document.getElementById('edit-card-serial').value;
+      const name = document.getElementById('edit-card-name').value;
+      const type = document.getElementById('edit-card-type').value;
+      const price = parseInt(document.getElementById('edit-card-price').value, 10);
+      const imgUrl = document.getElementById('edit-card-img').value;
+      const status = document.getElementById('edit-card-status').value;
+
+      if (cardId) {
+        const idx = inventory.findIndex(c => c.id === cardId);
+        if (idx !== -1) {
+          inventory[idx] = { ...inventory[idx], serial, name, type, price, imgUrl, status };
+        }
+      } else {
+        inventory.unshift({
+          id: `card-${Date.now()}`,
+          serial,
+          name,
+          type,
+          price,
+          imgUrl,
+          status,
+          owner: null
+        });
+      }
+
+      saveInventoryState();
+      closeCardEditorModal();
+      showToast('Card image & details saved successfully!');
+    }
+
     function closeCardEditorModal() { document.getElementById('card-editor-modal').classList.add('hidden'); }
+
+    // --- RENDER HELPERS ---
+    function renderCardGrid() {
+      const grid = document.getElementById('card-grid');
+      if (!grid) return;
+
+      document.getElementById('remaining-cards-count').innerText = inventory.filter(c => c.status === 'AVAILABLE').length;
+
+      grid.innerHTML = inventory.map(card => `
+        <div onclick="openCardDetailsModal('${card.id}')" class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between cursor-pointer">
+          <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 mb-2 overflow-hidden flex items-center justify-center">
+            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/1e293b/94a3b8?text=Image+Not+Found'">
+          </div>
+          <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${card.serial}</p>
+          <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderInventoryTable() {
+      const tbody = document.getElementById('inventory-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = inventory.map(card => `
+        <tr class="hover:bg-slate-800/40">
+          <td class="p-3 font-mono text-blue-400 font-bold">${card.serial}</td>
+          <td class="p-3 text-white flex items-center gap-2">
+            <img src="${card.imgUrl}" class="w-6 h-8 object-contain rounded border border-slate-800" onerror="this.src='https://placehold.co/1080x1350/1e293b/94a3b8?text=N/A'">
+            <span>${card.name}</span>
+          </td>
+          <td class="p-3">${card.type}</td>
+          <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
+          <td class="p-3"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span></td>
+          <td class="p-3 text-right">
+            <button onclick="openCardEditorModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg"><i class="fa-solid fa-pen"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderVaultGrid() {
+      const container = document.getElementById('owned-cards-grid');
+      if (!container) return;
+
+      if (!currentUser) {
+        container.innerHTML = `<p class="text-center text-xs text-slate-400">Log in with a custom account to view your owned cards inside your personal vault.</p>`;
+        return;
+      }
+
+      const owned = inventory.filter(c => c.owner === currentUser.username);
+      if (owned.length === 0) {
+        container.innerHTML = `<p class="text-center text-xs text-slate-400">No cards in your vault yet. Visit the Collection tab to purchase!</p>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          ${owned.map(card => `
+            <div class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between">
+              <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 mb-2">
+                <img src="${card.imgUrl}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/1e293b/94a3b8?text=Image+Not+Found'">
+              </div>
+              <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${card.serial}</p>
+              <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderHoldersList() {
+      const container = document.getElementById('holders-content');
+      if (!container) return;
+
+      container.innerHTML = customAccounts.map(u => `
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img src="${u.avatar}" class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700">
+            <div>
+              <h4 class="text-xs font-bold text-white">${u.name}</h4>
+              <p class="text-[10px] text-slate-400 font-mono">@${u.username}</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-teal-400">Collector</span>
+        </div>
+      `).join('');
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('history-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = historyLogs.map(log => `
+        <tr>
+          <td class="p-3 text-slate-400 font-mono">${log.timestamp || 'Just now'}</td>
+          <td class="p-3"><span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">${log.type || 'TRADE'}</span></td>
+          <td class="p-3 font-mono text-blue-400 font-bold">${log.serial}</td>
+          <td class="p-3 text-white">@${log.user}</td>
+          <td class="p-3 font-mono text-emerald-400 text-right">IDR ${(log.amount || 0).toLocaleString()}</td>
+        </tr>
+      `).join('');
+    }
+
+    function searchUsersForChat() {
+      const listContainer = document.getElementById('user-search-list');
+      if (!listContainer) return;
+
+      listContainer.innerHTML = customAccounts.map(u => `
+        <div onclick="startChatWithUser('${u.username}', '${u.name}')" class="p-3 bg-slate-800/80 hover:bg-slate-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-slate-700/60">
+          <div class="flex items-center gap-3">
+            <img src="${u.avatar}" class="w-7 h-7 rounded-full bg-slate-900">
+            <div>
+              <p class="text-xs font-bold text-white leading-tight">${u.name}</p>
+              <p class="text-[10px] text-slate-400 font-mono">@${u.username}</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+        </div>
+      `).join('');
+    }
+
+    function startChatWithUser(username, name) {
+      document.getElementById('chat-active-username').innerText = `${name} (@${username})`;
+      document.getElementById('chat-messages').innerHTML = `
+        <div class="p-3 bg-slate-800/80 rounded-xl text-left max-w-xs self-start border border-slate-700/80">
+          <p class="text-blue-400 font-bold text-[10px] mb-0.5">@${username}</p>
+          <p class="text-xs text-slate-200">Hello! Let's arrange a direct trade offer.</p>
+        </div>
+      `;
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chat-message-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatContainer = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'p-3 bg-blue-600 rounded-xl text-right max-w-xs self-end text-white text-xs shadow-md';
+      msgDiv.innerText = text;
+      chatContainer.appendChild(msgDiv);
+
+      input.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function updateAIPrediction() {
+      const total = inventory.length * 250000;
+      document.getElementById('ai-projected-volume').innerText = `IDR ${total.toLocaleString()}`;
+      document.getElementById('ai-projected-tax').innerText = `IDR ${Math.round(total * 0.02).toLocaleString()}`;
+    }
+
     function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
     function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
     function switchTab(tabName) {
-      const allTabs = ['catalog', 'trade', 'auction', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'ai-prediction', 'admin', 'inventory'];
+      const allTabs = ['catalog', 'trade', 'auction', 'inbox', 'holders', 'history', 'dashboard', 'ai-prediction', 'admin', 'inventory'];
       allTabs.forEach(t => {
         const view = document.getElementById(`view-${t}`);
         if (view) view.classList.add('hidden');
