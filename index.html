@@ -114,7 +114,7 @@
           <i class="fa-solid fa-handshake text-purple-400"></i> Trade Requests
         </button>
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all relative">
-          <i class="fa-solid fa-comments text-indigo-400"></i> Inbox
+          <i class="fa-solid fa-comments text-indigo-400"></i> Private Inbox
           <span id="unread-inbox-badge" class="w-2 h-2 rounded-full bg-indigo-500 hidden"></span>
         </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
@@ -164,6 +164,81 @@
     </div>
   </header>
 
+  <!-- CREATE AUCTION MODAL -->
+  <div id="create-auction-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeCreateAuctionModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+        <i class="fa-solid fa-gavel text-emerald-400"></i>
+        <h3 class="text-base font-bold text-white">List Card in Auction House</h3>
+      </div>
+
+      <form onsubmit="submitCardAuction(event)" class="space-y-3">
+        <input type="hidden" id="auction-card-id">
+
+        <div id="auction-card-summary" class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 text-xs font-bold text-emerald-400">
+          Card Selected
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Starting Bid Price (IDR)</label>
+          <input type="number" id="auction-start-price" required min="10000" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono">
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Auction Duration (Hours)</label>
+          <select id="auction-duration-hrs" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <option value="12">12 Hours</option>
+            <option value="24" selected>24 Hours</option>
+            <option value="48">48 Hours</option>
+          </select>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-gavel"></i> Launch Live Auction
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN PROOF APPROVAL MODAL -->
+  <div id="admin-proof-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeAdminProofModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+        <i class="fa-solid fa-upload text-amber-400"></i>
+        <h3 class="text-base font-bold text-white">Approve Payout (2% Tax Deducted)</h3>
+      </div>
+
+      <div id="admin-approval-summary" class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 text-xs text-slate-300 space-y-1">
+      </div>
+
+      <form onsubmit="confirmAdminPayoutWithProof(event)" class="space-y-3">
+        <input type="hidden" id="admin-pending-index">
+
+        <div>
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Upload Bank/E-Wallet Receipt Image (*Required)</label>
+          <input type="file" id="admin-receipt-file" accept="image/*" required class="w-full text-xs text-slate-400 bg-slate-800 border border-slate-700 rounded-xl p-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white">
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Transfer Reference / Note</label>
+          <input type="text" id="admin-tx-ref" placeholder="Ref: TRF-992014" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-check-circle"></i> Confirm Transfer & Send Payout Receipt
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- HOLDER VAULT INSPECTOR MODAL -->
   <div id="holder-vault-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[85vh] overflow-y-auto space-y-4">
@@ -212,6 +287,57 @@
     </div>
   </div>
 
+  <!-- TRADE PROPOSAL MODAL -->
+  <div id="trade-proposal-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeTradeProposalModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+        <i class="fa-solid fa-handshake text-purple-400"></i>
+        <h3 class="text-base font-bold text-white">Propose Card Trade / Offer</h3>
+      </div>
+
+      <form onsubmit="submitTradeProposal(event)" class="space-y-3">
+        <input type="hidden" id="trade-target-card-id">
+
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Target Item</label>
+          <div id="trade-target-summary" class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700 text-xs font-bold text-blue-400">
+            Selected Item
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Select Card to Offer (Optional)</label>
+          <select id="trade-offered-card-id" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
+            <option value="">-- No Card Offered (Pure Cash Offer) --</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Cash Amount Add-on (IDR)</label>
+          <input type="number" id="trade-cash-addon" min="0" value="0" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold uppercase text-slate-400">Upload Trade Attachment / Screenshot</label>
+          <input type="file" id="trade-attachment-file" accept="image/*" class="w-full text-xs text-slate-400 bg-slate-800 border border-slate-700 rounded-xl p-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white">
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Proposal Note</label>
+          <textarea id="trade-note" rows="2" placeholder="Write a brief message to the owner..." class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow transition-all">
+          Submit Trade Proposal
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- PROFILE EDIT MODAL -->
   <div id="profile-edit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
@@ -240,7 +366,7 @@
 
         <div>
           <label class="text-[11px] font-bold text-slate-400 uppercase">Collector Bio</label>
-          <textarea id="edit-profile-bio" rows="2" placeholder="High-end Eugene card collector and trader..." class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
+          <textarea id="edit-profile-bio" rows="2" placeholder="High-end Eugene card collector..." class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -325,7 +451,7 @@
           </div>
 
           <div class="space-y-2 pt-2">
-            <button onclick="buyActiveDetailCard()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
+            <button id="detail-buy-btn" onclick="buyActiveDetailCard()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
               <i class="fa-solid fa-qrcode"></i> Buy / Order via QRIS
             </button>
             <div class="grid grid-cols-2 gap-2">
@@ -354,7 +480,6 @@
         <p id="qris-card-title" class="text-xs text-blue-400 font-mono mt-1">Eugene Card Purchase</p>
       </div>
 
-      <!-- QR Code Canvas Display -->
       <div class="bg-white p-4 rounded-2xl w-56 h-56 mx-auto flex items-center justify-center border-2 border-blue-500 shadow-xl">
         <div id="qris-canvas"></div>
       </div>
@@ -490,7 +615,7 @@
         
         <div class="bg-slate-800/80 px-5 py-2.5 rounded-xl border border-slate-700 text-center sm:text-right w-full sm:w-auto">
           <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Remaining Cards</p>
-          <p class="text-xl font-bold font-mono text-blue-400"><span id="remaining-cards-count">50</span> <span class="text-slate-400 text-xs font-normal">Available</span></p>
+          <p class="text-xl font-bold font-mono text-blue-400"><span id="remaining-cards-count">0</span> <span class="text-slate-400 text-xs font-normal">Available</span></p>
         </div>
       </div>
 
@@ -528,13 +653,17 @@
 
     <!-- AUCTION VIEW -->
     <section id="view-auction" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
-        <p class="text-xs text-slate-400 mt-1">Place real-time bids on rare serial cards before time expires.</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
+          <p class="text-xs text-slate-400 mt-1">Place real-time bids on rare serial cards before time expires.</p>
+        </div>
+        <button onclick="switchTab('dashboard')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all">
+          + Start Auction From My Vault
+        </button>
       </div>
 
-      <div id="auction-content" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
-        Next featured auction begins soon. Stay tuned!
+      <div id="auction-content" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       </div>
     </section>
 
@@ -542,37 +671,39 @@
     <section id="view-trade-req" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Active Trade Proposals</h2>
-        <p class="text-xs text-slate-400 mt-1">Review incoming and outgoing trade proposals.</p>
+        <p class="text-xs text-slate-400 mt-1">Review incoming and outgoing card/cash trade proposals with screenshot attachments.</p>
       </div>
-      <div id="trade-req-content" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
-        No active trade proposals pending.
+      <div id="trade-req-content" class="space-y-3">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
+          No active trade proposals pending.
+        </div>
       </div>
     </section>
 
-    <!-- INBOX / CHAT VIEW -->
+    <!-- PRIVATE INBOX / CHAT VIEW -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Messenger & Live Inbox</h2>
-        <p class="text-xs text-slate-400 mt-1">Direct message buyers, sellers, and card collectors.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Private Messenger & Inbox</h2>
+        <p class="text-xs text-slate-400 mt-1">Private messages strictly scoped between you and buyers/sellers.</p>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-2xl grid grid-cols-1 md:grid-cols-3 min-h-[450px] overflow-hidden">
         <!-- Thread List Sidebar -->
         <div class="border-r border-slate-800 p-4 space-y-3">
-          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Conversations</p>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Private Threads</p>
           <div id="chat-threads-list" class="space-y-1.5"></div>
         </div>
 
         <!-- Chat Feed Window -->
         <div class="col-span-2 flex flex-col justify-between bg-slate-950/40 p-4">
           <div id="chat-active-header" class="pb-3 border-b border-slate-800 flex items-center justify-between">
-            <span class="text-xs font-bold text-white">Select a thread to start chatting</span>
+            <span class="text-xs font-bold text-white">Select a private conversation</span>
           </div>
 
           <div id="chat-messages-body" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-[300px] pr-2"></div>
 
           <form onsubmit="sendChatMessage(event)" class="pt-3 border-t border-slate-800 flex gap-2">
-            <input type="text" id="chat-input-text" placeholder="Write a message..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <input type="text" id="chat-input-text" placeholder="Write a private message..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
             <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all">Send</button>
           </form>
         </div>
@@ -600,7 +731,6 @@
 
     <!-- DASHBOARD / VAULT VIEW -->
     <section id="view-dashboard" class="hidden space-y-6">
-      <!-- Customizable Collector Profile Card -->
       <div id="user-profile-banner" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
           <div class="flex items-center gap-4">
@@ -614,7 +744,6 @@
               </div>
               <p id="profile-bio-text" class="text-xs text-slate-400 max-w-md">No bio added yet. Click customize to complete your profile.</p>
               
-              <!-- Clickable Social Media Links -->
               <div id="profile-socials-container" class="flex items-center gap-3 pt-1 text-xs"></div>
             </div>
           </div>
@@ -626,8 +755,8 @@
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-blue-400 mr-2"></i> My Personal Vault</h2>
-        <p class="text-xs text-slate-400 mt-1">Manage and inspect your owned card items.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-blue-400 mr-2"></i> My Personal Vault (Binder)</h2>
+        <p class="text-xs text-slate-400 mt-1">Manage, trade, launch live auctions, or sell back your owned cards to Admin at floor price.</p>
       </div>
       <div id="owned-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
         Log in with Google to view your owned cards inside your private binder.
@@ -647,20 +776,20 @@
     <section id="view-analytics" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> Market Analytics</h2>
-        <p class="text-xs text-slate-400 mt-1">Platform sales volume and distribution tracking.</p>
+        <p class="text-xs text-slate-400 mt-1">Platform sales volume and tax revenue tracking.</p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
           <p class="text-[10px] uppercase font-bold text-slate-400">Total Volume</p>
-          <p class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 12,500,000</p>
+          <p id="analytics-vol" class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 0</p>
         </div>
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Secondary Trades</p>
-          <p class="text-xl font-bold font-mono text-blue-400 mt-1">42 Completed</p>
+          <p class="text-[10px] uppercase font-bold text-slate-400">Admin Tax Collected (2%)</p>
+          <p id="analytics-tax" class="text-xl font-bold font-mono text-amber-400 mt-1">IDR 0</p>
         </div>
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
           <p class="text-[10px] uppercase font-bold text-slate-400">Active Holders</p>
-          <p class="text-xl font-bold font-mono text-purple-400 mt-1">19 Collectors</p>
+          <p id="analytics-holders" class="text-xl font-bold font-mono text-purple-400 mt-1">0 Collectors</p>
         </div>
       </div>
     </section>
@@ -670,11 +799,11 @@
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub</h2>
-          <p class="text-xs text-slate-400 mt-1">Verify payment submissions and oversee orders.</p>
+          <p class="text-xs text-slate-400 mt-1">Verify payment submissions and process payouts with a 2% platform tax.</p>
         </div>
       </div>
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3">
-        <h4 class="text-xs font-bold text-slate-300 uppercase">Pending QRIS Orders Queue</h4>
+        <h4 class="text-xs font-bold text-slate-300 uppercase">Pending Transactions Queue (QRIS, Trades & Sell-Backs)</h4>
         <div id="admin-orders-queue" class="space-y-2">
           <p class="text-xs text-slate-500">No pending orders waiting for manual approval.</p>
         </div>
@@ -744,26 +873,143 @@
 
     const QRIS_STRING_PAYLOAD = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
 
-    const INITIAL_JSON_BACKUP = {"exportedAt":"2026-07-29T13:25:53.048Z","exportedBy":"eugene.aquila06@gmail.com","inventoryCount":50,"cards":[{"id":"card-001","serial":"*001","name":"Eugene Standard #001","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeR1tJ2.md.png","edition":"Beta Edition: #0","sn":"001","tier":"100","printing":"1x"},{"id":"card-01","serial":"*01","name":"Eugene Premium #01","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRhf5v.png","edition":"Beta Edition: #0","sn":"01","tier":"500","printing":"1x"},{"id":"card-002","serial":"*002","name":"Eugene Standard #002","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":null,"status":"SOLD","imgUrl":"https://iili.io/CeREczX.md.png","edition":"Beta Edition: #0","sn":"002","tier":"100","printing":"1x"},{"id":"card-02","serial":"*02","name":"Eugene Premium #02","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRamG4.md.png","edition":"Beta Edition: #0","sn":"02","tier":"500","printing":"1x"},{"id":"card-003","serial":"*003","name":"Eugene Standard #003","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRExsa.md.png","edition":"Beta Edition: #0","sn":"003","tier":"100","printing":"1x"},{"id":"card-03","serial":"*03","name":"Eugene Premium #03","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRabnf.md.png","edition":"Beta Edition: #0","sn":"03","tier":"500","printing":"1x"},{"id":"card-004","serial":"*004","name":"Eugene Standard #004","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRERJp.md.png","edition":"Beta Edition: #0","sn":"004","tier":"100","printing":"1x"},{"id":"card-04","serial":"*04","name":"Eugene Premium #04","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRaZjs.md.png","edition":"Beta Edition: #0","sn":"0004","tier":"500","printing":"1x"},{"id":"card-005","serial":"*005","name":"Eugene Standard #005","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"kenneth_brilliant","status":"SOLD","imgUrl":"https://iili.io/CeREheS.md.png","edition":"Beta Edition: #0","sn":"005","tier":"100","printing":"1x"},{"id":"card-05","serial":"*05","name":"Eugene Premium #05","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRc7oJ.md.png","edition":"Beta Edition: #0","sn":"05","tier":"500","printing":"1x"},{"id":"card-006","serial":"*006","name":"Eugene Standard #006","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRGY3x.md.png","edition":"Beta Edition: #0","sn":"006","tier":"100","printing":"1x"},{"id":"card-06","serial":"*06","name":"Eugene Premium #06","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRcaPR.md.png","edition":"Beta Edition: #0","sn":"06","tier":"500","printing":"1x"},{"id":"card-007","serial":"*007","name":"Eugene Standard #007","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"andi_rende","status":"SOLD","imgUrl":"https://iili.io/CeRGX6J.md.png","edition":"Beta Edition: #0","sn":"007","tier":"100","printing":"1x"},{"id":"card-07","serial":"*07","name":"Eugene Premium #07","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRcVNn.md.png","edition":"Beta Edition: #0","sn":"07","tier":"500","printing":"1x"},{"id":"card-008","serial":"*008","name":"Eugene Standard #008","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRGVCg.md.png","edition":"Beta Edition: #0","sn":"008","tier":"100","printing":"1x"},{"id":"card-08","serial":"*08","name":"Eugene Premium #08","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRcG9t.md.png","edition":"Beta Edition: #0","sn":"08","tier":"500","printing":"1x"}]};
+    const INITIAL_JSON_BACKUP = {"exportedAt":"2026-07-29T13:25:53.048Z","exportedBy":"eugene.aquila06@gmail.com","inventoryCount":16,"cards":[{"id":"card-001","serial":"*001","name":"Eugene Standard #001","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeR1tJ2.md.png","edition":"Beta Edition: #0","sn":"001","tier":"100","printing":"1x"},{"id":"card-01","serial":"*01","name":"Eugene Premium #01","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRhf5v.png","edition":"Beta Edition: #0","sn":"01","tier":"500","printing":"1x"},{"id":"card-002","serial":"*002","name":"Eugene Standard #002","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":null,"status":"SOLD","imgUrl":"https://iili.io/CeREczX.md.png","edition":"Beta Edition: #0","sn":"002","tier":"100","printing":"1x"},{"id":"card-02","serial":"*02","name":"Eugene Premium #02","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRamG4.md.png","edition":"Beta Edition: #0","sn":"02","tier":"500","printing":"1x"}]};
 
     let currentUser = null;
     let currentFilter = 'ALL';
-    let inventory = [...INITIAL_JSON_BACKUP.cards];
+    let unreadNotifCount = 0;
+    let inventory = [];
+
     let wishlist = new Set();
-    let shoppingCart = new Set();
+    const storedWishlist = localStorage.getItem('eugene_wishlist_data');
+    if (storedWishlist) {
+      try { wishlist = new Set(JSON.parse(storedWishlist)); } catch(e) {}
+    }
+
+    let tradeProposals = [];
+    const storedTrades = localStorage.getItem('eugene_trade_proposals');
+    if (storedTrades) {
+      try { tradeProposals = JSON.parse(storedTrades); } catch(e) {}
+    }
+
     let pendingOrders = [];
+    const storedPending = localStorage.getItem('eugene_pending_orders');
+    if (storedPending) {
+      try { pendingOrders = JSON.parse(storedPending); } catch(e) {}
+    }
+
+    let liveAuctions = [];
+    const storedAuctions = localStorage.getItem('eugene_live_auctions');
+    if (storedAuctions) {
+      try { liveAuctions = JSON.parse(storedAuctions); } catch(e) {}
+    }
+
+    let transactionHistory = [];
+    const storedHistory = localStorage.getItem('eugene_transaction_history');
+    if (storedHistory) {
+      try { transactionHistory = JSON.parse(storedHistory); } catch(e) {}
+    } else {
+      transactionHistory = [
+        { id: 'tx-1', type: 'MINT', cardSerial: '*01', details: 'Genesis Minting of Eugene Premium #01', timestamp: '2026-07-29 10:00 AM' }
+      ];
+    }
+
+    let shoppingCart = new Set();
     let activeCardForAction = null;
     let selectedOwner = null;
 
-    // Chat Inbox Threads State
     let chatThreads = [
-      { id: 't1', user: 'Eugene', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Eugene', messages: [{ sender: 'Eugene', text: 'Hey! Are you open to trading card *01?' }] },
-      { id: 't2', user: 'kenneth_brilliant', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=kenneth', messages: [{ sender: 'kenneth_brilliant', text: 'Just bought *005 via QRIS!' }] },
-      { id: 't3', user: 'andi_rende', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=andi', messages: [{ sender: 'andi_rende', text: 'Welcome to Eugene Card Marketplace.' }] }
+      { id: 't1', user: 'Eugene', participant1: 'Eugene', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Eugene', messages: [{ sender: 'Eugene Admin', text: 'Welcome to Eugene Card Private Messenger.' }] }
     ];
+    const storedChats = localStorage.getItem('eugene_chat_threads');
+    if (storedChats) {
+      try { chatThreads = JSON.parse(storedChats); } catch(e) {}
+    }
     let activeChatThreadId = 't1';
 
+    // FETCH DATABASE INVENTORY WITH SUPABASE & BROADCAST REAL-TIME TO EVERYONE
+    async function fetchDatabaseInventory() {
+      if (window.supabaseClient) {
+        const { data, error } = await supabaseClient
+          .from('inventory')
+          .select('*')
+          .order('id', { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          inventory = data;
+          saveInventoryLocalCache();
+          renderCardGrid();
+          renderInventoryTable();
+          updateRemainingCardCount();
+          return;
+        }
+      }
+
+      const storedInventory = localStorage.getItem('eugene_inventory_data');
+      if (storedInventory) {
+        try { inventory = JSON.parse(storedInventory); } catch(e) { inventory = [...INITIAL_JSON_BACKUP.cards]; }
+      } else {
+        inventory = [...INITIAL_JSON_BACKUP.cards];
+      }
+      renderCardGrid();
+      renderInventoryTable();
+      updateRemainingCardCount();
+    }
+
+    function saveInventoryLocalCache() {
+      localStorage.setItem('eugene_inventory_data', JSON.stringify(inventory));
+    }
+
+    function saveWishlistState() {
+      localStorage.setItem('eugene_wishlist_data', JSON.stringify(Array.from(wishlist)));
+    }
+
+    function saveTradeProposalsState() {
+      localStorage.setItem('eugene_trade_proposals', JSON.stringify(tradeProposals));
+    }
+
+    function savePendingOrdersState() {
+      localStorage.setItem('eugene_pending_orders', JSON.stringify(pendingOrders));
+    }
+
+    function saveAuctionsState() {
+      localStorage.setItem('eugene_live_auctions', JSON.stringify(liveAuctions));
+    }
+
+    function saveHistoryState() {
+      localStorage.setItem('eugene_transaction_history', JSON.stringify(transactionHistory));
+    }
+
+    function saveChatsState() {
+      localStorage.setItem('eugene_chat_threads', JSON.stringify(chatThreads));
+    }
+
+    function triggerBellRingNotification(count = 1) {
+      unreadNotifCount += count;
+      const badge = document.getElementById('notification-badge');
+      if (badge) {
+        badge.innerText = unreadNotifCount;
+        badge.classList.remove('hidden');
+      }
+    }
+
+    function addHistoryRecord(type, cardSerial, details) {
+      const record = {
+        id: `tx-${Date.now()}`,
+        type: type,
+        cardSerial: cardSerial,
+        details: details,
+        timestamp: new Date().toLocaleString()
+      };
+      transactionHistory.unshift(record);
+      saveHistoryState();
+      renderHistoryLedger();
+      renderAnalyticsView();
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
+      await fetchDatabaseInventory();
+
       if (window.supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session?.user) {
@@ -779,13 +1025,23 @@
             renderAuthHeader();
           }
         });
+
+        // Live Real-Time Updates Across Devices
+        supabaseClient
+          .channel('public:inventory')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, () => {
+            fetchDatabaseInventory();
+          })
+          .subscribe();
       }
 
       renderAuthHeader();
-      renderCardGrid();
-      renderInventoryTable();
-      updateRemainingCardCount();
       renderChatThreads();
+      renderHistoryLedger();
+      renderAdminOrdersQueue();
+      renderTradeProposals();
+      renderAuctionsGrid();
+      document.getElementById('wishlist-count-badge').innerText = wishlist.size;
     });
 
     function isAdminEmail(email) {
@@ -850,30 +1106,21 @@
         avatarUrl: user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`
       };
 
-      // READ PERSISTED LOCALSTORAGE PROFILE
       const savedProfile = localStorage.getItem(`eugene_profile_${email}`);
       if (savedProfile) {
         try {
           const parsed = JSON.parse(savedProfile);
           profile = { ...profile, ...parsed, id: user.id, email: email, isAdmin: isAdmin };
-        } catch (e) {
-          console.error('Failed to parse saved profile:', e);
-        }
+        } catch (e) {}
       }
 
       currentUser = profile;
-
-      // MERGE ACCOUNT STEP: Auto-reassign legacy 'Eugene' cards to logged-in profile
-      inventory.forEach(card => {
-        if (card.owner === 'Eugene') {
-          card.owner = currentUser.name;
-        }
-      });
 
       renderAuthHeader();
       renderUserProfileUI();
       renderCardGrid();
       renderInventoryTable();
+      renderChatThreads();
     }
 
     function returnToPreviousStatePostLogin() {
@@ -894,6 +1141,7 @@
       currentUser = null;
       renderAuthHeader();
       renderUserProfileUI();
+      renderChatThreads();
       switchTab('catalog');
       showToast('Logged out.');
     }
@@ -940,7 +1188,7 @@
       }
     }
 
-    // --- PROFILE PERSONALIZATION ---
+    // PROFILE PERSONALIZATION
     function openProfileModal() {
       if (!currentUser) return openAuthModal();
 
@@ -971,13 +1219,12 @@
       currentUser.x = document.getElementById('edit-profile-x').value;
       currentUser.website = document.getElementById('edit-profile-website').value;
 
-      // PERSIST PROFILE TO BROWSER STORAGE
       localStorage.setItem(`eugene_profile_${currentUser.email}`, JSON.stringify(currentUser));
 
       renderAuthHeader();
       renderUserProfileUI();
       closeProfileModal();
-      showToast('Profile saved & persisted locally!');
+      showToast('Profile saved!');
     }
 
     function renderUserProfileUI() {
@@ -988,18 +1235,18 @@
       const socialsContainer = document.getElementById('profile-socials-container');
 
       if (!currentUser) {
-        avatarImg.src = 'https://api.dicebear.com/7.x/identicon/svg?seed=guest';
-        displayName.innerText = 'Guest Collector';
-        usernameTag.innerText = '@guest';
-        bioText.innerText = 'Log in to edit your custom profile details and social handlers.';
-        socialsContainer.innerHTML = '';
+        if (avatarImg) avatarImg.src = 'https://api.dicebear.com/7.x/identicon/svg?seed=guest';
+        if (displayName) displayName.innerText = 'Guest Collector';
+        if (usernameTag) usernameTag.innerText = '@guest';
+        if (bioText) bioText.innerText = 'Log in to edit your custom profile details and social handlers.';
+        if (socialsContainer) socialsContainer.innerHTML = '';
         return;
       }
 
-      avatarImg.src = currentUser.avatarUrl;
-      displayName.innerText = currentUser.name;
-      usernameTag.innerText = `@${currentUser.username}`;
-      bioText.innerText = currentUser.bio || 'No bio specified.';
+      if (avatarImg) avatarImg.src = currentUser.avatarUrl;
+      if (displayName) displayName.innerText = currentUser.name;
+      if (usernameTag) usernameTag.innerText = `@${currentUser.username}`;
+      if (bioText) bioText.innerText = currentUser.bio || 'No bio specified.';
 
       let socialHtml = '';
       if (currentUser.instagram) {
@@ -1015,10 +1262,10 @@
         socialHtml += `<a href="${currentUser.website}" target="_blank" class="text-slate-400 hover:text-emerald-400 transition-all"><i class="fa-solid fa-globe text-sm"></i></a>`;
       }
 
-      socialsContainer.innerHTML = socialHtml;
+      if (socialsContainer) socialsContainer.innerHTML = socialHtml;
     }
 
-    // --- CARD GRID & DETAILS WITH OWNERSHIP AND BUY/CART/OFFER FEATURES ---
+    // COLLECTION TAB
     function renderCardGrid() {
       const grid = document.getElementById('card-grid');
       if (!grid) return;
@@ -1031,12 +1278,12 @@
       });
 
       grid.innerHTML = filtered.map(card => {
-        const isOwned = card.owner && card.owner !== 'Unassigned';
+        const isOwned = (card.owner && card.owner !== 'Unassigned') || card.status === 'OWNED' || card.status === 'SOLD';
         const inCart = shoppingCart.has(card.id);
 
         let ownerBadge = '';
         if (isOwned) {
-          ownerBadge = `<span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 truncate max-w-[110px]">OWNED: ${card.owner}</span>`;
+          ownerBadge = `<span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 truncate max-w-[110px]">OWNED: ${card.owner || 'Collector'}</span>`;
         } else {
           ownerBadge = `<span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">AVAILABLE</span>`;
         }
@@ -1062,17 +1309,24 @@
               </div>
               <p class="text-[11px] font-bold text-white truncate text-left mb-2.5">${card.name}</p>
 
-              <!-- DIRECT ACTION BUTTONS: BUY, CART, OFFER -->
               <div class="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800" onclick="event.stopPropagation()">
-                <button onclick="quickBuyCard('${card.id}')" class="py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1" title="Buy via QRIS">
-                  <i class="fa-solid fa-qrcode"></i> Buy
-                </button>
+                ${isOwned ? `
+                  <button disabled class="py-1.5 bg-slate-800/50 text-slate-600 cursor-not-allowed font-bold text-[10px] rounded-lg flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-lock"></i> Owned
+                  </button>
+                  <button disabled class="py-1.5 bg-slate-800/50 text-slate-600 cursor-not-allowed font-bold text-[10px] rounded-lg flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-cart-shopping"></i> Cart
+                  </button>
+                ` : `
+                  <button onclick="quickBuyCard('${card.id}')" class="py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-qrcode"></i> Buy
+                  </button>
+                  <button onclick="toggleCart('${card.id}')" class="py-1.5 ${inCart ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 hover:bg-slate-700 text-amber-400'} text-[10px] rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-cart-shopping"></i> ${inCart ? 'Added' : 'Cart'}
+                  </button>
+                `}
 
-                <button onclick="toggleCart('${card.id}')" class="py-1.5 ${inCart ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 hover:bg-slate-700 text-amber-400'} text-[10px] rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-1" title="Add to Cart">
-                  <i class="fa-solid fa-cart-shopping"></i> ${inCart ? 'Added' : 'Cart'}
-                </button>
-
-                <button onclick="quickOfferCard('${card.id}')" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-400 font-bold text-[10px] rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-1" title="Make Trade Offer">
+                <button onclick="openTradeProposalModal('${card.id}')" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-400 font-bold text-[10px] rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-1">
                   <i class="fa-solid fa-handshake"></i> Offer
                 </button>
               </div>
@@ -1083,7 +1337,887 @@
       }).join('');
     }
 
-    // --- CART MANAGEMENT ---
+    // SEARCHABLE OWNER SELECTION DROPDOWN
+    function filterOwnerOptions(searchQuery) {
+      const dropdown = document.getElementById('owner-dropdown-list');
+      const query = searchQuery.toLowerCase().trim();
+
+      const collectors = Array.from(new Set([
+        'Unassigned (Null)',
+        'Eugene',
+        'kenneth_brilliant',
+        'andi_rende',
+        currentUser?.name || '',
+        currentUser?.email || ''
+      ])).filter(Boolean);
+
+      const filtered = collectors.filter(c => c.toLowerCase().includes(query));
+
+      if (filtered.length === 0) {
+        dropdown.innerHTML = `<div onclick="selectOwnerOption('${searchQuery}')" class="p-2 text-xs text-blue-400 hover:bg-slate-700 cursor-pointer">Use custom owner: "${searchQuery}"</div>`;
+      } else {
+        dropdown.innerHTML = filtered.map(c => `
+          <div onclick="selectOwnerOption('${c}')" class="p-2 text-xs text-white hover:bg-slate-700 cursor-pointer flex items-center justify-between">
+            <span>${c}</span>
+            ${c === 'Unassigned (Null)' ? '<span class="text-[9px] text-slate-500">Default</span>' : ''}
+          </div>
+        `).join('');
+      }
+
+      dropdown.classList.remove('hidden');
+    }
+
+    function selectOwnerOption(ownerVal) {
+      if (ownerVal === 'Unassigned (Null)') {
+        selectedOwner = null;
+        document.getElementById('current-owner-label').innerText = 'Unassigned';
+        document.getElementById('edit-card-owner-search').value = '';
+      } else {
+        selectedOwner = ownerVal;
+        document.getElementById('current-owner-label').innerText = ownerVal;
+        document.getElementById('edit-card-owner-search').value = ownerVal;
+      }
+      document.getElementById('owner-dropdown-list').classList.add('hidden');
+    }
+
+    // ADMIN INVENTORY EDITOR (UPDATES SUPABASE REAL-TIME FOR EVERYONE)
+    function openCardEditorModal(cardId = null) {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+
+      const modalTitle = document.getElementById('editor-modal-title');
+      
+      if (cardId) {
+        const card = inventory.find(c => c.id === cardId);
+        if (!card) return;
+
+        modalTitle.innerText = "Edit Card Details";
+        document.getElementById('edit-card-id').value = card.id;
+        document.getElementById('edit-card-serial').value = card.serial;
+        document.getElementById('edit-card-sn').value = card.sn || card.serial.replace('*', '');
+        document.getElementById('edit-card-name').value = card.name;
+        document.getElementById('edit-card-edition').value = card.edition || 'Beta Edition: #0';
+        document.getElementById('edit-card-printing').value = card.printing || '1x';
+        document.getElementById('edit-card-type').value = card.type;
+        document.getElementById('edit-card-price').value = card.price;
+        document.getElementById('edit-card-basefloor').value = card.baseFloorPrice || card.price;
+        document.getElementById('edit-card-img').value = card.imgUrl;
+        document.getElementById('edit-card-status').value = card.status;
+
+        selectOwnerOption(card.owner || 'Unassigned (Null)');
+      } else {
+        modalTitle.innerText = "Mint New Card";
+        document.getElementById('edit-card-id').value = '';
+        document.getElementById('edit-card-serial').value = `*${String(inventory.length + 1).padStart(2, '0')}`;
+        document.getElementById('edit-card-sn').value = String(inventory.length + 1).padStart(2, '0');
+        document.getElementById('edit-card-name').value = `Eugene Premium #${String(inventory.length + 1).padStart(2, '0')}`;
+        document.getElementById('edit-card-edition').value = 'Beta Edition: #0';
+        document.getElementById('edit-card-printing').value = '1x';
+        document.getElementById('edit-card-type').value = 'PREMIUM';
+        document.getElementById('edit-card-price').value = 500000;
+        document.getElementById('edit-card-basefloor').value = 500000;
+        document.getElementById('edit-card-img').value = `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${String(inventory.length + 1).padStart(2, '0')}`;
+        document.getElementById('edit-card-status').value = 'AVAILABLE';
+
+        selectOwnerOption('Unassigned (Null)');
+      }
+
+      document.getElementById('card-editor-modal').classList.remove('hidden');
+    }
+
+    function closeCardEditorModal() {
+      document.getElementById('card-editor-modal').classList.add('hidden');
+    }
+
+    async function saveCardEdit(event) {
+      event.preventDefault();
+
+      const cardId = document.getElementById('edit-card-id').value;
+      const serial = document.getElementById('edit-card-serial').value;
+      const sn = document.getElementById('edit-card-sn').value;
+      const name = document.getElementById('edit-card-name').value;
+      const edition = document.getElementById('edit-card-edition').value;
+      const printing = document.getElementById('edit-card-printing').value;
+      const type = document.getElementById('edit-card-type').value;
+      const price = parseInt(document.getElementById('edit-card-price').value, 10);
+      const baseFloorPrice = parseInt(document.getElementById('edit-card-basefloor').value, 10);
+      const imgUrl = document.getElementById('edit-card-img').value;
+      const status = document.getElementById('edit-card-status').value;
+
+      const cardPayload = {
+        serial, sn, name, edition, printing, type, price, baseFloorPrice, imgUrl, status, owner: selectedOwner
+      };
+
+      if (cardId) {
+        cardPayload.id = cardId;
+        const idx = inventory.findIndex(c => c.id === cardId);
+        if (idx !== -1) {
+          inventory[idx] = { ...inventory[idx], ...cardPayload };
+        }
+        
+        // Push update directly to Supabase Database so everyone sees it
+        if (window.supabaseClient) {
+          await supabaseClient
+            .from('inventory')
+            .update(cardPayload)
+            .eq('id', cardId);
+        }
+        addHistoryRecord('ADMIN_UPDATE', serial, `Admin updated specs for ${serial}`);
+        showToast(`Updated ${serial} details live for everyone!`);
+      } else {
+        const newId = `card-${Date.now()}`;
+        cardPayload.id = newId;
+        inventory.unshift(cardPayload);
+
+        // Insert new card live to Supabase Database
+        if (window.supabaseClient) {
+          await supabaseClient
+            .from('inventory')
+            .insert([cardPayload]);
+        }
+        addHistoryRecord('MINT_CARD', serial, `Newly minted card ${serial} added to network.`);
+        showToast(`Minted new card ${serial} live!`);
+      }
+
+      saveInventoryLocalCache();
+      renderCardGrid();
+      renderInventoryTable();
+      updateRemainingCardCount();
+      closeCardEditorModal();
+    }
+
+    async function deleteCard(cardId) {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+      const card = inventory.find(c => c.id === cardId);
+      inventory = inventory.filter(c => c.id !== cardId);
+      saveInventoryLocalCache();
+
+      if (window.supabaseClient) {
+        await supabaseClient
+          .from('inventory')
+          .delete()
+          .eq('id', cardId);
+      }
+
+      if (card) addHistoryRecord('DELETE_CARD', card.serial, `Admin removed card ${card.serial} from inventory.`);
+
+      renderCardGrid();
+      renderInventoryTable();
+      updateRemainingCardCount();
+      showToast('Card deleted live from database.');
+    }
+
+    // JSON IMPORT & EXPORT FEATURES
+    function exportInventoryJSON() {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+
+      const backupData = {
+        exportedAt: new Date().toISOString(),
+        exportedBy: currentUser.email,
+        inventoryCount: inventory.length,
+        cards: inventory
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `eugene_inventory_backup_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToast('Inventory backup exported successfully!');
+    }
+
+    async function importInventoryJSON(event) {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const newCards = Array.isArray(parsed.cards) ? parsed.cards : parsed;
+
+          if (window.supabaseClient && newCards.length > 0) {
+            await supabaseClient.from('inventory').upsert(newCards);
+            await fetchDatabaseInventory();
+          } else {
+            inventory = newCards;
+            saveInventoryLocalCache();
+            renderCardGrid();
+            renderInventoryTable();
+            updateRemainingCardCount();
+          }
+          addHistoryRecord('IMPORT_JSON', 'SYSTEM', `Admin imported ${newCards.length} cards into inventory.`);
+          showToast(`Imported ${newCards.length} cards into inventory live!`);
+        } catch (err) {
+          showToast('Failed to parse JSON file: ' + err.message);
+        }
+      };
+
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function openCardDetailsModal(cardId) {
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+
+      activeCardForAction = card;
+
+      document.getElementById('detail-card-img').src = card.imgUrl;
+      document.getElementById('detail-card-serial').innerText = card.serial;
+      document.getElementById('detail-card-name').innerText = card.name;
+      document.getElementById('detail-card-price').innerText = `IDR ${card.price.toLocaleString()}`;
+      document.getElementById('detail-card-edition').innerText = card.edition || 'Beta Edition: #0';
+      
+      const typeSpan = document.getElementById('detail-card-type');
+      typeSpan.innerText = card.type;
+      typeSpan.className = `text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}`;
+      
+      const isOwned = (card.owner && card.owner !== 'Unassigned') || card.status === 'OWNED' || card.status === 'SOLD';
+      document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owner: ${card.owner})` : ''}`;
+      
+      const buyBtn = document.getElementById('detail-buy-btn');
+      if (isOwned) {
+        buyBtn.disabled = true;
+        buyBtn.className = "w-full py-2.5 bg-slate-800 text-slate-500 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-2";
+        buyBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Card is Owned`;
+      } else {
+        buyBtn.disabled = false;
+        buyBtn.className = "w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2";
+        buyBtn.innerHTML = `<i class="fa-solid fa-qrcode"></i> Buy / Order via QRIS`;
+      }
+
+      document.getElementById('card-details-modal').classList.remove('hidden');
+    }
+
+    function closeCardDetailsModal() {
+      document.getElementById('card-details-modal').classList.add('hidden');
+    }
+
+    // QRIS CHECKOUT & PAYMENTS
+    function buyActiveDetailCard() {
+      if (!currentUser) return openAuthModal();
+      if (!activeCardForAction) return;
+
+      closeCardDetailsModal();
+
+      document.getElementById('qris-card-title').innerText = `${activeCardForAction.name} (${activeCardForAction.serial})`;
+      document.getElementById('qris-amount-due').innerText = `IDR ${activeCardForAction.price.toLocaleString()}`;
+
+      const canvasContainer = document.getElementById('qris-canvas');
+      canvasContainer.innerHTML = '';
+      
+      new QRCode(canvasContainer, {
+        text: QRIS_STRING_PAYLOAD,
+        width: 180,
+        height: 180,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      document.getElementById('qris-modal').classList.remove('hidden');
+    }
+
+    function closeQrisModal() {
+      document.getElementById('qris-modal').classList.add('hidden');
+    }
+
+    function submitQrisPaymentProof() {
+      const fileInput = document.getElementById('qris-proof-file');
+      if (!fileInput.files.length) {
+        return showToast('Please select a payment receipt image before submitting.');
+      }
+
+      pendingOrders.push({
+        id: `ord-${Date.now()}`,
+        card: activeCardForAction,
+        type: 'PURCHASE',
+        buyer: currentUser.name,
+        grossAmount: activeCardForAction.price,
+        taxAmount: activeCardForAction.price * 0.02,
+        payoutAmount: activeCardForAction.price * 0.98,
+        timestamp: new Date().toLocaleTimeString()
+      });
+
+      savePendingOrdersState();
+      addHistoryRecord('QRIS_SUBMIT', activeCardForAction.serial, `${currentUser.name} submitted QRIS payment receipt for ${activeCardForAction.serial}`);
+
+      showToast('Payment proof submitted! Waiting for Admin verification.');
+      closeQrisModal();
+      renderAdminOrdersQueue();
+    }
+
+    // NAVIGATION ROUTER
+    function switchTab(tabName) {
+      const adminOnlyTabs = ['admin', 'inventory', 'analytics'];
+      if (adminOnlyTabs.includes(tabName) && !currentUser?.isAdmin) {
+        return showToast('Admin permission required.');
+      }
+
+      const allTabs = ['catalog', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'analytics', 'admin', 'inventory'];
+
+      allTabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const nav = document.getElementById(`nav-${t}`);
+        if (view) view.classList.add('hidden');
+        if (nav && !adminOnlyTabs.includes(t)) {
+          nav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all';
+        }
+      });
+
+      const activeView = document.getElementById(`view-${tabName}`);
+      const activeNav = document.getElementById(`nav-${tabName}`);
+
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeNav && !adminOnlyTabs.includes(tabName)) {
+        activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-white bg-slate-700 flex items-center gap-1.5 whitespace-nowrap transition-all';
+      }
+
+      if (tabName === 'wishlist') renderWishlistGrid();
+      if (tabName === 'dashboard') renderVaultGrid();
+      if (tabName === 'inbox') renderChatThreads();
+      if (tabName === 'holders') renderHoldersLeaderboard();
+      if (tabName === 'history') renderHistoryLedger();
+      if (tabName === 'analytics') renderAnalyticsView();
+      if (tabName === 'auction') renderAuctionsGrid();
+    }
+
+    function toggleWishlist(cardId) {
+      if (wishlist.has(cardId)) {
+        wishlist.delete(cardId);
+        showToast('Removed from wishlist.');
+      } else {
+        wishlist.add(cardId);
+        showToast('Saved to wishlist!');
+      }
+      saveWishlistState();
+      document.getElementById('wishlist-count-badge').innerText = wishlist.size;
+      renderCardGrid();
+    }
+
+    function wishlistActiveDetailCard() {
+      if (activeCardForAction) toggleWishlist(activeCardForAction.id);
+    }
+
+    function renderWishlistGrid() {
+      const container = document.getElementById('wishlist-grid');
+      const items = inventory.filter(c => wishlist.has(c.id));
+
+      if (items.length === 0) {
+        container.innerHTML = `<div class="col-span-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">No wishlisted cards saved yet. Click the heart icon on any card in the Collection tab!</div>`;
+        return;
+      }
+
+      container.innerHTML = items.map(card => `
+        <div onclick="openCardDetailsModal('${card.id}')" class="card-holo-standard rounded-xl p-3 flex flex-col justify-between relative cursor-pointer">
+          <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden">
+            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
+          </div>
+          <p class="text-center font-bold text-blue-400 font-mono mb-1 text-xs">${card.serial}</p>
+          <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderVaultGrid() {
+      const container = document.getElementById('owned-cards-grid');
+      if (!currentUser) {
+        container.innerHTML = "Log in with Google to view your owned cards inside your private binder.";
+        return;
+      }
+
+      const owned = inventory.filter(c => 
+        c.owner === currentUser.email || 
+        c.owner === currentUser.name || 
+        c.owner === currentUser.username ||
+        c.owner === 'Eugene'
+      );
+
+      if (owned.length === 0) {
+        container.innerHTML = "You don't own any cards yet. Buy cards via QRIS or propose trades to populate your vault!";
+        return;
+      }
+
+      container.className = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4";
+      container.innerHTML = owned.map(card => {
+        return `
+          <div class="card-holo-premium rounded-xl p-3 flex flex-col justify-between relative">
+            <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden cursor-pointer" onclick="openCardDetailsModal('${card.id}')">
+              <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
+            </div>
+            <p class="text-center font-bold text-blue-400 font-mono mb-0.5 text-xs">${card.serial}</p>
+            <p class="text-[11px] font-bold text-white truncate text-center mb-3">${card.name}</p>
+
+            <div class="grid grid-cols-3 gap-1 pt-2 border-t border-slate-800/80">
+              <button onclick="openCreateAuctionModal('${card.id}')" class="py-1.5 bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/30 font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1">
+                <i class="fa-solid fa-gavel"></i> Auction
+              </button>
+              <button onclick="sellBackCardToAdmin('${card.id}')" class="py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-500/30 font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1">
+                <i class="fa-solid fa-building-columns"></i> Sell Back
+              </button>
+              <button onclick="openTradeProposalModal('${card.id}')" class="py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1">
+                <i class="fa-solid fa-right-left"></i> Trade
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function tradeActiveDetailCard() {
+      if (!currentUser) return openAuthModal();
+      openTradeProposalModal(activeCardForAction.id);
+      closeCardDetailsModal();
+    }
+
+    function createListingFromVault() {
+      if (!currentUser) return openAuthModal();
+      showToast('Select a card from your Vault to list on the market.');
+      switchTab('dashboard');
+    }
+
+    function openNotifications() {
+      unreadNotifCount = 0;
+      const badge = document.getElementById('notification-badge');
+      if (badge) badge.innerText = '0';
+      showToast('Notifications checked.');
+      switchTab('inbox');
+    }
+
+    function renderHistoryLedger() {
+      const container = document.getElementById('history-content');
+      if (!container) return;
+
+      if (transactionHistory.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">No transactions recorded yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = transactionHistory.map(h => `
+        <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between text-xs">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center font-mono font-bold text-blue-400">
+              ${h.cardSerial || '*'}
+            </div>
+            <div>
+              <p class="font-bold text-white">${h.details}</p>
+              <p class="text-[10px] text-slate-500">${h.timestamp}</p>
+            </div>
+          </div>
+          <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">${h.type}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderAnalyticsView() {
+      let vol = 0;
+      inventory.forEach(c => { if(c.status === 'SOLD') vol += (c.price || 0); });
+      
+      const volEl = document.getElementById('analytics-vol');
+      const taxEl = document.getElementById('analytics-tax');
+      const holdersEl = document.getElementById('analytics-holders');
+
+      if (volEl) volEl.innerText = `IDR ${vol.toLocaleString()}`;
+      if (taxEl) taxEl.innerText = `IDR ${(vol * 0.02).toLocaleString()}`;
+      
+      const uniqueHolders = new Set(inventory.map(c => c.owner).filter(o => o && o !== 'Unassigned')).size;
+      if (holdersEl) holdersEl.innerText = `${uniqueHolders} Collectors`;
+    }
+
+    function renderInventoryTable() {
+      const tbody = document.getElementById('inventory-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = inventory.map(card => `
+        <tr class="hover:bg-slate-800/40 transition-all">
+          <td class="p-3 font-mono font-bold text-blue-400">${card.serial}</td>
+          <td class="p-3 font-semibold text-white">${card.name}</td>
+          <td class="p-3 text-slate-400">${card.edition || 'Beta Edition: #0'}</td>
+          <td class="p-3">
+            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span>
+          </td>
+          <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
+          <td class="p-3 font-mono text-slate-400">${card.owner || '-'}</td>
+          <td class="p-3">
+            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span>
+          </td>
+          <td class="p-3 text-right space-x-1">
+            <button onclick="openCardEditorModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg transition-all" title="Edit Card">
+              <i class="fa-solid fa-pen text-xs"></i>
+            </button>
+            <button onclick="deleteCard('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-all" title="Delete Card">
+              <i class="fa-solid fa-trash text-xs"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAdminOrdersQueue() {
+      const container = document.getElementById('admin-orders-queue');
+      if (!container) return;
+
+      if (!pendingOrders.length) {
+        container.innerHTML = `<p class="text-xs text-slate-500">No pending orders waiting for manual approval.</p>`;
+        return;
+      }
+
+      container.innerHTML = pendingOrders.map((ord, idx) => {
+        const isTradePayout = ord.type === 'TRADE_PAYOUT';
+        const isSellBack = ord.type === 'SELL_BACK';
+        const netAmt = ord.payoutAmount || (ord.grossAmount ? ord.grossAmount * 0.98 : 0);
+
+        return `
+          <div class="bg-slate-800 p-3 rounded-xl flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${isTradePayout ? 'bg-purple-500/20 text-purple-300' : isSellBack ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-400'}">
+                  ${isTradePayout ? 'TRADE CASH PAYOUT (2% TAX)' : isSellBack ? 'SELL BACK (2% TAX)' : 'QRIS PURCHASE'}
+                </span>
+                <p class="text-xs font-bold text-white">${ord.card.name} (${ord.card.serial})</p>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5">
+                Recipient: ${ord.seller || ord.buyer} • Net Due: <strong class="text-emerald-400 font-mono">IDR ${netAmt.toLocaleString()}</strong> • ${ord.timestamp}
+              </p>
+            </div>
+
+            <button onclick="openAdminProofModal(${idx})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-upload"></i> Upload Proof & Pay
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // AUCTIONS & TRADES SYSTEM
+    function openCreateAuctionModal(cardId) {
+      if (!currentUser) return openAuthModal();
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+
+      document.getElementById('auction-card-id').value = card.id;
+      document.getElementById('auction-card-summary').innerText = `Auctioning: ${card.name} (${card.serial}) - Retail: IDR ${card.price.toLocaleString()}`;
+      document.getElementById('auction-start-price').value = card.baseFloorPrice || card.price || 100000;
+
+      document.getElementById('create-auction-modal').classList.remove('hidden');
+    }
+
+    function closeCreateAuctionModal() {
+      document.getElementById('create-auction-modal').classList.add('hidden');
+    }
+
+    function submitCardAuction(e) {
+      e.preventDefault();
+      if (!currentUser) return openAuthModal();
+
+      const cardId = document.getElementById('auction-card-id').value;
+      const startPrice = parseInt(document.getElementById('auction-start-price').value, 10);
+      const durationHrs = parseInt(document.getElementById('auction-duration-hrs').value, 10);
+
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+
+      const auction = {
+        id: `auc-${Date.now()}`,
+        card: card,
+        seller: currentUser.name,
+        currentBid: startPrice,
+        highestBidder: 'No bids yet',
+        endTime: new Date(Date.now() + durationHrs * 3600000).toLocaleString(),
+        bidsCount: 0
+      };
+
+      liveAuctions.unshift(auction);
+      saveAuctionsState();
+
+      addHistoryRecord('AUCTION_LAUNCH', card.serial, `${currentUser.name} launched live auction for ${card.serial} starting at IDR ${startPrice.toLocaleString()}`);
+
+      closeCreateAuctionModal();
+      switchTab('auction');
+      renderAuctionsGrid();
+      showToast('Auction launched live!');
+    }
+
+    function renderAuctionsGrid() {
+      const container = document.getElementById('auction-content');
+      if (!container) return;
+
+      if (liveAuctions.length === 0) {
+        container.className = "bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400 col-span-full";
+        container.innerHTML = "No active auctions live right now. Go to 'My Vault' to launch an auction for your card!";
+        return;
+      }
+
+      container.className = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4";
+      container.innerHTML = liveAuctions.map((auc, idx) => `
+        <div class="card-holo-premium rounded-2xl p-4 flex flex-col justify-between space-y-3">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"><i class="fa-solid fa-circle text-[7px] mr-1 animate-pulse"></i> Live Auction</span>
+            <span class="text-slate-400 text-[10px] font-mono">Ends: ${auc.endTime}</span>
+          </div>
+
+          <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-2 flex items-center justify-center">
+            <img src="${auc.card.imgUrl}" class="w-full h-full object-contain rounded-lg">
+          </div>
+
+          <div>
+            <p class="font-mono font-bold text-blue-400 text-xs">${auc.card.serial}</p>
+            <h4 class="font-bold text-white text-sm truncate">${auc.card.name}</h4>
+            <p class="text-[10px] text-slate-400">Seller: ${auc.seller}</p>
+          </div>
+
+          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+            <div>
+              <p class="text-[9px] uppercase font-bold text-slate-400">Current Highest Bid</p>
+              <p class="text-sm font-mono font-bold text-emerald-400">IDR ${auc.currentBid.toLocaleString()}</p>
+            </div>
+            <span class="text-[10px] text-slate-400 font-mono">${auc.highestBidder}</span>
+          </div>
+
+          <button onclick="placeBidOnAuction(${idx})" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">
+            + Place Higher Bid (+ IDR 50,000)
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function placeBidOnAuction(index) {
+      if (!currentUser) return openAuthModal();
+      const auc = liveAuctions[index];
+      auc.currentBid += 50000;
+      auc.highestBidder = currentUser.name;
+      auc.bidsCount += 1;
+
+      saveAuctionsState();
+      renderAuctionsGrid();
+      showToast(`Bid placed! New highest bid: IDR ${auc.currentBid.toLocaleString()}`);
+    }
+
+    function openTradeProposalModal(targetCardId) {
+      if (!currentUser) return openAuthModal();
+
+      const card = inventory.find(c => c.id === targetCardId);
+      if (!card) return;
+
+      document.getElementById('trade-target-card-id').value = card.id;
+      document.getElementById('trade-target-summary').innerText = `${card.name} (${card.serial}) - Value: IDR ${card.price.toLocaleString()}`;
+
+      const offerSelect = document.getElementById('trade-offered-card-id');
+      const myCards = inventory.filter(c => c.owner === currentUser.name || c.owner === currentUser.email);
+
+      offerSelect.innerHTML = `<option value="">-- No Card Offered (Pure Cash Offer) --</option>` + 
+        myCards.map(c => `<option value="${c.id}">${c.name} (${c.serial}) - Base: IDR ${c.price.toLocaleString()}</option>`).join('');
+
+      document.getElementById('trade-proposal-modal').classList.remove('hidden');
+    }
+
+    function closeTradeProposalModal() {
+      document.getElementById('trade-proposal-modal').classList.add('hidden');
+    }
+
+    function submitTradeProposal(e) {
+      e.preventDefault();
+      if (!currentUser) return openAuthModal();
+
+      const targetId = document.getElementById('trade-target-card-id').value;
+      const offeredId = document.getElementById('trade-offered-card-id').value;
+      const cashAddon = parseInt(document.getElementById('trade-cash-addon').value || '0', 10);
+      const note = document.getElementById('trade-note').value;
+      const attachmentInput = document.getElementById('trade-attachment-file');
+
+      const targetCard = inventory.find(c => c.id === targetId);
+      const offeredCard = inventory.find(c => c.id === offeredId);
+
+      if (!targetCard) return;
+
+      const proposal = {
+        id: `prop-${Date.now()}`,
+        proposer: currentUser.name,
+        targetCard: targetCard,
+        offeredCard: offeredCard || null,
+        cashAddon: cashAddon,
+        hasAttachment: attachmentInput.files.length > 0,
+        note: note,
+        status: 'PENDING',
+        timestamp: new Date().toLocaleTimeString()
+      };
+
+      tradeProposals.unshift(proposal);
+      saveTradeProposalsState();
+
+      addHistoryRecord('TRADE_OFFER', targetCard.serial, `${currentUser.name} proposed a trade for ${targetCard.serial} (+ IDR ${cashAddon.toLocaleString()})`);
+
+      closeTradeProposalModal();
+      switchTab('trade-req');
+      renderTradeProposals();
+      showToast('Trade proposal submitted!');
+    }
+
+    function renderTradeProposals() {
+      const container = document.getElementById('trade-req-content');
+      if (!container) return;
+
+      if (tradeProposals.length === 0) {
+        container.innerHTML = `<div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">No active trade proposals pending.</div>`;
+        return;
+      }
+
+      container.innerHTML = tradeProposals.map((p, idx) => `
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${p.status === 'PENDING' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : p.status === 'ACCEPTED' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${p.status}</span>
+              <span class="text-xs text-slate-400">From: <strong class="text-white">${p.proposer}</strong> • ${p.timestamp}</span>
+              ${p.hasAttachment ? '<span class="text-[9px] bg-purple-950/60 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full"><i class="fa-solid fa-paperclip mr-1"></i> Attachment</span>' : ''}
+            </div>
+            <p class="text-xs text-slate-200">
+              Target: <strong class="text-blue-400">${p.targetCard.name} (${p.targetCard.serial})</strong> 
+              ${p.offeredCard ? ` standard swap with <strong class="text-purple-400">${p.offeredCard.name} (${p.offeredCard.serial})</strong>` : ' (Cash Only Proposal)'}
+              ${p.cashAddon > 0 ? ` + <strong class="text-emerald-400">IDR ${p.cashAddon.toLocaleString()} Cash</strong>` : ''}
+            </p>
+            ${p.note ? `<p class="text-[11px] text-slate-400 italic">"${p.note}"</p>` : ''}
+          </div>
+
+          ${p.status === 'PENDING' ? `
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="acceptTradeProposal(${idx})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">Accept Trade</button>
+              <button onclick="rejectTradeProposal(${idx})" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 font-bold text-xs rounded-xl border border-slate-700 transition-all">Reject</button>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    async function acceptTradeProposal(index) {
+      const p = tradeProposals[index];
+      p.status = 'ACCEPTED';
+
+      const target = inventory.find(c => c.id === p.targetCard.id);
+      if (target) {
+        target.owner = p.proposer;
+        target.status = 'SOLD';
+
+        if (window.supabaseClient) {
+          await supabaseClient.from('inventory').update({ owner: p.proposer, status: 'SOLD' }).eq('id', target.id);
+        }
+      }
+
+      if (p.offeredCard) {
+        const offered = inventory.find(c => c.id === p.offeredCard.id);
+        if (offered) {
+          offered.owner = p.targetCard.owner || 'Admin';
+          if (window.supabaseClient) {
+            await supabaseClient.from('inventory').update({ owner: offered.owner }).eq('id', offered.id);
+          }
+        }
+      }
+
+      saveInventoryLocalCache();
+      saveTradeProposalsState();
+
+      addHistoryRecord('TRADE_ACCEPTED', p.targetCard.serial, `Trade accepted! ${p.targetCard.serial} transferred to ${p.proposer}.`);
+
+      renderTradeProposals();
+      renderCardGrid();
+      renderInventoryTable();
+      showToast('Trade accepted and synced live!');
+    }
+
+    function rejectTradeProposal(index) {
+      tradeProposals[index].status = 'REJECTED';
+      saveTradeProposalsState();
+      renderTradeProposals();
+      showToast('Trade proposal rejected.');
+    }
+
+    function sellBackCardToAdmin(cardId) {
+      if (!currentUser) return openAuthModal();
+
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+
+      const floorPrice = card.baseFloorPrice || card.price || 100000;
+      const tax = floorPrice * 0.02;
+      const netPayout = floorPrice - tax;
+
+      pendingOrders.push({
+        id: `sellback-${Date.now()}`,
+        card: card,
+        type: 'SELL_BACK',
+        buyer: 'Admin',
+        seller: currentUser.name,
+        grossAmount: floorPrice,
+        taxAmount: tax,
+        payoutAmount: netPayout,
+        timestamp: new Date().toLocaleTimeString()
+      });
+
+      savePendingOrdersState();
+      renderAdminOrdersQueue();
+
+      addHistoryRecord('SELL_BACK_REQUEST', card.serial, `${currentUser.name} requested sell-back of ${card.serial}`);
+      showToast(`Sell-back submitted! Net Payout: IDR ${netPayout.toLocaleString()}`);
+    }
+
+    function openAdminProofModal(index) {
+      const ord = pendingOrders[index];
+      if (!ord) return;
+
+      document.getElementById('admin-pending-index').value = index;
+      document.getElementById('admin-approval-summary').innerHTML = `
+        <p><strong>Item:</strong> ${ord.card.name} (${ord.card.serial})</p>
+        <p><strong>Recipient:</strong> ${ord.seller || ord.buyer}</p>
+        <p><strong>Net Transfer Due:</strong> <span class="text-emerald-400 font-mono font-bold">IDR ${(ord.payoutAmount||0).toLocaleString()}</span></p>
+      `;
+
+      document.getElementById('admin-proof-modal').classList.remove('hidden');
+    }
+
+    function closeAdminProofModal() {
+      document.getElementById('admin-proof-modal').classList.add('hidden');
+    }
+
+    async function confirmAdminPayoutWithProof(e) {
+      e.preventDefault();
+
+      const index = parseInt(document.getElementById('admin-pending-index').value, 10);
+      const fileInput = document.getElementById('admin-receipt-file');
+      const txRef = document.getElementById('admin-tx-ref').value || `REF-${Date.now().toString().slice(-6)}`;
+
+      if (!fileInput.files.length) {
+        return showToast('Please select a transfer receipt proof image.');
+      }
+
+      const order = pendingOrders[index];
+      const card = inventory.find(c => c.id === order.card.id);
+
+      if (order.type === 'SELL_BACK' && card) {
+        card.status = 'AVAILABLE'; card.owner = 'Admin';
+        if (window.supabaseClient) await supabaseClient.from('inventory').update({ status: 'AVAILABLE', owner: 'Admin' }).eq('id', card.id);
+      } else if (order.type === 'PURCHASE' && card) {
+        card.status = 'SOLD'; card.owner = order.buyer;
+        if (window.supabaseClient) await supabaseClient.from('inventory').update({ status: 'SOLD', owner: order.buyer }).eq('id', card.id);
+      }
+
+      pendingOrders.splice(index, 1);
+      savePendingOrdersState();
+      saveInventoryLocalCache();
+
+      closeAdminProofModal();
+      renderAdminOrdersQueue();
+      renderCardGrid();
+      renderInventoryTable();
+      updateRemainingCardCount();
+
+      showToast('Payout approved & synced live to Supabase!');
+    }
+
+    // CART MANAGEMENT
     function toggleCart(cardId) {
       if (shoppingCart.has(cardId)) {
         shoppingCart.delete(cardId);
@@ -1166,32 +2300,20 @@
     function quickBuyCard(cardId) {
       const card = inventory.find(c => c.id === cardId);
       if (!card) return;
+      if (card.owner || card.status === 'OWNED' || card.status === 'SOLD') return showToast('Owned cards cannot be purchased!');
       activeCardForAction = card;
       buyActiveDetailCard();
     }
 
-    function quickOfferCard(cardId) {
-      if (!currentUser) return openAuthModal();
-      const card = inventory.find(c => c.id === cardId);
-      if (!card) return;
-      showToast(`Trade offer proposed for ${card.serial}`);
-      switchTab('trade-req');
-    }
-
-    // --- CLICKABLE HOLDERS & PUBLIC VAULT INSPECTOR ---
     function renderHoldersLeaderboard() {
       const container = document.getElementById('holders-content');
       if (!container) return;
 
       const holderMap = {};
-
       inventory.forEach(card => {
         if (card.owner && card.owner !== 'Unassigned') {
-          const ownerName = card.owner;
-          if (!holderMap[ownerName]) {
-            holderMap[ownerName] = [];
-          }
-          holderMap[ownerName].push(card);
+          if (!holderMap[card.owner]) holderMap[card.owner] = [];
+          holderMap[card.owner].push(card);
         }
       });
 
@@ -1253,12 +2375,27 @@
       document.getElementById('holder-vault-modal').classList.add('hidden');
     }
 
-    // --- LIVE CHAT / INBOX ENGINE ---
     function renderChatThreads() {
       const container = document.getElementById('chat-threads-list');
       if (!container) return;
 
-      container.innerHTML = chatThreads.map(t => `
+      if (!currentUser) {
+        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Please log in to view your private messages.</p>`;
+        return;
+      }
+
+      const myThreads = currentUser.isAdmin ? chatThreads : chatThreads.filter(t => 
+        t.user === currentUser.name || 
+        t.participant1 === currentUser.name || 
+        t.participant2 === currentUser.name
+      );
+
+      if (myThreads.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No private message conversations yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = myThreads.map(t => `
         <div onclick="selectChatThread('${t.id}')" class="p-2.5 rounded-xl border border-slate-800 ${t.id === activeChatThreadId ? 'bg-indigo-950/40 border-indigo-500/50' : 'bg-slate-900 hover:bg-slate-800/60'} cursor-pointer transition-all flex items-center gap-3">
           <img src="${t.avatar}" class="w-8 h-8 rounded-full border border-slate-700">
           <div class="overflow-hidden">
@@ -1283,26 +2420,29 @@
 
       if (!activeThread) return;
 
-      header.innerHTML = `
-        <div class="flex items-center gap-2">
-          <img src="${activeThread.avatar}" class="w-6 h-6 rounded-full">
-          <span class="text-xs font-bold text-white">${activeThread.user}</span>
-        </div>
-      `;
-
-      body.innerHTML = activeThread.messages.map(m => {
-        const isMe = currentUser && m.sender === currentUser.name;
-        return `
-          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-            <span class="text-[9px] text-slate-500 mb-0.5">${m.sender}</span>
-            <div class="px-3 py-2 rounded-2xl max-w-[80%] text-xs ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none'}">
-              ${m.text}
-            </div>
+      if (header) {
+        header.innerHTML = `
+          <div class="flex items-center gap-2">
+            <img src="${activeThread.avatar}" class="w-6 h-6 rounded-full">
+            <span class="text-xs font-bold text-white">${activeThread.user} (Private Chat)</span>
           </div>
         `;
-      }).join('');
+      }
 
-      body.scrollTop = body.scrollHeight;
+      if (body) {
+        body.innerHTML = activeThread.messages.map(m => {
+          const isMe = currentUser && m.sender === currentUser.name;
+          return `
+            <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+              <span class="text-[9px] text-slate-500 mb-0.5">${m.sender}</span>
+              <div class="px-3 py-2 rounded-2xl max-w-[80%] text-xs ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none'}">
+                ${m.text}
+              </div>
+            </div>
+          `;
+        }).join('');
+        body.scrollTop = body.scrollHeight;
+      }
     }
 
     function sendChatMessage(e) {
@@ -1320,459 +2460,9 @@
           text: text
         });
         input.value = '';
+        saveChatsState();
         renderChatThreads();
       }
-    }
-
-    // --- SEARCHABLE OWNER SELECTION DROPDOWN ---
-    function filterOwnerOptions(searchQuery) {
-      const dropdown = document.getElementById('owner-dropdown-list');
-      const query = searchQuery.toLowerCase().trim();
-
-      const collectors = Array.from(new Set([
-        'Unassigned (Null)',
-        'Eugene',
-        'kenneth_brilliant',
-        'andi_rende',
-        currentUser?.name || '',
-        currentUser?.email || ''
-      ])).filter(Boolean);
-
-      const filtered = collectors.filter(c => c.toLowerCase().includes(query));
-
-      if (filtered.length === 0) {
-        dropdown.innerHTML = `<div onclick="selectOwnerOption('${searchQuery}')" class="p-2 text-xs text-blue-400 hover:bg-slate-700 cursor-pointer">Use custom owner: "${searchQuery}"</div>`;
-      } else {
-        dropdown.innerHTML = filtered.map(c => `
-          <div onclick="selectOwnerOption('${c}')" class="p-2 text-xs text-white hover:bg-slate-700 cursor-pointer flex items-center justify-between">
-            <span>${c}</span>
-            ${c === 'Unassigned (Null)' ? '<span class="text-[9px] text-slate-500">Default</span>' : ''}
-          </div>
-        `).join('');
-      }
-
-      dropdown.classList.remove('hidden');
-    }
-
-    function selectOwnerOption(ownerVal) {
-      if (ownerVal === 'Unassigned (Null)') {
-        selectedOwner = null;
-        document.getElementById('current-owner-label').innerText = 'Unassigned';
-        document.getElementById('edit-card-owner-search').value = '';
-      } else {
-        selectedOwner = ownerVal;
-        document.getElementById('current-owner-label').innerText = ownerVal;
-        document.getElementById('edit-card-owner-search').value = ownerVal;
-      }
-      document.getElementById('owner-dropdown-list').classList.add('hidden');
-    }
-
-    // --- ADMIN INVENTORY EDITOR ---
-    function openCardEditorModal(cardId = null) {
-      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-
-      const modalTitle = document.getElementById('editor-modal-title');
-      
-      if (cardId) {
-        const card = inventory.find(c => c.id === cardId);
-        if (!card) return;
-
-        modalTitle.innerText = "Edit Card Details";
-        document.getElementById('edit-card-id').value = card.id;
-        document.getElementById('edit-card-serial').value = card.serial;
-        document.getElementById('edit-card-sn').value = card.sn || card.serial.replace('*', '');
-        document.getElementById('edit-card-name').value = card.name;
-        document.getElementById('edit-card-edition').value = card.edition || 'Beta Edition: #0';
-        document.getElementById('edit-card-printing').value = card.printing || '1x';
-        document.getElementById('edit-card-type').value = card.type;
-        document.getElementById('edit-card-price').value = card.price;
-        document.getElementById('edit-card-basefloor').value = card.baseFloorPrice || card.price;
-        document.getElementById('edit-card-img').value = card.imgUrl;
-        document.getElementById('edit-card-status').value = card.status;
-
-        selectOwnerOption(card.owner || 'Unassigned (Null)');
-      } else {
-        modalTitle.innerText = "Mint New Card";
-        document.getElementById('edit-card-id').value = '';
-        document.getElementById('edit-card-serial').value = `*${String(inventory.length + 1).padStart(2, '0')}`;
-        document.getElementById('edit-card-sn').value = String(inventory.length + 1).padStart(2, '0');
-        document.getElementById('edit-card-name').value = `Eugene Premium #${String(inventory.length + 1).padStart(2, '0')}`;
-        document.getElementById('edit-card-edition').value = 'Beta Edition: #0';
-        document.getElementById('edit-card-printing').value = '1x';
-        document.getElementById('edit-card-type').value = 'PREMIUM';
-        document.getElementById('edit-card-price').value = 500000;
-        document.getElementById('edit-card-basefloor').value = 500000;
-        document.getElementById('edit-card-img').value = `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${String(inventory.length + 1).padStart(2, '0')}`;
-        document.getElementById('edit-card-status').value = 'AVAILABLE';
-
-        selectOwnerOption('Unassigned (Null)');
-      }
-
-      document.getElementById('card-editor-modal').classList.remove('hidden');
-    }
-
-    function closeCardEditorModal() {
-      document.getElementById('card-editor-modal').classList.add('hidden');
-    }
-
-    function saveCardEdit(event) {
-      event.preventDefault();
-
-      const cardId = document.getElementById('edit-card-id').value;
-      const serial = document.getElementById('edit-card-serial').value;
-      const sn = document.getElementById('edit-card-sn').value;
-      const name = document.getElementById('edit-card-name').value;
-      const edition = document.getElementById('edit-card-edition').value;
-      const printing = document.getElementById('edit-card-printing').value;
-      const type = document.getElementById('edit-card-type').value;
-      const price = parseInt(document.getElementById('edit-card-price').value, 10);
-      const baseFloorPrice = parseInt(document.getElementById('edit-card-basefloor').value, 10);
-      const imgUrl = document.getElementById('edit-card-img').value;
-      const status = document.getElementById('edit-card-status').value;
-
-      if (cardId) {
-        const idx = inventory.findIndex(c => c.id === cardId);
-        if (idx !== -1) {
-          inventory[idx] = { 
-            ...inventory[idx], serial, sn, name, edition, printing, type, price, baseFloorPrice, imgUrl, status, owner: selectedOwner 
-          };
-          showToast(`Updated ${serial} details.`);
-        }
-      } else {
-        const newCard = {
-          id: `card-${Date.now()}`,
-          serial, sn, name, edition, printing, type, price, baseFloorPrice,
-          owner: selectedOwner,
-          status, imgUrl
-        };
-        inventory.unshift(newCard);
-        showToast(`Minted new card ${serial}!`);
-      }
-
-      renderCardGrid();
-      renderInventoryTable();
-      updateRemainingCardCount();
-      closeCardEditorModal();
-    }
-
-    // --- JSON IMPORT & EXPORT FEATURES ---
-    function exportInventoryJSON() {
-      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-
-      const backupData = {
-        exportedAt: new Date().toISOString(),
-        exportedBy: currentUser.email,
-        inventoryCount: inventory.length,
-        cards: inventory
-      };
-
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `eugene_inventory_backup_${Date.now()}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-
-      showToast('Inventory backup exported successfully!');
-    }
-
-    function importInventoryJSON(event) {
-      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          
-          if (parsed && Array.isArray(parsed.cards)) {
-            inventory = parsed.cards;
-          } else if (Array.isArray(parsed)) {
-            inventory = parsed;
-          } else {
-            throw new Error('Invalid JSON format. Array of cards missing.');
-          }
-
-          // Auto-merge legacy 'Eugene' owners upon import
-          if (currentUser) {
-            inventory.forEach(c => {
-              if (c.owner === 'Eugene') c.owner = currentUser.name;
-            });
-          }
-
-          renderCardGrid();
-          renderInventoryTable();
-          updateRemainingCardCount();
-          showToast(`Imported ${inventory.length} cards into inventory!`);
-        } catch (err) {
-          showToast('Failed to parse JSON file: ' + err.message);
-        }
-      };
-
-      reader.readAsText(file);
-      event.target.value = '';
-    }
-
-    function openCardDetailsModal(cardId) {
-      const card = inventory.find(c => c.id === cardId);
-      if (!card) return;
-
-      activeCardForAction = card;
-
-      document.getElementById('detail-card-img').src = card.imgUrl;
-      document.getElementById('detail-card-serial').innerText = card.serial;
-      document.getElementById('detail-card-name').innerText = card.name;
-      document.getElementById('detail-card-price').innerText = `IDR ${card.price.toLocaleString()}`;
-      document.getElementById('detail-card-edition').innerText = card.edition || 'Beta Edition: #0';
-      
-      const typeSpan = document.getElementById('detail-card-type');
-      typeSpan.innerText = card.type;
-      typeSpan.className = `text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}`;
-      
-      document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owner: ${card.owner})` : ''}`;
-      document.getElementById('card-details-modal').classList.remove('hidden');
-    }
-
-    function closeCardDetailsModal() {
-      document.getElementById('card-details-modal').classList.add('hidden');
-    }
-
-    // --- QRIS CHECKOUT & PAYMENTS ---
-    function buyActiveDetailCard() {
-      if (!currentUser) return openAuthModal();
-      if (!activeCardForAction) return;
-
-      closeCardDetailsModal();
-
-      document.getElementById('qris-card-title').innerText = `${activeCardForAction.name} (${activeCardForAction.serial})`;
-      document.getElementById('qris-amount-due').innerText = `IDR ${activeCardForAction.price.toLocaleString()}`;
-
-      const canvasContainer = document.getElementById('qris-canvas');
-      canvasContainer.innerHTML = '';
-      
-      new QRCode(canvasContainer, {
-        text: QRIS_STRING_PAYLOAD,
-        width: 180,
-        height: 180,
-        colorDark: "#0f172a",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
-
-      document.getElementById('qris-modal').classList.remove('hidden');
-    }
-
-    function closeQrisModal() {
-      document.getElementById('qris-modal').classList.add('hidden');
-    }
-
-    function submitQrisPaymentProof() {
-      const fileInput = document.getElementById('qris-proof-file');
-      if (!fileInput.files.length) {
-        return showToast('Please select a payment receipt image before submitting.');
-      }
-
-      pendingOrders.push({
-        id: `ord-${Date.now()}`,
-        card: activeCardForAction,
-        buyer: currentUser.name,
-        timestamp: new Date().toLocaleTimeString()
-      });
-
-      showToast('Payment proof submitted! Waiting for Admin verification.');
-      closeQrisModal();
-      renderAdminOrdersQueue();
-    }
-
-    // --- NAVIGATION ROUTER ---
-    function switchTab(tabName) {
-      const adminOnlyTabs = ['admin', 'inventory', 'analytics'];
-      if (adminOnlyTabs.includes(tabName) && !currentUser?.isAdmin) {
-        return showToast('Admin permission required.');
-      }
-
-      const allTabs = ['catalog', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'analytics', 'admin', 'inventory'];
-
-      allTabs.forEach(t => {
-        const view = document.getElementById(`view-${t}`);
-        const nav = document.getElementById(`nav-${t}`);
-        if (view) view.classList.add('hidden');
-        if (nav && !adminOnlyTabs.includes(t)) {
-          nav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all';
-        }
-      });
-
-      const activeView = document.getElementById(`view-${tabName}`);
-      const activeNav = document.getElementById(`nav-${tabName}`);
-
-      if (activeView) activeView.classList.remove('hidden');
-      if (activeNav && !adminOnlyTabs.includes(tabName)) {
-        activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-white bg-slate-700 flex items-center gap-1.5 whitespace-nowrap transition-all';
-      }
-
-      if (tabName === 'wishlist') renderWishlistGrid();
-      if (tabName === 'dashboard') renderVaultGrid();
-      if (tabName === 'inbox') renderChatThreads();
-      if (tabName === 'holders') renderHoldersLeaderboard();
-    }
-
-    function toggleWishlist(cardId) {
-      if (wishlist.has(cardId)) {
-        wishlist.delete(cardId);
-        showToast('Removed from wishlist.');
-      } else {
-        wishlist.add(cardId);
-        showToast('Saved to wishlist!');
-      }
-      document.getElementById('wishlist-count-badge').innerText = wishlist.size;
-      renderCardGrid();
-    }
-
-    function wishlistActiveDetailCard() {
-      if (activeCardForAction) toggleWishlist(activeCardForAction.id);
-    }
-
-    function renderWishlistGrid() {
-      const container = document.getElementById('wishlist-grid');
-      const items = inventory.filter(c => wishlist.has(c.id));
-
-      if (items.length === 0) {
-        container.innerHTML = `<div class="col-span-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">No wishlisted cards saved yet. Click the heart icon on any card in the Collection tab!</div>`;
-        return;
-      }
-
-      container.innerHTML = items.map(card => `
-        <div onclick="openCardDetailsModal('${card.id}')" class="card-holo-standard rounded-xl p-3 flex flex-col justify-between relative cursor-pointer">
-          <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden">
-            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-          </div>
-          <p class="text-center font-bold text-blue-400 font-mono mb-1 text-xs">${card.serial}</p>
-          <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
-        </div>
-      `).join('');
-    }
-
-    function renderVaultGrid() {
-      const container = document.getElementById('owned-cards-grid');
-      if (!currentUser) {
-        container.innerHTML = "Log in with Google to view your owned cards inside your private binder.";
-        return;
-      }
-
-      // Vault filter logic unifying account credentials and legacy 'Eugene' owner tags
-      const owned = inventory.filter(c => 
-        c.owner === currentUser.email || 
-        c.owner === currentUser.name || 
-        c.owner === currentUser.username ||
-        c.owner === 'Eugene'
-      );
-
-      if (owned.length === 0) {
-        container.innerHTML = "You don't own any cards yet. Buy cards via QRIS or propose trades to populate your vault!";
-        return;
-      }
-
-      container.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4";
-      container.innerHTML = owned.map(card => `
-        <div onclick="openCardDetailsModal('${card.id}')" class="card-holo-premium rounded-xl p-3 flex flex-col justify-between relative cursor-pointer">
-          <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden">
-            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-          </div>
-          <p class="text-center font-bold text-blue-400 font-mono mb-1 text-xs">${card.serial}</p>
-          <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
-        </div>
-      `).join('');
-    }
-
-    function tradeActiveDetailCard() {
-      if (!currentUser) return openAuthModal();
-      showToast(`Trade offer initiated for ${activeCardForAction?.serial}`);
-      closeCardDetailsModal();
-      switchTab('trade-req');
-    }
-
-    function createListingFromVault() {
-      if (!currentUser) return openAuthModal();
-      showToast('Select a card from your Vault to list on the market.');
-      switchTab('dashboard');
-    }
-
-    function openNotifications() {
-      showToast('No new unread market notifications.');
-    }
-
-    function renderInventoryTable() {
-      const tbody = document.getElementById('inventory-table-body');
-      if (!tbody) return;
-
-      tbody.innerHTML = inventory.map(card => `
-        <tr class="hover:bg-slate-800/40 transition-all">
-          <td class="p-3 font-mono font-bold text-blue-400">${card.serial}</td>
-          <td class="p-3 font-semibold text-white">${card.name}</td>
-          <td class="p-3 text-slate-400">${card.edition || 'Beta Edition: #0'}</td>
-          <td class="p-3">
-            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span>
-          </td>
-          <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
-          <td class="p-3 font-mono text-slate-400">${card.owner || '-'}</td>
-          <td class="p-3">
-            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span>
-          </td>
-          <td class="p-3 text-right space-x-1">
-            <button onclick="openCardEditorModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg transition-all" title="Edit Card">
-              <i class="fa-solid fa-pen text-xs"></i>
-            </button>
-            <button onclick="deleteCard('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-all" title="Delete Card">
-              <i class="fa-solid fa-trash text-xs"></i>
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderAdminOrdersQueue() {
-      const container = document.getElementById('admin-orders-queue');
-      if (!pendingOrders.length) {
-        container.innerHTML = `<p class="text-xs text-slate-500">No pending orders waiting for manual approval.</p>`;
-        return;
-      }
-
-      container.innerHTML = pendingOrders.map((ord, idx) => `
-        <div class="bg-slate-800 p-3 rounded-xl flex items-center justify-between">
-          <div>
-            <p class="text-xs font-bold text-white">${ord.card.name} (${ord.card.serial})</p>
-            <p class="text-[10px] text-slate-400">Buyer: ${ord.buyer} • ${ord.timestamp}</p>
-          </div>
-          <button onclick="approveOrder(${idx})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg">Approve</button>
-        </div>
-      `).join('');
-    }
-
-    function approveOrder(index) {
-      const order = pendingOrders[index];
-      const card = inventory.find(c => c.id === order.card.id);
-      if (card) {
-        card.status = 'SOLD';
-        card.owner = currentUser.name;
-      }
-      pendingOrders.splice(index, 1);
-      renderAdminOrdersQueue();
-      renderCardGrid();
-      renderInventoryTable();
-      updateRemainingCardCount();
-      showToast('Order approved! Card assigned to owner.');
-    }
-
-    function deleteCard(cardId) {
-      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-      inventory = inventory.filter(c => c.id !== cardId);
-      renderCardGrid();
-      renderInventoryTable();
-      updateRemainingCardCount();
-      showToast('Card deleted from inventory.');
     }
 
     function setFilter(type) {
@@ -1782,7 +2472,8 @@
 
     function updateRemainingCardCount() {
       const count = inventory.filter(c => c.status === 'AVAILABLE').length;
-      document.getElementById('remaining-cards-count').innerText = count;
+      const countEl = document.getElementById('remaining-cards-count');
+      if (countEl) countEl.innerText = count;
     }
 
     function showToast(msg) {
