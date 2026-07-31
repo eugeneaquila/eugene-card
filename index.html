@@ -114,7 +114,7 @@
           <i class="fa-solid fa-handshake text-purple-400"></i> Trade Requests
         </button>
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all relative">
-          <i class="fa-solid fa-comments text-indigo-400"></i> Private Inbox
+          <i class="fa-solid fa-comments text-indigo-400"></i> Inbox
           <span id="unread-inbox-badge" class="w-2 h-2 rounded-full bg-indigo-500 hidden"></span>
         </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
@@ -164,81 +164,6 @@
     </div>
   </header>
 
-  <!-- CREATE AUCTION MODAL -->
-  <div id="create-auction-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeCreateAuctionModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
-        <i class="fa-solid fa-gavel text-emerald-400"></i>
-        <h3 class="text-base font-bold text-white">List Card in Auction House</h3>
-      </div>
-
-      <form onsubmit="submitCardAuction(event)" class="space-y-3">
-        <input type="hidden" id="auction-card-id">
-
-        <div id="auction-card-summary" class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 text-xs font-bold text-emerald-400">
-          Card Selected
-        </div>
-
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Starting Bid Price (IDR)</label>
-          <input type="number" id="auction-start-price" required min="10000" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono">
-        </div>
-
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Auction Duration (Hours)</label>
-          <select id="auction-duration-hrs" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-            <option value="12">12 Hours</option>
-            <option value="24" selected>24 Hours</option>
-            <option value="48">48 Hours</option>
-          </select>
-        </div>
-
-        <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-          <i class="fa-solid fa-gavel"></i> Launch Live Auction
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ADMIN PROOF APPROVAL MODAL -->
-  <div id="admin-proof-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeAdminProofModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
-        <i class="fa-solid fa-upload text-amber-400"></i>
-        <h3 class="text-base font-bold text-white">Approve Payout (2% Tax Deducted)</h3>
-      </div>
-
-      <div id="admin-approval-summary" class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 text-xs text-slate-300 space-y-1">
-      </div>
-
-      <form onsubmit="confirmAdminPayoutWithProof(event)" class="space-y-3">
-        <input type="hidden" id="admin-pending-index">
-
-        <div>
-          <label class="block text-[10px] font-bold uppercase text-slate-400">Upload Bank/E-Wallet Receipt Image (*Required)</label>
-          <input type="file" id="admin-receipt-file" accept="image/*" required class="w-full text-xs text-slate-400 bg-slate-800 border border-slate-700 rounded-xl p-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white">
-        </div>
-
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Transfer Reference / Note</label>
-          <input type="text" id="admin-tx-ref" placeholder="Ref: TRF-992014" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono">
-        </div>
-
-        <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-          <i class="fa-solid fa-check-circle"></i> Confirm Transfer & Send Payout Receipt
-        </button>
-      </form>
-    </div>
-  </div>
-
   <!-- HOLDER VAULT INSPECTOR MODAL -->
   <div id="holder-vault-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[85vh] overflow-y-auto space-y-4">
@@ -287,57 +212,6 @@
     </div>
   </div>
 
-  <!-- TRADE PROPOSAL MODAL -->
-  <div id="trade-proposal-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeTradeProposalModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
-        <i class="fa-solid fa-handshake text-purple-400"></i>
-        <h3 class="text-base font-bold text-white">Propose Card Trade / Offer</h3>
-      </div>
-
-      <form onsubmit="submitTradeProposal(event)" class="space-y-3">
-        <input type="hidden" id="trade-target-card-id">
-
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Target Item</label>
-          <div id="trade-target-summary" class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700 text-xs font-bold text-blue-400">
-            Selected Item
-          </div>
-        </div>
-
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Select Card to Offer (Optional)</label>
-          <select id="trade-offered-card-id" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
-            <option value="">-- No Card Offered (Pure Cash Offer) --</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Cash Amount Add-on (IDR)</label>
-          <input type="number" id="trade-cash-addon" min="0" value="0" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500 font-mono">
-        </div>
-
-        <div>
-          <label class="block text-[10px] font-bold uppercase text-slate-400">Upload Trade Attachment / Screenshot</label>
-          <input type="file" id="trade-attachment-file" accept="image/*" class="w-full text-xs text-slate-400 bg-slate-800 border border-slate-700 rounded-xl p-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white">
-        </div>
-
-        <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Proposal Note</label>
-          <textarea id="trade-note" rows="2" placeholder="Write a brief message to the owner..." class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500"></textarea>
-        </div>
-
-        <button type="submit" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow transition-all">
-          Submit Trade Proposal
-        </button>
-      </form>
-    </div>
-  </div>
-
   <!-- PROFILE EDIT MODAL -->
   <div id="profile-edit-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
@@ -366,7 +240,7 @@
 
         <div>
           <label class="text-[11px] font-bold text-slate-400 uppercase">Collector Bio</label>
-          <textarea id="edit-profile-bio" rows="2" placeholder="High-end Eugene card collector..." class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
+          <textarea id="edit-profile-bio" rows="2" placeholder="High-end Eugene card collector and trader..." class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -451,7 +325,7 @@
           </div>
 
           <div class="space-y-2 pt-2">
-            <button id="detail-buy-btn" onclick="buyActiveDetailCard()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
+            <button onclick="buyActiveDetailCard()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
               <i class="fa-solid fa-qrcode"></i> Buy / Order via QRIS
             </button>
             <div class="grid grid-cols-2 gap-2">
@@ -480,6 +354,7 @@
         <p id="qris-card-title" class="text-xs text-blue-400 font-mono mt-1">Eugene Card Purchase</p>
       </div>
 
+      <!-- QR Code Canvas Display -->
       <div class="bg-white p-4 rounded-2xl w-56 h-56 mx-auto flex items-center justify-center border-2 border-blue-500 shadow-xl">
         <div id="qris-canvas"></div>
       </div>
@@ -615,7 +490,7 @@
         
         <div class="bg-slate-800/80 px-5 py-2.5 rounded-xl border border-slate-700 text-center sm:text-right w-full sm:w-auto">
           <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Remaining Cards</p>
-          <p class="text-xl font-bold font-mono text-blue-400"><span id="remaining-cards-count">0</span> <span class="text-slate-400 text-xs font-normal">Available</span></p>
+          <p class="text-xl font-bold font-mono text-blue-400"><span id="remaining-cards-count">50</span> <span class="text-slate-400 text-xs font-normal">Available</span></p>
         </div>
       </div>
 
@@ -653,17 +528,13 @@
 
     <!-- AUCTION VIEW -->
     <section id="view-auction" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
-        <div>
-          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
-          <p class="text-xs text-slate-400 mt-1">Place real-time bids on rare serial cards before time expires.</p>
-        </div>
-        <button onclick="switchTab('dashboard')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all">
-          + Start Auction From My Vault
-        </button>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
+        <p class="text-xs text-slate-400 mt-1">Place real-time bids on rare serial cards before time expires.</p>
       </div>
 
-      <div id="auction-content" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div id="auction-content" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
+        Next featured auction begins soon. Stay tuned!
       </div>
     </section>
 
@@ -671,49 +542,37 @@
     <section id="view-trade-req" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Active Trade Proposals</h2>
-        <p class="text-xs text-slate-400 mt-1">Review incoming and outgoing card/cash trade proposals with screenshot attachments.</p>
+        <p class="text-xs text-slate-400 mt-1">Review incoming and outgoing trade proposals.</p>
       </div>
-      <div id="trade-req-content" class="space-y-3">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
-          No active trade proposals pending.
-        </div>
+      <div id="trade-req-content" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
+        No active trade proposals pending.
       </div>
     </section>
 
-    <!-- PRIVATE INBOX / CHAT VIEW -->
+    <!-- INBOX / CHAT VIEW -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Private Messenger & Inbox</h2>
-        <p class="text-xs text-slate-400 mt-1">Private messages strictly scoped between you and buyers/sellers.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Messenger & Live Inbox</h2>
+        <p class="text-xs text-slate-400 mt-1">Direct message buyers, sellers, and card collectors.</p>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-2xl grid grid-cols-1 md:grid-cols-3 min-h-[450px] overflow-hidden">
         <!-- Thread List Sidebar -->
         <div class="border-r border-slate-800 p-4 space-y-3">
-          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Search Collectors & Conversations</p>
-          
-          <!-- User Search Bar for Chat -->
-          <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-            <input type="text" id="chat-user-search" oninput="searchUsersForChat(this.value)" placeholder="Find collector @username or name..." class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-          </div>
-
-          <div id="chat-search-results" class="space-y-1 hidden bg-slate-950/80 p-2 rounded-xl border border-slate-800 max-h-40 overflow-y-auto"></div>
-
-          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider pt-2">Active Messages</p>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Conversations</p>
           <div id="chat-threads-list" class="space-y-1.5"></div>
         </div>
 
         <!-- Chat Feed Window -->
         <div class="col-span-2 flex flex-col justify-between bg-slate-950/40 p-4">
           <div id="chat-active-header" class="pb-3 border-b border-slate-800 flex items-center justify-between">
-            <span class="text-xs font-bold text-white">Select a private conversation or search for a collector</span>
+            <span class="text-xs font-bold text-white">Select a thread to start chatting</span>
           </div>
 
           <div id="chat-messages-body" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-[300px] pr-2"></div>
 
           <form onsubmit="sendChatMessage(event)" class="pt-3 border-t border-slate-800 flex gap-2">
-            <input type="text" id="chat-input-text" placeholder="Write a private message..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <input type="text" id="chat-input-text" placeholder="Write a message..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
             <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all">Send</button>
           </form>
         </div>
@@ -741,6 +600,7 @@
 
     <!-- DASHBOARD / VAULT VIEW -->
     <section id="view-dashboard" class="hidden space-y-6">
+      <!-- Customizable Collector Profile Card -->
       <div id="user-profile-banner" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
           <div class="flex items-center gap-4">
@@ -754,6 +614,7 @@
               </div>
               <p id="profile-bio-text" class="text-xs text-slate-400 max-w-md">No bio added yet. Click customize to complete your profile.</p>
               
+              <!-- Clickable Social Media Links -->
               <div id="profile-socials-container" class="flex items-center gap-3 pt-1 text-xs"></div>
             </div>
           </div>
@@ -765,8 +626,8 @@
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-blue-400 mr-2"></i> My Personal Vault (Binder)</h2>
-        <p class="text-xs text-slate-400 mt-1">Manage, trade, launch live auctions, or sell back your owned cards to Admin at floor price.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-blue-400 mr-2"></i> My Personal Vault</h2>
+        <p class="text-xs text-slate-400 mt-1">Manage and inspect your owned card items.</p>
       </div>
       <div id="owned-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
         Log in with Google to view your owned cards inside your private binder.
@@ -786,20 +647,20 @@
     <section id="view-analytics" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> Market Analytics</h2>
-        <p class="text-xs text-slate-400 mt-1">Platform sales volume and tax revenue tracking.</p>
+        <p class="text-xs text-slate-400 mt-1">Platform sales volume and distribution tracking.</p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
           <p class="text-[10px] uppercase font-bold text-slate-400">Total Volume</p>
-          <p id="analytics-vol" class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 0</p>
+          <p class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 12,500,000</p>
         </div>
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Admin Tax Collected (2%)</p>
-          <p id="analytics-tax" class="text-xl font-bold font-mono text-amber-400 mt-1">IDR 0</p>
+          <p class="text-[10px] uppercase font-bold text-slate-400">Secondary Trades</p>
+          <p class="text-xl font-bold font-mono text-blue-400 mt-1">42 Completed</p>
         </div>
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
           <p class="text-[10px] uppercase font-bold text-slate-400">Active Holders</p>
-          <p id="analytics-holders" class="text-xl font-bold font-mono text-purple-400 mt-1">0 Collectors</p>
+          <p class="text-xl font-bold font-mono text-purple-400 mt-1">19 Collectors</p>
         </div>
       </div>
     </section>
@@ -809,11 +670,11 @@
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub</h2>
-          <p class="text-xs text-slate-400 mt-1">Verify payment submissions and process payouts with a 2% platform tax.</p>
+          <p class="text-xs text-slate-400 mt-1">Verify payment submissions and oversee orders.</p>
         </div>
       </div>
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3">
-        <h4 class="text-xs font-bold text-slate-300 uppercase">Pending Transactions Queue (QRIS, Trades & Sell-Backs)</h4>
+        <h4 class="text-xs font-bold text-slate-300 uppercase">Pending QRIS Orders Queue</h4>
         <div id="admin-orders-queue" class="space-y-2">
           <p class="text-xs text-slate-500">No pending orders waiting for manual approval.</p>
         </div>
@@ -875,1517 +736,1061 @@
   <script src="js/supabase-init.js"></script>
 
   <script>
-const ADMIN_EMAILS = [
-  'eugene.aquila06@gmail.com',
-  'yujinybwork@gmail.com',
-  'eugene.aquila06'
-];
+    const ADMIN_EMAILS = [
+      'eugene.aquila06@gmail.com',
+      'yujinybwork@gmail.com',
+      'eugene.aquila06'
+    ];
 
-const QRIS_STRING_PAYLOAD = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
+    const QRIS_STRING_PAYLOAD = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
 
-let currentUser = null;     // { id, email, name, username, isAdmin, avatarUrl }
-let myProfile = null;
-let currentFilter = 'ALL';
-let inventory = [];         // camelCase mirror of the `cards` table
-let wishlist = new Set();   // card ids, backed by `wishlists` table
-let shoppingCart = new Set(); // persistent across refresh via localStorage
-let unreadNotifCount = 0;
-let activeCardForAction = null;
-let selectedOwner = null;
-let pendingCheckoutIds = [];
-let activeChatId = null;
-let chatThreadsCache = [];
+    const INITIAL_JSON_BACKUP = {"exportedAt":"2026-07-29T13:25:53.048Z","exportedBy":"eugene.aquila06@gmail.com","inventoryCount":50,"cards":[{"id":"card-001","serial":"*001","name":"Eugene Standard #001","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeR1tJ2.md.png","edition":"Beta Edition: #0","sn":"001","tier":"100","printing":"1x"},{"id":"card-01","serial":"*01","name":"Eugene Premium #01","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRhf5v.png","edition":"Beta Edition: #0","sn":"01","tier":"500","printing":"1x"},{"id":"card-002","serial":"*002","name":"Eugene Standard #002","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":null,"status":"SOLD","imgUrl":"https://iili.io/CeREczX.md.png","edition":"Beta Edition: #0","sn":"002","tier":"100","printing":"1x"},{"id":"card-02","serial":"*02","name":"Eugene Premium #02","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRamG4.md.png","edition":"Beta Edition: #0","sn":"02","tier":"500","printing":"1x"},{"id":"card-003","serial":"*003","name":"Eugene Standard #003","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRExsa.md.png","edition":"Beta Edition: #0","sn":"003","tier":"100","printing":"1x"},{"id":"card-03","serial":"*03","name":"Eugene Premium #03","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRabnf.md.png","edition":"Beta Edition: #0","sn":"03","tier":"500","printing":"1x"},{"id":"card-004","serial":"*004","name":"Eugene Standard #004","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRERJp.md.png","edition":"Beta Edition: #0","sn":"004","tier":"100","printing":"1x"},{"id":"card-04","serial":"*04","name":"Eugene Premium #04","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRaZjs.md.png","edition":"Beta Edition: #0","sn":"0004","tier":"500","printing":"1x"},{"id":"card-005","serial":"*005","name":"Eugene Standard #005","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"kenneth_brilliant","status":"SOLD","imgUrl":"https://iili.io/CeREheS.md.png","edition":"Beta Edition: #0","sn":"005","tier":"100","printing":"1x"},{"id":"card-05","serial":"*05","name":"Eugene Premium #05","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRc7oJ.md.png","edition":"Beta Edition: #0","sn":"05","tier":"500","printing":"1x"},{"id":"card-006","serial":"*006","name":"Eugene Standard #006","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRGY3x.md.png","edition":"Beta Edition: #0","sn":"006","tier":"100","printing":"1x"},{"id":"card-06","serial":"*06","name":"Eugene Premium #06","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRcaPR.md.png","edition":"Beta Edition: #0","sn":"06","tier":"500","printing":"1x"},{"id":"card-007","serial":"*007","name":"Eugene Standard #007","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"andi_rende","status":"SOLD","imgUrl":"https://iili.io/CeRGX6J.md.png","edition":"Beta Edition: #0","sn":"007","tier":"100","printing":"1x"},{"id":"card-07","serial":"*07","name":"Eugene Premium #07","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRcVNn.md.png","edition":"Beta Edition: #0","sn":"07","tier":"500","printing":"1x"},{"id":"card-008","serial":"*008","name":"Eugene Standard #008","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRGVCg.md.png","edition":"Beta Edition: #0","sn":"008","tier":"100","printing":"1x"},{"id":"card-08","serial":"*08","name":"Eugene Premium #08","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRcG9t.md.png","edition":"Beta Edition: #0","sn":"08","tier":"500","printing":"1x"}]};
 
-document.addEventListener('DOMContentLoaded', async () => {
-  loadLocalCart();
-  await initAuthSession();
-  await fetchDatabaseInventory();
+    let currentUser = null;
+    let currentFilter = 'ALL';
+    let inventory = [...INITIAL_JSON_BACKUP.cards];
+    let wishlist = new Set();
+    let shoppingCart = new Set();
+    let pendingOrders = [];
+    let activeCardForAction = null;
+    let selectedOwner = null;
 
-  if (window.supabaseClient) {
-    supabaseClient
-      .channel('public:cards')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => {
-        fetchDatabaseInventory();
-      })
-      .subscribe();
-  }
+    // Chat Inbox Threads State
+    let chatThreads = [
+      { id: 't1', user: 'Eugene', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Eugene', messages: [{ sender: 'Eugene', text: 'Hey! Are you open to trading card *01?' }] },
+      { id: 't2', user: 'kenneth_brilliant', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=kenneth', messages: [{ sender: 'kenneth_brilliant', text: 'Just bought *005 via QRIS!' }] },
+      { id: 't3', user: 'andi_rende', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=andi', messages: [{ sender: 'andi_rende', text: 'Welcome to Eugene Card Marketplace.' }] }
+    ];
+    let activeChatThreadId = 't1';
 
-  // Preserve location or fallback to catalog without forcing reload
-  const initialTab = localStorage.getItem('eugene_current_tab') || 'catalog';
-  switchTab(initialTab);
-});
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (window.supabaseClient) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session?.user) {
+          handleSupabaseUserSession(session.user);
+        }
 
-// Load cart from localStorage
-function loadLocalCart() {
-  try {
-    const saved = localStorage.getItem('eugene_cart_items');
-    if (saved) {
-      shoppingCart = new Set(JSON.parse(saved));
-      updateCartBadge();
-    }
-  } catch (e) {
-    console.error('Failed to load cart', e);
-  }
-}
-
-function saveLocalCart() {
-  localStorage.setItem('eugene_cart_items', JSON.stringify(Array.from(shoppingCart)));
-  updateCartBadge();
-}
-
-function updateCartBadge() {
-  const badge = document.getElementById('cart-badge');
-  if (badge) badge.innerText = shoppingCart.size;
-}
-
-// Fixed session handling to prevent infinite reloads
-async function initAuthSession() {
-  if (!window.supabaseClient) return;
-
-  // Clean URL hash if redirected from OAuth
-  if (window.location.hash.includes('access_token')) {
-    window.history.replaceState(null, '', window.location.pathname);
-  }
-
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if (session?.user) {
-    await handleSupabaseUserSession(session.user);
-  } else {
-    renderAuthHeader();
-    renderUserProfileUI();
-  }
-
-  supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session?.user) {
-      if (!currentUser || currentUser.id !== session.user.id) {
-        await handleSupabaseUserSession(session.user);
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+          if (session?.user) {
+            handleSupabaseUserSession(session.user);
+            returnToPreviousStatePostLogin();
+          } else {
+            currentUser = null;
+            renderAuthHeader();
+          }
+        });
       }
-    } else if (event === 'SIGNED_OUT') {
-      currentUser = null;
-      myProfile = null;
-      wishlist = new Set();
+
+      renderAuthHeader();
+      renderCardGrid();
+      renderInventoryTable();
+      updateRemainingCardCount();
+      renderChatThreads();
+    });
+
+    function isAdminEmail(email) {
+      if (!email) return false;
+      const lower = email.toLowerCase().trim();
+      return ADMIN_EMAILS.some(adminEmail => lower === adminEmail || lower.startsWith(adminEmail));
+    }
+
+    function openAuthModal() { 
+      const activeTab = getCurrentActiveTab();
+      localStorage.setItem('redirect_after_login_tab', activeTab);
+      document.getElementById('auth-modal').classList.remove('hidden'); 
+    }
+
+    function closeAuthModal() { 
+      document.getElementById('auth-modal').classList.add('hidden'); 
+    }
+
+    function getCurrentActiveTab() {
+      const tabs = ['catalog', 'trade', 'auction', 'trade-req', 'analytics', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'admin', 'inventory'];
+      for (let t of tabs) {
+        const v = document.getElementById(`view-${t}`);
+        if (v && !v.classList.contains('hidden')) return t;
+      }
+      return 'catalog';
+    }
+
+    async function loginWithGoogleSupabase() {
+      try {
+        const activeTab = getCurrentActiveTab();
+        localStorage.setItem('redirect_after_login_tab', activeTab);
+
+        if (!window.supabaseClient) throw new Error('Supabase client not initialized.');
+
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.origin }
+        });
+
+        if (error) throw error;
+      } catch (error) {
+        showToast('Supabase Auth Error: ' + error.message);
+      }
+    }
+
+    function handleSupabaseUserSession(user) {
+      const email = user.email ? user.email.toLowerCase() : '';
+      const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
+      const isAdmin = isAdminEmail(email);
+
+      let profile = {
+        id: user.id,
+        email: email,
+        name: name,
+        username: name.toLowerCase().replace(/\s+/g, '_'),
+        bio: 'Official owner and administrator of Eugene Card Marketplace.',
+        instagram: 'eugene_collector',
+        tiktok: '',
+        x: '',
+        website: '',
+        isAdmin: isAdmin,
+        avatarUrl: user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`
+      };
+
+      // READ PERSISTED LOCALSTORAGE PROFILE
+      const savedProfile = localStorage.getItem(`eugene_profile_${email}`);
+      if (savedProfile) {
+        try {
+          const parsed = JSON.parse(savedProfile);
+          profile = { ...profile, ...parsed, id: user.id, email: email, isAdmin: isAdmin };
+        } catch (e) {
+          console.error('Failed to parse saved profile:', e);
+        }
+      }
+
+      currentUser = profile;
+
+      // MERGE ACCOUNT STEP: Auto-reassign legacy 'Eugene' cards to logged-in profile
+      inventory.forEach(card => {
+        if (card.owner === 'Eugene') {
+          card.owner = currentUser.name;
+        }
+      });
+
       renderAuthHeader();
       renderUserProfileUI();
-    }
-  });
-}
-
-function isAdminEmail(email) {
-  if (!email) return false;
-  const lower = email.toLowerCase().trim();
-  return ADMIN_EMAILS.some(a => lower === a || lower.startsWith(a));
-}
-
-function myIdentity() {
-  return (myProfile?.username || myProfile?.name || currentUser?.username || '').toLowerCase();
-}
-
-// --- AUTH ---
-function openAuthModal() {
-  document.getElementById('auth-modal').classList.remove('hidden');
-}
-function closeAuthModal() {
-  document.getElementById('auth-modal').classList.add('hidden');
-}
-
-function getCurrentActiveTab() {
-  const tabs = ['catalog', 'trade', 'auction', 'trade-req', 'analytics', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'admin', 'inventory'];
-  for (const t of tabs) {
-    const v = document.getElementById(`view-${t}`);
-    if (v && !v.classList.contains('hidden')) return t;
-  }
-  return 'catalog';
-}
-
-async function loginWithGoogleSupabase() {
-  try {
-    if (!window.supabaseClient) throw new Error('Supabase client not initialized.');
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin }
-    });
-    if (error) throw error;
-  } catch (error) {
-    showToast('Supabase Auth Error: ' + error.message);
-  }
-}
-
-async function handleSupabaseUserSession(user) {
-  const email = user.email ? user.email.toLowerCase() : '';
-  const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
-  const isAdmin = isAdminEmail(email);
-
-  currentUser = {
-    id: user.id,
-    email,
-    name,
-    username: name.toLowerCase().replace(/\s+/g, '_'),
-    isAdmin,
-    avatarUrl: user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`
-  };
-
-  myProfile = await fetchOwnProfile();
-  await loadWishlist();
-  renderAuthHeader();
-  renderUserProfileUI();
-  refreshNotifications();
-}
-
-async function fetchOwnProfile() {
-  if (!currentUser || !window.supabaseClient) return null;
-  const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-  if (error) { console.error(error); return null; }
-  return data;
-}
-
-async function logoutUser() {
-  if (window.supabaseClient) await supabaseClient.auth.signOut();
-  currentUser = null;
-  myProfile = null;
-  wishlist = new Set();
-  renderAuthHeader();
-  renderUserProfileUI();
-  switchTab('catalog');
-  showToast('Logged out.');
-}
-
-function renderAuthHeader() {
-  const container = document.getElementById('auth-header-container');
-  if (!container) return;
-  const adminNavs = document.querySelectorAll('.admin-only-nav');
-  const adminSep = document.getElementById('admin-nav-separator');
-
-  if (currentUser) {
-    if (currentUser.isAdmin) {
-      adminNavs.forEach(el => el.classList.remove('hidden'));
-      if (adminSep) adminSep.classList.remove('hidden');
-    } else {
-      adminNavs.forEach(el => el.classList.add('hidden'));
-      if (adminSep) adminSep.classList.add('hidden');
+      renderCardGrid();
+      renderInventoryTable();
     }
 
-    container.innerHTML = `
-      <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-xl p-1 pl-2.5 cursor-pointer transition-all">
-        <img src="${currentUser.avatarUrl}" class="w-6 h-6 rounded-full object-cover border border-slate-700">
-        <div class="flex flex-col text-right">
-          <span class="text-xs font-bold text-white leading-tight">${currentUser.name}</span>
-          <span class="text-[9px] ${currentUser.isAdmin ? 'text-rose-400 font-bold' : 'text-slate-400'} font-mono">${currentUser.isAdmin ? 'Admin' : '@' + currentUser.username}</span>
-        </div>
-        <button onclick="event.stopPropagation(); logoutUser();" title="Log Out" class="p-1.5 bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-lg ml-1 transition-all">
-          <i class="fa-solid fa-right-from-bracket text-xs"></i>
-        </button>
-      </div>`;
-  } else {
-    adminNavs.forEach(el => el.classList.add('hidden'));
-    if (adminSep) adminSep.classList.add('hidden');
-    container.innerHTML = `
-      <button onclick="openAuthModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
-        <i class="fa-solid fa-right-to-bracket"></i> <span>Log In / Sign In</span>
-      </button>`;
-  }
-}
-
-function requireLogin() {
-  if (!currentUser) { showToast('Please log in first.'); openAuthModal(); return false; }
-  return true;
-}
-
-// --- PROFILE ---
-function openProfileModal() {
-  if (!requireLogin()) return;
-  document.getElementById('edit-profile-name').value = myProfile?.name || currentUser.name;
-  document.getElementById('edit-profile-username').value = myProfile?.username || currentUser.username;
-  document.getElementById('edit-profile-bio').value = myProfile?.bio || '';
-  document.getElementById('edit-profile-instagram').value = myProfile?.instagram || '';
-  document.getElementById('edit-profile-tiktok').value = myProfile?.tiktok || '';
-  document.getElementById('edit-profile-x').value = myProfile?.x_handle || '';
-  document.getElementById('edit-profile-website').value = myProfile?.website || '';
-  document.getElementById('profile-edit-modal').classList.remove('hidden');
-}
-function closeProfileModal() {
-  document.getElementById('profile-edit-modal').classList.add('hidden');
-}
-async function saveProfileSettings(e) {
-  e.preventDefault();
-  if (!currentUser) return;
-
-  const payload = {
-    name: document.getElementById('edit-profile-name').value,
-    username: document.getElementById('edit-profile-username').value.toLowerCase().replace(/[^a-z0-9_]/g, ''),
-    bio: document.getElementById('edit-profile-bio').value,
-    instagram: document.getElementById('edit-profile-instagram').value,
-    tiktok: document.getElementById('edit-profile-tiktok').value,
-    x_handle: document.getElementById('edit-profile-x').value,
-    website: document.getElementById('edit-profile-website').value
-  };
-
-  try {
-    const { error } = await supabaseClient.from('profiles').update(payload).eq('id', currentUser.id);
-    if (error) throw error;
-    myProfile = { ...myProfile, ...payload };
-    renderUserProfileUI();
-    closeProfileModal();
-    showToast('Profile saved!');
-  } catch (err) {
-    showToast('Profile save error: ' + err.message);
-  }
-}
-
-function renderUserProfileUI() {
-  const avatarImg = document.getElementById('profile-avatar-img');
-  const displayName = document.getElementById('profile-display-name');
-  const usernameTag = document.getElementById('profile-username-tag');
-  const bioText = document.getElementById('profile-bio-text');
-  const socialsContainer = document.getElementById('profile-socials-container');
-  if (!avatarImg) return;
-
-  if (!currentUser) {
-    avatarImg.src = 'https://api.dicebear.com/7.x/identicon/svg?seed=guest';
-    displayName.innerText = 'Guest Collector';
-    usernameTag.innerText = '@guest';
-    bioText.innerText = 'Log in to edit your custom profile details and social handles.';
-    socialsContainer.innerHTML = '';
-    return;
-  }
-
-  avatarImg.src = myProfile?.avatar_url || currentUser.avatarUrl;
-  displayName.innerText = myProfile?.name || currentUser.name;
-  usernameTag.innerText = `@${myProfile?.username || currentUser.username}`;
-  bioText.innerText = myProfile?.bio || 'No bio specified.';
-
-  let socialHtml = '';
-  if (myProfile?.instagram) socialHtml += `<a href="https://instagram.com/${myProfile.instagram}" target="_blank" class="text-slate-400 hover:text-pink-400"><i class="fa-brands fa-instagram text-sm"></i></a>`;
-  if (myProfile?.tiktok) socialHtml += `<a href="https://tiktok.com/@${myProfile.tiktok}" target="_blank" class="text-slate-400 hover:text-cyan-400"><i class="fa-brands fa-tiktok text-sm"></i></a>`;
-  if (myProfile?.x_handle) socialHtml += `<a href="https://x.com/${myProfile.x_handle}" target="_blank" class="text-slate-400 hover:text-white"><i class="fa-brands fa-x-twitter text-sm"></i></a>`;
-  if (myProfile?.website) socialHtml += `<a href="${myProfile.website}" target="_blank" class="text-slate-400 hover:text-emerald-400"><i class="fa-solid fa-globe text-sm"></i></a>`;
-  socialsContainer.innerHTML = socialHtml;
-}
-
-// --- TABS / NAV ---
-function switchTab(tabName) {
-  const adminOnlyTabs = ['admin', 'inventory', 'analytics'];
-  if (adminOnlyTabs.includes(tabName) && !currentUser?.isAdmin) {
-    return showToast('Admin permission required.');
-  }
-  const allTabs = ['catalog', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'analytics', 'admin', 'inventory'];
-
-  allTabs.forEach(t => {
-    const view = document.getElementById(`view-${t}`);
-    const nav = document.getElementById(`nav-${t}`);
-    if (view) view.classList.add('hidden');
-    if (nav && !adminOnlyTabs.includes(t)) {
-      nav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all relative';
-    }
-  });
-
-  const activeView = document.getElementById(`view-${tabName}`);
-  const activeNav = document.getElementById(`nav-${tabName}`);
-  if (activeView) activeView.classList.remove('hidden');
-  if (activeNav && !adminOnlyTabs.includes(tabName)) {
-    activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-white bg-slate-700 flex items-center gap-1.5 whitespace-nowrap transition-all relative';
-  }
-
-  localStorage.setItem('eugene_current_tab', tabName);
-
-  if (tabName === 'wishlist') renderWishlistGrid();
-  if (tabName === 'dashboard') renderVaultGrid();
-  if (tabName === 'inbox') renderChatThreads();
-  if (tabName === 'holders') renderHoldersLeaderboard();
-  if (tabName === 'history') renderHistoryLedger();
-  if (tabName === 'analytics') renderAnalyticsView();
-  if (tabName === 'auction') renderAuctionsGrid();
-  if (tabName === 'trade') renderTradeBoard();
-  if (tabName === 'trade-req') renderTradeProposals();
-  if (tabName === 'admin') renderAdminOrdersQueue();
-  if (tabName === 'inventory') renderInventoryTable();
-}
-
-// --- DATA MAPPING: DB (snake_case) <-> UI (camelCase) ---
-function mapDbCardToJs(row) {
-  return {
-    id: row.id,
-    serial: row.serial || '',
-    sn: row.sn || (row.serial || '').replace('*', ''),
-    name: row.name,
-    edition: row.edition || 'Beta Edition: #0',
-    printing: row.printing || '1x',
-    type: row.type || 'STANDARD',
-    price: Number(row.price || 0),
-    baseFloorPrice: Number(row.base_floor_price ?? row.price ?? 0),
-    owner: row.owner || null,
-    status: row.status || 'AVAILABLE',
-    imgUrl: row.img_url || row.image_url || `https://placehold.co/1080x1350/1e293b/3b82f6?text=${encodeURIComponent(row.serial || '?')}`
-  };
-}
-
-async function fetchDatabaseInventory() {
-  if (!window.supabaseClient) return;
-  const { data, error } = await supabaseClient.from('cards').select('*').order('serial', { ascending: true });
-  if (error) { console.error(error); showToast('Could not load cards: ' + error.message); return; }
-  inventory = (data || []).map(mapDbCardToJs);
-  renderCardGrid();
-  renderInventoryTable();
-  updateRemainingCardCount();
-}
-
-function updateRemainingCardCount() {
-  const count = inventory.filter(c => c.status === 'AVAILABLE').length;
-  const countEl = document.getElementById('remaining-cards-count');
-  if (countEl) countEl.innerText = count;
-}
-
-// --- CARD GRID ---
-function setFilter(type) {
-  currentFilter = type;
-  ['ALL', 'PREMIUM', 'STANDARD'].forEach(f => {
-    const btn = document.getElementById(`filter-${f}`);
-    if (btn) btn.className = f === type
-      ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition-all'
-      : 'px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-400 hover:text-white transition-all';
-  });
-  renderCardGrid();
-}
-
-function renderCardGrid() {
-  const grid = document.getElementById('card-grid');
-  if (!grid) return;
-
-  const searchVal = (document.getElementById('search-input')?.value || '').toLowerCase();
-  const filtered = inventory.filter(card => {
-    const matchesFilter = currentFilter === 'ALL' ? true : card.type === currentFilter;
-    const matchesSearch = card.serial.toLowerCase().includes(searchVal) || card.name.toLowerCase().includes(searchVal);
-    return matchesFilter && matchesSearch;
-  });
-
-  updateRemainingCardCount();
-
-  if (!filtered.length) {
-    grid.innerHTML = `<div class="col-span-full text-center text-xs text-slate-500 py-10">No cards match your search.</div>`;
-    return;
-  }
-
-  grid.innerHTML = filtered.map(card => {
-    const isOwned = !!card.owner || card.status === 'SOLD';
-    const inCart = shoppingCart.has(card.id);
-    const ownerBadge = isOwned
-      ? `<span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 truncate max-w-[110px]">OWNED: ${card.owner || 'Collector'}</span>`
-      : `<span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">AVAILABLE</span>`;
-
-    return `
-      <div onclick="openCardDetailsModal('${card.id}')" class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between relative cursor-pointer group">
-        <div class="flex items-center justify-between mb-2 gap-1">
-          ${ownerBadge}
-          <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-xs ${wishlist.has(card.id) ? 'text-rose-500' : 'text-slate-500 hover:text-rose-400'}">
-            <i class="fa-solid fa-heart"></i>
-          </button>
-        </div>
-        <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden relative">
-          <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-0.5">
-            <span class="text-center font-bold text-blue-400 font-mono text-xs">${card.serial}</span>
-            <span class="text-xs font-mono font-bold text-emerald-400">IDR ${card.price.toLocaleString()}</span>
-          </div>
-          <p class="text-[11px] font-bold text-white truncate text-left mb-2.5">${card.name}</p>
-          <div class="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800" onclick="event.stopPropagation()">
-            ${isOwned ? `
-              <button disabled class="py-1.5 bg-slate-800/50 text-slate-600 cursor-not-allowed font-bold text-[10px] rounded-lg flex items-center justify-center gap-1"><i class="fa-solid fa-lock"></i> Owned</button>
-              <button disabled class="py-1.5 bg-slate-800/50 text-slate-600 cursor-not-allowed font-bold text-[10px] rounded-lg flex items-center justify-center gap-1"><i class="fa-solid fa-cart-shopping"></i> Cart</button>
-            ` : `
-              <button onclick="quickBuyCard('${card.id}')" class="py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1"><i class="fa-solid fa-qrcode"></i> Buy</button>
-              <button onclick="toggleCart('${card.id}')" class="py-1.5 ${inCart ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 hover:bg-slate-700 text-amber-400'} text-[10px] rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-1"><i class="fa-solid fa-cart-shopping"></i> ${inCart ? 'Added' : 'Cart'}</button>
-            `}
-            <button onclick="openTradeProposalModal('${card.id}')" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-400 font-bold text-[10px] rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-1"><i class="fa-solid fa-handshake"></i> Offer</button>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-function openCardDetailsModal(cardId) {
-  const card = inventory.find(c => c.id === cardId);
-  if (!card) return;
-  activeCardForAction = card;
-
-  document.getElementById('detail-card-img').src = card.imgUrl;
-  document.getElementById('detail-card-serial').innerText = card.serial;
-  document.getElementById('detail-card-name').innerText = card.name;
-  document.getElementById('detail-card-edition').innerText = card.edition || 'Beta Edition: #0';
-  document.getElementById('detail-card-price').innerText = `IDR ${card.price.toLocaleString()}`;
-
-  const typeSpan = document.getElementById('detail-card-type');
-  typeSpan.innerText = card.type;
-  typeSpan.className = `text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}`;
-
-  const isOwned = !!card.owner || card.status === 'SOLD';
-  document.getElementById('detail-card-status').innerText = `Status: ${card.status}${card.owner ? ` (Owner: ${card.owner})` : ''}`;
-
-  const buyBtn = document.getElementById('detail-buy-btn');
-  if (isOwned) {
-    buyBtn.disabled = true;
-    buyBtn.className = 'w-full py-2.5 bg-slate-800 text-slate-500 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-2';
-    buyBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Card is Owned`;
-  } else {
-    buyBtn.disabled = false;
-    buyBtn.className = 'w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2';
-    buyBtn.innerHTML = `<i class="fa-solid fa-qrcode"></i> Buy / Order via QRIS`;
-  }
-
-  document.getElementById('card-details-modal').classList.remove('hidden');
-}
-function closeCardDetailsModal() {
-  document.getElementById('card-details-modal').classList.add('hidden');
-}
-
-// --- WISHLIST (backed by `wishlists` table) ---
-async function loadWishlist() {
-  if (!currentUser) { wishlist = new Set(); return; }
-  const { data, error } = await supabaseClient.from('wishlists').select('card_id').eq('user_id', currentUser.id);
-  if (error) { console.error(error); return; }
-  wishlist = new Set((data || []).map(r => r.card_id));
-  const badge = document.getElementById('wishlist-count-badge');
-  if (badge) badge.innerText = wishlist.size;
-}
-
-async function toggleWishlist(cardId) {
-  if (!requireLogin()) return;
-  try {
-    if (wishlist.has(cardId)) {
-      await supabaseClient.from('wishlists').delete().eq('user_id', currentUser.id).eq('card_id', cardId);
-      wishlist.delete(cardId);
-      showToast('Removed from wishlist.');
-    } else {
-      await supabaseClient.from('wishlists').insert({ user_id: currentUser.id, card_id: cardId });
-      wishlist.add(cardId);
-      showToast('Saved to wishlist!');
-    }
-    const badge = document.getElementById('wishlist-count-badge');
-    if (badge) badge.innerText = wishlist.size;
-    renderCardGrid();
-  } catch (err) {
-    showToast('Wishlist error: ' + err.message);
-  }
-}
-
-function wishlistActiveDetailCard() {
-  if (activeCardForAction) toggleWishlist(activeCardForAction.id);
-}
-
-function renderWishlistGrid() {
-  const container = document.getElementById('wishlist-grid');
-  if (!container) return;
-  const items = inventory.filter(c => wishlist.has(c.id));
-  if (!items.length) {
-    container.innerHTML = `<div class="col-span-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">No wishlisted cards saved yet. Click the heart icon on any card in the Collection tab!</div>`;
-    return;
-  }
-  container.innerHTML = items.map(card => `
-    <div onclick="openCardDetailsModal('${card.id}')" class="card-holo-standard rounded-xl p-3 flex flex-col justify-between relative cursor-pointer">
-      <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden">
-        <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-      </div>
-      <p class="text-center font-bold text-blue-400 font-mono mb-1 text-xs">${card.serial}</p>
-      <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
-    </div>`).join('');
-}
-
-// --- MY VAULT (dashboard) ---
-function renderVaultGrid() {
-  const container = document.getElementById('owned-cards-grid');
-  if (!container) return;
-  if (!currentUser) {
-    container.innerHTML = "Log in with Google to view your owned cards inside your private binder.";
-    return;
-  }
-  const ident = myIdentity();
-  const owned = inventory.filter(c => (c.owner || '').toLowerCase() === ident);
-  if (!owned.length) {
-    container.innerHTML = "You don't own any cards yet. Buy cards via QRIS or propose trades to populate your vault!";
-    return;
-  }
-  container.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
-  container.innerHTML = owned.map(card => `
-    <div class="card-holo-premium rounded-xl p-3 flex flex-col justify-between relative">
-      <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden cursor-pointer" onclick="openCardDetailsModal('${card.id}')">
-        <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-      </div>
-      <p class="text-center font-bold text-blue-400 font-mono mb-0.5 text-xs">${card.serial}</p>
-      <p class="text-[11px] font-bold text-white truncate text-center mb-3">${card.name}</p>
-      <div class="grid grid-cols-3 gap-1 pt-2 border-t border-slate-800/80">
-        <button onclick="openCreateAuctionModal('${card.id}')" class="py-1.5 bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/30 font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1"><i class="fa-solid fa-gavel"></i> Auction</button>
-        <button onclick="sellBackCardToAdmin('${card.id}')" class="py-1.5 bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-500/30 font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1"><i class="fa-solid fa-building-columns"></i> Sell Back</button>
-        <button onclick="openTradeProposalModal('${card.id}')" class="py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1"><i class="fa-solid fa-right-left"></i> Trade</button>
-      </div>
-    </div>`).join('');
-}
-
-async function sellBackCardToAdmin(cardId) {
-  if (!requireLogin()) return;
-  const card = inventory.find(c => c.id === cardId);
-  if (!card) return;
-  if (!confirm(`Sell ${card.serial} back to the Admin at floor price IDR ${card.baseFloorPrice.toLocaleString()}? This returns the card to the available pool immediately.`)) return;
-  try {
-    const { error } = await supabaseClient.rpc('sell_back_to_admin', { p_card_id: cardId });
-    if (error) throw error;
-    showToast('Card sold back — it is now available in the pool again.');
-    await fetchDatabaseInventory();
-    renderVaultGrid();
-  } catch (err) {
-    showToast('Sell-back error: ' + err.message);
-  }
-}
-
-// --- CART + QRIS CHECKOUT ---
-function toggleCart(cardId) {
-  if (shoppingCart.has(cardId)) { 
-    shoppingCart.delete(cardId); 
-    showToast('Removed from cart.'); 
-  } else { 
-    shoppingCart.add(cardId); 
-    showToast('Added to cart!'); 
-  }
-  saveLocalCart();
-  renderCardGrid();
-}
-
-function showCartModal() {
-  const list = document.getElementById('cart-items-list');
-  const priceTag = document.getElementById('cart-total-price');
-  const items = inventory.filter(c => shoppingCart.has(c.id));
-
-  if (!items.length) {
-    list.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">Your shopping cart is empty.</p>`;
-    priceTag.innerText = 'IDR 0';
-  } else {
-    let total = 0;
-    list.innerHTML = items.map(card => {
-      total += card.price;
-      return `
-        <div class="flex items-center justify-between py-2">
-          <div class="flex items-center gap-2">
-            <img src="${card.imgUrl}" class="w-8 h-8 rounded border border-slate-800 object-contain">
-            <div><p class="text-xs font-bold text-white">${card.name}</p><p class="text-[10px] font-mono text-blue-400">${card.serial}</p></div>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-mono font-bold text-emerald-400">IDR ${card.price.toLocaleString()}</span>
-            <button onclick="toggleCart('${card.id}'); showCartModal();" class="text-slate-500 hover:text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        </div>`;
-    }).join('');
-    priceTag.innerText = `IDR ${total.toLocaleString()}`;
-  }
-  document.getElementById('cart-modal').classList.remove('hidden');
-}
-function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
-
-function openQrisModal(title, amount, cardIds) {
-  pendingCheckoutIds = cardIds;
-  document.getElementById('qris-card-title').innerText = title;
-  document.getElementById('qris-amount-due').innerText = `IDR ${amount.toLocaleString()}`;
-  const canvasContainer = document.getElementById('qris-canvas');
-  canvasContainer.innerHTML = '';
-  new QRCode(canvasContainer, {
-    text: QRIS_STRING_PAYLOAD, width: 180, height: 180,
-    colorDark: "#0f172a", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H
-  });
-  document.getElementById('qris-modal').classList.remove('hidden');
-}
-function closeQrisModal() { document.getElementById('qris-modal').classList.add('hidden'); }
-
-function checkoutCartQRIS() {
-  if (!requireLogin()) return;
-  if (!shoppingCart.size) return showToast('Cart is empty!');
-  const items = inventory.filter(c => shoppingCart.has(c.id));
-  const total = items.reduce((acc, c) => acc + c.price, 0);
-  closeCartModal();
-  openQrisModal(`${items.length} Eugene Cards Cart Bundle`, total, items.map(c => c.id));
-}
-
-function quickBuyCard(cardId) {
-  const card = inventory.find(c => c.id === cardId);
-  if (!card) return;
-  if (card.owner || card.status === 'SOLD') return showToast('Owned cards cannot be purchased!');
-  activeCardForAction = card;
-  buyActiveDetailCard();
-}
-
-function buyActiveDetailCard() {
-  if (!requireLogin()) return;
-  if (!activeCardForAction) return;
-  const card = activeCardForAction;
-  closeCardDetailsModal();
-  openQrisModal(`${card.name} (${card.serial})`, card.price, [card.id]);
-}
-
-async function submitQrisPaymentProof() {
-  const fileInput = document.getElementById('qris-proof-file');
-  if (!fileInput.files.length) return showToast('Please select a payment receipt image before submitting.');
-  if (!pendingCheckoutIds.length) return showToast('Nothing to check out.');
-
-  try {
-    showToast('Uploading receipt...');
-    const file = fileInput.files[0];
-    const path = `${currentUser.id}/${Date.now()}-${file.name}`;
-    const { error: upErr } = await supabaseClient.storage.from('receipts').upload(path, file);
-    if (upErr) throw upErr;
-    const { data: pub } = supabaseClient.storage.from('receipts').getPublicUrl(path);
-
-    const { data, error } = await supabaseClient.rpc('create_order', {
-      p_card_ids: pendingCheckoutIds,
-      p_proof_url: pub.publicUrl
-    });
-    if (error) throw error;
-
-    const row = Array.isArray(data) ? data[0] : data;
-    showToast(`Order ${row?.order_id || ''} submitted — awaiting admin verification.`);
-
-    pendingCheckoutIds.forEach(id => shoppingCart.delete(id));
-    saveLocalCart();
-    pendingCheckoutIds = [];
-    fileInput.value = '';
-    closeQrisModal();
-    await fetchDatabaseInventory();
-  } catch (err) {
-    showToast('Payment submission error: ' + err.message);
-  }
-}
-
-// --- TRADE (secondary-market listings board) ---
-async function renderTradeBoard() {
-  const target = document.getElementById('trade-content');
-  if (!target) return;
-  const { data, error } = await supabaseClient.from('listings').select('*').eq('status', 'active').order('created_at', { ascending: false });
-  if (error) { target.innerHTML = `<div class="text-xs text-rose-400 p-4">${error.message}</div>`; return; }
-
-  if (!data || !data.length) {
-    target.innerHTML = `<div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">No peer-to-peer listings active yet. Be the first to create one!</div>`;
-    return;
-  }
-
-  target.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">` + data.map(listing => `
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex gap-4 items-center">
-      <div class="w-20 h-28 bg-slate-800 border border-blue-500/30 rounded-xl overflow-hidden flex items-center justify-center font-mono text-blue-400 font-bold">
-        ${listing.img_url ? `<img src="${listing.img_url}" class="w-full h-full object-cover">` : (listing.serial || '')}
-      </div>
-      <div class="flex-1 space-y-1">
-        <span class="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">Open Offer</span>
-        <h4 class="text-sm font-bold text-white">${listing.name || listing.serial}</h4>
-        <p class="text-xs text-slate-400">Seller: ${listing.seller_name || 'Unknown'} — IDR ${Number(listing.price || 0).toLocaleString()}</p>
-        <div class="flex gap-2 mt-2">
-          <button onclick="openTradeProposalModal('${listing.card_id}')" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-lg transition-all">Propose Trade</button>
-          ${currentUser && listing.seller_id === currentUser.id ? `<button onclick="cancelListing('${listing.id}')" class="px-3 py-1 bg-slate-800 hover:bg-rose-500/20 text-rose-400 font-semibold text-xs rounded-lg transition-all">Cancel</button>` : ''}
-        </div>
-      </div>
-    </div>`).join('') + `</div>`;
-}
-
-async function cancelListing(listingId) {
-  try {
-    const { error } = await supabaseClient.rpc('delete_listing', { p_listing_id: listingId });
-    if (error) throw error;
-    showToast('Listing cancelled.');
-    renderTradeBoard();
-  } catch (err) { showToast('Error: ' + err.message); }
-}
-
-async function createListingFromVault() {
-  if (!requireLogin()) return;
-  const ident = myIdentity();
-  const myCards = inventory.filter(c => (c.owner || '').toLowerCase() === ident);
-  if (!myCards.length) return showToast('You need to own a card to list it.');
-  const serial = prompt(`List which of your cards? (${myCards.map(c => c.serial).join(', ')})`);
-  const card = myCards.find(c => c.serial === (serial || '').trim());
-  if (!card) return showToast('No matching card.');
-  const price = parseFloat(prompt('Listing price (IDR):', card.price));
-  if (!price || price <= 0) return showToast('Invalid price.');
-  try {
-    const { error } = await supabaseClient.rpc('create_listing', { p_card_id: card.id, p_price: price });
-    if (error) throw error;
-    showToast('Listing created.');
-    switchTab('trade');
-  } catch (err) { showToast('Error: ' + err.message); }
-}
-
-// --- TRADE PROPOSAL MODAL ---
-function openTradeProposalModal(targetCardId) {
-  if (!requireLogin()) return;
-  const card = inventory.find(c => c.id === targetCardId);
-  if (!card) return;
-
-  document.getElementById('trade-target-card-id').value = card.id;
-  document.getElementById('trade-target-summary').innerText = `${card.name} (${card.serial}) - Value: IDR ${card.price.toLocaleString()}`;
-
-  const ident = myIdentity();
-  const myCards = inventory.filter(c => (c.owner || '').toLowerCase() === ident);
-  const offerSelect = document.getElementById('trade-offered-card-id');
-  offerSelect.innerHTML = `<option value="">-- No Card Offered (Pure Cash Offer) --</option>` +
-    myCards.map(c => `<option value="${c.id}">${c.name} (${c.serial}) - Base: IDR ${c.price.toLocaleString()}</option>`).join('');
-
-  document.getElementById('trade-proposal-modal').classList.remove('hidden');
-}
-function closeTradeProposalModal() { document.getElementById('trade-proposal-modal').classList.add('hidden'); }
-
-async function submitTradeProposal(e) {
-  e.preventDefault();
-  if (!requireLogin()) return;
-
-  const targetId = document.getElementById('trade-target-card-id').value;
-  const offeredId = document.getElementById('trade-offered-card-id').value || null;
-  const cashAddon = parseInt(document.getElementById('trade-cash-addon').value || '0', 10);
-  const note = document.getElementById('trade-note').value;
-  const attachmentInput = document.getElementById('trade-attachment-file');
-
-  try {
-    let finalNote = note;
-    if (attachmentInput.files.length) {
-      showToast('Uploading attachment...');
-      const file = attachmentInput.files[0];
-      const path = `trades/${currentUser.id}/${Date.now()}-${file.name}`;
-      const { error: upErr } = await supabaseClient.storage.from('receipts').upload(path, file);
-      if (!upErr) {
-        const { data: pub } = supabaseClient.storage.from('receipts').getPublicUrl(path);
-        finalNote = `${note} [Attachment: ${pub.publicUrl}]`;
+    function returnToPreviousStatePostLogin() {
+      const savedTab = localStorage.getItem('redirect_after_login_tab') || 'catalog';
+      localStorage.removeItem('redirect_after_login_tab');
+      closeAuthModal();
+      
+      if ((savedTab === 'admin' || savedTab === 'inventory' || savedTab === 'analytics') && !currentUser?.isAdmin) {
+        switchTab('catalog');
+        showToast('Returned to Collection tab.');
+      } else {
+        switchTab(savedTab);
       }
     }
 
-    const { error } = await supabaseClient.rpc('create_trade_request', {
-      p_card_id: targetId,
-      p_offer_type: offeredId ? 'TRADE' : 'CASH',
-      p_offered_card_id: offeredId,
-      p_plus_amount: cashAddon || 0,
-      p_notes: finalNote
-    });
-    if (error) throw error;
-
-    closeTradeProposalModal();
-    switchTab('trade-req');
-    showToast('Trade proposal submitted!');
-  } catch (err) {
-    showToast('Trade error: ' + err.message);
-  }
-}
-
-function tradeActiveDetailCard() {
-  if (!activeCardForAction) return;
-  closeCardDetailsModal();
-  openTradeProposalModal(activeCardForAction.id);
-}
-
-async function renderTradeProposals() {
-  const container = document.getElementById('trade-req-content');
-  if (!container) return;
-  if (!currentUser) {
-    container.innerHTML = `<div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">Log in to view your trade proposals.</div>`;
-    return;
-  }
-
-  const { data, error } = await supabaseClient
-    .from('trade_requests')
-    .select('*')
-    .or(`proposer_id.eq.${currentUser.id},target_owner_id.eq.${currentUser.id}`)
-    .order('created_at', { ascending: false });
-
-  if (error) { container.innerHTML = `<div class="text-xs text-rose-400 p-4">${error.message}</div>`; return; }
-
-  if (!data || !data.length) {
-    container.innerHTML = `<div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">No active trade proposals pending.</div>`;
-    return;
-  }
-
-  container.innerHTML = data.map(p => {
-    const incoming = p.target_owner_id === currentUser.id;
-    let actions = '';
-    if (p.status === 'PENDING' && incoming) {
-      actions = `<button onclick="acceptTradeProposal('${p.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">Accept Trade</button>
-        <button onclick="rejectTradeProposal('${p.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 font-bold text-xs rounded-xl border border-slate-700 transition-all">Reject</button>`;
-    } else if (p.status === 'PENDING' && !incoming) {
-      actions = `<button onclick="withdrawTradeProposal('${p.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 font-bold text-xs rounded-xl border border-slate-700 transition-all">Withdraw</button>`;
-    } else if (p.status === 'COUNTERED' && !incoming) {
-      actions = `<button onclick="acceptTradeProposal('${p.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">Accept Counter</button>`;
+    async function logoutUser() {
+      if (window.supabaseClient) await supabaseClient.auth.signOut();
+      currentUser = null;
+      renderAuthHeader();
+      renderUserProfileUI();
+      switchTab('catalog');
+      showToast('Logged out.');
     }
 
-    return `
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div class="space-y-1">
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${p.status === 'PENDING' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : p.status === 'ACCEPTED' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${p.status}</span>
-            <span class="text-xs text-slate-400">${incoming ? 'From' : 'To'}: <strong class="text-white">${incoming ? p.proposer_name : p.target_owner_name}</strong></span>
+    function renderAuthHeader() {
+      const container = document.getElementById('auth-header-container');
+      const adminNavs = document.querySelectorAll('.admin-only-nav');
+      const adminSep = document.getElementById('admin-nav-separator');
+
+      if (currentUser) {
+        if (currentUser.isAdmin) {
+          adminNavs.forEach(el => el.classList.remove('hidden'));
+          if (adminSep) adminSep.classList.remove('hidden');
+        } else {
+          adminNavs.forEach(el => el.classList.add('hidden'));
+          if (adminSep) adminSep.classList.add('hidden');
+        }
+
+        const avatarImgHtml = `<img src="${currentUser.avatarUrl}" class="w-6 h-6 rounded-full object-cover border border-slate-700">`;
+        let badgeText = currentUser.isAdmin ? 'Admin' : `@${currentUser.username}`;
+        let badgeColor = currentUser.isAdmin ? 'text-rose-400 font-bold' : 'text-slate-400';
+
+        container.innerHTML = `
+          <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-xl p-1 pl-2.5 cursor-pointer transition-all">
+            ${avatarImgHtml}
+            <div class="flex flex-col text-right">
+              <span class="text-xs font-bold text-white leading-tight">${currentUser.name}</span>
+              <span class="text-[9px] ${badgeColor} font-mono">${badgeText}</span>
+            </div>
+            <button onclick="event.stopPropagation(); logoutUser();" title="Log Out" class="p-1.5 bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-lg ml-1 transition-all">
+              <i class="fa-solid fa-right-from-bracket text-xs"></i>
+            </button>
           </div>
-          <p class="text-xs text-slate-200">
-            Target: <strong class="text-blue-400">${p.card_name || p.serial}</strong>
-            ${p.offer_type === 'TRADE' ? ' — offering a card in trade' : ' (Cash Only Proposal)'}
-            ${p.plus_amount > 0 ? ` + <strong class="text-emerald-400">IDR ${Number(p.plus_amount).toLocaleString()} Cash</strong>` : ''}
-          </p>
-          ${p.notes ? `<p class="text-[11px] text-slate-400 italic">"${p.notes}"</p>` : ''}
-        </div>
-        <div class="flex items-center gap-2 shrink-0">${actions}</div>
-      </div>`;
-  }).join('');
-}
+        `;
+      } else {
+        adminNavs.forEach(el => el.classList.add('hidden'));
+        if (adminSep) adminSep.classList.add('hidden');
 
-async function acceptTradeProposal(id) { await tradeAction(id, 'accept'); }
-async function rejectTradeProposal(id) { await tradeAction(id, 'reject'); }
-async function withdrawTradeProposal(id) { await tradeAction(id, 'withdraw'); }
-
-async function tradeAction(id, action) {
-  try {
-    const { error } = await supabaseClient.rpc('trade_action', { p_request_id: id, p_action: action });
-    if (error) throw error;
-    showToast('Done.');
-    await fetchDatabaseInventory();
-    renderTradeProposals();
-  } catch (err) { showToast('Error: ' + err.message); }
-}
-
-// --- AUCTION ---
-async function renderAuctionsGrid() {
-  const container = document.getElementById('auction-content');
-  if (!container) return;
-
-  const { data: auction, error } = await supabaseClient.from('auctions').select('*').eq('status', 'ACTIVE').maybeSingle();
-  if (error) { container.innerHTML = `<div class="text-xs text-rose-400 p-4">${error.message}</div>`; return; }
-
-  if (!auction) {
-    container.className = 'bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400 col-span-full';
-    container.innerHTML = "No active auctions live right now. Go to 'My Vault' to launch an auction for your card!";
-    return;
-  }
-
-  const expiresLabel = auction.expires_at ? new Date(auction.expires_at).toLocaleString() : 'No limit';
-  const history = (auction.bid_history || []).slice(-5).reverse();
-
-  container.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
-  container.innerHTML = `
-    <div class="card-holo-premium rounded-2xl p-4 flex flex-col justify-between space-y-3">
-      <div class="flex justify-between items-center text-xs">
-        <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"><i class="fa-solid fa-circle text-[7px] mr-1 animate-pulse"></i> Live Auction</span>
-        <span class="text-slate-400 text-[10px] font-mono">Ends: ${expiresLabel}</span>
-      </div>
-      <div class="w-full aspect-[4/5] bg-slate-950 rounded-xl p-2 flex items-center justify-center overflow-hidden">
-        <img src="${auction.card_img || ''}" class="w-full h-full object-contain rounded-lg">
-      </div>
-      <div>
-        <p class="font-mono font-bold text-blue-400 text-xs">${auction.serial || ''}</p>
-        <h4 class="font-bold text-white text-sm truncate">${auction.card_name || ''}</h4>
-        <p class="text-[10px] text-slate-400">Seller: ${auction.owner_name || 'Admin'}</p>
-      </div>
-      <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
-        <div>
-          <p class="text-[9px] uppercase font-bold text-slate-400">Current Highest Bid</p>
-          <p class="text-sm font-mono font-bold text-emerald-400">IDR ${Number(auction.current_bid || auction.starting_price || 0).toLocaleString()}</p>
-        </div>
-        <span class="text-[10px] text-slate-400 font-mono">${auction.high_bidder || 'No bids yet'}</span>
-      </div>
-      <button onclick="placeBidOnAuction(${Number(auction.current_bid || auction.starting_price || 0)})" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">+ Place Higher Bid</button>
-      ${currentUser?.isAdmin ? `<div class="flex gap-2"><button onclick="finalizeAuctionNow()" class="flex-1 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold rounded-lg">Finalize</button><button onclick="cancelAuctionNow()" class="flex-1 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 text-[10px] font-bold rounded-lg">Cancel</button></div>` : ''}
-    </div>
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-      <h4 class="text-xs font-bold text-slate-300 uppercase mb-3">Recent Bids</h4>
-      ${history.length ? history.map(b => `<div class="flex justify-between text-xs py-1.5 border-b border-slate-800"><span class="text-slate-400">${b.bidder}</span><span class="font-mono text-emerald-400">IDR ${Number(b.amount).toLocaleString()}</span></div>`).join('') : '<p class="text-xs text-slate-500">No bids yet — be the first!</p>'}
-    </div>`;
-}
-
-async function placeBidOnAuction(currentBid) {
-  if (!requireLogin()) return;
-  const amount = parseFloat(prompt(`Enter your bid (must be higher than IDR ${currentBid.toLocaleString()}):`, currentBid + 50000));
-  if (!amount || amount <= currentBid) return showToast('Bid must be higher than the current bid.');
-  try {
-    const { error } = await supabaseClient.rpc('place_auction_bid', { p_bid_amount: amount });
-    if (error) throw error;
-    showToast('Bid placed!');
-    renderAuctionsGrid();
-  } catch (err) { showToast('Bid error: ' + err.message); }
-}
-
-function openCreateAuctionModal(cardId) {
-  if (!requireLogin()) return;
-  const card = inventory.find(c => c.id === cardId);
-  if (!card) return;
-  document.getElementById('auction-card-id').value = card.id;
-  document.getElementById('auction-card-summary').innerText = `Auctioning: ${card.name} (${card.serial}) - Retail: IDR ${card.price.toLocaleString()}`;
-  document.getElementById('auction-start-price').value = card.baseFloorPrice || card.price || 100000;
-  document.getElementById('create-auction-modal').classList.remove('hidden');
-}
-function closeCreateAuctionModal() { document.getElementById('create-auction-modal').classList.add('hidden'); }
-
-async function submitCardAuction(e) {
-  e.preventDefault();
-  if (!requireLogin()) return;
-  const cardId = document.getElementById('auction-card-id').value;
-  const startPrice = parseInt(document.getElementById('auction-start-price').value, 10);
-  const durationHrs = parseInt(document.getElementById('auction-duration-hrs').value, 10);
-
-  try {
-    const { error } = await supabaseClient.rpc('start_auction', { p_card_id: cardId, p_starting_price: startPrice, p_duration_hours: durationHrs });
-    if (error) throw error;
-    closeCreateAuctionModal();
-    switchTab('auction');
-    showToast('Auction launched live!');
-  } catch (err) { showToast('Error: ' + err.message); }
-}
-
-async function finalizeAuctionNow() {
-  try {
-    const { error } = await supabaseClient.rpc('finalize_auction');
-    if (error) throw error;
-    showToast('Auction finalized.');
-    await fetchDatabaseInventory();
-    renderAuctionsGrid();
-  } catch (err) { showToast('Error: ' + err.message); }
-}
-async function cancelAuctionNow() {
-  if (!confirm('Cancel the active auction?')) return;
-  try {
-    const { error } = await supabaseClient.rpc('cancel_auction');
-    if (error) throw error;
-    showToast('Auction canceled.');
-    renderAuctionsGrid();
-  } catch (err) { showToast('Error: ' + err.message); }
-}
-
-// --- HOLDERS LEADERBOARD ---
-function renderHoldersLeaderboard() {
-  const container = document.getElementById('holders-content');
-  if (!container) return;
-
-  const holderMap = {};
-  inventory.forEach(card => {
-    if (card.owner) {
-      if (!holderMap[card.owner]) holderMap[card.owner] = [];
-      holderMap[card.owner].push(card);
+        container.innerHTML = `
+          <button onclick="openAuthModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-right-to-bracket"></i> <span>Log In / Sign In</span>
+          </button>
+        `;
+      }
     }
-  });
 
-  const holdersList = Object.keys(holderMap).map(owner => ({
-    ownerName: owner, cards: holderMap[owner], count: holderMap[owner].length
-  })).sort((a, b) => b.count - a.count);
+    // --- PROFILE PERSONALIZATION ---
+    function openProfileModal() {
+      if (!currentUser) return openAuthModal();
 
-  if (!holdersList.length) {
-    container.innerHTML = `<div class="col-span-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">No active card holders recorded in inventory.</div>`;
-    return;
-  }
+      document.getElementById('edit-profile-name').value = currentUser.name;
+      document.getElementById('edit-profile-username').value = currentUser.username;
+      document.getElementById('edit-profile-bio').value = currentUser.bio || '';
+      document.getElementById('edit-profile-instagram').value = currentUser.instagram || '';
+      document.getElementById('edit-profile-tiktok').value = currentUser.tiktok || '';
+      document.getElementById('edit-profile-x').value = currentUser.x || '';
+      document.getElementById('edit-profile-website').value = currentUser.website || '';
 
-  container.innerHTML = holdersList.map((h, rank) => `
-    <div onclick="openHolderVaultModal('${h.ownerName}')" class="bg-slate-900 border border-slate-800 hover:border-teal-500/50 p-4 rounded-2xl cursor-pointer transition-all flex items-center justify-between group">
-      <div class="flex items-center gap-3">
-        <span class="font-mono font-bold text-xs ${rank === 0 ? 'text-amber-400' : 'text-slate-500'}">#${rank + 1}</span>
-        <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 border border-slate-700">
-          <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(h.ownerName)}" class="w-full h-full object-cover">
+      document.getElementById('profile-edit-modal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-edit-modal').classList.add('hidden');
+    }
+
+    function saveProfileSettings(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      currentUser.name = document.getElementById('edit-profile-name').value;
+      currentUser.username = document.getElementById('edit-profile-username').value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+      currentUser.bio = document.getElementById('edit-profile-bio').value;
+      currentUser.instagram = document.getElementById('edit-profile-instagram').value;
+      currentUser.tiktok = document.getElementById('edit-profile-tiktok').value;
+      currentUser.x = document.getElementById('edit-profile-x').value;
+      currentUser.website = document.getElementById('edit-profile-website').value;
+
+      // PERSIST PROFILE TO BROWSER STORAGE
+      localStorage.setItem(`eugene_profile_${currentUser.email}`, JSON.stringify(currentUser));
+
+      renderAuthHeader();
+      renderUserProfileUI();
+      closeProfileModal();
+      showToast('Profile saved & persisted locally!');
+    }
+
+    function renderUserProfileUI() {
+      const avatarImg = document.getElementById('profile-avatar-img');
+      const displayName = document.getElementById('profile-display-name');
+      const usernameTag = document.getElementById('profile-username-tag');
+      const bioText = document.getElementById('profile-bio-text');
+      const socialsContainer = document.getElementById('profile-socials-container');
+
+      if (!currentUser) {
+        avatarImg.src = 'https://api.dicebear.com/7.x/identicon/svg?seed=guest';
+        displayName.innerText = 'Guest Collector';
+        usernameTag.innerText = '@guest';
+        bioText.innerText = 'Log in to edit your custom profile details and social handlers.';
+        socialsContainer.innerHTML = '';
+        return;
+      }
+
+      avatarImg.src = currentUser.avatarUrl;
+      displayName.innerText = currentUser.name;
+      usernameTag.innerText = `@${currentUser.username}`;
+      bioText.innerText = currentUser.bio || 'No bio specified.';
+
+      let socialHtml = '';
+      if (currentUser.instagram) {
+        socialHtml += `<a href="https://instagram.com/${currentUser.instagram}" target="_blank" class="text-slate-400 hover:text-pink-400 transition-all"><i class="fa-brands fa-instagram text-sm"></i></a>`;
+      }
+      if (currentUser.tiktok) {
+        socialHtml += `<a href="https://tiktok.com/@${currentUser.tiktok}" target="_blank" class="text-slate-400 hover:text-cyan-400 transition-all"><i class="fa-brands fa-tiktok text-sm"></i></a>`;
+      }
+      if (currentUser.x) {
+        socialHtml += `<a href="https://x.com/${currentUser.x}" target="_blank" class="text-slate-400 hover:text-white transition-all"><i class="fa-brands fa-x-twitter text-sm"></i></a>`;
+      }
+      if (currentUser.website) {
+        socialHtml += `<a href="${currentUser.website}" target="_blank" class="text-slate-400 hover:text-emerald-400 transition-all"><i class="fa-solid fa-globe text-sm"></i></a>`;
+      }
+
+      socialsContainer.innerHTML = socialHtml;
+    }
+
+    // --- CARD GRID & DETAILS WITH OWNERSHIP AND BUY/CART/OFFER FEATURES ---
+    function renderCardGrid() {
+      const grid = document.getElementById('card-grid');
+      if (!grid) return;
+      
+      const searchVal = (document.getElementById('search-input')?.value || '').toLowerCase();
+      const filtered = inventory.filter(card => {
+        const matchesFilter = currentFilter === 'ALL' ? true : card.type === currentFilter;
+        const matchesSearch = card.serial.toLowerCase().includes(searchVal) || card.name.toLowerCase().includes(searchVal);
+        return matchesFilter && matchesSearch;
+      });
+
+      grid.innerHTML = filtered.map(card => {
+        const isOwned = card.owner && card.owner !== 'Unassigned';
+        const inCart = shoppingCart.has(card.id);
+
+        let ownerBadge = '';
+        if (isOwned) {
+          ownerBadge = `<span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 truncate max-w-[110px]">OWNED: ${card.owner}</span>`;
+        } else {
+          ownerBadge = `<span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">AVAILABLE</span>`;
+        }
+
+        return `
+          <div onclick="openCardDetailsModal('${card.id}')" class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between relative cursor-pointer group">
+            
+            <div class="flex items-center justify-between mb-2 gap-1">
+              ${ownerBadge}
+              <button onclick="event.stopPropagation(); toggleWishlist('${card.id}')" class="text-xs ${wishlist.has(card.id) ? 'text-rose-500' : 'text-slate-500 hover:text-rose-400'}">
+                <i class="fa-solid fa-heart"></i>
+              </button>
+            </div>
+
+            <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden relative">
+              <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-center font-bold text-blue-400 font-mono text-xs">${card.serial}</span>
+                <span class="text-xs font-mono font-bold text-emerald-400">IDR ${card.price.toLocaleString()}</span>
+              </div>
+              <p class="text-[11px] font-bold text-white truncate text-left mb-2.5">${card.name}</p>
+
+              <!-- DIRECT ACTION BUTTONS: BUY, CART, OFFER -->
+              <div class="grid grid-cols-3 gap-1 pt-1 border-t border-slate-800" onclick="event.stopPropagation()">
+                <button onclick="quickBuyCard('${card.id}')" class="py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1" title="Buy via QRIS">
+                  <i class="fa-solid fa-qrcode"></i> Buy
+                </button>
+
+                <button onclick="toggleCart('${card.id}')" class="py-1.5 ${inCart ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 hover:bg-slate-700 text-amber-400'} text-[10px] rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-1" title="Add to Cart">
+                  <i class="fa-solid fa-cart-shopping"></i> ${inCart ? 'Added' : 'Cart'}
+                </button>
+
+                <button onclick="quickOfferCard('${card.id}')" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-purple-400 font-bold text-[10px] rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-1" title="Make Trade Offer">
+                  <i class="fa-solid fa-handshake"></i> Offer
+                </button>
+              </div>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- CART MANAGEMENT ---
+    function toggleCart(cardId) {
+      if (shoppingCart.has(cardId)) {
+        shoppingCart.delete(cardId);
+        showToast('Removed from cart.');
+      } else {
+        shoppingCart.add(cardId);
+        showToast('Added to cart!');
+      }
+      document.getElementById('cart-badge').innerText = shoppingCart.size;
+      renderCardGrid();
+    }
+
+    function showCartModal() {
+      const modal = document.getElementById('cart-modal');
+      const list = document.getElementById('cart-items-list');
+      const priceTag = document.getElementById('cart-total-price');
+
+      const items = inventory.filter(c => shoppingCart.has(c.id));
+
+      if (items.length === 0) {
+        list.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">Your shopping cart is empty.</p>`;
+        priceTag.innerText = `IDR 0`;
+      } else {
+        let total = 0;
+        list.innerHTML = items.map(card => {
+          total += card.price;
+          return `
+            <div class="flex items-center justify-between py-2">
+              <div class="flex items-center gap-2">
+                <img src="${card.imgUrl}" class="w-8 h-8 rounded border border-slate-800 object-contain">
+                <div>
+                  <p class="text-xs font-bold text-white">${card.name}</p>
+                  <p class="text-[10px] font-mono text-blue-400">${card.serial}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-mono font-bold text-emerald-400">IDR ${card.price.toLocaleString()}</span>
+                <button onclick="toggleCart('${card.id}'); showCartModal();" class="text-slate-500 hover:text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          `;
+        }).join('');
+        priceTag.innerText = `IDR ${total.toLocaleString()}`;
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeCartModal() {
+      document.getElementById('cart-modal').classList.add('hidden');
+    }
+
+    function checkoutCartQRIS() {
+      if (!currentUser) return openAuthModal();
+      if (shoppingCart.size === 0) return showToast('Cart is empty!');
+
+      const items = inventory.filter(c => shoppingCart.has(c.id));
+      const total = items.reduce((acc, c) => acc + c.price, 0);
+
+      closeCartModal();
+
+      document.getElementById('qris-card-title').innerText = `${items.length} Eugene Cards Cart Bundle`;
+      document.getElementById('qris-amount-due').innerText = `IDR ${total.toLocaleString()}`;
+
+      const canvasContainer = document.getElementById('qris-canvas');
+      canvasContainer.innerHTML = '';
+      
+      new QRCode(canvasContainer, {
+        text: QRIS_STRING_PAYLOAD,
+        width: 180,
+        height: 180,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      document.getElementById('qris-modal').classList.remove('hidden');
+    }
+
+    function quickBuyCard(cardId) {
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+      activeCardForAction = card;
+      buyActiveDetailCard();
+    }
+
+    function quickOfferCard(cardId) {
+      if (!currentUser) return openAuthModal();
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+      showToast(`Trade offer proposed for ${card.serial}`);
+      switchTab('trade-req');
+    }
+
+    // --- CLICKABLE HOLDERS & PUBLIC VAULT INSPECTOR ---
+    function renderHoldersLeaderboard() {
+      const container = document.getElementById('holders-content');
+      if (!container) return;
+
+      const holderMap = {};
+
+      inventory.forEach(card => {
+        if (card.owner && card.owner !== 'Unassigned') {
+          const ownerName = card.owner;
+          if (!holderMap[ownerName]) {
+            holderMap[ownerName] = [];
+          }
+          holderMap[ownerName].push(card);
+        }
+      });
+
+      const holdersList = Object.keys(holderMap).map(owner => ({
+        ownerName: owner,
+        cards: holderMap[owner],
+        count: holderMap[owner].length
+      })).sort((a, b) => b.count - a.count);
+
+      if (holdersList.length === 0) {
+        container.innerHTML = `<div class="col-span-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">No active card holders recorded in inventory.</div>`;
+        return;
+      }
+
+      container.innerHTML = holdersList.map((h, rank) => `
+        <div onclick="openHolderVaultModal('${h.ownerName}')" class="bg-slate-900 border border-slate-800 hover:border-teal-500/50 p-4 rounded-2xl cursor-pointer transition-all flex items-center justify-between group">
+          <div class="flex items-center gap-3">
+            <span class="font-mono font-bold text-xs ${rank === 0 ? 'text-amber-400' : 'text-slate-500'}">#${rank + 1}</span>
+            <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 border border-slate-700">
+              <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(h.ownerName)}" class="w-full h-full object-cover">
+            </div>
+            <div>
+              <p class="text-xs font-bold text-white group-hover:text-teal-400 transition-colors">${h.ownerName}</p>
+              <p class="text-[10px] text-slate-400">${h.count} ${h.count === 1 ? 'Card' : 'Cards'} Owned</p>
+            </div>
+          </div>
+          <span class="text-xs text-teal-400 font-bold bg-teal-950/40 px-2.5 py-1 rounded-lg border border-teal-500/20">View Vault <i class="fa-solid fa-chevron-right ml-1 text-[10px]"></i></span>
         </div>
-        <div>
-          <p class="text-xs font-bold text-white group-hover:text-teal-400 transition-colors">${h.ownerName}</p>
-          <p class="text-[10px] text-slate-400">${h.count} ${h.count === 1 ? 'Card' : 'Cards'} Owned</p>
+      `).join('');
+    }
+
+    function openHolderVaultModal(ownerName) {
+      const ownedCards = inventory.filter(c => c.owner === ownerName);
+      
+      document.getElementById('holder-modal-name').innerText = `${ownerName}'s Vault`;
+      document.getElementById('holder-modal-sub').innerText = `${ownedCards.length} Cards Collection`;
+      document.getElementById('holder-modal-avatar').src = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(ownerName)}`;
+
+      const grid = document.getElementById('holder-modal-cards-grid');
+
+      if (ownedCards.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-xs text-slate-400 text-center py-6">This collector currently owns no cards.</p>`;
+      } else {
+        grid.innerHTML = ownedCards.map(card => `
+          <div onclick="closeHolderVaultModal(); openCardDetailsModal('${card.id}')" class="card-holo-standard rounded-xl p-2 cursor-pointer hover:border-blue-500 transition-all">
+            <div class="w-full aspect-[4/5] bg-slate-950 rounded-lg p-1 mb-1.5 flex items-center justify-center">
+              <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
+            </div>
+            <p class="text-center font-bold text-blue-400 font-mono text-[11px]">${card.serial}</p>
+            <p class="text-[10px] font-bold text-white truncate text-center">${card.name}</p>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('holder-vault-modal').classList.remove('hidden');
+    }
+
+    function closeHolderVaultModal() {
+      document.getElementById('holder-vault-modal').classList.add('hidden');
+    }
+
+    // --- LIVE CHAT / INBOX ENGINE ---
+    function renderChatThreads() {
+      const container = document.getElementById('chat-threads-list');
+      if (!container) return;
+
+      container.innerHTML = chatThreads.map(t => `
+        <div onclick="selectChatThread('${t.id}')" class="p-2.5 rounded-xl border border-slate-800 ${t.id === activeChatThreadId ? 'bg-indigo-950/40 border-indigo-500/50' : 'bg-slate-900 hover:bg-slate-800/60'} cursor-pointer transition-all flex items-center gap-3">
+          <img src="${t.avatar}" class="w-8 h-8 rounded-full border border-slate-700">
+          <div class="overflow-hidden">
+            <p class="text-xs font-bold text-white truncate">${t.user}</p>
+            <p class="text-[10px] text-slate-400 truncate">${t.messages[t.messages.length - 1]?.text || 'No messages'}</p>
+          </div>
         </div>
-      </div>
-      <span class="text-xs text-teal-400 font-bold bg-teal-950/40 px-2.5 py-1 rounded-lg border border-teal-500/20">View Vault <i class="fa-solid fa-chevron-right ml-1 text-[10px]"></i></span>
-    </div>`).join('');
-}
+      `).join('');
 
-function openHolderVaultModal(ownerName) {
-  const ownedCards = inventory.filter(c => c.owner === ownerName);
-  document.getElementById('holder-modal-name').innerText = `${ownerName}'s Vault`;
-  document.getElementById('holder-modal-sub').innerText = `${ownedCards.length} Cards Collection`;
-  document.getElementById('holder-modal-avatar').src = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(ownerName)}`;
+      renderChatMessages();
+    }
 
-  const grid = document.getElementById('holder-modal-cards-grid');
-  grid.innerHTML = ownedCards.length ? ownedCards.map(card => `
-    <div onclick="closeHolderVaultModal(); openCardDetailsModal('${card.id}')" class="card-holo-standard rounded-xl p-2 cursor-pointer hover:border-blue-500 transition-all">
-      <div class="w-full aspect-[4/5] bg-slate-950 rounded-lg p-1 mb-1.5 flex items-center justify-center overflow-hidden">
-        <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-      </div>
-      <p class="text-center font-bold text-blue-400 font-mono text-[11px]">${card.serial}</p>
-      <p class="text-[10px] font-bold text-white truncate text-center">${card.name}</p>
-    </div>`).join('') : `<p class="col-span-full text-xs text-slate-400 text-center py-6">This collector currently owns no cards.</p>`;
+    function selectChatThread(threadId) {
+      activeChatThreadId = threadId;
+      renderChatThreads();
+    }
 
-  document.getElementById('holder-vault-modal').classList.remove('hidden');
-}
-function closeHolderVaultModal() { document.getElementById('holder-vault-modal').classList.add('hidden'); }
+    function renderChatMessages() {
+      const activeThread = chatThreads.find(t => t.id === activeChatThreadId);
+      const header = document.getElementById('chat-active-header');
+      const body = document.getElementById('chat-messages-body');
 
-// --- HISTORY LEDGER ---
-async function renderHistoryLedger() {
-  const container = document.getElementById('history-content');
-  if (!container) return;
-  const { data, error } = await supabaseClient.from('transactions').select('*').eq('status', 'APPROVED').order('reviewed_at', { ascending: false }).limit(50);
-  if (error) { container.innerHTML = `<div class="text-xs text-rose-400 p-4">${error.message}</div>`; return; }
+      if (!activeThread) return;
 
-  if (!data || !data.length) {
-    container.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">No transactions recorded yet.</p>`;
-    return;
-  }
-
-  container.innerHTML = data.map(tx => `
-    <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between text-xs">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center font-mono font-bold text-blue-400">
-          ${(tx.items || [])[0]?.serial || '*'}
-        </div>
-        <div>
-          <p class="font-bold text-white">${(tx.items || []).map(i => i.serial || i.name).join(', ') || 'Order'} Purchased</p>
-          <p class="text-[10px] text-slate-500">${tx.user_name || 'Collector'} — ${tx.reviewed_at ? new Date(tx.reviewed_at).toLocaleString() : ''}</p>
-        </div>
-      </div>
-      <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">IDR ${Number(tx.total_amount || 0).toLocaleString()}</span>
-    </div>`).join('');
-}
-
-// --- ANALYTICS ---
-async function renderAnalyticsView() {
-  const [{ data: approved }] = await Promise.all([
-    supabaseClient.from('transactions').select('total_amount,tax_amount').eq('status', 'APPROVED')
-  ]);
-  const vol = (approved || []).reduce((sum, t) => sum + Number(t.total_amount || 0), 0);
-  const tax = (approved || []).reduce((sum, t) => sum + Number(t.tax_amount || 0), 0);
-  const uniqueHolders = new Set(inventory.map(c => c.owner).filter(Boolean)).size;
-
-  const volEl = document.getElementById('analytics-vol');
-  const taxEl = document.getElementById('analytics-tax');
-  const holdersEl = document.getElementById('analytics-holders');
-  if (volEl) volEl.innerText = `IDR ${vol.toLocaleString()}`;
-  if (taxEl) taxEl.innerText = `IDR ${tax.toLocaleString()}`;
-  if (holdersEl) holdersEl.innerText = `${uniqueHolders} Collectors`;
-}
-
-// --- ADMIN: PENDING ORDERS ---
-async function renderAdminOrdersQueue() {
-  const container = document.getElementById('admin-orders-queue');
-  if (!container) return;
-  const { data, error } = await supabaseClient.from('transactions').select('*').eq('status', 'PENDING').order('created_at', { ascending: false });
-  if (error) { container.innerHTML = `<div class="text-xs text-rose-400 p-4">${error.message}</div>`; return; }
-
-  if (!data || !data.length) {
-    container.innerHTML = `<p class="text-xs text-slate-500">No pending orders waiting for manual approval.</p>`;
-    return;
-  }
-
-  container.innerHTML = data.map(ord => `
-    <div class="bg-slate-800 p-3 rounded-xl flex items-center justify-between">
-      <div>
+      header.innerHTML = `
         <div class="flex items-center gap-2">
-          <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400">QRIS PURCHASE</span>
-          <p class="text-xs font-bold text-white">${(ord.items || []).map(i => i.name).join(', ') || ord.id}</p>
+          <img src="${activeThread.avatar}" class="w-6 h-6 rounded-full">
+          <span class="text-xs font-bold text-white">${activeThread.user}</span>
         </div>
-        <p class="text-[10px] text-slate-400 mt-0.5">
-          Buyer: ${ord.user_name || 'Unknown'} • Total Due: <strong class="text-emerald-400 font-mono">IDR ${Number(ord.total_amount || 0).toLocaleString()}</strong>
-          ${ord.qris_proof_url ? ` • <a href="${ord.qris_proof_url}" target="_blank" class="text-blue-400 underline">View Proof</a>` : ' • No proof submitted'}
-        </p>
-      </div>
-      <div class="flex gap-2 shrink-0">
-        <button onclick="reviewOrder('${ord.id}','APPROVED')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow transition-all">Approve</button>
-        <button onclick="reviewOrder('${ord.id}','REJECTED')" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 font-bold text-xs rounded-lg transition-all">Reject</button>
-      </div>
-    </div>`).join('');
-}
+      `;
 
-async function reviewOrder(orderId, decision) {
-  try {
-    const { error } = await supabaseClient.rpc('review_order', { p_order_id: orderId, p_decision: decision });
-    if (error) throw error;
-    showToast(`Order ${decision.toLowerCase()}.`);
-    await fetchDatabaseInventory();
-    renderAdminOrdersQueue();
-  } catch (err) { showToast('Error: ' + err.message); }
-}
+      body.innerHTML = activeThread.messages.map(m => {
+        const isMe = currentUser && m.sender === currentUser.name;
+        return `
+          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+            <span class="text-[9px] text-slate-500 mb-0.5">${m.sender}</span>
+            <div class="px-3 py-2 rounded-2xl max-w-[80%] text-xs ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none'}">
+              ${m.text}
+            </div>
+          </div>
+        `;
+      }).join('');
 
-function openAdminProofModal() { showToast('Order approvals are handled directly in the Admin Hub queue now.'); }
-function closeAdminProofModal() { document.getElementById('admin-proof-modal').classList.add('hidden'); }
-function confirmAdminPayoutWithProof(e) { e.preventDefault(); closeAdminProofModal(); }
-
-// --- ADMIN INVENTORY CRUD ---
-function renderInventoryTable() {
-  const tbody = document.getElementById('inventory-table-body');
-  if (!tbody) return;
-  tbody.innerHTML = inventory.map(card => `
-    <tr class="hover:bg-slate-800/40 transition-all">
-      <td class="p-3 font-mono font-bold text-blue-400">${card.serial}</td>
-      <td class="p-3 font-semibold text-white">${card.name}</td>
-      <td class="p-3 text-slate-400">${card.edition}</td>
-      <td class="p-3"><span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span></td>
-      <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
-      <td class="p-3"><span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span></td>
-      <td class="p-3 font-mono text-slate-400">${card.owner || '-'}</td>
-      <td class="p-3 text-right space-x-1">
-        <button onclick="openCardEditorModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg transition-all" title="Edit Card"><i class="fa-solid fa-pen text-xs"></i></button>
-        <button onclick="deleteCard('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-all" title="Delete Card"><i class="fa-solid fa-trash text-xs"></i></button>
-      </td>
-    </tr>`).join('');
-}
-
-function filterOwnerOptions(searchQuery) {
-  const dropdown = document.getElementById('owner-dropdown-list');
-  const query = searchQuery.toLowerCase().trim();
-  const collectors = Array.from(new Set([
-    'Unassigned (Null)',
-    ...inventory.map(c => c.owner).filter(Boolean),
-    currentUser?.name || '', currentUser?.username || ''
-  ])).filter(Boolean);
-
-  const filtered = collectors.filter(c => c.toLowerCase().includes(query));
-
-  dropdown.innerHTML = filtered.length
-    ? filtered.map(c => `<div onclick="selectOwnerOption('${c}')" class="p-2 text-xs text-white hover:bg-slate-700 cursor-pointer flex items-center justify-between"><span>${c}</span>${c === 'Unassigned (Null)' ? '<span class="text-[9px] text-slate-500">Default</span>' : ''}</div>`).join('')
-    : `<div onclick="selectOwnerOption('${searchQuery}')" class="p-2 text-xs text-blue-400 hover:bg-slate-700 cursor-pointer">Use custom owner: "${searchQuery}"</div>`;
-
-  dropdown.classList.remove('hidden');
-}
-
-function selectOwnerOption(ownerVal) {
-  if (ownerVal === 'Unassigned (Null)') {
-    selectedOwner = null;
-    document.getElementById('current-owner-label').innerText = 'Unassigned';
-    document.getElementById('edit-card-owner-search').value = '';
-  } else {
-    selectedOwner = ownerVal;
-    document.getElementById('current-owner-label').innerText = ownerVal;
-    document.getElementById('edit-card-owner-search').value = ownerVal;
-  }
-  document.getElementById('owner-dropdown-list').classList.add('hidden');
-}
-
-function openCardEditorModal(cardId = null) {
-  if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-  const modalTitle = document.getElementById('editor-modal-title');
-
-  if (cardId) {
-    const card = inventory.find(c => c.id === cardId);
-    if (!card) return;
-    modalTitle.innerText = 'Edit Card Specs & Ownership';
-    document.getElementById('edit-card-id').value = card.id;
-    document.getElementById('edit-card-serial').value = card.serial;
-    document.getElementById('edit-card-sn').value = card.sn;
-    document.getElementById('edit-card-name').value = card.name;
-    document.getElementById('edit-card-edition').value = card.edition;
-    document.getElementById('edit-card-printing').value = card.printing;
-    document.getElementById('edit-card-type').value = card.type;
-    document.getElementById('edit-card-price').value = card.price;
-    document.getElementById('edit-card-basefloor').value = card.baseFloorPrice;
-    document.getElementById('edit-card-img').value = card.imgUrl;
-    document.getElementById('edit-card-status').value = card.status;
-    selectOwnerOption(card.owner || 'Unassigned (Null)');
-  } else {
-    const nextNum = inventory.length + 1;
-    modalTitle.innerText = 'Mint New Card';
-    document.getElementById('edit-card-id').value = '';
-    document.getElementById('edit-card-serial').value = `*${String(nextNum).padStart(2, '0')}`;
-    document.getElementById('edit-card-sn').value = String(nextNum).padStart(2, '0');
-    document.getElementById('edit-card-name').value = `Eugene Premium #${String(nextNum).padStart(2, '0')}`;
-    document.getElementById('edit-card-edition').value = 'Beta Edition: #0';
-    document.getElementById('edit-card-printing').value = '1x';
-    document.getElementById('edit-card-type').value = 'PREMIUM';
-    document.getElementById('edit-card-price').value = 500000;
-    document.getElementById('edit-card-basefloor').value = 500000;
-    document.getElementById('edit-card-img').value = `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${String(nextNum).padStart(2, '0')}`;
-    document.getElementById('edit-card-status').value = 'AVAILABLE';
-    selectOwnerOption('Unassigned (Null)');
-  }
-
-  document.getElementById('card-editor-modal').classList.remove('hidden');
-}
-function closeCardEditorModal() { document.getElementById('card-editor-modal').classList.add('hidden'); }
-
-async function saveCardEdit(event) {
-  event.preventDefault();
-  const cardId = document.getElementById('edit-card-id').value;
-  const payload = {
-    serial: document.getElementById('edit-card-serial').value,
-    sn: document.getElementById('edit-card-sn').value,
-    name: document.getElementById('edit-card-name').value,
-    edition: document.getElementById('edit-card-edition').value,
-    printing: document.getElementById('edit-card-printing').value,
-    type: document.getElementById('edit-card-type').value,
-    price: parseInt(document.getElementById('edit-card-price').value, 10),
-    base_floor_price: parseInt(document.getElementById('edit-card-basefloor').value, 10),
-    img_url: document.getElementById('edit-card-img').value,
-    image_url: document.getElementById('edit-card-img').value,
-    status: document.getElementById('edit-card-status').value,
-    owner: selectedOwner
-  };
-
-  try {
-    if (cardId) {
-      const { error } = await supabaseClient.from('cards').update(payload).eq('id', cardId);
-      if (error) throw error;
-      showToast(`Updated ${payload.serial} details live for everyone!`);
-    } else {
-      const { error } = await supabaseClient.from('cards').insert(payload);
-      if (error) throw error;
-      showToast(`Minted new card ${payload.serial} live!`);
-    }
-    await fetchDatabaseInventory();
-    closeCardEditorModal();
-  } catch (err) {
-    showToast('Save error: ' + err.message);
-  }
-}
-
-async function deleteCard(cardId) {
-  if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-  if (!confirm('Delete this card permanently?')) return;
-  try {
-    const { error } = await supabaseClient.from('cards').delete().eq('id', cardId);
-    if (error) throw error;
-    await fetchDatabaseInventory();
-    showToast('Card deleted from inventory.');
-  } catch (err) { showToast('Delete error: ' + err.message); }
-}
-
-async function exportInventoryJSON() {
-  if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-  const { data, error } = await supabaseClient.from('cards').select('*').order('serial', { ascending: true });
-  if (error) return showToast('Export error: ' + error.message);
-
-  const exportCards = (data || []).map(row => ({
-    id: row.id, serial: row.serial, name: row.name, type: row.type, price: row.price,
-    baseFloorPrice: row.base_floor_price, owner: row.owner, status: row.status,
-    imgUrl: row.img_url || row.image_url, edition: row.edition, sn: row.sn, tier: row.tier, printing: row.printing
-  }));
-
-  const backupData = { exportedAt: new Date().toISOString(), exportedBy: currentUser.email, inventoryCount: exportCards.length, cards: exportCards };
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-  const a = document.createElement('a');
-  a.setAttribute('href', dataStr);
-  a.setAttribute('download', `eugene_inventory_backup_${Date.now()}.json`);
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  showToast(`Exported ${exportCards.length} cards from Supabase!`);
-}
-
-async function importInventoryJSON(event) {
-  if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = async function (e) {
-    try {
-      const parsed = JSON.parse(e.target.result);
-      const importedCards = Array.isArray(parsed.cards) ? parsed.cards : (Array.isArray(parsed) ? parsed : []);
-      if (!importedCards.length) return showToast('Import failed: invalid JSON format or empty card list.');
-
-      showToast(`Uploading ${importedCards.length} cards to Supabase...`);
-      const rows = importedCards.map(c => ({
-        serial: c.serial, name: c.name, type: c.type, price: c.price,
-        base_floor_price: c.baseFloorPrice ?? c.price, owner: c.owner ?? null, status: c.status || 'AVAILABLE',
-        img_url: c.imgUrl, image_url: c.imgUrl, edition: c.edition, sn: c.sn, tier: c.tier, printing: c.printing
-      }));
-
-      const { error } = await supabaseClient.from('cards').upsert(rows, { onConflict: 'serial' });
-      if (error) throw error;
-
-      await fetchDatabaseInventory();
-      showToast(`Successfully imported ${importedCards.length} cards to Supabase live!`);
-    } catch (err) {
-      showToast('Import to Supabase failed: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
-
-// --- PRIVATE INBOX / CHAT WITH USER SEARCH ---
-async function searchUsersForChat(query) {
-  const container = document.getElementById('chat-search-results');
-  if (!query || query.trim().length < 2) {
-    container.classList.add('hidden');
-    container.innerHTML = '';
-    return;
-  }
-
-  const cleanQuery = query.toLowerCase().replace('@', '').trim();
-  const { data, error } = await supabaseClient
-    .from('profiles')
-    .select('id, name, username, avatar_url')
-    .or(`username.ilike.%${cleanQuery}%,name.ilike.%${cleanQuery}%`)
-    .limit(5);
-
-  if (error || !data || !data.length) {
-    container.innerHTML = `<p class="text-[10px] text-slate-500 p-2">No matching users found.</p>`;
-    container.classList.remove('hidden');
-    return;
-  }
-
-  container.innerHTML = data.map(u => `
-    <div onclick="startChatWithUser('${u.username}', '${u.name}')" class="flex items-center gap-2 p-2 hover:bg-slate-800 rounded-lg cursor-pointer transition-colors">
-      <img src="${u.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${u.username}`}" class="w-6 h-6 rounded-full border border-slate-700">
-      <div class="truncate">
-        <p class="text-xs font-bold text-white truncate">${u.name}</p>
-        <p class="text-[10px] text-blue-400 font-mono">@${u.username}</p>
-      </div>
-    </div>
-  `).join('');
-  container.classList.remove('hidden');
-}
-
-async function startChatWithUser(targetUsername, targetName) {
-  if (!requireLogin()) return;
-  const ident = myIdentity();
-  if (targetUsername.toLowerCase() === ident) {
-    showToast("You cannot message yourself.");
-    return;
-  }
-
-  document.getElementById('chat-search-results').classList.add('hidden');
-  document.getElementById('chat-user-search').value = '';
-
-  // Check if thread already exists
-  const existing = chatThreadsCache.find(t => 
-    (t.participant_a === ident && t.participant_b === targetUsername.toLowerCase()) ||
-    (t.participant_b === ident && t.participant_a === targetUsername.toLowerCase())
-  );
-
-  if (existing) {
-    selectChatThread(existing.id);
-  } else {
-    // Create new chat session thread
-    const { data, error } = await supabaseClient.from('chats').insert({
-      participant_a: ident,
-      participant_a_display: myProfile?.name || currentUser.name,
-      participant_b: targetUsername.toLowerCase(),
-      participant_b_display: targetName,
-      last_message: 'Started new chat'
-    }).select().single();
-
-    if (error) {
-      showToast('Could not start chat: ' + error.message);
-      return;
+      body.scrollTop = body.scrollHeight;
     }
 
-    await renderChatThreads();
-    selectChatThread(data.id);
-  }
-}
+    function sendChatMessage(e) {
+      e.preventDefault();
+      if (!currentUser) return openAuthModal();
 
-async function renderChatThreads() {
-  const container = document.getElementById('chat-threads-list');
-  if (!container) return;
-  if (!currentUser) {
-    container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Please log in to view your private messages.</p>`;
-    return;
-  }
+      const input = document.getElementById('chat-input-text');
+      const text = input.value.trim();
+      if (!text) return;
 
-  const ident = myIdentity();
-  const { data, error } = await supabaseClient.from('chats').select('*').or(`participant_a.eq.${ident},participant_b.eq.${ident}`).order('updated_at', { ascending: false });
-  if (error) { container.innerHTML = `<p class="text-xs text-rose-400 p-2">${error.message}</p>`; return; }
+      const activeThread = chatThreads.find(t => t.id === activeChatThreadId);
+      if (activeThread) {
+        activeThread.messages.push({
+          sender: currentUser.name,
+          text: text
+        });
+        input.value = '';
+        renderChatThreads();
+      }
+    }
 
-  chatThreadsCache = data || [];
-  if (!chatThreadsCache.length) {
-    container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No private message conversations yet.</p>`;
-    return;
-  }
+    // --- SEARCHABLE OWNER SELECTION DROPDOWN ---
+    function filterOwnerOptions(searchQuery) {
+      const dropdown = document.getElementById('owner-dropdown-list');
+      const query = searchQuery.toLowerCase().trim();
 
-  container.innerHTML = chatThreadsCache.map(t => {
-    const otherDisplay = t.participant_a === ident ? t.participant_b_display : t.participant_a_display;
-    return `
-      <div onclick="selectChatThread('${t.id}')" class="p-2.5 rounded-xl border border-slate-800 ${t.id === activeChatId ? 'bg-indigo-950/40 border-indigo-500/50' : 'bg-slate-900 hover:bg-slate-800/60'} cursor-pointer transition-all flex items-center gap-3">
-        <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(otherDisplay || '?')}" class="w-8 h-8 rounded-full border border-slate-700">
-        <div class="overflow-hidden">
-          <p class="text-xs font-bold text-white truncate">${otherDisplay || 'Unknown'}</p>
-          <p class="text-[10px] text-slate-400 truncate">${t.last_sender ? t.last_sender + ': ' : ''}${t.last_message || 'No messages'}</p>
+      const collectors = Array.from(new Set([
+        'Unassigned (Null)',
+        'Eugene',
+        'kenneth_brilliant',
+        'andi_rende',
+        currentUser?.name || '',
+        currentUser?.email || ''
+      ])).filter(Boolean);
+
+      const filtered = collectors.filter(c => c.toLowerCase().includes(query));
+
+      if (filtered.length === 0) {
+        dropdown.innerHTML = `<div onclick="selectOwnerOption('${searchQuery}')" class="p-2 text-xs text-blue-400 hover:bg-slate-700 cursor-pointer">Use custom owner: "${searchQuery}"</div>`;
+      } else {
+        dropdown.innerHTML = filtered.map(c => `
+          <div onclick="selectOwnerOption('${c}')" class="p-2 text-xs text-white hover:bg-slate-700 cursor-pointer flex items-center justify-between">
+            <span>${c}</span>
+            ${c === 'Unassigned (Null)' ? '<span class="text-[9px] text-slate-500">Default</span>' : ''}
+          </div>
+        `).join('');
+      }
+
+      dropdown.classList.remove('hidden');
+    }
+
+    function selectOwnerOption(ownerVal) {
+      if (ownerVal === 'Unassigned (Null)') {
+        selectedOwner = null;
+        document.getElementById('current-owner-label').innerText = 'Unassigned';
+        document.getElementById('edit-card-owner-search').value = '';
+      } else {
+        selectedOwner = ownerVal;
+        document.getElementById('current-owner-label').innerText = ownerVal;
+        document.getElementById('edit-card-owner-search').value = ownerVal;
+      }
+      document.getElementById('owner-dropdown-list').classList.add('hidden');
+    }
+
+    // --- ADMIN INVENTORY EDITOR ---
+    function openCardEditorModal(cardId = null) {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+
+      const modalTitle = document.getElementById('editor-modal-title');
+      
+      if (cardId) {
+        const card = inventory.find(c => c.id === cardId);
+        if (!card) return;
+
+        modalTitle.innerText = "Edit Card Details";
+        document.getElementById('edit-card-id').value = card.id;
+        document.getElementById('edit-card-serial').value = card.serial;
+        document.getElementById('edit-card-sn').value = card.sn || card.serial.replace('*', '');
+        document.getElementById('edit-card-name').value = card.name;
+        document.getElementById('edit-card-edition').value = card.edition || 'Beta Edition: #0';
+        document.getElementById('edit-card-printing').value = card.printing || '1x';
+        document.getElementById('edit-card-type').value = card.type;
+        document.getElementById('edit-card-price').value = card.price;
+        document.getElementById('edit-card-basefloor').value = card.baseFloorPrice || card.price;
+        document.getElementById('edit-card-img').value = card.imgUrl;
+        document.getElementById('edit-card-status').value = card.status;
+
+        selectOwnerOption(card.owner || 'Unassigned (Null)');
+      } else {
+        modalTitle.innerText = "Mint New Card";
+        document.getElementById('edit-card-id').value = '';
+        document.getElementById('edit-card-serial').value = `*${String(inventory.length + 1).padStart(2, '0')}`;
+        document.getElementById('edit-card-sn').value = String(inventory.length + 1).padStart(2, '0');
+        document.getElementById('edit-card-name').value = `Eugene Premium #${String(inventory.length + 1).padStart(2, '0')}`;
+        document.getElementById('edit-card-edition').value = 'Beta Edition: #0';
+        document.getElementById('edit-card-printing').value = '1x';
+        document.getElementById('edit-card-type').value = 'PREMIUM';
+        document.getElementById('edit-card-price').value = 500000;
+        document.getElementById('edit-card-basefloor').value = 500000;
+        document.getElementById('edit-card-img').value = `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${String(inventory.length + 1).padStart(2, '0')}`;
+        document.getElementById('edit-card-status').value = 'AVAILABLE';
+
+        selectOwnerOption('Unassigned (Null)');
+      }
+
+      document.getElementById('card-editor-modal').classList.remove('hidden');
+    }
+
+    function closeCardEditorModal() {
+      document.getElementById('card-editor-modal').classList.add('hidden');
+    }
+
+    function saveCardEdit(event) {
+      event.preventDefault();
+
+      const cardId = document.getElementById('edit-card-id').value;
+      const serial = document.getElementById('edit-card-serial').value;
+      const sn = document.getElementById('edit-card-sn').value;
+      const name = document.getElementById('edit-card-name').value;
+      const edition = document.getElementById('edit-card-edition').value;
+      const printing = document.getElementById('edit-card-printing').value;
+      const type = document.getElementById('edit-card-type').value;
+      const price = parseInt(document.getElementById('edit-card-price').value, 10);
+      const baseFloorPrice = parseInt(document.getElementById('edit-card-basefloor').value, 10);
+      const imgUrl = document.getElementById('edit-card-img').value;
+      const status = document.getElementById('edit-card-status').value;
+
+      if (cardId) {
+        const idx = inventory.findIndex(c => c.id === cardId);
+        if (idx !== -1) {
+          inventory[idx] = { 
+            ...inventory[idx], serial, sn, name, edition, printing, type, price, baseFloorPrice, imgUrl, status, owner: selectedOwner 
+          };
+          showToast(`Updated ${serial} details.`);
+        }
+      } else {
+        const newCard = {
+          id: `card-${Date.now()}`,
+          serial, sn, name, edition, printing, type, price, baseFloorPrice,
+          owner: selectedOwner,
+          status, imgUrl
+        };
+        inventory.unshift(newCard);
+        showToast(`Minted new card ${serial}!`);
+      }
+
+      renderCardGrid();
+      renderInventoryTable();
+      updateRemainingCardCount();
+      closeCardEditorModal();
+    }
+
+    // --- JSON IMPORT & EXPORT FEATURES ---
+    function exportInventoryJSON() {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+
+      const backupData = {
+        exportedAt: new Date().toISOString(),
+        exportedBy: currentUser.email,
+        inventoryCount: inventory.length,
+        cards: inventory
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `eugene_inventory_backup_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToast('Inventory backup exported successfully!');
+    }
+
+    function importInventoryJSON(event) {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          
+          if (parsed && Array.isArray(parsed.cards)) {
+            inventory = parsed.cards;
+          } else if (Array.isArray(parsed)) {
+            inventory = parsed;
+          } else {
+            throw new Error('Invalid JSON format. Array of cards missing.');
+          }
+
+          // Auto-merge legacy 'Eugene' owners upon import
+          if (currentUser) {
+            inventory.forEach(c => {
+              if (c.owner === 'Eugene') c.owner = currentUser.name;
+            });
+          }
+
+          renderCardGrid();
+          renderInventoryTable();
+          updateRemainingCardCount();
+          showToast(`Imported ${inventory.length} cards into inventory!`);
+        } catch (err) {
+          showToast('Failed to parse JSON file: ' + err.message);
+        }
+      };
+
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function openCardDetailsModal(cardId) {
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+
+      activeCardForAction = card;
+
+      document.getElementById('detail-card-img').src = card.imgUrl;
+      document.getElementById('detail-card-serial').innerText = card.serial;
+      document.getElementById('detail-card-name').innerText = card.name;
+      document.getElementById('detail-card-price').innerText = `IDR ${card.price.toLocaleString()}`;
+      document.getElementById('detail-card-edition').innerText = card.edition || 'Beta Edition: #0';
+      
+      const typeSpan = document.getElementById('detail-card-type');
+      typeSpan.innerText = card.type;
+      typeSpan.className = `text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}`;
+      
+      document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owner: ${card.owner})` : ''}`;
+      document.getElementById('card-details-modal').classList.remove('hidden');
+    }
+
+    function closeCardDetailsModal() {
+      document.getElementById('card-details-modal').classList.add('hidden');
+    }
+
+    // --- QRIS CHECKOUT & PAYMENTS ---
+    function buyActiveDetailCard() {
+      if (!currentUser) return openAuthModal();
+      if (!activeCardForAction) return;
+
+      closeCardDetailsModal();
+
+      document.getElementById('qris-card-title').innerText = `${activeCardForAction.name} (${activeCardForAction.serial})`;
+      document.getElementById('qris-amount-due').innerText = `IDR ${activeCardForAction.price.toLocaleString()}`;
+
+      const canvasContainer = document.getElementById('qris-canvas');
+      canvasContainer.innerHTML = '';
+      
+      new QRCode(canvasContainer, {
+        text: QRIS_STRING_PAYLOAD,
+        width: 180,
+        height: 180,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      document.getElementById('qris-modal').classList.remove('hidden');
+    }
+
+    function closeQrisModal() {
+      document.getElementById('qris-modal').classList.add('hidden');
+    }
+
+    function submitQrisPaymentProof() {
+      const fileInput = document.getElementById('qris-proof-file');
+      if (!fileInput.files.length) {
+        return showToast('Please select a payment receipt image before submitting.');
+      }
+
+      pendingOrders.push({
+        id: `ord-${Date.now()}`,
+        card: activeCardForAction,
+        buyer: currentUser.name,
+        timestamp: new Date().toLocaleTimeString()
+      });
+
+      showToast('Payment proof submitted! Waiting for Admin verification.');
+      closeQrisModal();
+      renderAdminOrdersQueue();
+    }
+
+    // --- NAVIGATION ROUTER ---
+    function switchTab(tabName) {
+      const adminOnlyTabs = ['admin', 'inventory', 'analytics'];
+      if (adminOnlyTabs.includes(tabName) && !currentUser?.isAdmin) {
+        return showToast('Admin permission required.');
+      }
+
+      const allTabs = ['catalog', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'analytics', 'admin', 'inventory'];
+
+      allTabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const nav = document.getElementById(`nav-${t}`);
+        if (view) view.classList.add('hidden');
+        if (nav && !adminOnlyTabs.includes(t)) {
+          nav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all';
+        }
+      });
+
+      const activeView = document.getElementById(`view-${tabName}`);
+      const activeNav = document.getElementById(`nav-${tabName}`);
+
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeNav && !adminOnlyTabs.includes(tabName)) {
+        activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-white bg-slate-700 flex items-center gap-1.5 whitespace-nowrap transition-all';
+      }
+
+      if (tabName === 'wishlist') renderWishlistGrid();
+      if (tabName === 'dashboard') renderVaultGrid();
+      if (tabName === 'inbox') renderChatThreads();
+      if (tabName === 'holders') renderHoldersLeaderboard();
+    }
+
+    function toggleWishlist(cardId) {
+      if (wishlist.has(cardId)) {
+        wishlist.delete(cardId);
+        showToast('Removed from wishlist.');
+      } else {
+        wishlist.add(cardId);
+        showToast('Saved to wishlist!');
+      }
+      document.getElementById('wishlist-count-badge').innerText = wishlist.size;
+      renderCardGrid();
+    }
+
+    function wishlistActiveDetailCard() {
+      if (activeCardForAction) toggleWishlist(activeCardForAction.id);
+    }
+
+    function renderWishlistGrid() {
+      const container = document.getElementById('wishlist-grid');
+      const items = inventory.filter(c => wishlist.has(c.id));
+
+      if (items.length === 0) {
+        container.innerHTML = `<div class="col-span-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">No wishlisted cards saved yet. Click the heart icon on any card in the Collection tab!</div>`;
+        return;
+      }
+
+      container.innerHTML = items.map(card => `
+        <div onclick="openCardDetailsModal('${card.id}')" class="card-holo-standard rounded-xl p-3 flex flex-col justify-between relative cursor-pointer">
+          <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden">
+            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
+          </div>
+          <p class="text-center font-bold text-blue-400 font-mono mb-1 text-xs">${card.serial}</p>
+          <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
         </div>
-      </div>`;
-  }).join('');
+      `).join('');
+    }
 
-  if (activeChatId) renderChatMessages();
-}
+    function renderVaultGrid() {
+      const container = document.getElementById('owned-cards-grid');
+      if (!currentUser) {
+        container.innerHTML = "Log in with Google to view your owned cards inside your private binder.";
+        return;
+      }
 
-async function selectChatThread(threadId) {
-  activeChatId = threadId;
-  await renderChatMessages();
-  renderChatThreads();
-}
+      // Vault filter logic unifying account credentials and legacy 'Eugene' owner tags
+      const owned = inventory.filter(c => 
+        c.owner === currentUser.email || 
+        c.owner === currentUser.name || 
+        c.owner === currentUser.username ||
+        c.owner === 'Eugene'
+      );
 
-async function renderChatMessages() {
-  const thread = chatThreadsCache.find(t => t.id === activeChatId);
-  const header = document.getElementById('chat-active-header');
-  const body = document.getElementById('chat-messages-body');
-  if (!thread || !header || !body) return;
+      if (owned.length === 0) {
+        container.innerHTML = "You don't own any cards yet. Buy cards via QRIS or propose trades to populate your vault!";
+        return;
+      }
 
-  const ident = myIdentity();
-  const otherDisplay = thread.participant_a === ident ? thread.participant_b_display : thread.participant_a_display;
-  header.innerHTML = `<div class="flex items-center gap-2"><img src="https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(otherDisplay || '?')}" class="w-6 h-6 rounded-full"><span class="text-xs font-bold text-white">${otherDisplay} (Private Chat)</span></div>`;
+      container.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4";
+      container.innerHTML = owned.map(card => `
+        <div onclick="openCardDetailsModal('${card.id}')" class="card-holo-premium rounded-xl p-3 flex flex-col justify-between relative cursor-pointer">
+          <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden">
+            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
+          </div>
+          <p class="text-center font-bold text-blue-400 font-mono mb-1 text-xs">${card.serial}</p>
+          <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
+        </div>
+      `).join('');
+    }
 
-  const { data: msgs, error } = await supabaseClient.from('chat_messages').select('*').eq('chat_id', activeChatId).order('created_at', { ascending: true });
-  if (error) { body.innerHTML = `<p class="text-xs text-rose-400">${error.message}</p>`; return; }
+    function tradeActiveDetailCard() {
+      if (!currentUser) return openAuthModal();
+      showToast(`Trade offer initiated for ${activeCardForAction?.serial}`);
+      closeCardDetailsModal();
+      switchTab('trade-req');
+    }
 
-  body.innerHTML = (msgs || []).map(m => {
-    const isMe = m.sender && m.sender.toLowerCase() === ident;
-    return `<div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-      <span class="text-[9px] text-slate-500 mb-0.5">${m.sender}</span>
-      <div class="px-3 py-2 rounded-2xl max-w-[80%] text-xs ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none'}">${m.text || ''}</div>
-    </div>`;
-  }).join('');
-  body.scrollTop = body.scrollHeight;
-}
+    function createListingFromVault() {
+      if (!currentUser) return openAuthModal();
+      showToast('Select a card from your Vault to list on the market.');
+      switchTab('dashboard');
+    }
 
-async function sendChatMessage(e) {
-  e.preventDefault();
-  if (!requireLogin()) return;
-  if (!activeChatId) return showToast('Select a conversation first.');
+    function openNotifications() {
+      showToast('No new unread market notifications.');
+    }
 
-  const input = document.getElementById('chat-input-text');
-  const text = input.value.trim();
-  if (!text) return;
+    function renderInventoryTable() {
+      const tbody = document.getElementById('inventory-table-body');
+      if (!tbody) return;
 
-  const thread = chatThreadsCache.find(t => t.id === activeChatId);
-  const ident = myIdentity();
-  const targetUser = thread.participant_a === ident ? thread.participant_b_display : thread.participant_a_display;
+      tbody.innerHTML = inventory.map(card => `
+        <tr class="hover:bg-slate-800/40 transition-all">
+          <td class="p-3 font-mono font-bold text-blue-400">${card.serial}</td>
+          <td class="p-3 font-semibold text-white">${card.name}</td>
+          <td class="p-3 text-slate-400">${card.edition || 'Beta Edition: #0'}</td>
+          <td class="p-3">
+            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span>
+          </td>
+          <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
+          <td class="p-3 font-mono text-slate-400">${card.owner || '-'}</td>
+          <td class="p-3">
+            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span>
+          </td>
+          <td class="p-3 text-right space-x-1">
+            <button onclick="openCardEditorModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg transition-all" title="Edit Card">
+              <i class="fa-solid fa-pen text-xs"></i>
+            </button>
+            <button onclick="deleteCard('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-all" title="Delete Card">
+              <i class="fa-solid fa-trash text-xs"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
 
-  try {
-    const { error } = await supabaseClient.rpc('send_chat_message', { p_chat_id: activeChatId, p_target_user: targetUser, p_text: text, p_img_url: '' });
-    if (error) throw error;
-    input.value = '';
-    await renderChatThreads();
-  } catch (err) { showToast('Message error: ' + err.message); }
-}
+    function renderAdminOrdersQueue() {
+      const container = document.getElementById('admin-orders-queue');
+      if (!pendingOrders.length) {
+        container.innerHTML = `<p class="text-xs text-slate-500">No pending orders waiting for manual approval.</p>`;
+        return;
+      }
 
-// --- NOTIFICATIONS ---
-async function refreshNotifications() {
-  const badge = document.getElementById('notification-badge');
-  const inboxDot = document.getElementById('unread-inbox-badge');
-  if (!currentUser) { if (badge) badge.innerText = '0'; if (inboxDot) inboxDot.classList.add('hidden'); return; }
-  const { count } = await supabaseClient.from('notifications').select('id', { count: 'exact', head: true }).eq('recipient_id', currentUser.id).eq('read', false);
-  unreadNotifCount = count || 0;
-  if (badge) { badge.innerText = unreadNotifCount; badge.classList.toggle('hidden', unreadNotifCount === 0); }
-  if (inboxDot) inboxDot.classList.toggle('hidden', unreadNotifCount === 0);
-}
+      container.innerHTML = pendingOrders.map((ord, idx) => `
+        <div class="bg-slate-800 p-3 rounded-xl flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-white">${ord.card.name} (${ord.card.serial})</p>
+            <p class="text-[10px] text-slate-400">Buyer: ${ord.buyer} • ${ord.timestamp}</p>
+          </div>
+          <button onclick="approveOrder(${idx})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg">Approve</button>
+        </div>
+      `).join('');
+    }
 
-async function openNotifications() {
-  if (!requireLogin()) return;
-  const { data, error } = await supabaseClient.from('notifications').select('*').eq('recipient_id', currentUser.id).order('created_at', { ascending: false }).limit(10);
-  if (!error && data?.length) {
-    alert(data.map(n => `• ${n.title}: ${n.message}`).join('\n'));
-  }
-  await supabaseClient.rpc('mark_all_notifications_read');
-  refreshNotifications();
-  switchTab('inbox');
-}
+    function approveOrder(index) {
+      const order = pendingOrders[index];
+      const card = inventory.find(c => c.id === order.card.id);
+      if (card) {
+        card.status = 'SOLD';
+        card.owner = currentUser.name;
+      }
+      pendingOrders.splice(index, 1);
+      renderAdminOrdersQueue();
+      renderCardGrid();
+      renderInventoryTable();
+      updateRemainingCardCount();
+      showToast('Order approved! Card assigned to owner.');
+    }
 
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  document.getElementById('toast-msg').innerText = msg;
-  toast.classList.remove('translate-y-20', 'opacity-0');
-  setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
-}
+    function deleteCard(cardId) {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+      inventory = inventory.filter(c => c.id !== cardId);
+      renderCardGrid();
+      renderInventoryTable();
+      updateRemainingCardCount();
+      showToast('Card deleted from inventory.');
+    }
+
+    function setFilter(type) {
+      currentFilter = type;
+      renderCardGrid();
+    }
+
+    function updateRemainingCardCount() {
+      const count = inventory.filter(c => c.status === 'AVAILABLE').length;
+      document.getElementById('remaining-cards-count').innerText = count;
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+    }
   </script>
-
-<script>
-async function ensureProfile(){
- if(!window.supabaseClient) return null;
- const {data:{user}}=await supabaseClient.auth.getUser();
- if(!user) return null;
- let {data:profile}=await supabaseClient.from('profiles').select('*').eq('id',user.id).maybeSingle();
- if(!profile){
-   const name=(user.user_metadata?.full_name||user.user_metadata?.name||user.email.split('@')[0]);
-   const username=(user.user_metadata?.preferred_username||name.replace(/\s+/g,'').toLowerCase());
-   const r=await supabaseClient.from('profiles').upsert({
-      id:user.id,email:user.email,name,username,role:'user'
-   }).select().single();
-   profile=r.data;
- }
- return profile;
-}
-</script>
-
 </body>
 </html>
