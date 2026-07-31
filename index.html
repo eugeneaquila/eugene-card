@@ -167,6 +167,33 @@
     </div>
   </header>
 
+  <!-- USERNAME EDIT MODAL -->
+  <div id="username-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeUsernameModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-user-pen text-blue-400"></i>
+        <h3 class="text-base font-bold text-white">Change Username</h3>
+      </div>
+
+      <div class="space-y-2">
+        <label class="text-[11px] font-bold text-slate-400 uppercase">New Username</label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-xs">@</span>
+          <input type="text" id="new-username-input" placeholder="eugene_master" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end gap-2">
+        <button onclick="closeUsernameModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
+        <button onclick="saveNewUsername()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Save Username</button>
+      </div>
+    </div>
+  </div>
+
   <!-- AUTH MODAL (Google Only) -->
   <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-5 relative shadow-2xl">
@@ -207,9 +234,7 @@
         </div>
       </div>
 
-      <div id="holder-binder-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[60vh] overflow-y-auto p-1">
-        <!-- Cards rendered dynamically -->
-      </div>
+      <div id="holder-binder-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[60vh] overflow-y-auto p-1"></div>
     </div>
   </div>
 
@@ -249,7 +274,7 @@
               <button onclick="toggleWishlistActiveDetailCard()" class="py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-heart"></i> <span id="detail-wishlist-text" data-i18n="wishlist">Wishlist</span>
               </button>
-              <button onclick="tradeActiveDetailCard()" class="py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
+              <button onclick="switchTab('trade')" class="py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-right-left"></i> <span data-i18n="trade">Trade</span>
               </button>
             </div>
@@ -259,7 +284,7 @@
     </div>
   </div>
 
-  <!-- QRIS PAYMENT & RECEIPT UPLOAD MODAL WITH 2% TAX -->
+  <!-- QRIS PAYMENT MODAL -->
   <div id="qris-payment-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl text-center">
       <button onclick="closeQRISPaymentModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
@@ -460,39 +485,37 @@
 
     <!-- TRADE VIEW -->
     <section id="view-trade" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-right-left text-blue-400 mr-2"></i> Trading Room</h2>
-          <p class="text-xs text-slate-400 mt-1">Browse open card offers or list one of your own cards for sale.</p>
+          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-right-left text-blue-400 mr-2"></i> Secondary Market Listings</h2>
+          <p class="text-xs text-slate-400 mt-1">Buy cards directly listed by other community collectors.</p>
         </div>
-        <button onclick="createListingFromVault()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all">
-          + Create Trade Listing
-        </button>
       </div>
 
-      <div id="trade-content"></div>
+      <div id="trade-listings-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
     </section>
 
     <!-- AUCTION VIEW -->
     <section id="view-auction" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
-        <p class="text-xs text-slate-400 mt-1">Place real-time bids on rare serial cards before time expires.</p>
+        <p class="text-xs text-slate-400 mt-1">Place competitive bids on rare serial cards before time runs out.</p>
       </div>
 
-      <div id="auction-content"></div>
+      <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
     </section>
 
     <!-- TRADE REQUESTS VIEW -->
     <section id="view-trade-req" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Active Trade Proposals</h2>
-        <p class="text-xs text-slate-400 mt-1">Review incoming and outgoing trade proposals.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Direct Card Swap Requests</h2>
+        <p class="text-xs text-slate-400 mt-1">Review active card swap proposals from other collectors.</p>
       </div>
-      <div id="trade-req-content"></div>
+
+      <div id="trade-requests-list" class="space-y-3"></div>
     </section>
 
-    <!-- INBOX VIEW WITH USER SEARCH -->
+    <!-- INBOX VIEW -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Messenger & Chat</h2>
@@ -551,7 +574,7 @@
       </div>
     </section>
 
-    <!-- HOLDERS VIEW WITH BINDER CLICK FEATURE -->
+    <!-- HOLDERS VIEW -->
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Top Card Holders</h2>
@@ -560,13 +583,34 @@
       <div id="holders-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- HISTORY VIEW -->
+    <!-- HISTORY VIEW (MARKETPLACE LEDGER) -->
     <section id="view-history" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Marketplace Ledger</h2>
-        <p class="text-xs text-slate-400 mt-1">Verified transaction records on the network.</p>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Marketplace Ledger</h2>
+          <p class="text-xs text-slate-400 mt-1">Verified primary and secondary transaction records on the network.</p>
+        </div>
+        <button onclick="clearHistoryLog()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-bold rounded-xl border border-slate-700 transition-all">
+          Clear Logs
+        </button>
       </div>
-      <div id="history-content" class="space-y-2"></div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-800/80 text-[10px] uppercase text-slate-400 font-semibold border-b border-slate-800">
+              <tr>
+                <th class="p-3">Timestamp</th>
+                <th class="p-3">Type</th>
+                <th class="p-3">Item Tag</th>
+                <th class="p-3">User / Collector</th>
+                <th class="p-3 font-mono text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <!-- DASHBOARD / VAULT VIEW -->
@@ -613,7 +657,7 @@
       </div>
     </section>
 
-    <!-- ADMIN HUB VIEW WITH QRIS RECEIPT VERIFICATION -->
+    <!-- ADMIN HUB VIEW -->
     <section id="view-admin" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
         <div>
@@ -682,8 +726,7 @@
                 <th class="p-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody id="inventory-table-body" class="divide-y divide-slate-800">
-            </tbody>
+            <tbody id="inventory-table-body" class="divide-y divide-slate-800"></tbody>
           </table>
         </div>
       </div>
@@ -714,7 +757,6 @@
       { username: 'vault_king', name: 'Elena Rostova', email: 'elena@example.com' }
     ];
 
-    // Language Dictionary (EN & ID)
     const I18N = {
       en: {
         navCollection: "Collection",
@@ -776,11 +818,16 @@
     let inventory = [];
     let wishlist = [];
     let qrisOrders = [];
+    let historyLogs = [];
+    let tradeListings = [];
+    let auctions = [];
+    let tradeRequests = [];
+    
     let activeDetailCardId = null;
     let sellbackCardTarget = null;
     let activeChatUser = null;
 
-    // --- INITIALIZATION & LOCALSTORAGE PERSISTENCE ---
+    // --- INITIALIZATION & LOCALSTORAGE ---
     function loadSavedState() {
       const savedInv = localStorage.getItem('eugene_inventory');
       if (savedInv) {
@@ -815,6 +862,31 @@
       if (savedOrders) {
         try { qrisOrders = JSON.parse(savedOrders); } catch(e) { qrisOrders = []; }
       }
+
+      const savedHistory = localStorage.getItem('eugene_history_logs');
+      if (savedHistory) {
+        try { historyLogs = JSON.parse(savedHistory); } catch(e) { historyLogs = []; }
+      } else {
+        historyLogs = [
+          { timestamp: new Date(Date.now() - 3600000 * 5).toLocaleString(), type: 'PRIMARY SALE', serial: '*05', user: 'alex_collector', amount: 510000 },
+          { timestamp: new Date(Date.now() - 3600000 * 12).toLocaleString(), type: 'PRIMARY SALE', serial: '*12', user: 'card_master99', amount: 510000 }
+        ];
+        saveHistoryLogsState();
+      }
+
+      // Initialize mock active trades & auctions
+      tradeListings = [
+        { id: 'trade-101', cardId: 'card-5', serial: '*05', name: 'Eugene Premium #05', seller: 'alex_collector', price: 650000, imgUrl: 'https://placehold.co/1080x1350/1e293b/3b82f6?text=*05' },
+        { id: 'trade-102', cardId: 'card-12', serial: '*12', name: 'Eugene Premium #12', seller: 'card_master99', price: 580000, imgUrl: 'https://placehold.co/1080x1350/1e293b/3b82f6?text=*12' }
+      ];
+
+      auctions = [
+        { id: 'auc-201', cardId: 'card-01', serial: '*01', name: 'Eugene Premium #01', topBidder: 'vault_king', currentBid: 750000, endSeconds: 8400, imgUrl: 'https://placehold.co/1080x1350/1e293b/3b82f6?text=*01' }
+      ];
+
+      tradeRequests = [
+        { id: 'tr-301', sender: 'alex_collector', offeredCard: '*05 (Eugene Premium #05)', requestedCard: '*12 (Eugene Premium #12)', status: 'PENDING' }
+      ];
     }
 
     function saveInventoryState() {
@@ -828,6 +900,22 @@
 
     function saveQRISOrdersState() {
       localStorage.setItem('eugene_qris_orders', JSON.stringify(qrisOrders));
+    }
+
+    function saveHistoryLogsState() {
+      localStorage.setItem('eugene_history_logs', JSON.stringify(historyLogs));
+    }
+
+    function addHistoryEntry(type, serial, user, amount) {
+      historyLogs.unshift({
+        timestamp: new Date().toLocaleString(),
+        type,
+        serial,
+        user,
+        amount
+      });
+      saveHistoryLogsState();
+      renderHistoryTable();
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -850,6 +938,11 @@
         });
       }
 
+      const savedCustomUsername = localStorage.getItem('eugene_custom_username');
+      if (savedCustomUsername && currentUser) {
+        currentUser.username = savedCustomUsername;
+      }
+
       applyLanguageTranslations();
       renderAuthHeader();
       renderCardGrid();
@@ -858,6 +951,10 @@
       renderWishlistGrid();
       renderQRISOrdersTable();
       renderHoldersList();
+      renderHistoryTable();
+      renderTradeListings();
+      renderAuctions();
+      renderTradeRequests();
       updateWishlistBadge();
     });
 
@@ -928,12 +1025,13 @@
       const email = user.email ? user.email.toLowerCase() : '';
       const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
       const isAdmin = isAdminEmail(email);
+      const customUsername = localStorage.getItem('eugene_custom_username');
 
       currentUser = {
         id: user.id,
         email: email,
         name: name,
-        username: name.toLowerCase().replace(/\s+/g, '_'),
+        username: customUsername || name.toLowerCase().replace(/\s+/g, '_'),
         isAdmin: isAdmin,
         avatarUrl: user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`
       };
@@ -987,11 +1085,11 @@
         let badgeColor = currentUser.isAdmin ? 'text-rose-400 font-bold' : 'text-slate-400';
 
         container.innerHTML = `
-          <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-xl p-1 pl-2.5 cursor-pointer transition-all">
+          <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-xl p-1 pl-2.5 cursor-pointer transition-all" onclick="openUsernameModal()">
             ${avatarImgHtml}
             <div class="flex flex-col text-right">
               <span class="text-xs font-bold text-white leading-tight">${currentUser.name}</span>
-              <span class="text-[9px] ${badgeColor} font-mono">${badgeText}</span>
+              <span class="text-[9px] ${badgeColor} font-mono">${badgeText} <i class="fa-solid fa-pen text-[8px] ml-0.5 text-blue-400"></i></span>
             </div>
             <button onclick="event.stopPropagation(); logoutUser();" title="Log Out" class="p-1.5 bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-lg ml-1 transition-all">
               <i class="fa-solid fa-right-from-bracket text-xs"></i>
@@ -1008,6 +1106,30 @@
           </button>
         `;
       }
+    }
+
+    // --- CHANGE USERNAME FEATURE ---
+    function openUsernameModal() {
+      if (!currentUser) return;
+      document.getElementById('new-username-input').value = currentUser.username;
+      document.getElementById('username-modal').classList.remove('hidden');
+    }
+
+    function closeUsernameModal() {
+      document.getElementById('username-modal').classList.add('hidden');
+    }
+
+    function saveNewUsername() {
+      const val = document.getElementById('new-username-input').value.trim().toLowerCase().replace(/\s+/g, '_');
+      if (!val) return showToast('Please enter a valid username.');
+
+      currentUser.username = val;
+      localStorage.setItem('eugene_custom_username', val);
+
+      renderAuthHeader();
+      renderHoldersList();
+      closeUsernameModal();
+      showToast(`Username updated to @${val}!`);
     }
 
     function switchTab(tabName) {
@@ -1037,7 +1159,143 @@
       }
     }
 
-    // --- QRIS ORDER FLOW & 2% TAX ---
+    // --- HISTORY PAGE (MARKETPLACE LEDGER) ---
+    function renderHistoryTable() {
+      const tbody = document.getElementById('history-table-body');
+      if (!tbody) return;
+
+      if (historyLogs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No transactions recorded on the marketplace ledger yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = historyLogs.map(log => `
+        <tr class="hover:bg-slate-800/40 transition-all">
+          <td class="p-3 text-slate-400 font-mono">${log.timestamp}</td>
+          <td class="p-3">
+            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
+              log.type === 'PRIMARY SALE' ? 'bg-emerald-500/10 text-emerald-400' :
+              log.type === 'SELL BACK' ? 'bg-amber-500/10 text-amber-400' : 'bg-blue-500/10 text-blue-400'
+            }">${log.type}</span>
+          </td>
+          <td class="p-3 font-mono font-bold text-blue-400">${log.serial}</td>
+          <td class="p-3 text-white font-semibold">@${log.user}</td>
+          <td class="p-3 font-mono font-bold text-right text-emerald-400">IDR ${log.amount.toLocaleString()}</td>
+        </tr>
+      `).join('');
+    }
+
+    function clearHistoryLog() {
+      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+      historyLogs = [];
+      saveHistoryLogsState();
+      renderHistoryTable();
+      showToast('Ledger history cleared.');
+    }
+
+    // --- SECONDARY TRADE, AUCTION & TRADE REQUESTS ---
+    function renderTradeListings() {
+      const container = document.getElementById('trade-listings-grid');
+      if (!container) return;
+
+      container.innerHTML = tradeListings.map(t => `
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono text-blue-400 font-bold">${t.serial}</span>
+            <span class="text-[10px] text-slate-400">Listed by @${t.seller}</span>
+          </div>
+          <div class="aspect-[4/5] bg-slate-950 rounded-xl border border-slate-800 p-2 flex items-center justify-center">
+            <img src="${t.imgUrl}" class="max-h-48 object-contain">
+          </div>
+          <p class="font-bold text-white text-xs truncate">${t.name}</p>
+          <div class="flex items-center justify-between pt-1">
+            <span class="font-mono text-sm font-bold text-emerald-400">IDR ${t.price.toLocaleString()}</span>
+            <button onclick="buyTradeListing('${t.id}')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Buy Item</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function buyTradeListing(tradeId) {
+      if (!currentUser) return openAuthModal();
+      tradeListings = tradeListings.filter(t => t.id !== tradeId);
+      renderTradeListings();
+      showToast('Offer accepted! Trade transaction completed.');
+    }
+
+    function renderAuctions() {
+      const container = document.getElementById('auctions-grid');
+      if (!container) return;
+
+      container.innerHTML = auctions.map(a => `
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col sm:flex-row gap-4 items-center">
+          <div class="w-32 aspect-[4/5] bg-slate-950 border border-slate-800 rounded-xl p-2 shrink-0 flex items-center justify-center">
+            <img src="${a.imgUrl}" class="max-h-36 object-contain">
+          </div>
+          <div class="space-y-2 flex-1 w-full">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold text-blue-400">${a.serial}</span>
+              <span class="text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold px-2 py-0.5 rounded-full">LIVE AUCTION</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">${a.name}</h4>
+            <div class="bg-slate-800/60 p-2.5 rounded-xl space-y-1">
+              <p class="text-[10px] text-slate-400">Current Highest Bid (@${a.topBidder}):</p>
+              <p class="font-mono font-bold text-base text-emerald-400">IDR ${a.currentBid.toLocaleString()}</p>
+            </div>
+            <div class="flex items-center gap-2 pt-1">
+              <button onclick="placeBid('${a.id}')" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">+ Bid IDR ${(a.currentBid + 50000).toLocaleString()}</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function placeBid(aucId) {
+      if (!currentUser) return openAuthModal();
+      const auc = auctions.find(a => a.id === aucId);
+      if (auc) {
+        auc.currentBid += 50000;
+        auc.topBidder = currentUser.username;
+        renderAuctions();
+        showToast(`Bid placed! You are now top bidder for ${auc.serial}`);
+      }
+    }
+
+    function renderTradeRequests() {
+      const container = document.getElementById('trade-requests-list');
+      if (!container) return;
+
+      container.innerHTML = tradeRequests.map(tr => `
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-white">Proposal from @${tr.sender}</span>
+              <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full font-semibold">Pending Swap</span>
+            </div>
+            <p class="text-xs text-slate-400">Offered: <span class="text-blue-400 font-mono font-bold">${tr.offeredCard}</span> <i class="fa-solid fa-arrow-right mx-1 text-slate-600"></i> Requesting: <span class="text-amber-400 font-mono font-bold">${tr.requestedCard}</span></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="acceptTradeReq('${tr.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">Accept Swap</button>
+            <button onclick="declineTradeReq('${tr.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs font-bold rounded-xl transition-all">Decline</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function acceptTradeReq(reqId) {
+      if (!currentUser) return openAuthModal();
+      tradeRequests = tradeRequests.filter(r => r.id !== reqId);
+      renderTradeRequests();
+      showToast('Trade request accepted! Cards swapped.');
+    }
+
+    function declineTradeReq(reqId) {
+      tradeRequests = tradeRequests.filter(r => r.id !== reqId);
+      renderTradeRequests();
+      showToast('Trade request declined.');
+    }
+
+    // --- QRIS ORDER SUBMISSION & VERIFICATION ---
     function openQRISPaymentModal() {
       if (!currentUser) return openAuthModal();
       const card = inventory.find(c => c.id === activeDetailCardId);
@@ -1160,6 +1418,8 @@
         card.owner = ord.buyerEmail;
       }
 
+      addHistoryEntry('PRIMARY SALE', ord.serial, ord.buyerUsername, ord.totalAmount);
+
       saveInventoryState();
       saveQRISOrdersState();
 
@@ -1203,7 +1463,7 @@
       });
 
       MOCK_USERS.forEach(u => {
-        if (!holderMap[u.email]) holderMap[u.email] = 2; // Default mock holdings
+        if (!holderMap[u.email]) holderMap[u.email] = 2;
       });
 
       if (currentUser && !holderMap[currentUser.email]) {
@@ -1376,6 +1636,9 @@
 
     function confirmSellbackAction() {
       if (!sellbackCardTarget) return;
+
+      const buybackPrice = Math.floor(sellbackCardTarget.price * 0.8);
+      addHistoryEntry('SELL BACK', sellbackCardTarget.serial, currentUser.username, buybackPrice);
 
       sellbackCardTarget.owner = null;
       sellbackCardTarget.status = 'AVAILABLE';
@@ -1550,7 +1813,7 @@
       document.getElementById('card-details-modal').classList.add('hidden');
     }
 
-    // --- ADMIN INVENTORY MANAGEMENT & EDITOR ---
+    // --- ADMIN INVENTORY CONTROL & IMAGE URL FIX ---
     function renderInventoryTable() {
       const tbody = document.getElementById('inventory-table-body');
       if (!tbody) return;
@@ -1558,7 +1821,10 @@
       tbody.innerHTML = inventory.map(card => `
         <tr class="hover:bg-slate-800/40 transition-all">
           <td class="p-3 font-mono font-bold text-blue-400">${card.serial}</td>
-          <td class="p-3 font-semibold text-white">${card.name}</td>
+          <td class="p-3 font-semibold text-white flex items-center gap-2">
+            <img src="${card.imgUrl}" class="w-6 h-8 object-contain rounded bg-slate-950 border border-slate-800">
+            <span>${card.name}</span>
+          </td>
           <td class="p-3">
             <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span>
           </td>
@@ -1642,12 +1908,15 @@
           imgUrl
         };
         inventory.unshift(newCard);
+        addHistoryEntry('CARD MINTED', serial, currentUser.username, price);
         showToast(`Minted new card ${serial}!`);
       }
 
       saveInventoryState();
       renderCardGrid();
       renderInventoryTable();
+      renderVaultGrid();
+      renderWishlistGrid();
       renderHoldersList();
       closeCardEditorModal();
     }
@@ -1658,6 +1927,8 @@
       saveInventoryState();
       renderCardGrid();
       renderInventoryTable();
+      renderVaultGrid();
+      renderWishlistGrid();
       renderHoldersList();
       showToast('Card deleted from inventory.');
     }
