@@ -133,15 +133,16 @@
           <i class="fa-solid fa-heart text-rose-400"></i> Wishlist (<span id="wishlist-count-badge">0</span>)
         </button>
 
-        <div id="admin-nav-separator" class="h-4 w-px bg-slate-700 mx-1 self-center hidden"></div>
+        <div id="admin-nav-separator" class="h-4 w-px bg-slate-700 mx-1 self-center"></div>
 
-        <button id="nav-analytics" onclick="switchTab('analytics')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
+        <!-- ALWAYS VISIBLE ADMIN BUTTONS -->
+        <button id="nav-analytics" onclick="switchTab('analytics')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
           <i class="fa-solid fa-chart-line text-amber-400"></i> Analytics
         </button>
-        <button id="nav-admin" onclick="switchTab('admin')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/30">
+        <button id="nav-admin" onclick="switchTab('admin')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/30">
           <i class="fa-solid fa-shield-halved"></i> Admin Hub
         </button>
-        <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
+        <button id="nav-inventory" onclick="switchTab('inventory')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
           <i class="fa-solid fa-boxes-stacked"></i> Inventory
         </button>
       </nav>
@@ -183,7 +184,7 @@
         <div class="flex justify-between text-xs"><span class="text-slate-400">Card Item:</span> <span id="sellback-card-name" class="font-bold text-white">-</span></div>
         <div class="flex justify-between text-xs"><span class="text-slate-400">Serial:</span> <span id="sellback-card-serial" class="font-mono text-blue-400">-</span></div>
         <div class="flex justify-between text-xs"><span class="text-slate-400">Floor Buyback Base:</span> <span id="sellback-card-base" class="font-mono text-slate-300">IDR 0</span></div>
-        <div class="flex justify-between text-xs"><span class="text-amber-400">Platform Fee (2%):</span> <span id="sellback-card-tax" class="font-mono text-amber-400">IDR 0</span></div>
+        <div class="flex justify-between text-xs"><span class="text-amber-400">Platform Processing Fee (2%):</span> <span id="sellback-card-tax" class="font-mono text-amber-400">IDR 0</span></div>
         <div class="flex justify-between text-xs pt-2 border-t border-slate-800"><span class="font-bold text-white">Your Net Payout:</span> <span id="sellback-card-payout" class="font-mono font-bold text-emerald-400 text-sm">IDR 0</span></div>
       </div>
 
@@ -322,183 +323,6 @@
     </div>
   </div>
 
-  <!-- CARD DETAILS MODAL -->
-  <div id="card-details-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl space-y-5">
-      <button onclick="closeCardDetailsModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center z-10">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div class="bg-slate-950 rounded-xl border border-slate-800 p-2 flex items-center justify-center">
-          <img id="detail-card-img" src="" class="w-full h-auto max-h-64 object-contain rounded-lg">
-        </div>
-
-        <div class="space-y-3 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span id="detail-card-type" class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full"></span>
-              <span id="detail-card-serial" class="text-xs font-mono font-bold text-blue-400"></span>
-            </div>
-            <h3 id="detail-card-name" class="text-lg font-bold text-white leading-tight"></h3>
-            <p id="detail-card-edition" class="text-[11px] text-slate-400 mt-1"></p>
-            <p id="detail-card-status" class="text-[11px] text-slate-400 mt-0.5"></p>
-          </div>
-
-          <div class="space-y-1 bg-slate-800/50 p-3 rounded-xl border border-slate-800">
-            <p class="text-[10px] uppercase font-bold text-slate-400">Market Value (Base)</p>
-            <p id="detail-card-price" class="text-lg font-mono font-bold text-white">IDR 0</p>
-            <p id="detail-card-total-price" class="text-xs font-mono font-bold text-emerald-400">+ 2% Platform Tax = IDR 0</p>
-          </div>
-
-          <div class="space-y-2 pt-2">
-            <button id="detail-buy-btn" onclick="buyActiveDetailCard()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-qrcode"></i> Buy / Order via QRIS
-            </button>
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="wishlistActiveDetailCard()" class="py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-heart"></i> Wishlist
-              </button>
-              <button onclick="tradeActiveDetailCard()" class="py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-right-left"></i> Trade
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- QRIS PAYMENT MODAL -->
-  <div id="qris-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 relative shadow-2xl space-y-4 text-center">
-      <button onclick="closeQrisModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div>
-        <h3 class="text-base font-bold text-white">Scan QRIS to Complete Payment</h3>
-        <p id="qris-card-title" class="text-xs text-blue-400 font-mono mt-1">Eugene Card Purchase</p>
-      </div>
-
-      <div class="bg-white p-4 rounded-2xl w-56 h-56 mx-auto flex items-center justify-center border-2 border-blue-500 shadow-xl">
-        <div id="qris-canvas"></div>
-      </div>
-
-      <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700 text-left space-y-1">
-        <div class="flex justify-between text-xs"><span class="text-slate-400">Merchant Name:</span> <span class="font-bold text-white">Eugene Card, Toko Kartu</span></div>
-        <div class="flex justify-between text-xs"><span class="text-slate-400">Location:</span> <span class="font-bold text-white">TORAJA UTARA</span></div>
-        <div class="flex justify-between text-xs"><span class="text-slate-400">Base Price:</span> <span id="qris-base-due" class="font-mono text-slate-300">IDR 0</span></div>
-        <div class="flex justify-between text-xs"><span class="text-amber-400">Platform Tax (2%):</span> <span id="qris-tax-due" class="font-mono text-amber-400">IDR 0</span></div>
-        <div class="flex justify-between text-xs pt-1 border-t border-slate-700"><span class="font-bold text-white">Total Amount Due:</span> <span id="qris-amount-due" class="font-mono font-bold text-emerald-400">IDR 0</span></div>
-      </div>
-
-      <div class="space-y-2 pt-2">
-        <label class="block text-left text-[10px] font-bold uppercase text-slate-400">Upload Payment Proof (Receipt Screenshot)</label>
-        <input type="file" id="qris-proof-file" accept="image/*" class="w-full text-xs text-slate-400 bg-slate-800 border border-slate-700 rounded-xl p-2 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white">
-        
-        <button onclick="submitQrisPaymentProof()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 mt-3">
-          <i class="fa-solid fa-check-circle"></i> Confirm & Submit Payment Proof
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADVANCED ADMIN CARD EDITOR MODAL -->
-  <div id="card-editor-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 relative shadow-2xl max-h-[90vh] overflow-y-auto">
-      <button onclick="closeCardEditorModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-boxes-stacked text-amber-400"></i>
-        <h3 id="editor-modal-title" class="text-base font-bold text-white">Edit Card Specs & Ownership</h3>
-      </div>
-
-      <form id="card-editor-form" onsubmit="saveCardEdit(event)" class="space-y-3">
-        <input type="hidden" id="edit-card-id">
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-[11px] font-bold text-slate-400 uppercase">Serial Tag (*01 / *001)</label>
-            <input type="text" id="edit-card-serial" required placeholder="*01" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-          </div>
-          <div>
-            <label class="text-[11px] font-bold text-slate-400 uppercase">Serial Number (SN)</label>
-            <input type="text" id="edit-card-sn" required placeholder="001" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-          </div>
-        </div>
-
-        <div>
-          <label class="text-[11px] font-bold text-slate-400 uppercase">Card Name</label>
-          <input type="text" id="edit-card-name" required placeholder="Eugene Premium #01" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-[11px] font-bold text-slate-400 uppercase">Edition</label>
-            <input type="text" id="edit-card-edition" required placeholder="Beta Edition: #0" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-          </div>
-          <div>
-            <label class="text-[11px] font-bold text-slate-400 uppercase">Printing Multiplier</label>
-            <input type="text" id="edit-card-printing" required placeholder="1x" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3">
-          <div>
-            <label class="text-[11px] font-bold text-slate-400 uppercase">Card Tier</label>
-            <select id="edit-card-type" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-              <option value="PREMIUM">PREMIUM</option>
-              <option value="STANDARD">STANDARD</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-[11px] font-bold text-slate-400 uppercase">Price (IDR)</label>
-            <input type="number" id="edit-card-price" required min="0" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-          </div>
-          <div>
-            <label class="text-[11px] font-bold text-slate-400 uppercase">Base Floor Price</label>
-            <input type="number" id="edit-card-basefloor" required min="0" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-          </div>
-        </div>
-
-        <!-- SEARCHABLE OWNER DROPDOWN -->
-        <div class="relative">
-          <label class="text-[11px] font-bold text-slate-400 uppercase flex justify-between">
-            <span>Assigned Owner</span>
-            <span id="current-owner-label" class="text-blue-400 font-mono">Unassigned</span>
-          </label>
-          <input type="text" id="edit-card-owner-search" oninput="filterOwnerOptions(this.value)" placeholder="Search collector name or type custom..." class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-          
-          <div id="owner-dropdown-list" class="absolute left-0 right-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-xl max-h-36 overflow-y-auto hidden z-20 shadow-xl divide-y divide-slate-700/50">
-          </div>
-        </div>
-
-        <div>
-          <label class="text-[11px] font-bold text-slate-400 uppercase">Image URL</label>
-          <input type="text" id="edit-card-img" required class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-        </div>
-
-        <div>
-          <label class="text-[11px] font-bold text-slate-400 uppercase">Status</label>
-          <select id="edit-card-status" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-            <option value="AVAILABLE">AVAILABLE</option>
-            <option value="SOLD">SOLD</option>
-            <option value="OWNED">OWNED</option>
-            <option value="RESERVED">RESERVED</option>
-          </select>
-        </div>
-
-        <div class="pt-2 flex items-center justify-end gap-2">
-          <button type="button" onclick="closeCardEditorModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Save Changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- Main Marketplace Body -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8">
     
@@ -535,6 +359,39 @@
       </div>
 
       <div id="card-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+    </section>
+
+    <!-- TRADE VIEW -->
+    <section id="view-trade" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-right-left text-blue-400 mr-2"></i> Trading Room</h2>
+          <p class="text-xs text-slate-400 mt-1">Browse open card offers or list one of your own cards for sale.</p>
+        </div>
+      </div>
+      <div id="trade-content" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
+        No peer-to-peer listings active yet.
+      </div>
+    </section>
+
+    <!-- AUCTION VIEW -->
+    <section id="view-auction" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
+          <p class="text-xs text-slate-400 mt-1">Place real-time bids on rare serial cards before time expires.</p>
+        </div>
+      </div>
+      <div id="auction-content" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- TRADE REQUESTS VIEW -->
+    <section id="view-trade-req" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Active Trade Proposals</h2>
+        <p class="text-xs text-slate-400 mt-1">Review incoming and outgoing card/cash trade proposals.</p>
+      </div>
+      <div id="trade-req-content" class="space-y-3"></div>
     </section>
 
     <!-- PRIVATE INBOX / CHAT VIEW SYNCHRONIZED WITH PROFILE -->
@@ -574,6 +431,24 @@
       </div>
     </section>
 
+    <!-- HOLDERS VIEW -->
+    <section id="view-holders" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Top Card Holders</h2>
+        <p class="text-xs text-slate-400 mt-1">Community leaderboard and collector ranks.</p>
+      </div>
+      <div id="holders-content" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- HISTORY VIEW -->
+    <section id="view-history" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Marketplace Ledger</h2>
+        <p class="text-xs text-slate-400 mt-1">Verified transaction records on the network.</p>
+      </div>
+      <div id="history-content" class="space-y-2"></div>
+    </section>
+
     <!-- DASHBOARD / VAULT VIEW -->
     <section id="view-dashboard" class="hidden space-y-6">
       <div id="user-profile-banner" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
@@ -588,7 +463,6 @@
                 <span id="profile-username-tag" class="text-xs font-mono text-blue-400">@guest</span>
               </div>
               <p id="profile-bio-text" class="text-xs text-slate-400 max-w-md">No bio added yet. Click customize to complete your profile.</p>
-              
               <div id="profile-socials-container" class="flex items-center gap-3 pt-1 text-xs"></div>
             </div>
           </div>
@@ -605,6 +479,66 @@
       </div>
       <div id="owned-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
         Log in with Google to view your owned cards inside your private binder.
+      </div>
+    </section>
+
+    <!-- WISHLIST VIEW -->
+    <section id="view-wishlist" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> Saved Wishlist</h2>
+        <p class="text-xs text-slate-400 mt-1">Keep track of cards you want to acquire.</p>
+      </div>
+      <div id="wishlist-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+    </section>
+
+    <!-- ANALYTICS VIEW (ADMIN ONLY) -->
+    <section id="view-analytics" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> Market Analytics</h2>
+        <p class="text-xs text-slate-400 mt-1">Platform sales volume and tax revenue tracking.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <p class="text-[10px] uppercase font-bold text-slate-400">Total Volume</p>
+          <p id="analytics-vol" class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <p class="text-[10px] uppercase font-bold text-slate-400">Admin Tax Collected (2%)</p>
+          <p id="analytics-tax" class="text-xl font-bold font-mono text-amber-400 mt-1">IDR 0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <p class="text-[10px] uppercase font-bold text-slate-400">Active Holders</p>
+          <p id="analytics-holders" class="text-xl font-bold font-mono text-purple-400 mt-1">0 Collectors</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN HUB VIEW -->
+    <section id="view-admin" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub</h2>
+          <p class="text-xs text-slate-400 mt-1">Verify payment submissions and process payouts.</p>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3">
+        <h4 class="text-xs font-bold text-slate-300 uppercase">Pending Transactions Queue (QRIS, Trades & Sell-Backs)</h4>
+        <div id="admin-orders-queue" class="space-y-2">
+          <p class="text-xs text-slate-500">No pending orders waiting for manual approval.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVENTORY VIEW (ADMIN ONLY) -->
+    <section id="view-inventory" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-2"></i> Inventory Control</h2>
+          <p class="text-xs text-slate-400 mt-1">Manage specs, edit owners, export backup JSON, or mint new cards.</p>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <p class="text-xs text-slate-400">Database Inventory active.</p>
       </div>
     </section>
 
@@ -626,63 +560,19 @@
       'eugene.aquila06'
     ];
 
-    const QRIS_STRING_PAYLOAD = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
-
     const INITIAL_JSON_BACKUP = {"exportedAt":"2026-07-29T13:25:53.048Z","exportedBy":"eugene.aquila06@gmail.com","inventoryCount":16,"cards":[{"id":"card-001","serial":"*001","name":"Eugene Standard #001","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeR1tJ2.md.png","edition":"Beta Edition: #0","sn":"001","tier":"100","printing":"1x"},{"id":"card-01","serial":"*01","name":"Eugene Premium #01","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":"Eugene","status":"SOLD","imgUrl":"https://iili.io/CeRhf5v.png","edition":"Beta Edition: #0","sn":"01","tier":"500","printing":"1x"},{"id":"card-002","serial":"*002","name":"Eugene Standard #002","type":"STANDARD","price":100000,"baseFloorPrice":100000,"owner":null,"status":"SOLD","imgUrl":"https://iili.io/CeREczX.md.png","edition":"Beta Edition: #0","sn":"002","tier":"100","printing":"1x"},{"id":"card-02","serial":"*02","name":"Eugene Premium #02","type":"PREMIUM","price":500000,"baseFloorPrice":500000,"owner":null,"status":"AVAILABLE","imgUrl":"https://iili.io/CeRamG4.md.png","edition":"Beta Edition: #0","sn":"02","tier":"500","printing":"1x"}]};
 
     let currentUser = null;
     let currentFilter = 'ALL';
-    let unreadNotifCount = 0;
     let inventory = [];
-
     let wishlist = new Set();
-    const storedWishlist = localStorage.getItem('eugene_wishlist_data');
-    if (storedWishlist) {
-      try { wishlist = new Set(JSON.parse(storedWishlist)); } catch(e) {}
-    }
-
-    let tradeProposals = [];
-    const storedTrades = localStorage.getItem('eugene_trade_proposals');
-    if (storedTrades) {
-      try { tradeProposals = JSON.parse(storedTrades); } catch(e) {}
-    }
-
     let pendingOrders = [];
-    const storedPending = localStorage.getItem('eugene_pending_orders');
-    if (storedPending) {
-      try { pendingOrders = JSON.parse(storedPending); } catch(e) {}
-    }
-
-    let liveAuctions = [];
-    const storedAuctions = localStorage.getItem('eugene_live_auctions');
-    if (storedAuctions) {
-      try { liveAuctions = JSON.parse(storedAuctions); } catch(e) {}
-    }
-
-    let transactionHistory = [];
-    const storedHistory = localStorage.getItem('eugene_transaction_history');
-    if (storedHistory) {
-      try { transactionHistory = JSON.parse(storedHistory); } catch(e) {}
-    } else {
-      transactionHistory = [
-        { id: 'tx-1', type: 'MINT', cardSerial: '*01', details: 'Genesis Minting of Eugene Premium #01', timestamp: '2026-07-29 10:00 AM' }
-      ];
-    }
-
-    let shoppingCart = new Set();
-    let activeCardForAction = null;
-    let activePurchaseAmount = 0;
-    let selectedOwner = null;
     let activeSellBackCard = null;
 
     let chatThreads = [
       { id: 't1', user: 'Eugene Admin', participant1: 'Eugene Admin', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Eugene', messages: [{ sender: 'Eugene Admin', text: 'Welcome to Eugene Card Private Messenger.' }] },
       { id: 't2', user: 'Yujin Aquila', participant1: 'Yujin Aquila', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Yujin', messages: [{ sender: 'Yujin Aquila', text: 'Is Eugene Premium #05 available?' }] }
     ];
-    const storedChats = localStorage.getItem('eugene_chat_threads');
-    if (storedChats) {
-      try { chatThreads = JSON.parse(storedChats); } catch(e) {}
-    }
     let activeChatThreadId = 't1';
 
     // SAFE DOM HELPERS TO PREVENT NULL CRASHES
@@ -837,7 +727,6 @@
     function openProfileModal() {
       if (!currentUser) return openAuthModal();
 
-      safeSetText('edit-profile-name', currentUser.name);
       const nameInput = document.getElementById('edit-profile-name');
       if (nameInput) nameInput.value = currentUser.name;
 
@@ -898,7 +787,6 @@
 
       localStorage.setItem(`eugene_profile_${currentUser.email}`, JSON.stringify(currentUser));
 
-      // Sync across active private conversations
       chatThreads.forEach(t => {
         if (t.user === oldName || t.participant1 === oldName) {
           t.user = currentUser.name;
@@ -1131,17 +1019,28 @@
 
     // TAB ROUTER
     function switchTab(tabName) {
-      const allTabs = ['catalog', 'inbox', 'dashboard'];
+      const allTabs = ['catalog', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'analytics', 'admin', 'inventory'];
+      
       allTabs.forEach(t => {
         const view = document.getElementById(`view-${t}`);
+        const nav = document.getElementById(`nav-${t}`);
         if (view) view.classList.add('hidden');
+        if (nav) nav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all';
       });
 
       const activeView = document.getElementById(`view-${tabName}`);
+      const activeNav = document.getElementById(`nav-${tabName}`);
+
       if (activeView) activeView.classList.remove('hidden');
+      if (activeNav) activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-white bg-slate-700 flex items-center gap-1.5 whitespace-nowrap transition-all';
 
       if (tabName === 'inbox') renderChatThreads();
       if (tabName === 'dashboard') renderUserProfileUI();
+    }
+
+    function setFilter(type) {
+      currentFilter = type;
+      renderCardGrid();
     }
 
     function updateRemainingCardCount() {
