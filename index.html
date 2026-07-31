@@ -164,6 +164,33 @@
     </div>
   </header>
 
+  <!-- RECEIPT LIGHTBOX PREVIEW MODAL -->
+  <div id="receipt-lightbox-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl space-y-4">
+      <button onclick="closeReceiptLightbox()" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+        <i class="fa-solid fa-file-invoice-dollar text-emerald-400 text-lg"></i>
+        <h3 id="receipt-modal-title" class="text-base font-bold text-white">Payment Receipt Screenshot</h3>
+      </div>
+
+      <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 flex justify-center max-h-[60vh] overflow-auto">
+        <img id="receipt-modal-img" src="" class="max-w-full h-auto object-contain rounded-lg border border-slate-800">
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <a id="receipt-modal-open-link" href="" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-2 transition-all">
+          <i class="fa-solid fa-up-right-from-square"></i> Open Full Image
+        </a>
+        <button onclick="closeReceiptLightbox()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">
+          Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- CREATE AUCTION MODAL -->
   <div id="create-auction-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
@@ -693,18 +720,25 @@
       </div>
     </section>
 
-    <!-- PRIVATE INBOX / CHAT VIEW -->
+    <!-- PRIVATE INBOX / CHAT VIEW WITH ACCOUNT SEARCH -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-comments text-indigo-400 mr-2"></i> Private Messenger & Inbox</h2>
         <p class="text-xs text-slate-400 mt-1">Private messages strictly scoped between you and buyers/sellers.</p>
       </div>
 
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl grid grid-cols-1 md:grid-cols-3 min-h-[450px] overflow-hidden">
-        <!-- Thread List Sidebar -->
-        <div class="border-r border-slate-800 p-4 space-y-3">
-          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Private Threads</p>
-          <div id="chat-threads-list" class="space-y-1.5"></div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl grid grid-cols-1 md:grid-cols-3 min-h-[480px] overflow-hidden">
+        <!-- Thread List Sidebar with Search -->
+        <div class="border-r border-slate-800 p-4 space-y-3 flex flex-col">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Conversations</p>
+          
+          <!-- SEARCH ACCOUNT INPUT -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="chat-search-input" oninput="filterChatThreads(this.value)" placeholder="Search account name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition-all font-mono">
+          </div>
+
+          <div id="chat-threads-list" class="space-y-1.5 flex-1 overflow-y-auto max-h-[360px] pr-1"></div>
         </div>
 
         <!-- Chat Feed Window -->
@@ -713,7 +747,7 @@
             <span class="text-xs font-bold text-white">Select a private conversation</span>
           </div>
 
-          <div id="chat-messages-body" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-[300px] pr-2"></div>
+          <div id="chat-messages-body" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-[320px] pr-2"></div>
 
           <form onsubmit="sendChatMessage(event)" class="pt-3 border-t border-slate-800 flex gap-2">
             <input type="text" id="chat-input-text" placeholder="Write a private message..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
@@ -933,7 +967,8 @@
     let selectedOwner = null;
 
     let chatThreads = [
-      { id: 't1', user: 'Eugene', participant1: 'Eugene', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Eugene', messages: [{ sender: 'Eugene Admin', text: 'Welcome to Eugene Card Private Messenger.' }] }
+      { id: 't1', user: 'Eugene Admin', participant1: 'Eugene', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Eugene', messages: [{ sender: 'Eugene Admin', text: 'Welcome to Eugene Card Private Messenger.' }] },
+      { id: 't2', user: 'Yujin Aquila', participant1: 'Yujin Aquila', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Yujin', messages: [{ sender: 'Yujin Aquila', text: 'Is Eugene Premium #05 available?' }] }
     ];
     const storedChats = localStorage.getItem('eugene_chat_threads');
     if (storedChats) {
@@ -1394,7 +1429,7 @@
       document.getElementById('owner-dropdown-list').classList.add('hidden');
     }
 
-    // ADMIN INVENTORY EDITOR (UPDATES SUPABASE REAL-TIME FOR EVERYONE)
+    // ADMIN INVENTORY EDITOR
     function openCardEditorModal(cardId = null) {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
 
@@ -1468,7 +1503,6 @@
           inventory[idx] = { ...inventory[idx], ...cardPayload };
         }
         
-        // Push update directly to Supabase Database so everyone sees it
         if (window.supabaseClient) {
           await supabaseClient
             .from('inventory')
@@ -1482,7 +1516,6 @@
         cardPayload.id = newId;
         inventory.unshift(cardPayload);
 
-        // Insert new card live to Supabase Database
         if (window.supabaseClient) {
           await supabaseClient
             .from('inventory')
@@ -1520,7 +1553,7 @@
       showToast('Card deleted live from database.');
     }
 
-    // JSON IMPORT & EXPORT FEATURES
+    // JSON IMPORT & EXPORT
     function exportInventoryJSON() {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
 
@@ -1686,6 +1719,76 @@
       };
 
       reader.readAsDataURL(file);
+    }
+
+    // RENDER ADMIN HUB ORDER QUEUE WITH ENHANCED RECEIPT UI
+    function renderAdminOrdersQueue() {
+      const container = document.getElementById('admin-orders-queue');
+      if (!container) return;
+
+      if (!pendingOrders.length) {
+        container.innerHTML = `<p class="text-xs text-slate-500">No pending orders waiting for manual approval.</p>`;
+        return;
+      }
+
+      container.innerHTML = pendingOrders.map((ord, idx) => {
+        const isTradePayout = ord.type === 'TRADE_PAYOUT';
+        const isSellBack = ord.type === 'SELL_BACK';
+        const netAmt = ord.grossAmount || (ord.card ? ord.card.price * 1.02 : 0);
+
+        return `
+          <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:border-slate-600 transition-all">
+            <div class="flex items-center gap-3.5">
+              ${ord.proofImg ? `
+                <div onclick="openReceiptLightbox('${ord.proofImg}', '${ord.card.name}')" class="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-emerald-500/50 bg-slate-950 shrink-0 cursor-pointer group shadow-md">
+                  <img src="${ord.proofImg}" class="w-full h-full object-cover group-hover:scale-110 transition-transform">
+                  <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity text-emerald-400">
+                    <i class="fa-solid fa-receipt text-xs"></i>
+                    <span class="text-[8px] font-bold uppercase tracking-tighter mt-0.5">View</span>
+                  </div>
+                </div>
+              ` : `
+                <div class="w-16 h-16 rounded-xl border border-dashed border-slate-700 bg-slate-900/60 flex flex-col items-center justify-center text-slate-500 shrink-0">
+                  <i class="fa-solid fa-file-circle-xmark text-sm"></i>
+                  <span class="text-[8px] mt-1 font-semibold">No Receipt</span>
+                </div>
+              `}
+
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[9px] font-bold uppercase px-2.5 py-0.5 rounded-full ${isTradePayout ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : isSellBack ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}">
+                    ${isTradePayout ? 'TRADE CASH PAYOUT' : isSellBack ? 'SELL BACK' : 'QRIS PURCHASE (+2% TAX)'}
+                  </span>
+                  <p class="text-xs font-bold text-white">${ord.card.name} (${ord.card.serial})</p>
+                </div>
+                <p class="text-[11px] text-slate-300 mt-1">
+                  Buyer/Recipient: <strong class="text-white">${ord.seller || ord.buyer}</strong> • Total Due: <strong class="text-emerald-400 font-mono font-bold">IDR ${netAmt.toLocaleString()}</strong>
+                </p>
+                <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                  <span><i class="fa-solid fa-clock text-slate-500 mr-1"></i>${ord.timestamp}</span>
+                  ${ord.proofImg ? `<button onclick="openReceiptLightbox('${ord.proofImg}', '${ord.card.name}')" class="text-emerald-400 hover:underline font-semibold flex items-center gap-1"><i class="fa-solid fa-receipt"></i> Inspect Receipt</button>` : ''}
+                </div>
+              </div>
+            </div>
+
+            <button onclick="openAdminProofModal(${idx})" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+              <i class="fa-solid fa-upload"></i> Upload Proof & Pay
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // RECEIPT LIGHTBOX MODAL HANDLERS
+    function openReceiptLightbox(imgSrc, titleName) {
+      document.getElementById('receipt-modal-img').src = imgSrc;
+      document.getElementById('receipt-modal-open-link').href = imgSrc;
+      document.getElementById('receipt-modal-title').innerText = `Receipt Proof: ${titleName}`;
+      document.getElementById('receipt-lightbox-modal').classList.remove('hidden');
+    }
+
+    function closeReceiptLightbox() {
+      document.getElementById('receipt-lightbox-modal').classList.add('hidden');
     }
 
     // NAVIGATION ROUTER
@@ -1892,49 +1995,6 @@
           </td>
         </tr>
       `).join('');
-    }
-
-    function renderAdminOrdersQueue() {
-      const container = document.getElementById('admin-orders-queue');
-      if (!container) return;
-
-      if (!pendingOrders.length) {
-        container.innerHTML = `<p class="text-xs text-slate-500">No pending orders waiting for manual approval.</p>`;
-        return;
-      }
-
-      container.innerHTML = pendingOrders.map((ord, idx) => {
-        const isTradePayout = ord.type === 'TRADE_PAYOUT';
-        const isSellBack = ord.type === 'SELL_BACK';
-        const netAmt = ord.grossAmount || (ord.card ? ord.card.price * 1.02 : 0);
-
-        return `
-          <div class="bg-slate-800 p-3 rounded-xl flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-              ${ord.proofImg ? `
-                <a href="${ord.proofImg}" target="_blank" title="Click to open full receipt">
-                  <img src="${ord.proofImg}" class="w-14 h-14 object-cover rounded-lg border border-slate-700 hover:opacity-80 transition-opacity">
-                </a>
-              ` : ''}
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${isTradePayout ? 'bg-purple-500/20 text-purple-300' : isSellBack ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-400'}">
-                    ${isTradePayout ? 'TRADE CASH PAYOUT' : isSellBack ? 'SELL BACK' : 'QRIS PURCHASE (+2% TAX)'}
-                  </span>
-                  <p class="text-xs font-bold text-white">${ord.card.name} (${ord.card.serial})</p>
-                </div>
-                <p class="text-[10px] text-slate-400 mt-0.5">
-                  Buyer/Recipient: ${ord.seller || ord.buyer} • Total Due: <strong class="text-emerald-400 font-mono">IDR ${netAmt.toLocaleString()}</strong> • ${ord.timestamp}
-                </p>
-              </div>
-            </div>
-
-            <button onclick="openAdminProofModal(${idx})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow transition-all flex items-center gap-1.5 shrink-0">
-              <i class="fa-solid fa-upload"></i> Upload Proof & Pay
-            </button>
-          </div>
-        `;
-      }).join('');
     }
 
     // AUCTIONS & TRADES SYSTEM
@@ -2434,7 +2494,8 @@
       document.getElementById('holder-vault-modal').classList.add('hidden');
     }
 
-    function renderChatThreads() {
+    // PRIVATE MESSENGER WITH ACCOUNT SEARCH
+    function renderChatThreads(searchQuery = '') {
       const container = document.getElementById('chat-threads-list');
       if (!container) return;
 
@@ -2443,23 +2504,31 @@
         return;
       }
 
-      const myThreads = currentUser.isAdmin ? chatThreads : chatThreads.filter(t => 
+      let myThreads = currentUser.isAdmin ? chatThreads : chatThreads.filter(t => 
         t.user === currentUser.name || 
         t.participant1 === currentUser.name || 
         t.participant2 === currentUser.name
       );
 
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase().trim();
+        myThreads = myThreads.filter(t => 
+          t.user.toLowerCase().includes(query) || 
+          t.messages.some(m => m.text.toLowerCase().includes(query))
+        );
+      }
+
       if (myThreads.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No private message conversations yet.</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No matching accounts found.</p>`;
         return;
       }
 
       container.innerHTML = myThreads.map(t => `
-        <div onclick="selectChatThread('${t.id}')" class="p-2.5 rounded-xl border border-slate-800 ${t.id === activeChatThreadId ? 'bg-indigo-950/40 border-indigo-500/50' : 'bg-slate-900 hover:bg-slate-800/60'} cursor-pointer transition-all flex items-center gap-3">
-          <img src="${t.avatar}" class="w-8 h-8 rounded-full border border-slate-700">
-          <div class="overflow-hidden">
+        <div onclick="selectChatThread('${t.id}')" class="p-2.5 rounded-xl border border-slate-800 ${t.id === activeChatThreadId ? 'bg-indigo-950/50 border-indigo-500/60' : 'bg-slate-900 hover:bg-slate-800/60'} cursor-pointer transition-all flex items-center gap-3">
+          <img src="${t.avatar}" class="w-8 h-8 rounded-full border border-slate-700 shrink-0">
+          <div class="overflow-hidden flex-1">
             <p class="text-xs font-bold text-white truncate">${t.user}</p>
-            <p class="text-[10px] text-slate-400 truncate">${t.messages[t.messages.length - 1]?.text || 'No messages'}</p>
+            <p class="text-[10px] text-slate-400 truncate mt-0.5">${t.messages[t.messages.length - 1]?.text || 'No messages'}</p>
           </div>
         </div>
       `).join('');
@@ -2467,9 +2536,13 @@
       renderChatMessages();
     }
 
+    function filterChatThreads(query) {
+      renderChatThreads(query);
+    }
+
     function selectChatThread(threadId) {
       activeChatThreadId = threadId;
-      renderChatThreads();
+      renderChatThreads(document.getElementById('chat-search-input')?.value || '');
     }
 
     function renderChatMessages() {
@@ -2482,8 +2555,11 @@
       if (header) {
         header.innerHTML = `
           <div class="flex items-center gap-2">
-            <img src="${activeThread.avatar}" class="w-6 h-6 rounded-full">
-            <span class="text-xs font-bold text-white">${activeThread.user} (Private Chat)</span>
+            <img src="${activeThread.avatar}" class="w-6 h-6 rounded-full border border-slate-700">
+            <div>
+              <span class="text-xs font-bold text-white">${activeThread.user}</span>
+              <span class="text-[9px] text-emerald-400 font-mono ml-2">● Active Session</span>
+            </div>
           </div>
         `;
       }
@@ -2520,7 +2596,7 @@
         });
         input.value = '';
         saveChatsState();
-        renderChatThreads();
+        renderChatThreads(document.getElementById('chat-search-input')?.value || '');
       }
     }
 
