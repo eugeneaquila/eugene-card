@@ -164,32 +164,6 @@
     </div>
   </header>
 
-  <!-- STRICT GOOGLE AUTH ONLY MODAL -->
-  <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-6 relative shadow-2xl text-center">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="space-y-2">
-        <div class="w-14 h-14 rounded-2xl mx-auto bg-slate-800 border border-slate-700 p-2.5 flex items-center justify-center shadow-inner">
-          <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
-        </div>
-        <h3 class="text-base font-bold text-white">Google Sign-In Required</h3>
-        <p class="text-xs text-slate-400 leading-relaxed">To ensure account security, user authentication on Eugene Card is strictly handled through Google.</p>
-      </div>
-
-      <div class="pt-2">
-        <button onclick="loginWithGoogleSupabase()" class="w-full py-3.5 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all">
-          <i class="fa-brands fa-google text-red-500 text-base"></i>
-          <span>Continue with Google</span>
-        </button>
-      </div>
-
-      <p class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Protected by Supabase Auth</p>
-    </div>
-  </div>
-
   <!-- SELL BACK CONFIRMATION MODAL -->
   <div id="sellback-confirm-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
@@ -506,6 +480,29 @@
           Submit Trade Proposal
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-5 relative shadow-2xl">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-xl mx-auto bg-slate-800 border border-slate-700 p-2 flex items-center justify-center">
+          <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
+        </div>
+        <h3 class="text-base font-bold text-white">Log In to Eugene Card</h3>
+        <p class="text-xs text-slate-400">Sign in securely with Google to trade cards, manage your vault, and access admin features.</p>
+      </div>
+
+      <div class="pt-2">
+        <button onclick="loginWithGoogleSupabase()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all">
+          <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Sign In with Google</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -836,10 +833,10 @@
             </div>
             <div class="space-y-1">
               <div class="flex items-center gap-2">
-                <h2 id="profile-display-name" class="text-lg font-bold text-white">Google User</h2>
-                <span id="profile-username-tag" class="text-xs font-mono text-blue-400">@google_user</span>
+                <h2 id="profile-display-name" class="text-lg font-bold text-white">Guest Collector</h2>
+                <span id="profile-username-tag" class="text-xs font-mono text-blue-400">@guest</span>
               </div>
-              <p id="profile-bio-text" class="text-xs text-slate-400 max-w-md">Sign in via Google to customize your collector profile.</p>
+              <p id="profile-bio-text" class="text-xs text-slate-400 max-w-md">No bio added yet. Click customize to complete your profile.</p>
               
               <div id="profile-socials-container" class="flex items-center gap-3 pt-1 text-xs"></div>
             </div>
@@ -856,7 +853,7 @@
         <p class="text-xs text-slate-400 mt-1">Manage, trade, launch live auctions, or sell back your owned cards to Admin at floor price.</p>
       </div>
       <div id="owned-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400">
-        Sign in with Google to view your owned cards inside your private binder.
+        Log in with Google to view your owned cards inside your private binder.
       </div>
     </section>
 
@@ -1021,46 +1018,11 @@
       { id: 't1', user: 'Eugene Admin', participant1: 'Eugene', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Eugene', messages: [{ sender: 'Eugene Admin', text: 'Welcome to Eugene Card Private Messenger.' }] },
       { id: 't2', user: 'Yujin Aquila', participant1: 'Yujin Aquila', participant2: 'Admin', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Yujin', messages: [{ sender: 'Yujin Aquila', text: 'Is Eugene Premium #05 available?' }] }
     ];
+    const storedChats = localStorage.getItem('eugene_chat_threads');
+    if (storedChats) {
+      try { chatThreads = JSON.parse(storedChats); } catch(e) {}
+    }
     let activeChatThreadId = 't1';
-
-    // Normalizes row data from Supabase DB to JS camelCase format
-    function normalizeCardData(raw) {
-      return {
-        id: raw.id || `card-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-        serial: raw.serial || raw.serial_number || '*00',
-        name: raw.name || raw.card_name || 'Unnamed Card',
-        type: raw.type || raw.card_type || 'STANDARD',
-        price: Number(raw.price) || 0,
-        baseFloorPrice: Number(raw.baseFloorPrice || raw.base_floor_price || raw.price || 0),
-        owner: raw.owner || raw.owner_name || null,
-        status: raw.status || (raw.owner ? 'SOLD' : 'AVAILABLE'),
-        imgUrl: raw.imgUrl || raw.img_url || raw.image_url || 'https://placehold.co/1080x1350/1e293b/3b82f6?text=No+Image',
-        edition: raw.edition || 'Beta Edition: #0',
-        sn: raw.sn || raw.serial_tag || (raw.serial ? String(raw.serial).replace('*', '') : '00'),
-        tier: raw.tier || '100',
-        printing: raw.printing || '1x'
-      };
-    }
-
-    // Normalizes JS camelCase card back to Supabase DB schema column names
-    function mapCardToSupabaseRow(card) {
-      const norm = normalizeCardData(card);
-      return {
-        id: norm.id,
-        serial: norm.serial,
-        name: norm.name,
-        type: norm.type,
-        price: norm.price,
-        base_floor_price: norm.baseFloorPrice,
-        owner: norm.owner,
-        status: norm.status,
-        img_url: norm.imgUrl,
-        edition: norm.edition,
-        sn: norm.sn,
-        tier: norm.tier,
-        printing: norm.printing
-      };
-    }
 
     // FETCH DATABASE INVENTORY WITH SUPABASE & BROADCAST REAL-TIME TO EVERYONE
     async function fetchDatabaseInventory() {
@@ -1071,78 +1033,24 @@
           .order('id', { ascending: true });
 
         if (!error && data && data.length > 0) {
-          inventory = data.map(normalizeCardData);
+          inventory = data;
           saveInventoryLocalCache();
           renderCardGrid();
           renderInventoryTable();
           updateRemainingCardCount();
-          renderHoldersLeaderboard();
           return;
         }
       }
 
       const storedInventory = localStorage.getItem('eugene_inventory_data');
       if (storedInventory) {
-        try { 
-          const parsed = JSON.parse(storedInventory);
-          inventory = parsed.map(normalizeCardData);
-        } catch(e) { 
-          inventory = INITIAL_JSON_BACKUP.cards.map(normalizeCardData); 
-        }
+        try { inventory = JSON.parse(storedInventory); } catch(e) { inventory = [...INITIAL_JSON_BACKUP.cards]; }
       } else {
-        inventory = INITIAL_JSON_BACKUP.cards.map(normalizeCardData);
+        inventory = [...INITIAL_JSON_BACKUP.cards];
       }
       renderCardGrid();
       renderInventoryTable();
       updateRemainingCardCount();
-      renderHoldersLeaderboard();
-    }
-
-    // FETCH REAL-TIME PRIVATE CHAT MESSAGES FROM SUPABASE
-    async function fetchDatabaseChats() {
-      if (!window.supabaseClient) {
-        const storedChats = localStorage.getItem('eugene_chat_threads');
-        if (storedChats) {
-          try { chatThreads = JSON.parse(storedChats); } catch(e) {}
-        }
-        renderChatThreads();
-        return;
-      }
-
-      const { data, error } = await supabaseClient
-        .from('chat_messages')
-        .select('*')
-        .order('created_at', { ascending: true });
-
-      if (!error && data) {
-        const threadMap = {};
-
-        data.forEach(msg => {
-          const threadId = msg.thread_id || 't1';
-          if (!threadMap[threadId]) {
-            threadMap[threadId] = {
-              id: threadId,
-              user: msg.thread_title || msg.sender_name || 'Collector',
-              participant1: msg.sender_name,
-              participant2: 'Admin',
-              avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(msg.sender_name || 'user')}`,
-              messages: []
-            };
-          }
-          threadMap[threadId].messages.push({
-            sender: msg.sender_name,
-            text: msg.message_text
-          });
-        });
-
-        const fetchedThreads = Object.values(threadMap);
-        if (fetchedThreads.length > 0) {
-          chatThreads = fetchedThreads;
-          saveChatsState();
-        }
-      }
-
-      renderChatThreads(document.getElementById('chat-search-input')?.value || '');
     }
 
     function saveInventoryLocalCache() {
@@ -1189,7 +1097,6 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       await fetchDatabaseInventory();
-      await fetchDatabaseChats();
 
       if (window.supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -1207,24 +1114,17 @@
           }
         });
 
-        // Real-Time Inventory Channel Subscriptions for Multi-User Live Sync
+        // Live Real-Time Updates Across Devices
         supabaseClient
           .channel('public:inventory')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, () => {
             fetchDatabaseInventory();
           })
           .subscribe();
-
-        // Real-Time Chat Channel Subscriptions for Live Messaging
-        supabaseClient
-          .channel('public:chat_messages')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, () => {
-            fetchDatabaseChats();
-          })
-          .subscribe();
       }
 
       renderAuthHeader();
+      renderChatThreads();
       renderHistoryLedger();
       renderAdminOrdersQueue();
       renderTradeProposals();
@@ -1257,7 +1157,6 @@
       return 'catalog';
     }
 
-    // MANDATORY GOOGLE OAUTH LOG-IN
     async function loginWithGoogleSupabase() {
       try {
         const activeTab = getCurrentActiveTab();
@@ -1272,7 +1171,7 @@
 
         if (error) throw error;
       } catch (error) {
-        showToast('Supabase Google Auth Error: ' + error.message);
+        showToast('Supabase Auth Error: ' + error.message);
       }
     }
 
@@ -1286,7 +1185,7 @@
         email: email,
         name: name,
         username: name.toLowerCase().replace(/\s+/g, '_'),
-        bio: 'Official collector authenticated via Google.',
+        bio: 'Official owner and administrator of Eugene Card Marketplace.',
         instagram: 'eugene_collector',
         tiktok: '',
         x: '',
@@ -1309,7 +1208,7 @@
       renderUserProfileUI();
       renderCardGrid();
       renderInventoryTable();
-      fetchDatabaseChats();
+      renderChatThreads();
     }
 
     function returnToPreviousStatePostLogin() {
@@ -1332,7 +1231,7 @@
       renderUserProfileUI();
       renderChatThreads();
       switchTab('catalog');
-      showToast('Logged out of Google account.');
+      showToast('Logged out.');
     }
 
     function renderAuthHeader() {
@@ -1371,7 +1270,7 @@
 
         container.innerHTML = `
           <button onclick="openAuthModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
-            <i class="fa-brands fa-google"></i> <span>Google Sign In</span>
+            <i class="fa-solid fa-right-to-bracket"></i> <span>Log In / Sign In</span>
           </button>
         `;
       }
@@ -1449,9 +1348,9 @@
 
       if (!currentUser) {
         if (avatarImg) avatarImg.src = 'https://api.dicebear.com/7.x/identicon/svg?seed=guest';
-        if (displayName) displayName.innerText = 'Google User';
-        if (usernameTag) usernameTag.innerText = '@google_user';
-        if (bioText) bioText.innerText = 'Sign in with Google to edit your custom profile details and social handlers.';
+        if (displayName) displayName.innerText = 'Guest Collector';
+        if (usernameTag) usernameTag.innerText = '@guest';
+        if (bioText) bioText.innerText = 'Log in to edit your custom profile details and social handlers.';
         if (socialsContainer) socialsContainer.innerHTML = '';
         return;
       }
@@ -1712,31 +1611,34 @@
       const imgUrl = document.getElementById('edit-card-img').value;
       const status = document.getElementById('edit-card-status').value;
 
-      const cardPayload = normalizeCardData({
-        id: cardId || `card-${Date.now()}`,
+      const cardPayload = {
         serial, sn, name, edition, printing, type, price, baseFloorPrice, imgUrl, status, owner: selectedOwner
-      });
+      };
 
       if (cardId) {
+        cardPayload.id = cardId;
         const idx = inventory.findIndex(c => c.id === cardId);
         if (idx !== -1) {
-          inventory[idx] = cardPayload;
+          inventory[idx] = { ...inventory[idx], ...cardPayload };
         }
         
         if (window.supabaseClient) {
           await supabaseClient
             .from('inventory')
-            .upsert([mapCardToSupabaseRow(cardPayload)]);
+            .update(cardPayload)
+            .eq('id', cardId);
         }
         addHistoryRecord('ADMIN_UPDATE', serial, `Admin updated specs for ${serial}`);
         showToast(`Updated ${serial} details live for everyone!`);
       } else {
+        const newId = `card-${Date.now()}`;
+        cardPayload.id = newId;
         inventory.unshift(cardPayload);
 
         if (window.supabaseClient) {
           await supabaseClient
             .from('inventory')
-            .insert([mapCardToSupabaseRow(cardPayload)]);
+            .insert([cardPayload]);
         }
         addHistoryRecord('MINT_CARD', serial, `Newly minted card ${serial} added to network.`);
         showToast(`Minted new card ${serial} live!`);
@@ -1802,40 +1704,20 @@
       reader.onload = async function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
-          let rawCards = [];
+          const newCards = Array.isArray(parsed.cards) ? parsed.cards : parsed;
 
-          if (Array.isArray(parsed)) {
-            rawCards = parsed;
-          } else if (parsed && Array.isArray(parsed.cards)) {
-            rawCards = parsed.cards;
-          } else if (parsed && typeof parsed === 'object') {
-            rawCards = Object.values(parsed).filter(item => typeof item === 'object');
-          }
-
-          if (!rawCards.length) {
-            throw new Error('No card objects found in backup JSON file.');
-          }
-
-          const normalizedCards = rawCards.map(normalizeCardData);
-
-          if (window.supabaseClient) {
-            const supabaseRows = normalizedCards.map(mapCardToSupabaseRow);
-            const { error } = await supabaseClient.from('inventory').upsert(supabaseRows);
-            if (error) {
-              console.warn('Supabase backup upsert warning:', error.message);
-            }
+          if (window.supabaseClient && newCards.length > 0) {
+            await supabaseClient.from('inventory').upsert(newCards);
             await fetchDatabaseInventory();
           } else {
-            inventory = normalizedCards;
+            inventory = newCards;
             saveInventoryLocalCache();
             renderCardGrid();
             renderInventoryTable();
             updateRemainingCardCount();
-            renderHoldersLeaderboard();
           }
-
-          addHistoryRecord('IMPORT_JSON', 'SYSTEM', `Admin imported ${normalizedCards.length} cards into inventory.`);
-          showToast(`Successfully imported ${normalizedCards.length} cards!`);
+          addHistoryRecord('IMPORT_JSON', 'SYSTEM', `Admin imported ${newCards.length} cards into inventory.`);
+          showToast(`Imported ${newCards.length} cards into inventory live!`);
         } catch (err) {
           showToast('Failed to parse JSON file: ' + err.message);
         }
@@ -2056,7 +1938,7 @@
 
       if (tabName === 'wishlist') renderWishlistGrid();
       if (tabName === 'dashboard') renderVaultGrid();
-      if (tabName === 'inbox') fetchDatabaseChats();
+      if (tabName === 'inbox') renderChatThreads();
       if (tabName === 'holders') renderHoldersLeaderboard();
       if (tabName === 'history') renderHistoryLedger();
       if (tabName === 'analytics') renderAnalyticsView();
@@ -2103,7 +1985,7 @@
     function renderVaultGrid() {
       const container = document.getElementById('owned-cards-grid');
       if (!currentUser) {
-        container.innerHTML = "Sign in with Google to view your owned cards inside your private binder.";
+        container.innerHTML = "Log in with Google to view your owned cards inside your private binder.";
         return;
       }
 
@@ -2702,7 +2584,7 @@
       document.getElementById('holder-vault-modal').classList.add('hidden');
     }
 
-    // PRIVATE MESSENGER WITH ACCOUNT SEARCH & REALTIME DB PERSISTENCE
+    // PRIVATE MESSENGER WITH ACCOUNT SEARCH
     function renderChatThreads(searchQuery = '') {
       const container = document.getElementById('chat-threads-list');
       if (!container) return;
@@ -2788,7 +2670,7 @@
       }
     }
 
-    async function sendChatMessage(e) {
+    function sendChatMessage(e) {
       e.preventDefault();
       if (!currentUser) return openAuthModal();
 
@@ -2798,22 +2680,10 @@
 
       const activeThread = chatThreads.find(t => t.id === activeChatThreadId);
       if (activeThread) {
-        const msgObj = {
-          thread_id: activeThread.id,
-          thread_title: activeThread.user,
-          sender_name: currentUser.name,
-          message_text: text
-        };
-
-        if (window.supabaseClient) {
-          await supabaseClient.from('chat_messages').insert([msgObj]);
-        }
-
         activeThread.messages.push({
           sender: currentUser.name,
           text: text
         });
-
         input.value = '';
         saveChatsState();
         renderChatThreads(document.getElementById('chat-search-input')?.value || '');
