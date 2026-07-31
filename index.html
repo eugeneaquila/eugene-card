@@ -1633,23 +1633,33 @@
         return showToast('Please select a payment receipt image before submitting.');
       }
 
-      pendingOrders.push({
-        id: `ord-${Date.now()}`,
-        card: activeCardForAction,
-        type: 'PURCHASE',
-        buyer: currentUser.name,
-        grossAmount: activeCardForAction.price,
-        taxAmount: activeCardForAction.price * 0.02,
-        payoutAmount: activeCardForAction.price * 0.98,
-        timestamp: new Date().toLocaleTimeString()
-      });
+      const file = fileInput.files[0];
+      const reader = new FileReader();
 
-      savePendingOrdersState();
-      addHistoryRecord('QRIS_SUBMIT', activeCardForAction.serial, `${currentUser.name} submitted QRIS payment receipt for ${activeCardForAction.serial}`);
+      reader.onload = function(e) {
+        const proofImageDataUrl = e.target.result;
 
-      showToast('Payment proof submitted! Waiting for Admin verification.');
-      closeQrisModal();
-      renderAdminOrdersQueue();
+        pendingOrders.push({
+          id: `ord-${Date.now()}`,
+          card: activeCardForAction,
+          type: 'PURCHASE',
+          buyer: currentUser.name,
+          grossAmount: activeCardForAction.price,
+          taxAmount: activeCardForAction.price * 0.02,
+          payoutAmount: activeCardForAction.price * 0.98,
+          proofImg: proofImageDataUrl,
+          timestamp: new Date().toLocaleTimeString()
+        });
+
+        savePendingOrdersState();
+        addHistoryRecord('QRIS_SUBMIT', activeCardForAction.serial, `${currentUser.name} submitted QRIS payment receipt for ${activeCardForAction.serial}`);
+
+        showToast('Payment proof submitted! Waiting for Admin verification.');
+        closeQrisModal();
+        renderAdminOrdersQueue();
+      };
+
+      reader.readAsDataURL(file);
     }
 
     // NAVIGATION ROUTER
@@ -1873,20 +1883,27 @@
         const netAmt = ord.payoutAmount || (ord.grossAmount ? ord.grossAmount * 0.98 : 0);
 
         return `
-          <div class="bg-slate-800 p-3 rounded-xl flex items-center justify-between">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${isTradePayout ? 'bg-purple-500/20 text-purple-300' : isSellBack ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-400'}">
-                  ${isTradePayout ? 'TRADE CASH PAYOUT (2% TAX)' : isSellBack ? 'SELL BACK (2% TAX)' : 'QRIS PURCHASE'}
-                </span>
-                <p class="text-xs font-bold text-white">${ord.card.name} (${ord.card.serial})</p>
+          <div class="bg-slate-800 p-3 rounded-xl flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              ${ord.proofImg ? `
+                <a href="${ord.proofImg}" target="_blank" title="Click to open full receipt">
+                  <img src="${ord.proofImg}" class="w-14 h-14 object-cover rounded-lg border border-slate-700 hover:opacity-80 transition-opacity">
+                </a>
+              ` : ''}
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${isTradePayout ? 'bg-purple-500/20 text-purple-300' : isSellBack ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-400'}">
+                    ${isTradePayout ? 'TRADE CASH PAYOUT (2% TAX)' : isSellBack ? 'SELL BACK (2% TAX)' : 'QRIS PURCHASE'}
+                  </span>
+                  <p class="text-xs font-bold text-white">${ord.card.name} (${ord.card.serial})</p>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-0.5">
+                  Buyer/Recipient: ${ord.seller || ord.buyer} • Net Due: <strong class="text-emerald-400 font-mono">IDR ${netAmt.toLocaleString()}</strong> • ${ord.timestamp}
+                </p>
               </div>
-              <p class="text-[10px] text-slate-400 mt-0.5">
-                Recipient: ${ord.seller || ord.buyer} • Net Due: <strong class="text-emerald-400 font-mono">IDR ${netAmt.toLocaleString()}</strong> • ${ord.timestamp}
-              </p>
             </div>
 
-            <button onclick="openAdminProofModal(${idx})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow transition-all flex items-center gap-1.5">
+            <button onclick="openAdminProofModal(${idx})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow transition-all flex items-center gap-1.5 shrink-0">
               <i class="fa-solid fa-upload"></i> Upload Proof & Pay
             </button>
           </div>
