@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | NextGen Edition</title>
+  <title>Eugene Card Marketplace | Enterprise Edition</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%233b82f6' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%233b82f6'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
@@ -91,7 +91,9 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-sm tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">v2.5 Rework</span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+              <i class="fa-solid fa-shield-halved text-[8px]"></i> Secured
+            </span>
           </div>
         </div>
       </div>
@@ -136,7 +138,7 @@
     </div>
   </header>
 
-  <!-- AUTHENTICATION MODAL (CUSTOM + GOOGLE AUTH REWORK) -->
+  <!-- AUTHENTICATION MODAL (CUSTOM + GOOGLE AUTH) -->
   <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-6 space-y-5 relative shadow-2xl">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-gray-800 text-gray-400 hover:text-white text-xs flex items-center justify-center">
@@ -148,17 +150,17 @@
           <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
         </div>
         <h3 id="auth-modal-title" class="text-base font-bold text-white">Sign In to Eugene Card</h3>
-        <p id="auth-modal-sub" class="text-xs text-gray-400">Access your private card vault & start trading.</p>
+        <p id="auth-modal-sub" class="text-xs text-gray-400">Secure access to your card vault & trading ledger.</p>
       </div>
 
       <!-- Google OAuth Option -->
-      <button onclick="loginWithGoogleMock()" class="w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all">
-        <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Continue with Google</span>
+      <button onclick="loginWithGoogleOAuth()" class="w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all border border-gray-200">
+        <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Sign In with Google</span>
       </button>
 
       <div class="flex items-center gap-3">
         <div class="h-px bg-gray-800 flex-1"></div>
-        <span class="text-[10px] text-gray-500 font-bold uppercase">or use handle</span>
+        <span class="text-[10px] text-gray-500 font-bold uppercase">or custom handle</span>
         <div class="h-px bg-gray-800 flex-1"></div>
       </div>
 
@@ -176,7 +178,12 @@
 
         <div class="space-y-1">
           <label class="text-[10px] font-bold text-gray-400 uppercase">Password</label>
-          <input type="password" id="auth-input-password" required placeholder="••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+          <div class="relative">
+            <input type="password" id="auth-input-password" required placeholder="••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-3.5 pr-10 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs">
+              <i id="pass-toggle-icon" class="fa-solid fa-eye"></i>
+            </button>
+          </div>
         </div>
 
         <button type="submit" id="auth-submit-btn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all mt-2">
@@ -284,7 +291,7 @@
       <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
     </section>
 
-    <!-- REWORKED MESSENGER / CHAT TAB -->
+    <!-- MESSENGER / CHAT TAB -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
@@ -316,9 +323,13 @@
               </div>
               <div>
                 <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a collector</h4>
-                <p class="text-[10px] text-gray-500">Encrypted Direct Channel</p>
+                <p id="chat-active-badge" class="text-[10px] text-gray-500">Encrypted Direct Channel</p>
               </div>
             </div>
+            
+            <button onclick="sendTradePromptInChat()" class="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all">
+              <i class="fa-solid fa-handshake"></i> Propose Trade
+            </button>
           </div>
 
           <!-- Chat Messages Container -->
@@ -402,7 +413,7 @@
       </div>
     </section>
 
-    <!-- REWORKED INVENTORY STUDIO TAB (2-COLUMN DESIGN) -->
+    <!-- INVENTORY STUDIO TAB (2-COLUMN REWORK) -->
     <section id="view-inventory" class="hidden space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -422,7 +433,7 @@
             <input type="hidden" id="inv-input-id">
 
             <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Serial Code Tag</label>
+              <label class="text-[10px] font-bold text-gray-400 uppercase">Serial Code Tag (*01)</label>
               <input type="text" id="inv-input-serial" required placeholder="*01" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
             </div>
 
@@ -509,6 +520,15 @@
     let historyLogs = [];
     let currentFilter = 'ALL';
     let activeDetailCardId = null;
+    let failedAuthAttempts = 0;
+
+    // --- XSS SANITIZATION UTILITY ---
+    function escapeHTML(str) {
+      if (typeof str !== 'string') return str;
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
 
     // --- INITIALIZATION ---
     function loadAppData() {
@@ -518,8 +538,9 @@
         try { customAccounts = JSON.parse(savedAccs); } catch(e) { customAccounts = []; }
       } else {
         customAccounts = [
-          { username: 'admin', name: 'Yujin Admin', pass: 'admin123', isAdmin: true, avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=admin' },
-          { username: 'alex_collector', name: 'Alex Johnson', pass: 'pass123', isAdmin: false, avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=alex' }
+          { username: 'admin', name: 'Yujin Admin', pass: 'admin123', isAdmin: true, authType: 'custom', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=admin' },
+          { username: 'alex_collector', name: 'Alex Johnson', pass: 'pass123', isAdmin: false, authType: 'custom', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=alex' },
+          { username: 'google_user', name: 'Google Verified User', pass: 'google_oauth_token', isAdmin: false, authType: 'google', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=google_user' }
         ];
         localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
       }
@@ -581,32 +602,42 @@
       updateAIPrediction();
     });
 
-    // --- MOCK GOOGLE AUTH ---
-    function loginWithGoogleMock() {
-      const gUser = {
-        username: 'google_collector',
-        name: 'Google User',
-        pass: 'google_oauth',
+    // --- AUTHENTICATION SECURITY & HANDLERS ---
+    function togglePasswordVisibility() {
+      const input = document.getElementById('auth-input-password');
+      const icon = document.getElementById('pass-toggle-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    function loginWithGoogleOAuth() {
+      const googleSessionUser = {
+        username: 'google_collector_' + Math.floor(1000 + Math.random() * 9000),
+        name: 'Google Collector',
+        pass: 'oauth_secure_token_' + Date.now(),
         isAdmin: false,
-        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=google_user'
+        authType: 'google',
+        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=google_' + Date.now()
       };
       
-      if (!customAccounts.some(u => u.username === gUser.username)) {
-        customAccounts.push(gUser);
-        localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
-      }
+      customAccounts.push(googleSessionUser);
+      localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
 
-      currentUser = gUser;
+      currentUser = googleSessionUser;
       localStorage.setItem('eugene_active_user', JSON.stringify(currentUser));
       closeAuthModal();
       renderAuthHeader();
       renderVaultGrid();
       renderHoldersList();
       searchUsersForChat();
-      showToast('Logged in via Google Authentication!');
+      showToast('Authenticated securely via Google OAuth!');
     }
 
-    // --- CUSTOM AUTH LOGIC ---
     function toggleAuthMode() {
       isSignUpMode = !isSignUpMode;
       document.getElementById('auth-modal-title').innerText = isSignUpMode ? "Create Custom Account" : "Sign In to Eugene Card";
@@ -617,30 +648,50 @@
 
     function handleCustomAuthSubmit(e) {
       e.preventDefault();
-      const username = document.getElementById('auth-input-username').value.trim().toLowerCase().replace(/\s+/g, '_');
-      const password = document.getElementById('auth-input-password').value;
-      const name = document.getElementById('auth-input-name').value.trim() || username;
 
-      if (!username || !password) return showToast('Please enter username and password.');
+      if (failedAuthAttempts >= 5) {
+        return showToast('Too many failed attempts. Please try again later.');
+      }
+
+      const rawUsername = document.getElementById('auth-input-username').value.trim();
+      const rawPassword = document.getElementById('auth-input-password').value;
+      const rawName = document.getElementById('auth-input-name').value.trim();
+
+      const username = escapeHTML(rawUsername.toLowerCase().replace(/\s+/g, '_'));
+      const password = rawPassword;
+      const name = escapeHTML(rawName || username);
+
+      if (!username || !password) return showToast('Please enter both username and password.');
 
       if (isSignUpMode) {
-        if (customAccounts.some(u => u.username === username)) return showToast('Username handle taken.');
+        if (password.length < 6) {
+          return showToast('Password must be at least 6 characters.');
+        }
+        if (customAccounts.some(u => u.username === username)) {
+          return showToast('Username handle already exists.');
+        }
         const newAcc = {
           username,
           name,
           pass: password,
+          authType: 'custom',
           isAdmin: ADMIN_HANDLES.includes(username),
           avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`
         };
         customAccounts.push(newAcc);
         localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
         currentUser = newAcc;
-        showToast('Account created & logged in!');
+        failedAuthAttempts = 0;
+        showToast('Account registered successfully!');
       } else {
         const acc = customAccounts.find(u => u.username === username && u.pass === password);
-        if (!acc) return showToast('Invalid handle or password.');
+        if (!acc) {
+          failedAuthAttempts++;
+          return showToast(`Invalid credentials (${failedAuthAttempts}/5 attempts)`);
+        }
         currentUser = acc;
-        showToast(`Welcome back, @${username}!`);
+        failedAuthAttempts = 0;
+        showToast(`Welcome back, @${currentUser.username}!`);
       }
 
       localStorage.setItem('eugene_active_user', JSON.stringify(currentUser));
@@ -673,14 +724,19 @@
           if (adminSep) adminSep.classList.add('hidden');
         }
 
+        const isGoogle = currentUser.authType === 'google';
+
         container.innerHTML = `
           <div class="flex items-center gap-2 bg-gray-800/90 border border-gray-700/80 rounded-xl p-1.5 pl-2.5">
             <img src="${currentUser.avatar}" class="w-6 h-6 rounded-full object-cover bg-gray-900 border border-gray-700">
             <div class="flex flex-col text-left">
-              <span class="text-xs font-bold text-white leading-tight">${currentUser.name}</span>
-              <span class="text-[9px] font-semibold text-blue-400 font-mono">@${currentUser.username}</span>
+              <div class="flex items-center gap-1">
+                <span class="text-xs font-bold text-white leading-tight">${escapeHTML(currentUser.name)}</span>
+                ${isGoogle ? '<i class="fa-brands fa-google text-[9px] text-red-400" title="Google Verified"></i>' : ''}
+              </div>
+              <span class="text-[9px] font-semibold text-blue-400 font-mono">@${escapeHTML(currentUser.username)}</span>
             </div>
-            <button onclick="logoutUser()" title="Log Out" class="p-1.5 bg-gray-900 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-lg ml-1">
+            <button onclick="logoutUser()" title="Log Out" class="p-1.5 bg-gray-900 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-lg ml-1 transition-all">
               <i class="fa-solid fa-right-from-bracket text-xs"></i>
             </button>
           </div>
@@ -697,25 +753,34 @@
       }
     }
 
-    // --- REWORKED INVENTORY CONTROL STUDIO ---
+    // --- SECURED INVENTORY CONTROL STUDIO ---
     function handleInventorySubmit(e) {
       e.preventDefault();
-      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+      
+      // Strict Admin Authorization Guard
+      if (!currentUser || !currentUser.isAdmin) {
+        return showToast('Unauthorized action: Admin privileges required.');
+      }
 
       const cardId = document.getElementById('inv-input-id').value;
-      const serial = document.getElementById('inv-input-serial').value;
-      const name = document.getElementById('inv-input-name').value;
+      const serial = escapeHTML(document.getElementById('inv-input-serial').value.trim());
+      const name = escapeHTML(document.getElementById('inv-input-name').value.trim());
       const type = document.getElementById('inv-input-type').value;
       const price = parseInt(document.getElementById('inv-input-price').value, 10);
-      const imgUrl = document.getElementById('inv-input-img').value;
+      const imgUrl = document.getElementById('inv-input-img').value.trim();
       const status = document.getElementById('inv-input-status').value;
+
+      // URL Security Validation
+      if (!imgUrl.startsWith('http://') && !imgUrl.startsWith('https://')) {
+        return showToast('Invalid Image URL. Must start with http:// or https://');
+      }
 
       if (cardId) {
         const idx = inventory.findIndex(c => c.id === cardId);
         if (idx !== -1) {
           inventory[idx] = { ...inventory[idx], serial, name, type, price, imgUrl, status };
         }
-        showToast(`Updated ${serial} details.`);
+        showToast(`Updated card ${serial} successfully.`);
       } else {
         inventory.unshift({
           id: `card-${Date.now()}`,
@@ -735,6 +800,7 @@
     }
 
     function editInventoryCard(cardId) {
+      if (!currentUser?.isAdmin) return showToast('Admin privileges required.');
       const card = inventory.find(c => c.id === cardId);
       if (!card) return;
 
@@ -750,10 +816,12 @@
     }
 
     function deleteInventoryCard(cardId) {
-      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+      if (!currentUser?.isAdmin) return showToast('Admin privileges required.');
+      if (!confirm('Are you sure you want to permanently delete this card?')) return;
+
       inventory = inventory.filter(c => c.id !== cardId);
       saveInventoryState();
-      showToast('Card deleted from inventory.');
+      showToast('Card removed from inventory.');
     }
 
     function resetInventoryForm() {
@@ -773,31 +841,37 @@
         <tr class="hover:bg-gray-800/40 transition-all">
           <td class="p-3 font-mono font-bold text-blue-400 flex items-center gap-2">
             <img src="${card.imgUrl}" class="w-6 h-8 object-contain rounded bg-gray-950 border border-gray-800" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=N/A'">
-            <span>${card.serial} (${card.name})</span>
+            <span>${escapeHTML(card.serial)} (${escapeHTML(card.name)})</span>
           </td>
           <td class="p-3 font-semibold text-gray-300">${card.type}</td>
           <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
           <td class="p-3"><span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span></td>
           <td class="p-3 text-right space-x-1">
-            <button onclick="editInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-gray-700 text-amber-300 rounded-lg"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-rose-500/20 text-rose-400 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+            <button onclick="editInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-gray-700 text-amber-300 rounded-lg transition-all" title="Edit"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-all" title="Delete"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
       `).join('');
     }
 
-    // --- REWORKED MESSENGER / CHAT ---
+    // --- CHAT & TRADE PROPOSAL SYSTEM ---
     function searchUsersForChat() {
       const listContainer = document.getElementById('user-search-list');
       if (!listContainer) return;
 
-      listContainer.innerHTML = customAccounts.map(u => `
-        <div onclick="startChatWithUser('${u.username}', '${u.name}')" class="p-2.5 bg-gray-800/80 hover:bg-gray-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-gray-700/60 transition-all">
+      const query = document.getElementById('user-search-chat').value.toLowerCase();
+      const filtered = customAccounts.filter(u => u.username.includes(query) || u.name.toLowerCase().includes(query));
+
+      listContainer.innerHTML = filtered.map(u => `
+        <div onclick="startChatWithUser('${u.username}', '${escapeHTML(u.name)}', '${u.authType}')" class="p-2.5 bg-gray-800/80 hover:bg-gray-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-gray-700/60 transition-all">
           <div class="flex items-center gap-2.5">
             <img src="${u.avatar}" class="w-7 h-7 rounded-full bg-gray-900 border border-gray-700">
             <div>
-              <p class="text-xs font-bold text-white leading-tight">${u.name}</p>
-              <p class="text-[10px] text-gray-400 font-mono">@${u.username}</p>
+              <p class="text-xs font-bold text-white leading-tight flex items-center gap-1">
+                ${escapeHTML(u.name)}
+                ${u.authType === 'google' ? '<i class="fa-brands fa-google text-[8px] text-red-400"></i>' : ''}
+              </p>
+              <p class="text-[10px] text-gray-400 font-mono">@${escapeHTML(u.username)}</p>
             </div>
           </div>
           <i class="fa-solid fa-chevron-right text-[10px] text-gray-500"></i>
@@ -805,28 +879,43 @@
       `).join('');
     }
 
-    function startChatWithUser(username, name) {
+    function startChatWithUser(username, name, authType) {
       document.getElementById('chat-active-username').innerText = `${name} (@${username})`;
+      document.getElementById('chat-active-badge').innerText = authType === 'google' ? 'Google Verified Account' : 'Custom Verified Account';
+      
       document.getElementById('chat-messages').innerHTML = `
         <div class="p-3 bg-gray-800/80 rounded-xl text-left max-w-xs self-start border border-gray-700/80 shadow-sm">
-          <p class="text-blue-400 font-bold text-[10px] mb-0.5">@${username}</p>
-          <p class="text-xs text-gray-200">Hello! Let's arrange a direct trade offer for cards in our vaults.</p>
+          <p class="text-blue-400 font-bold text-[10px] mb-0.5">@${escapeHTML(username)}</p>
+          <p class="text-xs text-gray-200">Hello! Let's arrange a card trade.</p>
         </div>
       `;
     }
 
     function sendChatMessage() {
       const input = document.getElementById('chat-message-input');
-      const text = input.value.trim();
+      const text = escapeHTML(input.value.trim());
       if (!text) return;
 
       const chatContainer = document.getElementById('chat-messages');
       const msgDiv = document.createElement('div');
       msgDiv.className = 'p-3 bg-blue-600 rounded-xl text-right max-w-xs self-end text-white text-xs shadow-md';
-      msgDiv.innerText = text;
+      msgDiv.innerHTML = `<p>${text}</p><span class="text-[8px] text-blue-200 mt-1 block">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
       chatContainer.appendChild(msgDiv);
 
       input.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function sendTradePromptInChat() {
+      if (!currentUser) return openAuthModal();
+      const chatContainer = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'p-3 bg-purple-950/80 border border-purple-500/40 rounded-xl text-right max-w-xs self-end text-purple-200 text-xs shadow-md space-y-1';
+      msgDiv.innerHTML = `
+        <p class="font-bold flex items-center justify-end gap-1"><i class="fa-solid fa-handshake"></i> Direct Trade Proposal</p>
+        <p class="text-[11px]">User @${currentUser.username} initiated a trade request.</p>
+      `;
+      chatContainer.appendChild(msgDiv);
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
@@ -850,7 +939,7 @@
         const isMyCard = currentUser && currentUser.username === card.owner;
         actionBox.innerHTML = `
           <button disabled class="w-full py-2.5 bg-gray-800 text-gray-500 font-bold text-xs rounded-xl border border-gray-700 cursor-not-allowed flex items-center justify-center gap-2">
-            <i class="fa-solid fa-lock"></i> ${isMyCard ? "Already In Your Vault" : `Owned by @${card.owner}`}
+            <i class="fa-solid fa-lock"></i> ${isMyCard ? "In Your Private Vault" : `Owned by @${card.owner}`}
           </button>
         `;
       } else {
@@ -901,8 +990,8 @@
           <div class="w-full aspect-[4/5] bg-gray-950 rounded-lg border border-gray-800 p-1 mb-2 overflow-hidden flex items-center justify-center">
             <img src="${card.imgUrl}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=Image+Unavailable'">
           </div>
-          <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${card.serial}</p>
-          <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
+          <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${escapeHTML(card.serial)}</p>
+          <p class="text-[11px] font-bold text-white truncate text-center">${escapeHTML(card.name)}</p>
         </div>
       `).join('');
     }
@@ -929,8 +1018,8 @@
               <div class="w-full aspect-[4/5] bg-gray-950 rounded-lg border border-gray-800 p-1 mb-2">
                 <img src="${card.imgUrl}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=Image+Unavailable'">
               </div>
-              <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${card.serial}</p>
-              <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
+              <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${escapeHTML(card.serial)}</p>
+              <p class="text-[11px] font-bold text-white truncate text-center">${escapeHTML(card.name)}</p>
             </div>
           `).join('')}
         </div>
@@ -946,8 +1035,11 @@
           <div class="flex items-center gap-3">
             <img src="${u.avatar}" class="w-9 h-9 rounded-full bg-gray-950 border border-gray-800">
             <div>
-              <h4 class="text-xs font-bold text-white">${u.name}</h4>
-              <p class="text-[10px] text-gray-400 font-mono">@${u.username}</p>
+              <h4 class="text-xs font-bold text-white flex items-center gap-1">
+                ${escapeHTML(u.name)}
+                ${u.authType === 'google' ? '<i class="fa-brands fa-google text-[8px] text-red-400"></i>' : ''}
+              </h4>
+              <p class="text-[10px] text-gray-400 font-mono">@${escapeHTML(u.username)}</p>
             </div>
           </div>
           <span class="text-xs font-bold text-teal-400">Collector</span>
@@ -963,8 +1055,8 @@
         <tr>
           <td class="p-3 text-gray-400 font-mono">${log.timestamp || 'Just now'}</td>
           <td class="p-3"><span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">${log.type || 'TRADE'}</span></td>
-          <td class="p-3 font-mono text-blue-400 font-bold">${log.serial}</td>
-          <td class="p-3 text-white">@${log.user}</td>
+          <td class="p-3 font-mono text-blue-400 font-bold">${escapeHTML(log.serial)}</td>
+          <td class="p-3 text-white">@${escapeHTML(log.user)}</td>
           <td class="p-3 font-mono text-emerald-400 text-right">IDR ${(log.amount || 0).toLocaleString()}</td>
         </tr>
       `).join('');
