@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eugene Card Marketplace | Beta Edition</title>
 
-  <!-- Browser Tab Favicon -->
+  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%233b82f6' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%233b82f6'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
 
   <!-- Tailwind CSS -->
@@ -17,13 +17,10 @@
         extend: {
           colors: {
             gemini: {
-              bg: '#0f172a',
+              bg: '#0b1120',
               card: '#1e293b',
               border: '#334155',
-              hover: '#334155',
-              accent: '#3b82f6',
-              accentHover: '#2563eb',
-              muted: '#94a3b8'
+              accent: '#3b82f6'
             }
           },
           fontFamily: { sans: ['Inter', 'sans-serif'] }
@@ -70,9 +67,6 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white relative">
 
-  <!-- Hidden JSON File Input -->
-  <input type="file" id="json-import-input" accept=".json" class="hidden" onchange="handleJSONImport(event)">
-
   <!-- Embedded Logo SVG -->
   <svg style="display: none;">
     <defs>
@@ -104,72 +98,56 @@
       <!-- Navigation Tabs -->
       <nav class="flex items-center gap-1 bg-slate-800/80 p-1 rounded-2xl border border-slate-700 overflow-x-auto max-w-full">
         <button id="nav-catalog" onclick="switchTab('catalog')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-white bg-slate-700 flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-layer-group text-blue-400"></i> <span data-i18n="navCollection">Collection</span>
+          <i class="fa-solid fa-layer-group text-blue-400"></i> <span>Collection</span>
         </button>
         <button id="nav-trade" onclick="switchTab('trade')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-right-left text-blue-400"></i> <span data-i18n="navTrade">Trade</span>
+          <i class="fa-solid fa-right-left text-blue-400"></i> <span>Trade</span>
         </button>
         <button id="nav-auction" onclick="switchTab('auction')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-gavel text-emerald-400"></i> <span data-i18n="navAuction">Auction</span>
-        </button>
-        <button id="nav-trade-req" onclick="switchTab('trade-req')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-handshake text-purple-400"></i> <span data-i18n="navTradeReq">Trade Requests</span>
+          <i class="fa-solid fa-gavel text-emerald-400"></i> <span>Auction</span>
         </button>
         <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-comments text-indigo-400"></i> <span data-i18n="navInbox">Inbox</span>
+          <i class="fa-solid fa-comments text-indigo-400"></i> <span>Inbox</span>
         </button>
         <button id="nav-holders" onclick="switchTab('holders')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-users text-teal-400"></i> <span data-i18n="navHolders">Holders</span>
+          <i class="fa-solid fa-users text-teal-400"></i> <span>Holders</span>
         </button>
         <button id="nav-history" onclick="switchTab('history')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span data-i18n="navHistory">History</span>
+          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span>History</span>
         </button>
 
         <div class="h-4 w-px bg-slate-700 mx-1 self-center hidden sm:block"></div>
 
         <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-vault text-blue-400"></i> <span data-i18n="navVault">My Vault</span>
+          <i class="fa-solid fa-vault text-blue-400"></i> <span>My Vault</span>
         </button>
         <button id="nav-wishlist" onclick="switchTab('wishlist')" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-heart text-rose-400"></i> <span data-i18n="navWishlist">Wishlist</span> ( <span id="wishlist-count">0</span> )
+          <i class="fa-solid fa-heart text-rose-400"></i> <span>Wishlist</span> ( <span id="wishlist-count">0</span> )
         </button>
 
-        <!-- Admin Features Section -->
+        <!-- Admin Only Tabs -->
         <div id="admin-nav-separator" class="h-4 w-px bg-slate-700 mx-1 self-center hidden"></div>
 
-        <button id="nav-analytics" onclick="switchTab('analytics')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
-          <i class="fa-solid fa-chart-line text-amber-400"></i> <span data-i18n="navAnalytics">Analytics</span>
-        </button>
         <button id="nav-ai-prediction" onclick="switchTab('ai-prediction')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-emerald-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-emerald-950/30 border border-emerald-500/30">
           <i class="fa-solid fa-brain text-emerald-400"></i> <span>AI Prediction</span>
         </button>
         <button id="nav-admin" onclick="switchTab('admin')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-rose-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-rose-950/30 border border-rose-500/30">
-          <i class="fa-solid fa-shield-halved"></i> <span data-i18n="navAdmin">Admin Hub</span>
+          <i class="fa-solid fa-shield-halved"></i> <span>Admin Hub</span>
         </button>
         <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav hidden px-3 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 whitespace-nowrap bg-amber-950/30 border border-amber-500/30">
-          <i class="fa-solid fa-boxes-stacked"></i> <span data-i18n="navInventory">Inventory</span>
+          <i class="fa-solid fa-boxes-stacked"></i> <span>Inventory</span>
         </button>
       </nav>
 
-      <!-- Auth & Lang Header Container -->
+      <!-- Auth Header Container -->
       <div class="flex items-center gap-2 shrink-0">
-        <button onclick="toggleLanguage()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
-          <i class="fa-solid fa-globe text-blue-400"></i>
-          <span id="lang-label">EN</span>
-        </button>
-
-        <button id="notif-toggle-btn" onclick="openNotifications()" class="relative p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700 flex items-center justify-center transition-all">
-          <i class="fa-solid fa-bell text-xs text-blue-400"></i>
-          <span id="notification-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 text-white font-bold text-[9px] rounded-full flex items-center justify-center">0</span>
-        </button>
-
         <div id="auth-header-container"></div>
       </div>
 
     </div>
   </header>
 
-  <!-- USERNAME EDIT MODAL -->
+  <!-- EDIT USERNAME MODAL -->
   <div id="username-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
       <button onclick="closeUsernameModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
@@ -182,21 +160,21 @@
       </div>
 
       <div class="space-y-2">
-        <label class="text-[11px] font-bold text-slate-400 uppercase">New Username</label>
+        <label class="text-[11px] font-bold text-slate-400 uppercase">New Handle</label>
         <div class="relative">
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-xs">@</span>
-          <input type="text" id="new-username-input" placeholder="eugene_master" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+          <input type="text" id="new-username-input" placeholder="eugene_collector" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
         </div>
       </div>
 
       <div class="pt-2 flex justify-end gap-2">
         <button onclick="closeUsernameModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
-        <button onclick="saveNewUsername()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Save Username</button>
+        <button onclick="saveNewUsername()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Save Handle</button>
       </div>
     </div>
   </div>
 
-  <!-- AUTH MODAL -->
+  <!-- GOOGLE AUTH MODAL -->
   <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-5 relative shadow-2xl">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
@@ -208,180 +186,13 @@
           <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
         </div>
         <h3 class="text-base font-bold text-white">Log In to Eugene Card</h3>
-        <p class="text-xs text-slate-400">Sign in securely with Google to trade cards, manage your vault, and access admin features.</p>
+        <p class="text-xs text-slate-400">Authentication is strictly powered by Google accounts for verified trade security.</p>
       </div>
 
       <div class="pt-2">
         <button onclick="loginWithGoogleSupabase()" class="w-full py-3 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all">
           <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Sign In with Google</span>
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- HOLDER BINDER MODAL -->
-  <div id="holder-binder-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full p-6 relative shadow-2xl space-y-4">
-      <button onclick="closeHolderBinderModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center z-10">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
-        <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-blue-400 font-bold">
-          <i class="fa-solid fa-book-open"></i>
-        </div>
-        <div>
-          <h3 id="holder-binder-title" class="text-base font-bold text-white">Collector's Binder</h3>
-          <p id="holder-binder-subtitle" class="text-xs text-slate-400">Inspecting owned cards collection.</p>
-        </div>
-      </div>
-
-      <div id="holder-binder-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[60vh] overflow-y-auto p-1"></div>
-    </div>
-  </div>
-
-  <!-- CARD DETAILS MODAL -->
-  <div id="card-details-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl space-y-5">
-      <button onclick="closeCardDetailsModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center z-10">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div class="bg-slate-950 rounded-xl border border-slate-800 p-2 flex items-center justify-center">
-          <img id="detail-card-img" src="" class="w-full h-auto max-h-64 object-contain rounded-lg">
-        </div>
-
-        <div class="space-y-3 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span id="detail-card-type" class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full"></span>
-              <span id="detail-card-serial" class="text-xs font-mono font-bold text-blue-400"></span>
-            </div>
-            <h3 id="detail-card-name" class="text-lg font-bold text-white leading-tight"></h3>
-            <p id="detail-card-status" class="text-[11px] text-slate-400 mt-1"></p>
-          </div>
-
-          <div class="space-y-1 bg-slate-800/50 p-3 rounded-xl border border-slate-800">
-            <p class="text-[10px] uppercase font-bold text-slate-400" data-i18n="priceTag">Price Tag</p>
-            <p id="detail-card-price" class="text-lg font-mono font-bold text-emerald-400">IDR 0</p>
-            <p class="text-[9px] text-slate-400 mt-0.5">+ 2% Marketplace Tax added at checkout</p>
-          </div>
-
-          <div class="space-y-2 pt-2">
-            <button onclick="openQRISPaymentModal()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-qrcode"></i> <span data-i18n="buyQrisBtn">Buy / Order via QRIS</span>
-            </button>
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="toggleWishlistActiveDetailCard()" class="py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-heart"></i> <span id="detail-wishlist-text" data-i18n="wishlist">Wishlist</span>
-              </button>
-              <button onclick="switchTab('trade')" class="py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-right-left"></i> <span data-i18n="trade">Trade</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- QRIS PAYMENT MODAL -->
-  <div id="qris-payment-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl text-center">
-      <button onclick="closeQRISPaymentModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="space-y-1">
-        <h3 class="text-base font-bold text-white" data-i18n="qrisTitle">QRIS Payment</h3>
-        <p class="text-xs text-slate-400" data-i18n="qrisDesc">Scan to pay and upload your transfer receipt.</p>
-      </div>
-
-      <div class="bg-white p-3 rounded-xl inline-block shadow-inner">
-        <img id="qris-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=EUGENE_CARD_QRIS_PAYMENT" class="w-40 h-40 mx-auto">
-      </div>
-
-      <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 text-left space-y-1 text-xs">
-        <div class="flex justify-between">
-          <span class="text-slate-400">Item:</span>
-          <span id="qris-modal-item" class="font-bold text-white">---</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-400">Base Price:</span>
-          <span id="qris-modal-base-price" class="font-mono text-slate-300">IDR 0</span>
-        </div>
-        <div class="flex justify-between text-amber-400 font-semibold">
-          <span>Tax (+2%):</span>
-          <span id="qris-modal-tax" class="font-mono">IDR 0</span>
-        </div>
-        <div class="h-px bg-slate-700 my-1"></div>
-        <div class="flex justify-between text-sm font-bold">
-          <span class="text-slate-300">Total Payment:</span>
-          <span id="qris-modal-total" class="font-mono text-emerald-400">IDR 0</span>
-        </div>
-      </div>
-
-      <div class="text-left space-y-1.5">
-        <label class="text-[11px] font-bold text-slate-400 uppercase" data-i18n="uploadReceipt">Upload Payment Receipt</label>
-        <input type="file" id="qris-receipt-file" accept="image/*" class="w-full text-xs text-slate-300 bg-slate-800 border border-slate-700 rounded-xl p-2 focus:outline-none">
-      </div>
-
-      <button onclick="submitQRISOrder()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-        <i class="fa-solid fa-paper-plane"></i> <span data-i18n="submitOrder">Submit Order & Receipt</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- SELL BACK CONFIRMATION MODAL -->
-  <div id="sellback-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl text-center">
-      <button onclick="closeSellbackModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="w-12 h-12 rounded-xl mx-auto bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl">
-        <i class="fa-solid fa-hand-holding-dollar"></i>
-      </div>
-
-      <div>
-        <h3 class="text-base font-bold text-white">Confirm Sell Back</h3>
-        <p class="text-xs text-slate-400 mt-1">Are you sure you want to sell back this card to the vault?</p>
-      </div>
-
-      <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700 text-left space-y-1.5">
-        <div class="flex justify-between text-xs">
-          <span class="text-slate-400">Card Name:</span>
-          <span id="sellback-card-name" class="font-bold text-white truncate max-w-[150px]">---</span>
-        </div>
-        <div class="flex justify-between text-xs">
-          <span class="text-slate-400">Buyback Price (80%):</span>
-          <span id="sellback-card-price" class="font-mono font-bold text-emerald-400">IDR 0</span>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2 pt-2">
-        <button onclick="closeSellbackModal()" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
-        <button onclick="confirmSellbackAction()" class="py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow transition-all">Confirm Sell</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADMIN RECEIPT VIEW MODAL -->
-  <div id="receipt-view-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeReceiptModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <h3 class="text-base font-bold text-white">Payment Receipt Proof</h3>
-      
-      <div class="bg-slate-950 rounded-xl border border-slate-800 p-2 flex items-center justify-center max-h-96 overflow-hidden">
-        <img id="receipt-modal-img" src="" class="max-h-80 w-auto object-contain rounded-lg">
-      </div>
-
-      <div class="flex justify-end">
-        <button onclick="closeReceiptModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Close</button>
       </div>
     </div>
   </div>
@@ -426,7 +237,7 @@
         </div>
 
         <div>
-          <label class="text-[11px] font-bold text-slate-400 uppercase">Image URL</label>
+          <label class="text-[11px] font-bold text-slate-400 uppercase">Image URL (Syncs across all devices)</label>
           <input type="text" id="edit-card-img" required class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
         </div>
 
@@ -441,7 +252,7 @@
 
         <div class="pt-2 flex items-center justify-end gap-2">
           <button type="button" onclick="closeCardEditorModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Save Changes</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Save & Sync Global</button>
         </div>
       </form>
     </div>
@@ -459,13 +270,13 @@
           </div>
           <div>
             <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-wider">LIMITED EDITION</span>
-            <h2 class="text-base font-bold text-white mt-0.5" data-i18n="catalogTitle">Beta Edition Card Stock</h2>
-            <p class="text-xs text-slate-400" data-i18n="catalogSub">Official Primary Market Availability (+2% Tax Included at Checkout)</p>
+            <h2 class="text-base font-bold text-white mt-0.5">Beta Edition Card Stock</h2>
+            <p class="text-xs text-slate-400">Official Market Availability (+2% Tax Included at Checkout)</p>
           </div>
         </div>
         
         <div class="bg-slate-800/80 px-5 py-2.5 rounded-xl border border-slate-700 text-center sm:text-right w-full sm:w-auto">
-          <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider" data-i18n="remainingCards">Remaining Cards</p>
+          <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Remaining Cards</p>
           <p class="text-xl font-bold font-mono text-blue-400"><span id="remaining-cards-count">0</span> <span class="text-slate-400 text-xs font-normal">Available</span></p>
         </div>
       </div>
@@ -485,71 +296,28 @@
       <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </section>
 
-    <!-- TRADE VIEW -->
-    <section id="view-trade" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-right-left text-blue-400 mr-2"></i> Secondary Market Listings</h2>
-          <p class="text-xs text-slate-400 mt-1">Buy cards directly listed by other community collectors.</p>
-        </div>
-      </div>
-
-      <div id="trade-listings-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
-    </section>
-
-    <!-- AUCTION VIEW -->
-    <section id="view-auction" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
-        <p class="text-xs text-slate-400 mt-1">Place competitive bids on rare serial cards before time runs out.</p>
-      </div>
-
-      <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-    </section>
-
-    <!-- TRADE REQUESTS VIEW -->
-    <section id="view-trade-req" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-handshake text-purple-400 mr-2"></i> Direct Card Swap Requests</h2>
-        <p class="text-xs text-slate-400 mt-1">Review active card swap proposals from other collectors.</p>
-      </div>
-
-      <div id="trade-requests-list" class="space-y-3"></div>
-    </section>
-
-    <!-- INBOX VIEW (MATCHED UI STYLING) -->
+    <!-- INBOX VIEW (GOOGLE USERS REALTIME CHAT) -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase tracking-wide flex items-center gap-2">
           <i class="fa-solid fa-comments text-indigo-400"></i> MESSENGER & CHAT
         </h2>
-        <p class="text-xs text-slate-400 mt-1">Direct message buyers, sellers, or search collectors by username.</p>
+        <p class="text-xs text-slate-400 mt-1">Direct message other Google-authenticated collectors.</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Inbox Sidebar -->
         <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-4 space-y-4">
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search username..." class="w-full bg-slate-800/70 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+            <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search Google collectors..." class="w-full bg-slate-800/70 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
           </div>
 
           <div id="user-search-results" class="space-y-1.5">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1">SEARCH RESULTS</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1">COMMUNITY GOOGLE USERS</p>
             <div id="user-search-list" class="space-y-1.5"></div>
-          </div>
-
-          <div class="space-y-1.5 pt-2 border-t border-slate-800/60">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1">ACTIVE CONVERSATIONS</p>
-            <div id="active-chats-list" class="space-y-1">
-              <div class="p-4 bg-slate-800/30 rounded-xl border border-slate-800/50 text-xs text-slate-400 text-center leading-relaxed">
-                No active conversations yet. Search a username above to start chatting!
-              </div>
-            </div>
           </div>
         </div>
 
-        <!-- Chat Window -->
         <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between min-h-[420px]">
           <div id="chat-header" class="border-b border-slate-800/80 pb-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -557,15 +325,15 @@
                 <i class="fa-solid fa-user"></i>
               </div>
               <div>
-                <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a chat</h4>
-                <p class="text-[10px] text-slate-500">Offline</p>
+                <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a Google User to chat</h4>
+                <p class="text-[10px] text-slate-500">Verified Supabase Account</p>
               </div>
             </div>
           </div>
 
           <div id="chat-messages" class="flex-1 my-6 space-y-3 overflow-y-auto max-h-72 text-xs text-slate-400 flex flex-col justify-center items-center">
             <i class="fa-solid fa-paper-plane text-3xl text-slate-800 mb-2"></i>
-            <span class="text-slate-400 font-medium">Select a user or start a new conversation to view messages.</span>
+            <span class="text-slate-400 font-medium">Select a user to view direct messages.</span>
           </div>
 
           <div class="flex items-center gap-2 border-t border-slate-800/80 pt-4">
@@ -581,202 +349,22 @@
     <!-- HOLDERS VIEW -->
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Top Card Holders</h2>
-        <p class="text-xs text-slate-400 mt-1">Community leaderboard. Click on any collector to inspect their binder.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Google Verified Collectors</h2>
+        <p class="text-xs text-slate-400 mt-1">Live leaderboard of active Google account holders.</p>
       </div>
       <div id="holders-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- HISTORY VIEW -->
-    <section id="view-history" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
-        <div>
-          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Marketplace Ledger</h2>
-          <p class="text-xs text-slate-400 mt-1">Verified primary and secondary transaction records on the network.</p>
-        </div>
-        <button onclick="clearHistoryLog()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-bold rounded-xl border border-slate-700 transition-all">
-          Clear Logs
-        </button>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-800/80 text-[10px] uppercase text-slate-400 font-semibold border-b border-slate-800">
-              <tr>
-                <th class="p-3">Timestamp</th>
-                <th class="p-3">Type</th>
-                <th class="p-3">Item Tag</th>
-                <th class="p-3">User / Collector</th>
-                <th class="p-3 font-mono text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody id="history-table-body" class="divide-y divide-slate-800"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- DASHBOARD / VAULT VIEW -->
-    <section id="view-dashboard" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-blue-400 mr-2"></i> My Personal Vault</h2>
-        <p class="text-xs text-slate-400 mt-1">Manage, list, or sell back your owned cards.</p>
-      </div>
-      <div id="owned-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <p class="text-center text-xs text-slate-400">Log in with Google to view your owned cards inside your private binder.</p>
-      </div>
-    </section>
-
-    <!-- WISHLIST VIEW -->
-    <section id="view-wishlist" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> Saved Wishlist</h2>
-        <p class="text-xs text-slate-400 mt-1">Keep track of cards you want to acquire.</p>
-      </div>
-      <div id="wishlist-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <p class="text-center text-xs text-slate-400 py-8">No wishlisted cards saved yet. Click the heart icon on any card in the Collection tab!</p>
-      </div>
-    </section>
-
-    <!-- ANALYTICS VIEW (ADMIN ONLY) -->
-    <section id="view-analytics" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-chart-line text-amber-400 mr-2"></i> Market Analytics</h2>
-        <p class="text-xs text-slate-400 mt-1">Platform sales volume and distribution tracking.</p>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Total Volume</p>
-          <p class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 12,500,000</p>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Secondary Trades</p>
-          <p class="text-xl font-bold font-mono text-blue-400 mt-1">42 Completed</p>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Active Holders</p>
-          <p class="text-xl font-bold font-mono text-purple-400 mt-1">19 Collectors</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- AI REVENUE PREDICTION VIEW (NEW ADMIN TAB) -->
-    <section id="view-ai-prediction" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
-        <div>
-          <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
-            <i class="fa-solid fa-brain text-emerald-400"></i> AI Financial Revenue Prediction
-          </h2>
-          <p class="text-xs text-slate-400 mt-1">Predict projected 30-day sales volume, marketplace 2% tax revenues, and growth forecasts using platform heuristics.</p>
-        </div>
-        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold px-3 py-1 rounded-full uppercase">Predictive Intelligence</span>
-      </div>
-
-      <!-- AI Forecast Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Projected 30-Day Volume</p>
-          <p id="ai-projected-volume" class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 24,500,000</p>
-          <p class="text-[10px] text-emerald-500 font-semibold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +18.4% vs last month</p>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Est. 2% Tax Earnings</p>
-          <p id="ai-projected-tax" class="text-xl font-bold font-mono text-blue-400 mt-1">IDR 490,000</p>
-          <p class="text-[10px] text-blue-400 font-semibold mt-1">Net platform revenue</p>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Predicted Mint Sellouts</p>
-          <p id="ai-projected-sellouts" class="text-xl font-bold font-mono text-amber-400 mt-1">14 Cards</p>
-          <p class="text-[10px] text-amber-400 font-semibold mt-1">Based on search velocity</p>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-slate-400">Market Confidence Score</p>
-          <p class="text-xl font-bold font-mono text-purple-400 mt-1">94.2 / 100</p>
-          <p class="text-[10px] text-purple-400 font-semibold mt-1">High collector activity</p>
-        </div>
-      </div>
-
-      <!-- Interactive Parameter Controls -->
-      <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
-        <h4 class="text-xs font-bold text-slate-300 uppercase">Interactive Forecast Simulator</h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="space-y-2">
-            <div class="flex justify-between text-xs">
-              <span class="text-slate-400">User Growth Rate Multiplier:</span>
-              <span id="growth-rate-val" class="font-bold text-blue-400 font-mono">1.5x</span>
-            </div>
-            <input type="range" id="growth-rate-slider" min="0.5" max="3.0" step="0.1" value="1.5" oninput="updateAIPrediction()" class="w-full accent-blue-500">
-          </div>
-
-          <div class="space-y-2">
-            <div class="flex justify-between text-xs">
-              <span class="text-slate-400">Est. Monthly Trade Count:</span>
-              <span id="trade-count-val" class="font-bold text-emerald-400 font-mono">60 Trades</span>
-            </div>
-            <input type="range" id="trade-count-slider" min="10" max="200" step="5" value="60" oninput="updateAIPrediction()" class="w-full accent-emerald-500">
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ADMIN HUB VIEW -->
-    <section id="view-admin" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
-        <div>
-          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub</h2>
-          <p class="text-xs text-slate-400 mt-1">Verify payment receipts and oversee pending QRIS orders.</p>
-        </div>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-        <h4 class="text-xs font-bold text-slate-300 uppercase flex items-center gap-2">
-          <i class="fa-solid fa-receipt text-amber-400"></i> Pending QRIS Orders & Receipts
-        </h4>
-        
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-800/80 text-[10px] uppercase text-slate-400 font-semibold border-b border-slate-800">
-              <tr>
-                <th class="p-3">Order ID</th>
-                <th class="p-3">Buyer</th>
-                <th class="p-3">Card Tag</th>
-                <th class="p-3">Total Amount (+2% Tax)</th>
-                <th class="p-3">Receipt Proof</th>
-                <th class="p-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="qris-orders-table-body" class="divide-y divide-slate-800">
-              <tr>
-                <td colspan="6" class="p-4 text-center text-slate-500">No pending QRIS orders waiting for approval.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- INVENTORY VIEW (ADMIN ONLY) -->
+    <!-- INVENTORY VIEW (ADMIN MULTI-DEVICE CONTROL) -->
     <section id="view-inventory" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-2"></i> Inventory Control</h2>
-          <p class="text-xs text-slate-400 mt-1">Manage, edit, or mint new cards in the collection.</p>
+          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-2"></i> Global Inventory Control</h2>
+          <p class="text-xs text-slate-400 mt-1">Edits made here update live on all devices globally via Supabase Realtime.</p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <button onclick="triggerJSONImport()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-file-import text-blue-400"></i> Import JSON
-          </button>
-          <button onclick="exportJSON()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-file-export text-emerald-400"></i> Export JSON
-          </button>
-          <button onclick="openCardEditorModal()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow flex items-center gap-1.5">
-            <i class="fa-solid fa-plus"></i> Mint / Add New Card
-          </button>
-        </div>
+        <button onclick="openCardEditorModal()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow flex items-center gap-1.5">
+          <i class="fa-solid fa-plus"></i> Mint / Add New Card
+        </button>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
@@ -800,215 +388,80 @@
 
   </main>
 
-  <!-- TOAST NOTIFICATION -->
+  <!-- TOAST -->
   <div id="toast" class="fixed bottom-6 right-6 z-[10000] bg-slate-900 border border-blue-500/40 text-blue-400 text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all pointer-events-none">
     <span id="toast-msg">Action completed.</span>
   </div>
 
-  <!-- Supabase JS Client Library -->
+  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-init.js"></script>
 
   <script>
     const ADMIN_EMAILS = [
       'eugene.aquila06@gmail.com',
-      'yujinybwork@gmail.com',
-      'eugene.aquila06'
+      'yujinybwork@gmail.com'
     ];
 
-    const MOCK_USERS = [
-      { username: 'alex_collector', name: 'Alex Johnson', email: 'alex@example.com' },
-      { username: 'card_master99', name: 'Samantha Lee', email: 'samantha@example.com' },
-      { username: 'eugene_fan', name: 'David Miller', email: 'david@example.com' },
-      { username: 'vault_king', name: 'Elena Rostova', email: 'elena@example.com' }
-    ];
-
-    const I18N = {
-      en: {
-        navCollection: "Collection",
-        navTrade: "Trade",
-        navAuction: "Auction",
-        navTradeReq: "Trade Requests",
-        navInbox: "Inbox",
-        navHolders: "Holders",
-        navHistory: "History",
-        navVault: "My Vault",
-        navWishlist: "Wishlist",
-        navAnalytics: "Analytics",
-        navAdmin: "Admin Hub",
-        navInventory: "Inventory",
-        catalogTitle: "Beta Edition Card Stock",
-        catalogSub: "Official Primary Market Availability (+2% Tax Included at Checkout)",
-        remainingCards: "Remaining Cards",
-        priceTag: "Price Tag",
-        buyQrisBtn: "Buy / Order via QRIS",
-        wishlist: "Wishlist",
-        wishlisted: "Wishlisted",
-        trade: "Trade",
-        qrisTitle: "QRIS Payment",
-        qrisDesc: "Scan to pay and upload your transfer receipt.",
-        uploadReceipt: "Upload Payment Receipt",
-        submitOrder: "Submit Order & Receipt"
-      },
-      id: {
-        navCollection: "Koleksi",
-        navTrade: "Tukar",
-        navAuction: "Lelang",
-        navTradeReq: "Permintaan Tukar",
-        navInbox: "Pesan",
-        navHolders: "Pemilik",
-        navHistory: "Riwayat",
-        navVault: "Brankas Saya",
-        navWishlist: "Keinginan",
-        navAnalytics: "Analistik",
-        navAdmin: "Pusat Admin",
-        navInventory: "Inventaris",
-        catalogTitle: "Stok Kartu Edisi Beta",
-        catalogSub: "Ketersediaan Pasar Resmi (+Pajak 2% Ditambahkan Saat Checkout)",
-        remainingCards: "Sisa Kartu",
-        priceTag: "Label Harga",
-        buyQrisBtn: "Beli / Pesan via QRIS",
-        wishlist: "Keinginan",
-        wishlisted: "Tersimpan",
-        trade: "Tukar",
-        qrisTitle: "Pembayaran QRIS",
-        qrisDesc: "Pindai untuk membayar dan unggah bukti transfer Anda.",
-        uploadReceipt: "Unggah Bukti Pembayaran",
-        submitOrder: "Kirim Pesanan & Bukti"
-      }
-    };
-
-    let currentLang = localStorage.getItem('eugene_lang') || 'en';
     let currentUser = null;
-    let currentFilter = 'ALL';
     let inventory = [];
-    let wishlist = [];
-    let qrisOrders = [];
-    let historyLogs = [];
-    let tradeListings = [];
-    let auctions = [];
-    let tradeRequests = [];
-    
-    let activeDetailCardId = null;
-    let sellbackCardTarget = null;
-    let activeChatUser = null;
+    let googleProfiles = [];
+    let currentFilter = 'ALL';
 
-    // --- INITIALIZATION & REAL-TIME LOCALSTORAGE SYNCHRONIZATION ---
-    function loadSavedState() {
-      const savedInv = localStorage.getItem('eugene_inventory');
-      if (savedInv) {
-        try { inventory = JSON.parse(savedInv); } catch(e) { inventory = []; }
-      }
-      
-      if (!inventory || inventory.length === 0) {
-        inventory = [];
-        for (let i = 1; i <= 50; i++) {
-          const isPremium = i <= 25;
-          const numStr = String(i).padStart(2, '0');
-          inventory.push({
-            id: `card-${i}`,
-            serial: `*${numStr}`,
-            name: isPremium ? `Eugene Premium #${numStr}` : `Eugene Standard #${numStr}`,
-            type: isPremium ? 'PREMIUM' : 'STANDARD',
-            price: isPremium ? 500000 : 100000,
-            owner: i === 5 ? 'alex@example.com' : i === 12 ? 'samantha@example.com' : null,
-            status: (i === 5 || i === 12) ? 'OWNED' : 'AVAILABLE',
-            imgUrl: `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${numStr}`
-          });
-        }
-        saveInventoryState();
-      }
+    // --- SUPABASE DATABASE REALTIME & SYNC ---
+    async function loadDatabaseState() {
+      if (!window.supabaseClient) return;
 
-      const savedWish = localStorage.getItem('eugene_wishlist');
-      if (savedWish) {
-        try { wishlist = JSON.parse(savedWish); } catch(e) { wishlist = []; }
-      }
-
-      const savedOrders = localStorage.getItem('eugene_qris_orders');
-      if (savedOrders) {
-        try { qrisOrders = JSON.parse(savedOrders); } catch(e) { qrisOrders = []; }
-      }
-
-      const savedHistory = localStorage.getItem('eugene_history_logs');
-      if (savedHistory) {
-        try { historyLogs = JSON.parse(savedHistory); } catch(e) { historyLogs = []; }
+      // 1. Fetch Cards Inventory from Supabase Database
+      const { data: cards, error } = await supabaseClient.from('cards').select('*').order('created_at', { ascending: true });
+      if (!error && cards && cards.length > 0) {
+        inventory = cards;
       } else {
-        historyLogs = [
-          { timestamp: new Date(Date.now() - 3600000 * 5).toLocaleString(), type: 'PRIMARY SALE', serial: '*05', user: 'alex_collector', amount: 510000 },
-          { timestamp: new Date(Date.now() - 3600000 * 12).toLocaleString(), type: 'PRIMARY SALE', serial: '*12', user: 'card_master99', amount: 510000 }
-        ];
-        saveHistoryLogsState();
+        // Fallback standard database structure if table is empty
+        inventory = Array.from({ length: 50 }, (_, i) => ({
+          id: `card-${i+1}`,
+          serial: `*${String(i+1).padStart(2, '0')}`,
+          name: i < 25 ? `Eugene Premium #${String(i+1).padStart(2, '0')}` : `Eugene Standard #${String(i+1).padStart(2, '0')}`,
+          type: i < 25 ? 'PREMIUM' : 'STANDARD',
+          price: i < 25 ? 500000 : 100000,
+          status: 'AVAILABLE',
+          imgUrl: `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${String(i+1).padStart(2, '0')}`
+        }));
       }
 
-      tradeListings = [
-        { id: 'trade-101', cardId: 'card-5', serial: '*05', name: 'Eugene Premium #05', seller: 'alex_collector', price: 650000, imgUrl: 'https://placehold.co/1080x1350/1e293b/3b82f6?text=*05' },
-        { id: 'trade-102', cardId: 'card-12', serial: '*12', name: 'Eugene Premium #12', seller: 'card_master99', price: 580000, imgUrl: 'https://placehold.co/1080x1350/1e293b/3b82f6?text=*12' }
-      ];
+      // 2. Fetch Verified Google Sign-In Profiles from Supabase
+      const { data: profiles } = await supabaseClient.from('profiles').select('*');
+      if (profiles) googleProfiles = profiles;
 
-      auctions = [
-        { id: 'auc-201', cardId: 'card-01', serial: '*01', name: 'Eugene Premium #01', topBidder: 'vault_king', currentBid: 750000, endSeconds: 8400, imgUrl: 'https://placehold.co/1080x1350/1e293b/3b82f6?text=*01' }
-      ];
-
-      tradeRequests = [
-        { id: 'tr-301', sender: 'alex_collector', offeredCard: '*05 (Eugene Premium #05)', requestedCard: '*12 (Eugene Premium #12)', status: 'PENDING' }
-      ];
+      renderCardGrid();
+      renderInventoryTable();
+      renderHoldersList();
+      searchUsersForChat();
     }
 
-    function saveInventoryState() {
-      localStorage.setItem('eugene_inventory', JSON.stringify(inventory));
-    }
+    // MULTI-DEVICE REALTIME BROADCAST SUBSCRIPTION
+    function subscribeToRealtimeChanges() {
+      if (!window.supabaseClient) return;
 
-    function saveWishlistState() {
-      localStorage.setItem('eugene_wishlist', JSON.stringify(wishlist));
-      updateWishlistBadge();
-    }
-
-    function saveQRISOrdersState() {
-      localStorage.setItem('eugene_qris_orders', JSON.stringify(qrisOrders));
-    }
-
-    function saveHistoryLogsState() {
-      localStorage.setItem('eugene_history_logs', JSON.stringify(historyLogs));
-    }
-
-    // CROSS-TAB REALTIME REFRESH FIX
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'eugene_inventory' || e.key === 'eugene_qris_orders' || e.key === 'eugene_wishlist') {
-        loadSavedState();
-        renderCardGrid();
-        renderInventoryTable();
-        renderVaultGrid();
-        renderWishlistGrid();
-        renderHoldersList();
-        renderQRISOrdersTable();
-      }
-    });
-
-    function addHistoryEntry(type, serial, user, amount) {
-      historyLogs.unshift({
-        timestamp: new Date().toLocaleString(),
-        type,
-        serial,
-        user,
-        amount
-      });
-      saveHistoryLogsState();
-      renderHistoryTable();
+      supabaseClient
+        .channel('public:cards')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, payload => {
+          loadDatabaseState(); // Instant updates across all devices globally!
+          showToast('Live database sync: Cards updated!');
+        })
+        .subscribe();
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      loadSavedState();
-
       if (window.supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session?.user) {
-          handleSupabaseUserSession(session.user);
+          await handleSupabaseUserSession(session.user);
         }
 
-        supabaseClient.auth.onAuthStateChange((event, session) => {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
           if (session?.user) {
-            handleSupabaseUserSession(session.user);
-            returnToPreviousStatePostLogin();
+            await handleSupabaseUserSession(session.user);
           } else {
             currentUser = null;
             renderAuthHeader();
@@ -1016,136 +469,55 @@
         });
       }
 
-      const savedCustomUsername = localStorage.getItem('eugene_custom_username');
-      if (savedCustomUsername && currentUser) {
-        currentUser.username = savedCustomUsername;
-      }
-
-      applyLanguageTranslations();
-      renderAuthHeader();
-      renderCardGrid();
-      renderInventoryTable();
-      renderVaultGrid();
-      renderWishlistGrid();
-      renderQRISOrdersTable();
-      renderHoldersList();
-      renderHistoryTable();
-      renderTradeListings();
-      renderAuctions();
-      renderTradeRequests();
-      searchUsersForChat();
-      updateWishlistBadge();
+      await loadDatabaseState();
+      subscribeToRealtimeChanges();
     });
 
-    // --- LANGUAGE TRANSLATIONS ---
-    function toggleLanguage() {
-      currentLang = currentLang === 'en' ? 'id' : 'en';
-      localStorage.setItem('eugene_lang', currentLang);
-      document.getElementById('lang-label').innerText = currentLang.toUpperCase();
-      applyLanguageTranslations();
-      renderCardGrid();
-    }
-
-    function applyLanguageTranslations() {
-      document.getElementById('lang-label').innerText = currentLang.toUpperCase();
-      const dict = I18N[currentLang];
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dict[key]) el.innerText = dict[key];
-      });
-    }
-
-    function isAdminEmail(email) {
-      if (!email) return false;
-      const lower = email.toLowerCase().trim();
-      return ADMIN_EMAILS.some(adminEmail => lower === adminEmail || lower.startsWith(adminEmail));
-    }
-
-    function openAuthModal() { 
-      const activeTab = getCurrentActiveTab();
-      localStorage.setItem('redirect_after_login_tab', activeTab);
-      document.getElementById('auth-modal').classList.remove('hidden'); 
-    }
-
-    function closeAuthModal() { 
-      document.getElementById('auth-modal').classList.add('hidden'); 
-    }
-
-    function getCurrentActiveTab() {
-      const tabs = ['catalog', 'trade', 'auction', 'trade-req', 'analytics', 'ai-prediction', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'admin', 'inventory'];
-      for (let t of tabs) {
-        const v = document.getElementById(`view-${t}`);
-        if (v && !v.classList.contains('hidden')) return t;
-      }
-      return 'catalog';
-    }
-
-    async function loginWithGoogleSupabase() {
-      try {
-        const activeTab = getCurrentActiveTab();
-        localStorage.setItem('redirect_after_login_tab', activeTab);
-
-        if (!window.supabaseClient) {
-          throw new Error('Supabase client not initialized.');
-        }
-
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: window.location.origin }
-        });
-
-        if (error) throw error;
-      } catch (error) {
-        showToast('Supabase Auth Error: ' + error.message);
-      }
-    }
-
-    function handleSupabaseUserSession(user) {
+    // --- GOOGLE SIGN-IN & PROFILE PROVISIONING ---
+    async function handleSupabaseUserSession(user) {
       const email = user.email ? user.email.toLowerCase() : '';
       const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
-      const isAdmin = isAdminEmail(email);
-      const customUsername = localStorage.getItem('eugene_custom_username');
+      const avatarUrl = user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
+      const isAdmin = ADMIN_EMAILS.some(a => email === a || email.startsWith(a));
 
       currentUser = {
         id: user.id,
-        email: email,
-        name: name,
-        username: customUsername || name.toLowerCase().replace(/\s+/g, '_'),
-        isAdmin: isAdmin,
-        avatarUrl: user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`
+        email,
+        name,
+        username: email.split('@')[0],
+        avatarUrl,
+        isAdmin
       };
 
+      // Upsert profile record in database to verify Google account across devices
+      if (window.supabaseClient) {
+        await supabaseClient.from('profiles').upsert({
+          id: user.id,
+          email: email,
+          name: name,
+          avatar_url: avatarUrl,
+          updated_at: new Date()
+        });
+      }
+
       renderAuthHeader();
-      renderVaultGrid();
-      renderQRISOrdersTable();
-      renderHoldersList();
     }
 
-    function returnToPreviousStatePostLogin() {
-      const savedTab = localStorage.getItem('redirect_after_login_tab') || 'catalog';
-      localStorage.removeItem('redirect_after_login_tab');
-      closeAuthModal();
-      
-      if ((savedTab === 'admin' || savedTab === 'inventory' || savedTab === 'analytics' || savedTab === 'ai-prediction') && !currentUser?.isAdmin) {
-        switchTab('catalog');
-        showToast('Returned to Collection tab.');
-      } else {
-        switchTab(savedTab);
-      }
+    async function loginWithGoogleSupabase() {
+      if (!window.supabaseClient) return showToast('Supabase client uninitialized.');
+      await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin }
+      });
     }
 
     async function logoutUser() {
-      if (window.supabaseClient) {
-        await supabaseClient.auth.signOut();
-      }
+      if (window.supabaseClient) await supabaseClient.auth.signOut();
       currentUser = null;
       renderAuthHeader();
-      renderVaultGrid();
-      switchTab('catalog');
-      showToast('Logged out.');
+      showToast('Logged out successfully.');
     }
 
-    // MATCHED UI USER HEADER CONTAINER (Based on Screenshot)
     function renderAuthHeader() {
       const container = document.getElementById('auth-header-container');
       const adminNavs = document.querySelectorAll('.admin-only-nav');
@@ -1160,23 +532,14 @@
           if (adminSep) adminSep.classList.add('hidden');
         }
 
-        const avatarImgHtml = `<div class="w-6 h-6 rounded-full bg-amber-600 flex items-center justify-center text-white font-bold text-[10px]">
-            ${currentUser.name.charAt(0).toUpperCase()}
-          </div>`;
-        let badgeText = currentUser.isAdmin ? 'Admin' : `@${currentUser.username}`;
-        let badgeColor = currentUser.isAdmin ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'text-slate-400';
-
         container.innerHTML = `
-          <div class="flex items-center gap-2 bg-slate-800/90 border border-slate-700/80 hover:border-slate-600 rounded-xl p-1.5 pl-2.5 cursor-pointer transition-all" onclick="openUsernameModal()">
-            ${avatarImgHtml}
+          <div class="flex items-center gap-2 bg-slate-800/90 border border-slate-700/80 rounded-xl p-1.5 pl-2.5">
+            <img src="${currentUser.avatarUrl}" class="w-6 h-6 rounded-full object-cover">
             <div class="flex flex-col text-left">
               <span class="text-xs font-bold text-white leading-tight">${currentUser.name}</span>
-              <div class="flex items-center gap-1 mt-0.5">
-                <span class="text-[8px] font-semibold px-1.5 py-0.2 rounded ${badgeColor}">${badgeText}</span>
-                <i class="fa-solid fa-pen text-[8px] text-blue-400"></i>
-              </div>
+              <span class="text-[8px] font-semibold text-emerald-400">Google Verified</span>
             </div>
-            <button onclick="event.stopPropagation(); logoutUser();" title="Log Out" class="p-1.5 bg-slate-900/80 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-lg ml-1 transition-all">
+            <button onclick="logoutUser()" title="Log Out" class="p-1.5 bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-lg ml-1">
               <i class="fa-solid fa-right-from-bracket text-xs"></i>
             </button>
           </div>
@@ -1187,687 +550,108 @@
 
         container.innerHTML = `
           <button onclick="openAuthModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-right-to-bracket"></i> <span>Log In / Sign In</span>
+            <i class="fa-brands fa-google"></i> <span>Google Login</span>
           </button>
         `;
       }
     }
 
-    function openUsernameModal() {
-      if (!currentUser) return;
-      document.getElementById('new-username-input').value = currentUser.username;
-      document.getElementById('username-modal').classList.remove('hidden');
-    }
+    // --- SAVE EDITS DUAL SYNC (LOCAL + MULTI-DEVICE DB) ---
+    async function saveCardEdit(event) {
+      event.preventDefault();
+      if (!currentUser?.isAdmin) return showToast('Admin access required.');
 
-    function closeUsernameModal() {
-      document.getElementById('username-modal').classList.add('hidden');
-    }
+      const cardId = document.getElementById('edit-card-id').value;
+      const serial = document.getElementById('edit-card-serial').value;
+      const name = document.getElementById('edit-card-name').value;
+      const type = document.getElementById('edit-card-type').value;
+      const price = parseInt(document.getElementById('edit-card-price').value, 10);
+      const imgUrl = document.getElementById('edit-card-img').value;
+      const status = document.getElementById('edit-card-status').value;
 
-    function saveNewUsername() {
-      const val = document.getElementById('new-username-input').value.trim().toLowerCase().replace(/\s+/g, '_');
-      if (!val) return showToast('Please enter a valid username.');
+      const cardPayload = { serial, name, type, price, imgUrl, status };
 
-      currentUser.username = val;
-      localStorage.setItem('eugene_custom_username', val);
-
-      renderAuthHeader();
-      renderHoldersList();
-      closeUsernameModal();
-      showToast(`Username updated to @${val}!`);
-    }
-
-    function switchTab(tabName) {
-      const adminOnlyTabs = ['admin', 'inventory', 'analytics', 'ai-prediction'];
-      
-      if (adminOnlyTabs.includes(tabName) && !currentUser?.isAdmin) {
-        return showToast('Admin permission required.');
-      }
-
-      const allTabs = ['catalog', 'trade', 'auction', 'trade-req', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'analytics', 'ai-prediction', 'admin', 'inventory'];
-
-      allTabs.forEach(t => {
-        const view = document.getElementById(`view-${t}`);
-        const nav = document.getElementById(`nav-${t}`);
-        if (view) view.classList.add('hidden');
-        if (nav && !adminOnlyTabs.includes(t)) {
-          nav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all';
+      if (window.supabaseClient) {
+        if (cardId) {
+          await supabaseClient.from('cards').update(cardPayload).eq('id', cardId);
+        } else {
+          await supabaseClient.from('cards').insert([{ ...cardPayload, id: `card-${Date.now()}` }]);
         }
-      });
-
-      const activeView = document.getElementById(`view-${tabName}`);
-      const activeNav = document.getElementById(`nav-${tabName}`);
-
-      if (activeView) activeView.classList.remove('hidden');
-      if (activeNav && !adminOnlyTabs.includes(tabName)) {
-        activeNav.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-white bg-slate-700 flex items-center gap-1.5 whitespace-nowrap transition-all';
       }
+
+      await loadDatabaseState();
+      closeCardEditorModal();
+      showToast('Changes saved and broadcasted to all active devices!');
     }
 
-    // --- AI REVENUE PREDICTION LOGIC ---
-    function updateAIPrediction() {
-      const growthMult = parseFloat(document.getElementById('growth-rate-slider').value);
-      const tradesCount = parseInt(document.getElementById('trade-count-slider').value, 10);
+    // --- INBOX SEARCH FOR GOOGLE USERS ---
+    function searchUsersForChat() {
+      const listContainer = document.getElementById('user-search-list');
+      if (!listContainer) return;
 
-      document.getElementById('growth-rate-val').innerText = `${growthMult.toFixed(1)}x`;
-      document.getElementById('trade-count-val').innerText = `${tradesCount} Trades`;
-
-      const baseVolume = 15000000;
-      const predictedVolume = Math.round(baseVolume * growthMult + (tradesCount * 300000));
-      const predictedTax = Math.round(predictedVolume * 0.02);
-      const predictedSellouts = Math.min(50, Math.round(tradesCount * 0.25 * growthMult));
-
-      document.getElementById('ai-projected-volume').innerText = `IDR ${predictedVolume.toLocaleString()}`;
-      document.getElementById('ai-projected-tax').innerText = `IDR ${predictedTax.toLocaleString()}`;
-      document.getElementById('ai-projected-sellouts').innerText = `${predictedSellouts} Cards`;
-    }
-
-    // --- HISTORY PAGE ---
-    function renderHistoryTable() {
-      const tbody = document.getElementById('history-table-body');
-      if (!tbody) return;
-
-      if (historyLogs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No transactions recorded on the marketplace ledger yet.</td></tr>`;
+      if (googleProfiles.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-500 px-1">No Google users signed in yet.</p>`;
         return;
       }
 
-      tbody.innerHTML = historyLogs.map(log => `
-        <tr class="hover:bg-slate-800/40 transition-all">
-          <td class="p-3 text-slate-400 font-mono">${log.timestamp}</td>
-          <td class="p-3">
-            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-              log.type === 'PRIMARY SALE' ? 'bg-emerald-500/10 text-emerald-400' :
-              log.type === 'SELL BACK' ? 'bg-amber-500/10 text-amber-400' : 'bg-blue-500/10 text-blue-400'
-            }">${log.type}</span>
-          </td>
-          <td class="p-3 font-mono font-bold text-blue-400">${log.serial}</td>
-          <td class="p-3 text-white font-semibold">@${log.user}</td>
-          <td class="p-3 font-mono font-bold text-right text-emerald-400">IDR ${log.amount.toLocaleString()}</td>
-        </tr>
-      `).join('');
-    }
-
-    function clearHistoryLog() {
-      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-      historyLogs = [];
-      saveHistoryLogsState();
-      renderHistoryTable();
-      showToast('Ledger history cleared.');
-    }
-
-    // --- TRADES, AUCTIONS & TRADE REQUESTS ---
-    function renderTradeListings() {
-      const container = document.getElementById('trade-listings-grid');
-      if (!container) return;
-
-      container.innerHTML = tradeListings.map(t => `
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono text-blue-400 font-bold">${t.serial}</span>
-            <span class="text-[10px] text-slate-400">Listed by @${t.seller}</span>
+      listContainer.innerHTML = googleProfiles.map(u => `
+        <div onclick="startChatWithUser('${u.name}')" class="p-3 bg-slate-800/80 hover:bg-slate-700/80 rounded-xl cursor-pointer transition-all flex items-center justify-between border border-slate-700/60 shadow-sm">
+          <div class="flex items-center gap-3">
+            <img src="${u.avatar_url || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + u.email}" class="w-7 h-7 rounded-full">
+            <div>
+              <p class="text-xs font-bold text-white leading-tight">${u.name}</p>
+              <p class="text-[10px] text-slate-400 font-mono">${u.email}</p>
+            </div>
           </div>
-          <div class="aspect-[4/5] bg-slate-950 rounded-xl border border-slate-800 p-2 flex items-center justify-center">
-            <img src="${t.imgUrl}" class="max-h-48 object-contain">
-          </div>
-          <p class="font-bold text-white text-xs truncate">${t.name}</p>
-          <div class="flex items-center justify-between pt-1">
-            <span class="font-mono text-sm font-bold text-emerald-400">IDR ${t.price.toLocaleString()}</span>
-            <button onclick="buyTradeListing('${t.id}')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Buy Item</button>
-          </div>
+          <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
         </div>
       `).join('');
     }
 
-    function buyTradeListing(tradeId) {
-      if (!currentUser) return openAuthModal();
-      tradeListings = tradeListings.filter(t => t.id !== tradeId);
-      renderTradeListings();
-      showToast('Offer accepted! Trade transaction completed.');
-    }
-
-    function renderAuctions() {
-      const container = document.getElementById('auctions-grid');
-      if (!container) return;
-
-      container.innerHTML = auctions.map(a => `
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col sm:flex-row gap-4 items-center">
-          <div class="w-32 aspect-[4/5] bg-slate-950 border border-slate-800 rounded-xl p-2 shrink-0 flex items-center justify-center">
-            <img src="${a.imgUrl}" class="max-h-36 object-contain">
-          </div>
-          <div class="space-y-2 flex-1 w-full">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold text-blue-400">${a.serial}</span>
-              <span class="text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold px-2 py-0.5 rounded-full">LIVE AUCTION</span>
-            </div>
-            <h4 class="font-bold text-white text-sm">${a.name}</h4>
-            <div class="bg-slate-800/60 p-2.5 rounded-xl space-y-1">
-              <p class="text-[10px] text-slate-400">Current Highest Bid (@${a.topBidder}):</p>
-              <p class="font-mono font-bold text-base text-emerald-400">IDR ${a.currentBid.toLocaleString()}</p>
-            </div>
-            <div class="flex items-center gap-2 pt-1">
-              <button onclick="placeBid('${a.id}')" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">+ Bid IDR ${(a.currentBid + 50000).toLocaleString()}</button>
-            </div>
-          </div>
+    function startChatWithUser(name) {
+      document.getElementById('chat-active-username').innerText = `${name} (Google User)`;
+      document.getElementById('chat-messages').innerHTML = `
+        <div class="p-3 bg-slate-800/80 rounded-xl text-left max-w-xs self-start border border-slate-700/80 shadow">
+          <p class="text-blue-400 font-bold text-[10px] mb-0.5">${name}</p>
+          <p class="text-xs text-slate-200">Hello! Let's arrange a card trade.</p>
         </div>
-      `).join('');
+      `;
     }
 
-    function placeBid(aucId) {
-      if (!currentUser) return openAuthModal();
-      const auc = auctions.find(a => a.id === aucId);
-      if (auc) {
-        auc.currentBid += 50000;
-        auc.topBidder = currentUser.username;
-        renderAuctions();
-        showToast(`Bid placed! You are now top bidder for ${auc.serial}`);
-      }
-    }
-
-    function renderTradeRequests() {
-      const container = document.getElementById('trade-requests-list');
-      if (!container) return;
-
-      container.innerHTML = tradeRequests.map(tr => `
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold text-white">Proposal from @${tr.sender}</span>
-              <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full font-semibold">Pending Swap</span>
-            </div>
-            <p class="text-xs text-slate-400">Offered: <span class="text-blue-400 font-mono font-bold">${tr.offeredCard}</span> <i class="fa-solid fa-arrow-right mx-1 text-slate-600"></i> Requesting: <span class="text-amber-400 font-mono font-bold">${tr.requestedCard}</span></p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="acceptTradeReq('${tr.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all">Accept Swap</button>
-            <button onclick="declineTradeReq('${tr.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs font-bold rounded-xl transition-all">Decline</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function acceptTradeReq(reqId) {
-      if (!currentUser) return openAuthModal();
-      tradeRequests = tradeRequests.filter(r => r.id !== reqId);
-      renderTradeRequests();
-      showToast('Trade request accepted! Cards swapped.');
-    }
-
-    function declineTradeReq(reqId) {
-      tradeRequests = tradeRequests.filter(r => r.id !== reqId);
-      renderTradeRequests();
-      showToast('Trade request declined.');
-    }
-
-    // --- QRIS ORDER SUBMISSION & VERIFICATION ---
-    function openQRISPaymentModal() {
-      if (!currentUser) return openAuthModal();
-      const card = inventory.find(c => c.id === activeDetailCardId);
-      if (!card) return;
-
-      const basePrice = card.price;
-      const taxAmount = Math.round(basePrice * 0.02);
-      const totalAmount = basePrice + taxAmount;
-
-      document.getElementById('qris-modal-item').innerText = `${card.name} (${card.serial})`;
-      document.getElementById('qris-modal-base-price').innerText = `IDR ${basePrice.toLocaleString()}`;
-      document.getElementById('qris-modal-tax').innerText = `IDR ${taxAmount.toLocaleString()}`;
-      document.getElementById('qris-modal-total').innerText = `IDR ${totalAmount.toLocaleString()}`;
-      document.getElementById('qris-receipt-file').value = '';
-      
-      closeCardDetailsModal();
-      document.getElementById('qris-payment-modal').classList.remove('hidden');
-    }
-
-    function closeQRISPaymentModal() {
-      document.getElementById('qris-payment-modal').classList.add('hidden');
-    }
-
-    function submitQRISOrder() {
-      const card = inventory.find(c => c.id === activeDetailCardId);
-      const fileInput = document.getElementById('qris-receipt-file');
-      
-      if (!fileInput.files || fileInput.files.length === 0) {
-        return showToast('Please upload a valid payment receipt.');
-      }
-
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-        const basePrice = card.price;
-        const taxAmount = Math.round(basePrice * 0.02);
-        const totalAmount = basePrice + taxAmount;
-
-        const newOrder = {
-          id: `ORD-${Date.now().toString().slice(-6)}`,
-          cardId: card.id,
-          serial: card.serial,
-          cardName: card.name,
-          buyerEmail: currentUser.email,
-          buyerUsername: currentUser.username,
-          basePrice: basePrice,
-          taxAmount: taxAmount,
-          totalAmount: totalAmount,
-          receiptImg: e.target.result,
-          status: 'PENDING'
-        };
-
-        qrisOrders.unshift(newOrder);
-        card.status = 'RESERVED';
-
-        saveInventoryState();
-        saveQRISOrdersState();
-
-        renderCardGrid();
-        renderInventoryTable();
-        renderQRISOrdersTable();
-        closeQRISPaymentModal();
-        showToast('Payment submitted! Admin will verify your receipt shortly.');
-      };
-
-      reader.readAsDataURL(file);
-    }
-
-    function renderQRISOrdersTable() {
-      const tbody = document.getElementById('qris-orders-table-body');
-      if (!tbody) return;
-
-      if (qrisOrders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No pending QRIS orders waiting for approval.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = qrisOrders.map(ord => `
-        <tr class="hover:bg-slate-800/40 transition-all">
-          <td class="p-3 font-mono font-bold text-slate-400">${ord.id}</td>
-          <td class="p-3 text-white">@${ord.buyerUsername}</td>
-          <td class="p-3 font-mono font-bold text-blue-400">${ord.serial}</td>
-          <td class="p-3 font-mono text-emerald-400">IDR ${(ord.totalAmount || ord.amount).toLocaleString()}</td>
-          <td class="p-3">
-            <button onclick="viewReceiptImage('${ord.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-blue-400 font-semibold rounded-lg border border-slate-700 flex items-center gap-1">
-              <i class="fa-solid fa-image"></i> Proof
-            </button>
-          </td>
-          <td class="p-3 text-right space-x-1">
-            ${ord.status === 'PENDING' ? `
-              <button onclick="approveQRISOrder('${ord.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-all">Approve</button>
-              <button onclick="rejectQRISOrder('${ord.id}')" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg transition-all">Reject</button>
-            ` : `<span class="font-bold ${ord.status === 'APPROVED' ? 'text-emerald-400' : 'text-rose-400'}">${ord.status}</span>`}
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function viewReceiptImage(orderId) {
-      const ord = qrisOrders.find(o => o.id === orderId);
-      if (!ord) return;
-
-      document.getElementById('receipt-modal-img').src = ord.receiptImg;
-      document.getElementById('receipt-view-modal').classList.remove('hidden');
-    }
-
-    function closeReceiptModal() {
-      document.getElementById('receipt-view-modal').classList.add('hidden');
-    }
-
-    function approveQRISOrder(orderId) {
-      const ord = qrisOrders.find(o => o.id === orderId);
-      if (!ord) return;
-
-      ord.status = 'APPROVED';
-      const card = inventory.find(c => c.id === ord.cardId);
-      if (card) {
-        card.status = 'OWNED';
-        card.owner = ord.buyerEmail;
-      }
-
-      addHistoryEntry('PRIMARY SALE', ord.serial, ord.buyerUsername, ord.totalAmount);
-
-      saveInventoryState();
-      saveQRISOrdersState();
-
-      renderCardGrid();
-      renderInventoryTable();
-      renderVaultGrid();
-      renderQRISOrdersTable();
-      renderHoldersList();
-      showToast(`Approved Order ${ord.id}! Card assigned to @${ord.buyerUsername}`);
-    }
-
-    function rejectQRISOrder(orderId) {
-      const ord = qrisOrders.find(o => o.id === orderId);
-      if (!ord) return;
-
-      ord.status = 'REJECTED';
-      const card = inventory.find(c => c.id === ord.cardId);
-      if (card) {
-        card.status = 'AVAILABLE';
-      }
-
-      saveInventoryState();
-      saveQRISOrdersState();
-
-      renderCardGrid();
-      renderInventoryTable();
-      renderQRISOrdersTable();
-      showToast(`Rejected Order ${ord.id}.`);
-    }
-
-    // --- HOLDERS & BINDER MODAL FEATURE ---
+    // --- HOLDERS LIST (DYNAMICAL FROM GOOGLE PROFILES) ---
     function renderHoldersList() {
       const container = document.getElementById('holders-content');
       if (!container) return;
 
-      const holderMap = {};
-      inventory.forEach(card => {
-        if (card.owner) {
-          holderMap[card.owner] = (holderMap[card.owner] || 0) + 1;
-        }
-      });
-
-      MOCK_USERS.forEach(u => {
-        if (!holderMap[u.email]) holderMap[u.email] = 2;
-      });
-
-      if (currentUser && !holderMap[currentUser.email]) {
-        const userCardCount = inventory.filter(c => c.owner === currentUser.email).length;
-        if (userCardCount > 0) holderMap[currentUser.email] = userCardCount;
-      }
-
-      const holderEntries = Object.entries(holderMap).sort((a, b) => b[1] - a[1]);
-
-      container.innerHTML = holderEntries.map(([email, count]) => {
-        const mockMatch = MOCK_USERS.find(u => u.email === email);
-        const name = email === currentUser?.email ? currentUser.name : mockMatch ? mockMatch.name : email.split('@')[0];
-        const username = email === currentUser?.email ? currentUser.username : mockMatch ? mockMatch.username : email.split('@')[0];
-
-        return `
-          <div onclick="openHolderBinderModal('${email}', '${name}')" class="bg-slate-900 border border-slate-800 hover:border-slate-700 p-4 rounded-2xl cursor-pointer transition-all flex items-center justify-between shadow-sm hover:translate-y-[-2px]">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-teal-400 font-bold text-lg">
-                <i class="fa-solid fa-book-open"></i>
-              </div>
-              <div>
-                <h4 class="text-xs font-bold text-white">${name}</h4>
-                <p class="text-[10px] text-slate-400 font-mono">@${username}</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <span class="text-xs font-mono font-bold text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2.5 py-1 rounded-full">${count} Cards</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function openHolderBinderModal(email, name) {
-      const grid = document.getElementById('holder-binder-grid');
-      document.getElementById('holder-binder-title').innerText = `${name}'s Binder`;
-      document.getElementById('holder-binder-subtitle').innerText = `Viewing collection owned by ${email}`;
-
-      const ownedCards = inventory.filter(c => c.owner === email);
-
-      if (ownedCards.length === 0) {
-        grid.innerHTML = `<p class="col-span-full text-center text-xs text-slate-500 py-8">This collector currently holds no cards in their binder.</p>`;
-      } else {
-        grid.innerHTML = ownedCards.map(card => `
-          <div class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-2.5 flex flex-col justify-between">
-            <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 mb-2">
-              <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-            </div>
-            <p class="text-center font-bold text-blue-400 font-mono text-[10px] mb-0.5">${card.serial}</p>
-            <p class="text-[10px] font-bold text-white truncate text-center">${card.name}</p>
-          </div>
-        `).join('');
-      }
-
-      document.getElementById('holder-binder-modal').classList.remove('hidden');
-    }
-
-    function closeHolderBinderModal() {
-      document.getElementById('holder-binder-modal').classList.add('hidden');
-    }
-
-    // --- WISHLIST TAB & PERSISTENCE ---
-    function toggleWishlistActiveDetailCard() {
-      if (!activeDetailCardId) return;
-      const idx = wishlist.indexOf(activeDetailCardId);
-      if (idx > -1) {
-        wishlist.splice(idx, 1);
-        showToast('Removed from Wishlist');
-      } else {
-        wishlist.push(activeDetailCardId);
-        showToast('Saved to Wishlist!');
-      }
-
-      saveWishlistState();
-      updateWishlistModalText();
-      renderWishlistGrid();
-    }
-
-    function updateWishlistBadge() {
-      const badge = document.getElementById('wishlist-count');
-      if (badge) badge.innerText = wishlist.length;
-    }
-
-    function updateWishlistModalText() {
-      const isWishlisted = wishlist.includes(activeDetailCardId);
-      const txt = document.getElementById('detail-wishlist-text');
-      if (txt) txt.innerText = isWishlisted ? (I18N[currentLang].wishlisted || "Wishlisted") : (I18N[currentLang].wishlist || "Wishlist");
-    }
-
-    function renderWishlistGrid() {
-      const container = document.getElementById('wishlist-cards-grid');
-      if (!container) return;
-
-      const wishCards = inventory.filter(c => wishlist.includes(c.id));
-
-      if (wishCards.length === 0) {
-        container.innerHTML = `<p class="text-center text-xs text-slate-400 py-8">No wishlisted cards saved yet. Click the heart icon on any card in the Collection tab!</p>`;
+      if (googleProfiles.length === 0) {
+        container.innerHTML = `<p class="col-span-full text-center text-xs text-slate-500 py-8">No Google collectors online yet.</p>`;
         return;
       }
 
-      container.innerHTML = `
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          ${wishCards.map(card => `
-            <div class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between">
-              <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 mb-2">
-                <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-              </div>
-              <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${card.serial}</p>
-              <p class="text-[11px] font-bold text-white truncate text-center mb-2">${card.name}</p>
-              <button onclick="openCardDetailsModal('${card.id}')" class="w-full py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition-all">
-                View Item
-              </button>
+      container.innerHTML = googleProfiles.map(u => `
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-sm">
+          <div class="flex items-center gap-3">
+            <img src="${u.avatar_url || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + u.email}" class="w-10 h-10 rounded-full border border-slate-700">
+            <div>
+              <h4 class="text-xs font-bold text-white">${u.name}</h4>
+              <p class="text-[10px] text-slate-400 font-mono">${u.email}</p>
             </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    // --- VAULT & SELL BACK WITH CONFIRMATION ---
-    function renderVaultGrid() {
-      const container = document.getElementById('owned-cards-grid');
-      if (!container) return;
-
-      if (!currentUser) {
-        container.innerHTML = `<p class="text-center text-xs text-slate-400 py-8">Log in with Google to view your owned cards inside your private binder.</p>`;
-        return;
-      }
-
-      const userCards = inventory.filter(c => c.owner === currentUser.email);
-
-      if (userCards.length === 0) {
-        container.innerHTML = `<p class="text-center text-xs text-slate-400 py-8">You don't own any cards yet. Visit the Collection tab to purchase!</p>`;
-        return;
-      }
-
-      container.innerHTML = `
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          ${userCards.map(card => `
-            <div class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between">
-              <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 mb-2">
-                <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
-              </div>
-              <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${card.serial}</p>
-              <p class="text-[11px] font-bold text-white truncate text-center mb-2">${card.name}</p>
-              <button onclick="promptSellback('${card.id}')" class="w-full py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold text-xs rounded-lg border border-rose-500/30 transition-all flex items-center justify-center gap-1">
-                <i class="fa-solid fa-arrow-rotate-left"></i> Sell Back
-              </button>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    function promptSellback(cardId) {
-      const card = inventory.find(c => c.id === cardId);
-      if (!card) return;
-
-      sellbackCardTarget = card;
-      const buybackPrice = Math.floor(card.price * 0.8);
-
-      document.getElementById('sellback-card-name').innerText = card.name;
-      document.getElementById('sellback-card-price').innerText = `IDR ${buybackPrice.toLocaleString()}`;
-      document.getElementById('sellback-modal').classList.remove('hidden');
-    }
-
-    function closeSellbackModal() {
-      sellbackCardTarget = null;
-      document.getElementById('sellback-modal').classList.add('hidden');
-    }
-
-    function confirmSellbackAction() {
-      if (!sellbackCardTarget) return;
-
-      const buybackPrice = Math.floor(sellbackCardTarget.price * 0.8);
-      addHistoryEntry('SELL BACK', sellbackCardTarget.serial, currentUser.username, buybackPrice);
-
-      sellbackCardTarget.owner = null;
-      sellbackCardTarget.status = 'AVAILABLE';
-
-      saveInventoryState();
-
-      renderCardGrid();
-      renderInventoryTable();
-      renderVaultGrid();
-      renderHoldersList();
-      closeSellbackModal();
-      showToast('Card sold back to market successfully.');
-    }
-
-    // MATCHED INBOX SEARCH & USER LIST (Based on Screenshot)
-    function searchUsersForChat() {
-      const query = (document.getElementById('user-search-chat').value || '').toLowerCase().trim();
-      const listContainer = document.getElementById('user-search-list');
-
-      const matches = MOCK_USERS.filter(u => u.username.toLowerCase().includes(query) || u.name.toLowerCase().includes(query));
-
-      if (matches.length === 0) {
-        listContainer.innerHTML = `<p class="text-xs text-slate-500 px-1 py-1">No collectors found matching search.</p>`;
-      } else {
-        listContainer.innerHTML = matches.map(u => `
-          <div onclick="startChatWithUser('${u.username}', '${u.name}')" class="p-3 bg-slate-800/80 hover:bg-slate-700/80 rounded-xl cursor-pointer transition-all flex items-center justify-between border border-slate-700/60 shadow-sm">
-            <div class="flex items-center gap-3">
-              <div class="w-7 h-7 rounded-full bg-blue-600/30 text-blue-400 flex items-center justify-center text-xs font-bold border border-blue-500/30">
-                <i class="fa-solid fa-user"></i>
-              </div>
-              <div>
-                <p class="text-xs font-bold text-white leading-tight">${u.name}</p>
-                <p class="text-[10px] text-slate-400 font-mono">@${u.username}</p>
-              </div>
-            </div>
-            <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
           </div>
-        `).join('');
-      }
-    }
-
-    function startChatWithUser(username, name) {
-      activeChatUser = { username, name };
-      document.getElementById('chat-active-username').innerText = `${name} (@${username})`;
-      document.getElementById('chat-messages').innerHTML = `
-        <div class="p-3 bg-slate-800/80 rounded-xl text-left max-w-xs self-start border border-slate-700/80 shadow">
-          <p class="text-blue-400 font-bold text-[10px] mb-0.5">@${username}</p>
-          <p class="text-xs text-slate-200">Hey! Interested in trading or buying any cards from my binder?</p>
+          <span class="text-xs font-mono font-bold text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2.5 py-1 rounded-full">Collector</span>
         </div>
-      `;
+      `).join('');
     }
 
-    function sendChatMessage() {
-      const input = document.getElementById('chat-message-input');
-      const text = input.value.trim();
-      if (!text || !activeChatUser) return;
-
-      const chatContainer = document.getElementById('chat-messages');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'p-3 bg-blue-600 rounded-xl text-right max-w-xs self-end text-white text-xs shadow-md';
-      msgDiv.innerText = text;
-      
-      chatContainer.appendChild(msgDiv);
-      input.value = '';
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    // --- JSON IMPORT & EXPORT FEATURES ---
-    function exportJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(inventory, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `eugene_card_inventory_${Date.now()}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      showToast('Inventory exported successfully!');
-    }
-
-    function triggerJSONImport() {
-      document.getElementById('json-import-input').click();
-    }
-
-    function handleJSONImport(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const importedData = JSON.parse(e.target.result);
-          if (Array.isArray(importedData)) {
-            inventory = importedData;
-            saveInventoryState();
-            renderCardGrid();
-            renderInventoryTable();
-            renderVaultGrid();
-            renderHoldersList();
-            showToast(`Successfully imported ${importedData.length} cards.`);
-          } else {
-            showToast('Import Failed: JSON root must be an array.');
-          }
-        } catch (err) {
-          showToast('Import Failed: Invalid JSON file.');
-        }
-      };
-      reader.readAsText(file);
-      event.target.value = '';
-    }
-
-    // --- CARD GRID & DETAILS ---
+    // --- GENERAL RENDERING HELPERS ---
     function renderCardGrid() {
       const grid = document.getElementById('card-grid');
       if (!grid) return;
-      
+
       const availableCards = inventory.filter(c => c.status === 'AVAILABLE').length;
       document.getElementById('remaining-cards-count').innerText = availableCards;
 
-      const searchVal = (document.getElementById('search-input')?.value || '').toLowerCase();
-      const filtered = inventory.filter(card => {
-        const matchesFilter = currentFilter === 'ALL' ? true : card.type === currentFilter;
-        const matchesSearch = card.serial.toLowerCase().includes(searchVal) || card.name.toLowerCase().includes(searchVal);
-        return matchesFilter && matchesSearch;
-      });
-
-      grid.innerHTML = filtered.map(card => `
-        <div onclick="openCardDetailsModal('${card.id}')" class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between relative cursor-pointer">
+      grid.innerHTML = inventory.map(card => `
+        <div class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between relative">
           <div class="flex items-center justify-between mb-2">
             <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span>
           </div>
@@ -1880,32 +664,6 @@
       `).join('');
     }
 
-    function openCardDetailsModal(cardId) {
-      const card = inventory.find(c => c.id === cardId);
-      if (!card) return;
-
-      activeDetailCardId = card.id;
-
-      document.getElementById('detail-card-img').src = card.imgUrl;
-      document.getElementById('detail-card-serial').innerText = card.serial;
-      document.getElementById('detail-card-name').innerText = card.name;
-      document.getElementById('detail-card-price').innerText = `IDR ${card.price.toLocaleString()}`;
-      
-      const typeSpan = document.getElementById('detail-card-type');
-      typeSpan.innerText = card.type;
-      typeSpan.className = `text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}`;
-      
-      document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owner: ${card.owner})` : ''}`;
-
-      updateWishlistModalText();
-      document.getElementById('card-details-modal').classList.remove('hidden');
-    }
-
-    function closeCardDetailsModal() {
-      document.getElementById('card-details-modal').classList.add('hidden');
-    }
-
-    // --- INVENTORY MANAGEMENT & IMAGE FIX ---
     function renderInventoryTable() {
       const tbody = document.getElementById('inventory-table-body');
       if (!tbody) return;
@@ -1924,12 +682,9 @@
           <td class="p-3">
             <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span>
           </td>
-          <td class="p-3 text-right space-x-1">
+          <td class="p-3 text-right">
             <button onclick="openCardEditorModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg transition-all" title="Edit Card">
               <i class="fa-solid fa-pen text-xs"></i>
-            </button>
-            <button onclick="deleteCard('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-all" title="Delete Card">
-              <i class="fa-solid fa-trash text-xs"></i>
             </button>
           </td>
         </tr>
@@ -1938,14 +693,9 @@
 
     function openCardEditorModal(cardId = null) {
       if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-
-      const modalTitle = document.getElementById('editor-modal-title');
-      
       if (cardId) {
         const card = inventory.find(c => c.id === cardId);
         if (!card) return;
-
-        modalTitle.innerText = "Edit Card Details";
         document.getElementById('edit-card-id').value = card.id;
         document.getElementById('edit-card-serial').value = card.serial;
         document.getElementById('edit-card-name').value = card.name;
@@ -1953,81 +703,22 @@
         document.getElementById('edit-card-price').value = card.price;
         document.getElementById('edit-card-img').value = card.imgUrl;
         document.getElementById('edit-card-status').value = card.status;
-      } else {
-        modalTitle.innerText = "Mint New Card";
-        document.getElementById('edit-card-id').value = '';
-        document.getElementById('edit-card-serial').value = `*${String(inventory.length + 1).padStart(2, '0')}`;
-        document.getElementById('edit-card-name').value = `Eugene Premium #${String(inventory.length + 1).padStart(2, '0')}`;
-        document.getElementById('edit-card-type').value = 'PREMIUM';
-        document.getElementById('edit-card-price').value = 500000;
-        document.getElementById('edit-card-img').value = `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${String(inventory.length + 1).padStart(2, '0')}`;
-        document.getElementById('edit-card-status').value = 'AVAILABLE';
       }
-
       document.getElementById('card-editor-modal').classList.remove('hidden');
     }
 
-    function closeCardEditorModal() {
-      document.getElementById('card-editor-modal').classList.add('hidden');
-    }
+    function closeCardEditorModal() { document.getElementById('card-editor-modal').classList.add('hidden'); }
+    function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
+    function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
-    function saveCardEdit(event) {
-      event.preventDefault();
-
-      const cardId = document.getElementById('edit-card-id').value;
-      const serial = document.getElementById('edit-card-serial').value;
-      const name = document.getElementById('edit-card-name').value;
-      const type = document.getElementById('edit-card-type').value;
-      const price = parseInt(document.getElementById('edit-card-price').value, 10);
-      const imgUrl = document.getElementById('edit-card-img').value;
-      const status = document.getElementById('edit-card-status').value;
-
-      if (cardId) {
-        const idx = inventory.findIndex(c => c.id === cardId);
-        if (idx !== -1) {
-          inventory[idx] = { ...inventory[idx], serial, name, type, price, imgUrl, status };
-          showToast(`Updated ${serial} details & image URL.`);
-        }
-      } else {
-        const newCard = {
-          id: `card-${Date.now()}`,
-          serial,
-          name,
-          type,
-          price,
-          owner: null,
-          status,
-          imgUrl
-        };
-        inventory.unshift(newCard);
-        addHistoryEntry('CARD MINTED', serial, currentUser.username, price);
-        showToast(`Minted new card ${serial}!`);
-      }
-
-      saveInventoryState();
-      renderCardGrid();
-      renderInventoryTable();
-      renderVaultGrid();
-      renderWishlistGrid();
-      renderHoldersList();
-      closeCardEditorModal();
-    }
-
-    function deleteCard(cardId) {
-      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
-      inventory = inventory.filter(c => c.id !== cardId);
-      saveInventoryState();
-      renderCardGrid();
-      renderInventoryTable();
-      renderVaultGrid();
-      renderWishlistGrid();
-      renderHoldersList();
-      showToast('Card deleted from inventory.');
-    }
-
-    function setFilter(type) {
-      currentFilter = type;
-      renderCardGrid();
+    function switchTab(tabName) {
+      const allTabs = ['catalog', 'trade', 'auction', 'inbox', 'holders', 'history', 'dashboard', 'wishlist', 'ai-prediction', 'admin', 'inventory'];
+      allTabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        if (view) view.classList.add('hidden');
+      });
+      const activeView = document.getElementById(`view-${tabName}`);
+      if (activeView) activeView.classList.remove('hidden');
     }
 
     function showToast(msg) {
