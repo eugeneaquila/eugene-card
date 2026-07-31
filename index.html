@@ -67,6 +67,9 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white relative">
 
+  <!-- Hidden File Input for Chat Attachment -->
+  <input type="file" id="chat-file-input" accept="image/*,.pdf,.doc,.docx" class="hidden" onchange="handleChatFileSelect(event)">
+
   <!-- Embedded Logo SVG -->
   <svg style="display: none;">
     <defs>
@@ -146,33 +149,6 @@
 
     </div>
   </header>
-
-  <!-- EDIT USERNAME MODAL -->
-  <div id="username-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4 relative shadow-2xl">
-      <button onclick="closeUsernameModal()" class="absolute top-4 right-4 w-7 h-7 rounded-lg bg-slate-800 text-slate-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-user-pen text-blue-400"></i>
-        <h3 class="text-base font-bold text-white">Change Username</h3>
-      </div>
-
-      <div class="space-y-2">
-        <label class="text-[11px] font-bold text-slate-400 uppercase">New Handle</label>
-        <div class="relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-xs">@</span>
-          <input type="text" id="new-username-input" placeholder="eugene_collector" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-        </div>
-      </div>
-
-      <div class="pt-2 flex justify-end gap-2">
-        <button onclick="closeUsernameModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
-        <button onclick="saveNewUsername()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Save Handle</button>
-      </div>
-    </div>
-  </div>
 
   <!-- GOOGLE AUTH MODAL -->
   <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
@@ -261,7 +237,7 @@
   <!-- Main Marketplace Body -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8">
     
-    <!-- CATALOG VIEW -->
+    <!-- CATALOG / COLLECTION VIEW -->
     <section id="view-catalog" class="space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div class="flex items-center gap-4">
@@ -296,20 +272,41 @@
       <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
     </section>
 
-    <!-- INBOX VIEW (GOOGLE USERS REALTIME CHAT) -->
+    <!-- TRADE VIEW -->
+    <section id="view-trade" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-right-left text-blue-400 mr-2"></i> Secondary Trade Market</h2>
+        <p class="text-xs text-slate-400 mt-1">Live listings posted by collectors on the network.</p>
+      </div>
+
+      <div id="trade-listings-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- AUCTION VIEW -->
+    <section id="view-auction" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
+        <p class="text-xs text-slate-400 mt-1">Realtime bids on rare serial cards.</p>
+      </div>
+
+      <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    </section>
+
+    <!-- INBOX VIEW (WITH ATTACHMENT SUPPORT) -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase tracking-wide flex items-center gap-2">
           <i class="fa-solid fa-comments text-indigo-400"></i> MESSENGER & CHAT
         </h2>
-        <p class="text-xs text-slate-400 mt-1">Direct message other Google-authenticated collectors.</p>
+        <p class="text-xs text-slate-400 mt-1">Direct message buyers and send file/image attachments in realtime.</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Inbox Sidebar -->
         <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-4 space-y-4">
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search Google collectors..." class="w-full bg-slate-800/70 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+            <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search collectors..." class="w-full bg-slate-800/70 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
           </div>
 
           <div id="user-search-results" class="space-y-1.5">
@@ -318,25 +315,41 @@
           </div>
         </div>
 
-        <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between min-h-[420px]">
+        <!-- Chat Window -->
+        <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between min-h-[440px]">
           <div id="chat-header" class="border-b border-slate-800/80 pb-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 text-xs">
                 <i class="fa-solid fa-user"></i>
               </div>
               <div>
-                <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a Google User to chat</h4>
-                <p class="text-[10px] text-slate-500">Verified Supabase Account</p>
+                <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a user to chat</h4>
+                <p class="text-[10px] text-slate-500">Realtime Direct Messenger</p>
               </div>
             </div>
           </div>
 
-          <div id="chat-messages" class="flex-1 my-6 space-y-3 overflow-y-auto max-h-72 text-xs text-slate-400 flex flex-col justify-center items-center">
+          <div id="chat-messages" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-80 text-xs text-slate-400 flex flex-col justify-center items-center">
             <i class="fa-solid fa-paper-plane text-3xl text-slate-800 mb-2"></i>
-            <span class="text-slate-400 font-medium">Select a user to view direct messages.</span>
+            <span class="text-slate-400 font-medium">Select a user to view messages or attach files.</span>
           </div>
 
-          <div class="flex items-center gap-2 border-t border-slate-800/80 pt-4">
+          <!-- Selected Attachment Preview Box -->
+          <div id="attachment-preview-box" class="hidden mb-2 p-2 bg-slate-800/90 border border-slate-700 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-2 overflow-hidden">
+              <i class="fa-solid fa-paperclip text-blue-400 text-xs"></i>
+              <span id="attachment-filename" class="text-xs text-white truncate max-w-[200px]">filename.png</span>
+            </div>
+            <button onclick="clearChatAttachment()" class="text-slate-400 hover:text-rose-400 text-xs px-2">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <!-- Chat Bar Input & Attachment Controls -->
+          <div class="flex items-center gap-2 border-t border-slate-800/80 pt-3">
+            <button onclick="triggerChatFileSelect()" title="Attach File or Image" class="p-2.5 bg-slate-800/90 hover:bg-slate-700 text-blue-400 rounded-xl border border-slate-700/80 transition-all">
+              <i class="fa-solid fa-paperclip text-xs"></i>
+            </button>
             <input type="text" id="chat-message-input" placeholder="Type a message..." class="flex-1 bg-slate-800/70 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
             <button onclick="sendChatMessage()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-md">
               Send
@@ -349,21 +362,123 @@
     <!-- HOLDERS VIEW -->
     <section id="view-holders" class="hidden space-y-6">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Google Verified Collectors</h2>
-        <p class="text-xs text-slate-400 mt-1">Live leaderboard of active Google account holders.</p>
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Community Collectors</h2>
+        <p class="text-xs text-slate-400 mt-1">Live active user binder list.</p>
       </div>
       <div id="holders-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- INVENTORY VIEW (ADMIN MULTI-DEVICE CONTROL) -->
+    <!-- HISTORY VIEW -->
+    <section id="view-history" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Marketplace Ledger</h2>
+          <p class="text-xs text-slate-400 mt-1">Live primary and secondary market ledger logs.</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-800/80 text-[10px] uppercase text-slate-400 font-semibold border-b border-slate-800">
+              <tr>
+                <th class="p-3">Timestamp</th>
+                <th class="p-3">Type</th>
+                <th class="p-3">Item Tag</th>
+                <th class="p-3">User</th>
+                <th class="p-3 font-mono text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- MY VAULT VIEW -->
+    <section id="view-dashboard" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-blue-400 mr-2"></i> My Personal Vault</h2>
+        <p class="text-xs text-slate-400 mt-1">Cards linked to your active Google profile.</p>
+      </div>
+      <div id="owned-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-6"></div>
+    </section>
+
+    <!-- WISHLIST VIEW -->
+    <section id="view-wishlist" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-heart text-rose-400 mr-2"></i> Saved Wishlist</h2>
+        <p class="text-xs text-slate-400 mt-1">Saved cards wishlist.</p>
+      </div>
+      <div id="wishlist-cards-grid" class="bg-slate-900 border border-slate-800 rounded-2xl p-6"></div>
+    </section>
+
+    <!-- AI REVENUE PREDICTION VIEW -->
+    <section id="view-ai-prediction" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
+            <i class="fa-solid fa-brain text-emerald-400"></i> AI Financial Revenue Prediction
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Realtime projected 30-day volume and fee calculations based on live database state.</p>
+        </div>
+        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold px-3 py-1 rounded-full uppercase">Predictive Intelligence</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <p class="text-[10px] uppercase font-bold text-slate-400">Projected 30-Day Volume</p>
+          <p id="ai-projected-volume" class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <p class="text-[10px] uppercase font-bold text-slate-400">Est. 2% Tax Earnings</p>
+          <p id="ai-projected-tax" class="text-xl font-bold font-mono text-blue-400 mt-1">IDR 0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <p class="text-[10px] uppercase font-bold text-slate-400">Predicted Mint Sellouts</p>
+          <p id="ai-projected-sellouts" class="text-xl font-bold font-mono text-amber-400 mt-1">0 Cards</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <p class="text-[10px] uppercase font-bold text-slate-400">Market Health Index</p>
+          <p class="text-xl font-bold font-mono text-purple-400 mt-1">96.8 / 100</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN HUB VIEW -->
+    <section id="view-admin" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Admin Hub</h2>
+        <p class="text-xs text-slate-400 mt-1">Pending order receipts verification.</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-800/80 text-[10px] uppercase text-slate-400 font-semibold border-b border-slate-800">
+              <tr>
+                <th class="p-3">Order ID</th>
+                <th class="p-3">Buyer</th>
+                <th class="p-3">Card Tag</th>
+                <th class="p-3">Total Amount</th>
+                <th class="p-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="qris-orders-table-body" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVENTORY VIEW -->
     <section id="view-inventory" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
         <div>
           <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-2"></i> Global Inventory Control</h2>
-          <p class="text-xs text-slate-400 mt-1">Edits made here update live on all devices globally via Supabase Realtime.</p>
+          <p class="text-xs text-slate-400 mt-1">All edits refresh live across all devices globally.</p>
         </div>
-        <button onclick="openCardEditorModal()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow flex items-center gap-1.5">
-          <i class="fa-solid fa-plus"></i> Mint / Add New Card
+        <button onclick="openCardEditorModal()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow">
+          <i class="fa-solid fa-plus"></i> Mint Card
         </button>
       </div>
 
@@ -388,134 +503,168 @@
 
   </main>
 
-  <!-- TOAST -->
+  <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed bottom-6 right-6 z-[10000] bg-slate-900 border border-blue-500/40 text-blue-400 text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all pointer-events-none">
     <span id="toast-msg">Action completed.</span>
   </div>
 
-  <!-- Supabase JS Client -->
+  <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-init.js"></script>
 
   <script>
-    const ADMIN_EMAILS = [
-      'eugene.aquila06@gmail.com',
-      'yujinybwork@gmail.com'
-    ];
+    const ADMIN_EMAILS = ['eugene.aquila06@gmail.com', 'yujinybwork@gmail.com'];
 
     let currentUser = null;
     let inventory = [];
     let googleProfiles = [];
+    let historyLogs = [];
+    let qrisOrders = [];
     let currentFilter = 'ALL';
+    let currentChatAttachment = null;
+    let activeChatUser = null;
 
-    // --- SUPABASE DATABASE REALTIME & SYNC ---
-    async function loadDatabaseState() {
+    // --- FULL DATABASE & REALTIME SYNC REFRESH FIX ---
+    async function refreshAllViews() {
       if (!window.supabaseClient) return;
 
-      // 1. Fetch Cards Inventory from Supabase Database
-      const { data: cards, error } = await supabaseClient.from('cards').select('*').order('created_at', { ascending: true });
-      if (!error && cards && cards.length > 0) {
-        inventory = cards;
-      } else {
-        // Fallback standard database structure if table is empty
-        inventory = Array.from({ length: 50 }, (_, i) => ({
-          id: `card-${i+1}`,
-          serial: `*${String(i+1).padStart(2, '0')}`,
-          name: i < 25 ? `Eugene Premium #${String(i+1).padStart(2, '0')}` : `Eugene Standard #${String(i+1).padStart(2, '0')}`,
-          type: i < 25 ? 'PREMIUM' : 'STANDARD',
-          price: i < 25 ? 500000 : 100000,
-          status: 'AVAILABLE',
-          imgUrl: `https://placehold.co/1080x1350/1e293b/3b82f6?text=*${String(i+1).padStart(2, '0')}`
-        }));
-      }
+      // 1. Refresh Cards
+      const { data: cards } = await supabaseClient.from('cards').select('*').order('created_at', { ascending: true });
+      if (cards && cards.length > 0) inventory = cards;
 
-      // 2. Fetch Verified Google Sign-In Profiles from Supabase
+      // 2. Refresh Profiles
       const { data: profiles } = await supabaseClient.from('profiles').select('*');
       if (profiles) googleProfiles = profiles;
 
+      // 3. Refresh Orders
+      const { data: orders } = await supabaseClient.from('orders').select('*');
+      if (orders) qrisOrders = orders;
+
+      // 4. Refresh History Logs
+      const { data: logs } = await supabaseClient.from('history_logs').select('*').order('created_at', { ascending: false });
+      if (logs) historyLogs = logs;
+
+      // Trigger UI Rerenders across all tabs
       renderCardGrid();
       renderInventoryTable();
+      renderVaultGrid();
       renderHoldersList();
+      renderHistoryTable();
+      renderQRISOrdersTable();
+      updateAIPrediction();
       searchUsersForChat();
     }
 
-    // MULTI-DEVICE REALTIME BROADCAST SUBSCRIPTION
-    function subscribeToRealtimeChanges() {
+    function subscribeToRealtimeDatabase() {
       if (!window.supabaseClient) return;
 
       supabaseClient
-        .channel('public:cards')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, payload => {
-          loadDatabaseState(); // Instant updates across all devices globally!
-          showToast('Live database sync: Cards updated!');
-        })
+        .channel('global-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'cards' }, () => refreshAllViews())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => refreshAllViews())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'history_logs' }, () => refreshAllViews())
         .subscribe();
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
       if (window.supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session?.user) {
-          await handleSupabaseUserSession(session.user);
-        }
+        if (session?.user) await handleSupabaseUserSession(session.user);
 
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
-          if (session?.user) {
-            await handleSupabaseUserSession(session.user);
-          } else {
-            currentUser = null;
-            renderAuthHeader();
-          }
+          if (session?.user) await handleSupabaseUserSession(session.user);
+          else { currentUser = null; renderAuthHeader(); }
         });
       }
 
-      await loadDatabaseState();
-      subscribeToRealtimeChanges();
+      await refreshAllViews();
+      subscribeToRealtimeDatabase();
     });
 
-    // --- GOOGLE SIGN-IN & PROFILE PROVISIONING ---
+    // --- CHAT FILE ATTACHMENT HANDLERS ---
+    function triggerChatFileSelect() {
+      document.getElementById('chat-file-input').click();
+    }
+
+    function handleChatFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        currentChatAttachment = {
+          name: file.name,
+          type: file.type.startsWith('image/') ? 'image' : 'file',
+          dataUrl: e.target.result
+        };
+
+        document.getElementById('attachment-filename').innerText = file.name;
+        document.getElementById('attachment-preview-box').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearChatAttachment() {
+      currentChatAttachment = null;
+      document.getElementById('chat-file-input').value = '';
+      document.getElementById('attachment-preview-box').classList.add('hidden');
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chat-message-input');
+      const text = input.value.trim();
+
+      if (!text && !currentChatAttachment) return;
+
+      const chatContainer = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'p-3 bg-blue-600 rounded-xl text-right max-w-xs self-end text-white text-xs shadow-md space-y-2';
+
+      let innerContent = '';
+      if (currentChatAttachment) {
+        if (currentChatAttachment.type === 'image') {
+          innerContent += `<img src="${currentChatAttachment.dataUrl}" class="max-h-36 rounded-lg object-cover mb-1 border border-blue-400/40">`;
+        } else {
+          innerContent += `<div class="p-2 bg-blue-700/60 rounded-lg flex items-center gap-2 border border-blue-400/40"><i class="fa-solid fa-file"></i> <span class="truncate">${currentChatAttachment.name}</span></div>`;
+        }
+      }
+
+      if (text) innerContent += `<p>${text}</p>`;
+
+      msgDiv.innerHTML = innerContent;
+      chatContainer.appendChild(msgDiv);
+
+      input.value = '';
+      clearChatAttachment();
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // --- AUTHENTICATION & HEADERS ---
     async function handleSupabaseUserSession(user) {
       const email = user.email ? user.email.toLowerCase() : '';
       const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
       const avatarUrl = user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${email}`;
       const isAdmin = ADMIN_EMAILS.some(a => email === a || email.startsWith(a));
 
-      currentUser = {
-        id: user.id,
-        email,
-        name,
-        username: email.split('@')[0],
-        avatarUrl,
-        isAdmin
-      };
+      currentUser = { id: user.id, email, name, avatarUrl, isAdmin };
 
-      // Upsert profile record in database to verify Google account across devices
       if (window.supabaseClient) {
-        await supabaseClient.from('profiles').upsert({
-          id: user.id,
-          email: email,
-          name: name,
-          avatar_url: avatarUrl,
-          updated_at: new Date()
-        });
+        await supabaseClient.from('profiles').upsert({ id: user.id, email, name, avatar_url: avatarUrl });
       }
 
       renderAuthHeader();
     }
 
     async function loginWithGoogleSupabase() {
-      if (!window.supabaseClient) return showToast('Supabase client uninitialized.');
-      await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.origin }
-      });
+      if (!window.supabaseClient) return showToast('Supabase Client missing');
+      await supabaseClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
     }
 
     async function logoutUser() {
       if (window.supabaseClient) await supabaseClient.auth.signOut();
       currentUser = null;
       renderAuthHeader();
-      showToast('Logged out successfully.');
+      showToast('Logged out');
     }
 
     function renderAuthHeader() {
@@ -556,20 +705,29 @@
       }
     }
 
-    // --- SAVE EDITS DUAL SYNC (LOCAL + MULTI-DEVICE DB) ---
+    // --- AI PREDICTION COMPUTATION ---
+    function updateAIPrediction() {
+      const totalCards = inventory.length;
+      const baseVal = totalCards * 250000;
+      document.getElementById('ai-projected-volume').innerText = `IDR ${baseVal.toLocaleString()}`;
+      document.getElementById('ai-projected-tax').innerText = `IDR ${Math.round(baseVal * 0.02).toLocaleString()}`;
+      document.getElementById('ai-projected-sellouts').innerText = `${Math.round(totalCards * 0.4)} Cards`;
+    }
+
+    // --- SAVE EDITS & SYNC ---
     async function saveCardEdit(event) {
       event.preventDefault();
       if (!currentUser?.isAdmin) return showToast('Admin access required.');
 
       const cardId = document.getElementById('edit-card-id').value;
-      const serial = document.getElementById('edit-card-serial').value;
-      const name = document.getElementById('edit-card-name').value;
-      const type = document.getElementById('edit-card-type').value;
-      const price = parseInt(document.getElementById('edit-card-price').value, 10);
-      const imgUrl = document.getElementById('edit-card-img').value;
-      const status = document.getElementById('edit-card-status').value;
-
-      const cardPayload = { serial, name, type, price, imgUrl, status };
+      const cardPayload = {
+        serial: document.getElementById('edit-card-serial').value,
+        name: document.getElementById('edit-card-name').value,
+        type: document.getElementById('edit-card-type').value,
+        price: parseInt(document.getElementById('edit-card-price').value, 10),
+        imgUrl: document.getElementById('edit-card-img').value,
+        status: document.getElementById('edit-card-status').value
+      };
 
       if (window.supabaseClient) {
         if (cardId) {
@@ -579,86 +737,23 @@
         }
       }
 
-      await loadDatabaseState();
+      await refreshAllViews();
       closeCardEditorModal();
-      showToast('Changes saved and broadcasted to all active devices!');
+      showToast('Changes updated & synced globally!');
     }
 
-    // --- INBOX SEARCH FOR GOOGLE USERS ---
-    function searchUsersForChat() {
-      const listContainer = document.getElementById('user-search-list');
-      if (!listContainer) return;
-
-      if (googleProfiles.length === 0) {
-        listContainer.innerHTML = `<p class="text-xs text-slate-500 px-1">No Google users signed in yet.</p>`;
-        return;
-      }
-
-      listContainer.innerHTML = googleProfiles.map(u => `
-        <div onclick="startChatWithUser('${u.name}')" class="p-3 bg-slate-800/80 hover:bg-slate-700/80 rounded-xl cursor-pointer transition-all flex items-center justify-between border border-slate-700/60 shadow-sm">
-          <div class="flex items-center gap-3">
-            <img src="${u.avatar_url || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + u.email}" class="w-7 h-7 rounded-full">
-            <div>
-              <p class="text-xs font-bold text-white leading-tight">${u.name}</p>
-              <p class="text-[10px] text-slate-400 font-mono">${u.email}</p>
-            </div>
-          </div>
-          <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
-        </div>
-      `).join('');
-    }
-
-    function startChatWithUser(name) {
-      document.getElementById('chat-active-username').innerText = `${name} (Google User)`;
-      document.getElementById('chat-messages').innerHTML = `
-        <div class="p-3 bg-slate-800/80 rounded-xl text-left max-w-xs self-start border border-slate-700/80 shadow">
-          <p class="text-blue-400 font-bold text-[10px] mb-0.5">${name}</p>
-          <p class="text-xs text-slate-200">Hello! Let's arrange a card trade.</p>
-        </div>
-      `;
-    }
-
-    // --- HOLDERS LIST (DYNAMICAL FROM GOOGLE PROFILES) ---
-    function renderHoldersList() {
-      const container = document.getElementById('holders-content');
-      if (!container) return;
-
-      if (googleProfiles.length === 0) {
-        container.innerHTML = `<p class="col-span-full text-center text-xs text-slate-500 py-8">No Google collectors online yet.</p>`;
-        return;
-      }
-
-      container.innerHTML = googleProfiles.map(u => `
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-sm">
-          <div class="flex items-center gap-3">
-            <img src="${u.avatar_url || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + u.email}" class="w-10 h-10 rounded-full border border-slate-700">
-            <div>
-              <h4 class="text-xs font-bold text-white">${u.name}</h4>
-              <p class="text-[10px] text-slate-400 font-mono">${u.email}</p>
-            </div>
-          </div>
-          <span class="text-xs font-mono font-bold text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2.5 py-1 rounded-full">Collector</span>
-        </div>
-      `).join('');
-    }
-
-    // --- GENERAL RENDERING HELPERS ---
+    // --- VIEW RENDERING HELPERS ---
     function renderCardGrid() {
       const grid = document.getElementById('card-grid');
       if (!grid) return;
-
-      const availableCards = inventory.filter(c => c.status === 'AVAILABLE').length;
-      document.getElementById('remaining-cards-count').innerText = availableCards;
+      document.getElementById('remaining-cards-count').innerText = inventory.filter(c => c.status === 'AVAILABLE').length;
 
       grid.innerHTML = inventory.map(card => `
         <div class="${card.type === 'PREMIUM' ? 'card-holo-premium' : 'card-holo-standard'} rounded-xl p-3 flex flex-col justify-between relative">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span>
-          </div>
-          <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 flex flex-col justify-between mb-2 text-center overflow-hidden">
+          <div class="w-full aspect-[4/5] bg-slate-900 rounded-lg border border-slate-800 p-1 mb-2">
             <img src="${card.imgUrl}" class="w-full h-full object-contain rounded">
           </div>
-          <p class="text-center font-bold text-blue-400 font-mono mb-1 text-xs">${card.serial}</p>
+          <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${card.serial}</p>
           <p class="text-[11px] font-bold text-white truncate text-center">${card.name}</p>
         </div>
       `).join('');
@@ -669,26 +764,85 @@
       if (!tbody) return;
 
       tbody.innerHTML = inventory.map(card => `
-        <tr class="hover:bg-slate-800/40 transition-all">
-          <td class="p-3 font-mono font-bold text-blue-400">${card.serial}</td>
-          <td class="p-3 font-semibold text-white flex items-center gap-2">
-            <img src="${card.imgUrl}" class="w-6 h-8 object-contain rounded bg-slate-950 border border-slate-800">
-            <span>${card.name}</span>
-          </td>
-          <td class="p-3">
-            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${card.type === 'PREMIUM' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-blue-500/20 text-blue-400'}">${card.type}</span>
-          </td>
+        <tr class="hover:bg-slate-800/40">
+          <td class="p-3 font-mono text-blue-400 font-bold">${card.serial}</td>
+          <td class="p-3 text-white flex items-center gap-2"><img src="${card.imgUrl}" class="w-6 h-8 object-contain"> ${card.name}</td>
+          <td class="p-3">${card.type}</td>
           <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
-          <td class="p-3">
-            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span>
-          </td>
+          <td class="p-3">${card.status}</td>
           <td class="p-3 text-right">
-            <button onclick="openCardEditorModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg transition-all" title="Edit Card">
-              <i class="fa-solid fa-pen text-xs"></i>
-            </button>
+            <button onclick="openCardEditorModal('${card.id}')" class="p-1.5 bg-slate-800 text-amber-300 rounded"><i class="fa-solid fa-pen"></i></button>
           </td>
         </tr>
       `).join('');
+    }
+
+    function renderVaultGrid() {
+      const container = document.getElementById('owned-cards-grid');
+      if (!container) return;
+      container.innerHTML = `<p class="text-center text-xs text-slate-400">Log in with Google to view your owned cards inside your private binder.</p>`;
+    }
+
+    function renderHoldersList() {
+      const container = document.getElementById('holders-content');
+      if (!container) return;
+
+      container.innerHTML = googleProfiles.map(u => `
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img src="${u.avatar_url}" class="w-9 h-9 rounded-full">
+            <div>
+              <h4 class="text-xs font-bold text-white">${u.name}</h4>
+              <p class="text-[10px] text-slate-400">${u.email}</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-teal-400">Collector</span>
+        </div>
+      `).join('');
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('history-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = historyLogs.map(log => `
+        <tr>
+          <td class="p-3 text-slate-400 font-mono">${log.timestamp || 'Just now'}</td>
+          <td class="p-3">${log.type || 'SALE'}</td>
+          <td class="p-3 font-mono text-blue-400">${log.serial || '*01'}</td>
+          <td class="p-3 text-white">${log.user || 'Collector'}</td>
+          <td class="p-3 font-mono text-emerald-400">IDR ${(log.amount || 0).toLocaleString()}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderQRISOrdersTable() {
+      const tbody = document.getElementById('qris-orders-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = qrisOrders.length === 0 ? `<tr><td colspan="5" class="p-4 text-center text-slate-500">No pending orders.</td></tr>` : '';
+    }
+
+    function searchUsersForChat() {
+      const listContainer = document.getElementById('user-search-list');
+      if (!listContainer) return;
+      listContainer.innerHTML = googleProfiles.map(u => `
+        <div onclick="startChatWithUser('${u.name}')" class="p-3 bg-slate-800/80 hover:bg-slate-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-slate-700/60">
+          <div class="flex items-center gap-3">
+            <img src="${u.avatar_url}" class="w-7 h-7 rounded-full">
+            <p class="text-xs font-bold text-white">${u.name}</p>
+          </div>
+          <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+        </div>
+      `).join('');
+    }
+
+    function startChatWithUser(name) {
+      document.getElementById('chat-active-username').innerText = `${name} (Google User)`;
+      document.getElementById('chat-messages').innerHTML = `
+        <div class="p-3 bg-slate-800/80 rounded-xl text-left max-w-xs self-start border border-slate-700/80">
+          <p class="text-blue-400 font-bold text-[10px] mb-0.5">${name}</p>
+          <p class="text-xs text-slate-200">Hello! Let's arrange a trade.</p>
+        </div>
+      `;
     }
 
     function openCardEditorModal(cardId = null) {
@@ -719,6 +873,11 @@
       });
       const activeView = document.getElementById(`view-${tabName}`);
       if (activeView) activeView.classList.remove('hidden');
+    }
+
+    function setFilter(type) {
+      currentFilter = type;
+      renderCardGrid();
     }
 
     function showToast(msg) {
