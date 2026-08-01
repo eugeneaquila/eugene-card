@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Supabase Auth Enabled</title>
+  <title>Eugene Card Marketplace | Working Private Messenger</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%233b82f6' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%233b82f6'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
@@ -93,7 +93,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-sm tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Supabase Connected</span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Messenger Fixed</span>
           </div>
         </div>
       </div>
@@ -343,39 +343,52 @@
       <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
     </section>
 
-    <!-- MESSENGER VIEW -->
+    <!-- MESSENGER VIEW (REWORKED & FIXED) -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
           <i class="fa-solid fa-comments text-indigo-400"></i> MESSENGER & DIRECT CHAT
         </h2>
-        <p class="text-xs text-gray-400 mt-1">Select a collector handle to open a private chat channel.</p>
+        <p class="text-xs text-gray-400 mt-1">Select a collector handle to open an isolated private conversation.</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Sidebar Collectors Search -->
         <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-4">
-          <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search collectors..." class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-          <div id="user-search-list" class="space-y-1.5 max-h-80 overflow-y-auto"></div>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+            <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search collectors..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+          </div>
+          <div id="user-search-list" class="space-y-1.5 max-h-80 overflow-y-auto pr-1"></div>
         </div>
 
-        <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between min-h-[420px]">
+        <!-- DM Conversation Box -->
+        <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between min-h-[440px]">
           <div id="chat-header" class="border-b border-gray-800 pb-3 flex items-center justify-between">
             <div>
               <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a collector</h4>
-              <p id="chat-active-badge" class="text-[10px] text-gray-500">Private DM Channel</p>
+              <p id="chat-active-badge" class="text-[10px] text-gray-500">Private Channel</p>
             </div>
-            <button onclick="sendTradePromptInChat()" class="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold transition-all">Propose Trade</button>
+            <button onclick="sendTradePromptInChat()" class="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-handshake"></i> Propose Trade
+            </button>
           </div>
 
-          <div id="chat-messages" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-72 text-xs text-gray-400 flex flex-col justify-center items-center">
-            <i class="fa-solid fa-lock text-3xl text-gray-800 mb-2"></i>
-            <span>Select a user handle to view your private conversation.</span>
+          <!-- FIXED CHAT CONTAINER CSS -->
+          <div id="chat-messages" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-80 p-2 text-xs text-gray-400">
+            <div class="h-full flex flex-col items-center justify-center text-center text-xs text-gray-500 py-10">
+              <i class="fa-solid fa-comments text-3xl text-gray-800 mb-2"></i>
+              <span>Select a user handle from the sidebar to open direct messages.</span>
+            </div>
           </div>
 
-          <div class="flex items-center gap-2 border-t border-gray-800 pt-3">
+          <!-- Message Input Bar -->
+          <form onsubmit="handleChatFormSubmit(event)" class="flex items-center gap-2 border-t border-gray-800 pt-3">
             <input type="text" id="chat-message-input" placeholder="Type a message..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
-            <button onclick="sendChatMessage()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Send</button>
-          </div>
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1">
+              <i class="fa-solid fa-paper-plane"></i> <span>Send</span>
+            </button>
+          </form>
         </div>
       </div>
     </section>
@@ -458,7 +471,7 @@
               </div>
               <div>
                 <label class="text-[10px] font-bold text-gray-400 uppercase">Price (IDR)</label>
-                <input type="number" id="inv-input-price" required min="0" placeholder="500000" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
+                <input type="number" id="inv-input-price" required min="0" placeholder="500000" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
               </div>
             </div>
             <div>
@@ -515,20 +528,16 @@
   </div>
 
   <script>
-    // ----------------------------------------------------
-    // SUPABASE CONFIGURATION (Replace with your project keys)
-    // ----------------------------------------------------
-    const SUPABASE_URL = "https://yswwicdycbscurnpbqjb.supabase.co";
+    // Supabase Credentials Placeholder
+    const SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_ID.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlzd3dpY2R5Y2JzY3VybnBicWpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyOTUzNjAsImV4cCI6MjEwMDg3MTM2MH0.FESrSxt3ys6WJXF768q1lXJceQrff6T6WLgCn8prEw8";
 
-    // Initialize Real Supabase Client
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    // QRIS Payload Config
+    // QRIS String Payload
     const QRIS_PAYLOAD_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
     const QRIS_IMAGE_DATA_URI = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(QRIS_PAYLOAD_STRING)}`;
 
-    // Strictly Authorized Admins
     const ADMIN_EMAILS = [
       'eugene.aquila06@gmail.com',
       'yujinybwork@gmail.com'
@@ -554,123 +563,7 @@
       return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
-    // ----------------------------------------------------
-    // REAL SUPABASE AUTH FUNCTIONS
-    // ----------------------------------------------------
-    async function initSupabaseAuthListener() {
-      if (!supabaseClient) return;
-
-      // Check existing active session
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (session) {
-        handleSupabaseUserSession(session.user);
-      }
-
-      // Subscribe to realtime auth status changes
-      supabaseClient.auth.onAuthStateChange((event, session) => {
-        if (session?.user) {
-          handleSupabaseUserSession(session.user);
-        } else if (event === 'SIGNED_OUT') {
-          currentUser = null;
-          renderAuthHeader();
-          renderVaultGrid();
-        }
-      });
-    }
-
-    function handleSupabaseUserSession(user) {
-      const email = user.email || '';
-      const username = email || user.user_metadata?.username || `user_${user.id.substring(0, 5)}`;
-      const name = user.user_metadata?.full_name || user.user_metadata?.name || username.split('@')[0];
-      const isAdmin = isUserAdmin({ email, username });
-
-      currentUser = {
-        id: user.id,
-        username,
-        email,
-        name,
-        isAdmin,
-        authType: user.app_metadata?.provider || 'supabase',
-        avatar: user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`
-      };
-
-      // Sync local account directory
-      if (!customAccounts.some(u => u.username === currentUser.username)) {
-        customAccounts.push(currentUser);
-        localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
-      }
-
-      renderAuthHeader();
-      renderVaultGrid();
-      renderHoldersList();
-      searchUsersForChat();
-      populateOwnerSelectDropdown();
-    }
-
-    async function loginWithGoogleOAuth() {
-      if (!supabaseClient || SUPABASE_URL.includes("YOUR_SUPABASE")) {
-        // Fallback to demo email prompt if URL not configured yet
-        const inputEmail = prompt("Enter your Google Account email:", "eugene.aquila06@gmail.com");
-        if (!inputEmail) return;
-        const cleanEmail = inputEmail.trim().toLowerCase();
-        handleSupabaseUserSession({ id: 'demo-' + Date.now(), email: cleanEmail, user_metadata: { name: cleanEmail.split('@')[0] } });
-        closeAuthModal();
-        return;
-      }
-
-      // Real Supabase OAuth call
-      const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.href }
-      });
-
-      if (error) showToast(`Google Sign In Error: ${error.message}`);
-    }
-
-    async function handleCustomAuthSubmit(e) {
-      e.preventDefault();
-      const email = document.getElementById('auth-input-username').value.trim();
-      const password = document.getElementById('auth-input-password').value;
-      const name = document.getElementById('auth-input-name').value.trim();
-
-      if (!supabaseClient || SUPABASE_URL.includes("YOUR_SUPABASE")) {
-        // Local Fallback
-        handleSupabaseUserSession({ id: 'demo-' + Date.now(), email, user_metadata: { name: name || email.split('@')[0] } });
-        closeAuthModal();
-        showToast('Signed in!');
-        return;
-      }
-
-      if (isSignUpMode) {
-        const { data, error } = await supabaseClient.auth.signUp({
-          email,
-          password,
-          options: { data: { name: name || email.split('@')[0] } }
-        });
-        if (error) return showToast(`Sign Up Error: ${error.message}`);
-        showToast('Registration complete! Check your email to confirm or sign in.');
-      } else {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) return showToast(`Sign In Error: ${error.message}`);
-        showToast('Signed in successfully!');
-      }
-
-      closeAuthModal();
-    }
-
-    async function logoutUser() {
-      if (supabaseClient && !SUPABASE_URL.includes("YOUR_SUPABASE")) {
-        await supabaseClient.auth.signOut();
-      }
-      currentUser = null;
-      renderAuthHeader();
-      renderVaultGrid();
-      showToast('Logged out.');
-    }
-
-    // ----------------------------------------------------
-    // INITIALIZATION & RENDER
-    // ----------------------------------------------------
+    // Load Data
     function loadAppData() {
       const savedAccs = localStorage.getItem('eugene_custom_accounts');
       if (savedAccs) {
@@ -740,22 +633,106 @@
       populateOwnerSelectDropdown();
     });
 
-    function populateOwnerSelectDropdown() {
-      const select = document.getElementById('inv-input-owner');
-      if (!select) return;
+    // Supabase Auth Handling
+    async function initSupabaseAuthListener() {
+      if (!supabaseClient) return;
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) handleSupabaseUserSession(session.user);
 
-      const currentValue = select.value;
-      select.innerHTML = '<option value="">(None - System)</option>' + 
-        customAccounts.map(u => `<option value="${escapeHTML(u.username)}">@${escapeHTML(u.username)} (${escapeHTML(u.name)})</option>`).join('');
-      select.value = currentValue;
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (session?.user) {
+          handleSupabaseUserSession(session.user);
+        } else if (event === 'SIGNED_OUT') {
+          currentUser = null;
+          renderAuthHeader();
+          renderVaultGrid();
+        }
+      });
     }
 
-    function toggleAuthMode() {
-      isSignUpMode = !isSignUpMode;
-      document.getElementById('auth-modal-title').innerText = isSignUpMode ? "Create Account" : "Sign In to Eugene Card";
-      document.getElementById('auth-name-field').classList.toggle('hidden', !isSignUpMode);
-      document.getElementById('auth-submit-btn').innerText = isSignUpMode ? "Register" : "Sign In";
-      document.getElementById('auth-toggle-btn').innerText = isSignUpMode ? "Already have an account? Sign In" : "Need an account? Register";
+    function handleSupabaseUserSession(user) {
+      const email = user.email || '';
+      const username = email || user.user_metadata?.username || `user_${user.id.substring(0, 5)}`;
+      const name = user.user_metadata?.full_name || user.user_metadata?.name || username.split('@')[0];
+      const isAdmin = isUserAdmin({ email, username });
+
+      currentUser = {
+        id: user.id,
+        username,
+        email,
+        name,
+        isAdmin,
+        authType: user.app_metadata?.provider || 'supabase',
+        avatar: user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`
+      };
+
+      if (!customAccounts.some(u => u.username === currentUser.username)) {
+        customAccounts.push(currentUser);
+        localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
+      }
+
+      renderAuthHeader();
+      renderVaultGrid();
+      renderHoldersList();
+      searchUsersForChat();
+      populateOwnerSelectDropdown();
+    }
+
+    async function loginWithGoogleOAuth() {
+      if (!supabaseClient || SUPABASE_URL.includes("YOUR_SUPABASE")) {
+        const inputEmail = prompt("Enter your Google Account email:", "eugene.aquila06@gmail.com");
+        if (!inputEmail) return;
+        const cleanEmail = inputEmail.trim().toLowerCase();
+        handleSupabaseUserSession({ id: 'demo-' + Date.now(), email: cleanEmail, user_metadata: { name: cleanEmail.split('@')[0] } });
+        closeAuthModal();
+        return;
+      }
+
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.href }
+      });
+      if (error) showToast(`Google Auth Error: ${error.message}`);
+    }
+
+    async function handleCustomAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-input-username').value.trim();
+      const password = document.getElementById('auth-input-password').value;
+      const name = document.getElementById('auth-input-name').value.trim();
+
+      if (!supabaseClient || SUPABASE_URL.includes("YOUR_SUPABASE")) {
+        handleSupabaseUserSession({ id: 'demo-' + Date.now(), email, user_metadata: { name: name || email.split('@')[0] } });
+        closeAuthModal();
+        showToast('Signed in!');
+        return;
+      }
+
+      if (isSignUpMode) {
+        const { error } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: { data: { name: name || email.split('@')[0] } }
+        });
+        if (error) return showToast(`Sign Up Error: ${error.message}`);
+        showToast('Registration complete! Check your email to confirm or sign in.');
+      } else {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) return showToast(`Sign In Error: ${error.message}`);
+        showToast('Signed in successfully!');
+      }
+
+      closeAuthModal();
+    }
+
+    async function logoutUser() {
+      if (supabaseClient && !SUPABASE_URL.includes("YOUR_SUPABASE")) {
+        await supabaseClient.auth.signOut();
+      }
+      currentUser = null;
+      renderAuthHeader();
+      renderVaultGrid();
+      showToast('Logged out.');
     }
 
     function renderAuthHeader() {
@@ -801,106 +778,9 @@
       }
     }
 
-    function handleInventorySubmit(e) {
-      e.preventDefault();
-      if (!isUserAdmin(currentUser)) return showToast('Admin permission required.');
-
-      const cardId = document.getElementById('inv-input-id').value;
-      const serial = escapeHTML(document.getElementById('inv-input-serial').value.trim());
-      const name = escapeHTML(document.getElementById('inv-input-name').value.trim());
-      const type = document.getElementById('inv-input-type').value;
-      const price = parseInt(document.getElementById('inv-input-price').value, 10);
-      const imgUrl = document.getElementById('inv-input-img').value.trim();
-      let status = document.getElementById('inv-input-status').value;
-      const owner = document.getElementById('inv-input-owner').value || null;
-
-      if (owner && status === 'AVAILABLE') status = 'OWNED';
-
-      if (!imgUrl.startsWith('http://') && !imgUrl.startsWith('https://')) {
-        return showToast('Image URL must start with http:// or https://');
-      }
-
-      if (cardId) {
-        const idx = inventory.findIndex(c => c.id === cardId);
-        if (idx !== -1) {
-          inventory[idx] = { ...inventory[idx], serial, name, type, price, imgUrl, status, owner };
-        }
-        showToast(`Updated card ${serial}.`);
-      } else {
-        inventory.unshift({ id: `card-${Date.now()}`, serial, name, type, price, imgUrl, status, owner });
-        showToast(`Minted ${serial}!`);
-      }
-
-      saveInventoryState();
-      resetInventoryForm();
-    }
-
-    function editInventoryCard(cardId) {
-      if (!isUserAdmin(currentUser)) return showToast('Admin access required.');
-      const card = inventory.find(c => c.id === cardId);
-      if (!card) return;
-
-      document.getElementById('inv-form-title').innerText = `Edit ${card.serial}`;
-      document.getElementById('inv-input-id').value = card.id;
-      document.getElementById('inv-input-serial').value = card.serial;
-      document.getElementById('inv-input-name').value = card.name;
-      document.getElementById('inv-input-type').value = card.type;
-      document.getElementById('inv-input-price').value = card.price;
-      document.getElementById('inv-input-img').value = card.imgUrl;
-      document.getElementById('inv-input-status').value = card.status;
-      document.getElementById('inv-input-owner').value = card.owner || '';
-      document.getElementById('inv-submit-btn').innerText = "Update Card";
-    }
-
-    function deleteInventoryCard(cardId) {
-      if (!isUserAdmin(currentUser)) return showToast('Admin access required.');
-      if (!confirm('Permanently delete card?')) return;
-      inventory = inventory.filter(c => c.id !== cardId);
-      saveInventoryState();
-      showToast('Card deleted.');
-    }
-
-    function resetInventoryForm() {
-      document.getElementById('inv-form-title').innerText = "Mint New Card";
-      document.getElementById('inventory-editor-form').reset();
-      document.getElementById('inv-input-id').value = '';
-      document.getElementById('inv-submit-btn').innerText = "Mint Card";
-    }
-
-    function renderInventoryTable() {
-      const tbody = document.getElementById('inventory-table-body');
-      if (!tbody) return;
-
-      const searchVal = (document.getElementById('inventory-search-input')?.value || '').toLowerCase();
-      const filtered = inventory.filter(c => 
-        c.serial.toLowerCase().includes(searchVal) ||
-        c.name.toLowerCase().includes(searchVal) ||
-        (c.owner && c.owner.toLowerCase().includes(searchVal))
-      );
-
-      document.getElementById('inv-total-count').innerText = filtered.length;
-
-      tbody.innerHTML = filtered.map(card => `
-        <tr class="hover:bg-gray-800/40">
-          <td class="p-3 font-mono font-bold text-blue-400 flex items-center gap-2">
-            <img src="${card.imgUrl}" class="w-6 h-8 object-contain rounded bg-gray-950 border border-gray-800" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=N/A'">
-            <span>${escapeHTML(card.serial)} (${escapeHTML(card.name)})</span>
-          </td>
-          <td class="p-3 font-semibold text-gray-300">${card.type}</td>
-          <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
-          <td class="p-3">
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span>
-            ${card.owner ? `<span class="block text-[10px] text-gray-400 font-mono mt-0.5">@${escapeHTML(card.owner)}</span>` : ''}
-          </td>
-          <td class="p-3 text-right space-x-1">
-            <button onclick="editInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-gray-700 text-amber-300 rounded-lg"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-rose-500/20 text-rose-400 rounded-lg"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // --- MESSENGER & 1-ON-1 CHAT LOGIC ---
+    // ----------------------------------------------------
+    // REWORKED & FIXED MESSENGER MODULE
+    // ----------------------------------------------------
     function searchUsersForChat() {
       const listContainer = document.getElementById('user-search-list');
       if (!listContainer) return;
@@ -908,10 +788,15 @@
       const query = (document.getElementById('user-search-chat')?.value || '').toLowerCase();
       const filtered = customAccounts.filter(u => 
         currentUser ? u.username !== currentUser.username : true
-      ).filter(u => u.username.includes(query) || u.name.toLowerCase().includes(query));
+      ).filter(u => u.username.toLowerCase().includes(query) || u.name.toLowerCase().includes(query));
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `<p class="text-[11px] text-gray-500 text-center py-2">No collectors found</p>`;
+        return;
+      }
 
       listContainer.innerHTML = filtered.map(u => `
-        <div onclick="startChatWithUser('${u.username}', '${escapeHTML(u.name)}')" class="p-2.5 bg-gray-800/80 hover:bg-gray-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-gray-700/60 transition-all">
+        <div onclick="startChatWithUser('${u.username}', '${escapeHTML(u.name)}')" class="p-2.5 bg-gray-800/80 hover:bg-gray-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-gray-700/60 transition-all ${activeChatPartner === u.username ? 'border-blue-500/80 bg-blue-950/30' : ''}">
           <div class="flex items-center gap-2.5">
             <img src="${u.avatar}" class="w-7 h-7 rounded-full bg-gray-900 border border-gray-700">
             <div>
@@ -926,24 +811,33 @@
 
     function startChatWithUser(username, name) {
       if (!currentUser) return openAuthModal();
+
       activeChatPartner = username;
       document.getElementById('chat-active-username').innerText = `${name} (@${username})`;
-      document.getElementById('chat-active-badge').innerText = `Encrypted Channel (@${currentUser.username} ↔ @${username})`;
+      document.getElementById('chat-active-badge').innerText = `Private Thread (@${currentUser.username} ↔ @${username})`;
+
+      searchUsersForChat();
       renderPrivateMessages();
+
+      const input = document.getElementById('chat-message-input');
+      if (input) input.focus();
     }
 
     function renderPrivateMessages() {
       const chatContainer = document.getElementById('chat-messages');
+      if (!chatContainer) return;
+
       if (!currentUser || !activeChatPartner) {
         chatContainer.innerHTML = `
-          <div class="flex flex-col items-center justify-center text-center">
+          <div class="h-full flex flex-col items-center justify-center text-center text-xs text-gray-500 py-10">
             <i class="fa-solid fa-lock text-3xl text-gray-800 mb-2"></i>
-            <span>Select a collector to open a private encrypted chat.</span>
+            <span>Select a collector handle to open a private conversation.</span>
           </div>
         `;
         return;
       }
 
+      // Filter pair thread
       const thread = chatMessages.filter(m => 
         (m.from === currentUser.username && m.to === activeChatPartner) ||
         (m.from === activeChatPartner && m.to === currentUser.username)
@@ -951,9 +845,9 @@
 
       if (thread.length === 0) {
         chatContainer.innerHTML = `
-          <div class="flex flex-col items-center justify-center text-center text-xs text-gray-500">
-            <i class="fa-solid fa-comments text-2xl text-gray-800 mb-1"></i>
-            <span>No messages yet with @${escapeHTML(activeChatPartner)}. Send a greeting!</span>
+          <div class="h-full flex flex-col items-center justify-center text-center text-xs text-gray-500 py-10">
+            <i class="fa-solid fa-comments text-3xl text-gray-800 mb-2"></i>
+            <span>No previous messages with @${escapeHTML(activeChatPartner)}. Say hello!</span>
           </div>
         `;
         return;
@@ -962,12 +856,14 @@
       chatContainer.innerHTML = thread.map(msg => {
         const isMe = msg.from === currentUser.username;
         return `
-          <div class="p-3 ${isMe ? 'bg-blue-600 text-white self-end' : 'bg-gray-800 text-gray-200 self-start border border-gray-700'} rounded-xl max-w-xs text-xs shadow-md mb-2">
-            <div class="flex justify-between items-center gap-2 mb-1">
-              <span class="font-bold text-[10px] ${isMe ? 'text-blue-200' : 'text-blue-400'}">@${escapeHTML(msg.from)}</span>
-              <span class="text-[8px] opacity-70">${msg.timestamp}</span>
+          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2">
+            <div class="p-3 ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-gray-800 text-gray-200 border border-gray-700 rounded-2xl rounded-tl-none'} max-w-sm text-xs shadow-md">
+              <div class="flex justify-between items-center gap-3 mb-1">
+                <span class="font-bold text-[10px] ${isMe ? 'text-blue-200' : 'text-blue-400'}">@${escapeHTML(msg.from)}</span>
+                <span class="text-[8px] opacity-70 font-mono">${msg.timestamp}</span>
+              </div>
+              <p class="leading-relaxed">${escapeHTML(msg.text)}</p>
             </div>
-            <p>${escapeHTML(msg.text)}</p>
           </div>
         `;
       }).join('');
@@ -975,9 +871,14 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
+    function handleChatFormSubmit(e) {
+      e.preventDefault();
+      sendChatMessage();
+    }
+
     function sendChatMessage() {
       if (!currentUser) return openAuthModal();
-      if (!activeChatPartner) return showToast('Please select a collector from the sidebar.');
+      if (!activeChatPartner) return showToast('Please select a collector to chat with.');
 
       const input = document.getElementById('chat-message-input');
       const text = input.value.trim();
@@ -997,12 +898,12 @@
 
     function sendTradePromptInChat() {
       if (!currentUser) return openAuthModal();
-      if (!activeChatPartner) return showToast('Please select a collector from the sidebar.');
+      if (!activeChatPartner) return showToast('Please select a collector to request a trade.');
 
       chatMessages.push({
         from: currentUser.username,
         to: activeChatPartner,
-        text: `🤝 TRADE PROPOSAL: User @${currentUser.username} requested a direct card trade offer.`,
+        text: `🤝 TRADE PROPOSAL: @${currentUser.username} requested a direct card trade offer!`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
 
@@ -1010,7 +911,7 @@
       renderPrivateMessages();
     }
 
-    // --- CHECKOUT & UI HELPERS ---
+    // --- CHECKOUT & CATALOG INVENTORY LOGIC ---
     function openCardDetailsModal(cardId) {
       const card = inventory.find(c => c.id === cardId);
       if (!card) return;
@@ -1187,6 +1088,105 @@
           <td class="p-3 font-mono text-blue-400 font-bold">${escapeHTML(log.serial)}</td>
           <td class="p-3 text-white">@${escapeHTML(log.user)}</td>
           <td class="p-3 font-mono text-emerald-400 text-right">IDR ${(log.amount || 0).toLocaleString()}</td>
+        </tr>
+      `).join('');
+    }
+
+    function handleInventorySubmit(e) {
+      e.preventDefault();
+      if (!isUserAdmin(currentUser)) return showToast('Admin permission required.');
+
+      const cardId = document.getElementById('inv-input-id').value;
+      const serial = escapeHTML(document.getElementById('inv-input-serial').value.trim());
+      const name = escapeHTML(document.getElementById('inv-input-name').value.trim());
+      const type = document.getElementById('inv-input-type').value;
+      const price = parseInt(document.getElementById('inv-input-price').value, 10);
+      const imgUrl = document.getElementById('inv-input-img').value.trim();
+      let status = document.getElementById('inv-input-status').value;
+      const owner = document.getElementById('inv-input-owner').value || null;
+
+      if (owner && status === 'AVAILABLE') status = 'OWNED';
+
+      if (!imgUrl.startsWith('http://') && !imgUrl.startsWith('https://')) {
+        return showToast('Image URL must start with http:// or https://');
+      }
+
+      if (cardId) {
+        const idx = inventory.findIndex(c => c.id === cardId);
+        if (idx !== -1) {
+          inventory[idx] = { ...inventory[idx], serial, name, type, price, imgUrl, status, owner };
+        }
+        showToast(`Updated card ${serial}.`);
+      } else {
+        inventory.unshift({ id: `card-${Date.now()}`, serial, name, type, price, imgUrl, status, owner });
+        showToast(`Minted ${serial}!`);
+      }
+
+      saveInventoryState();
+      resetInventoryForm();
+    }
+
+    function editInventoryCard(cardId) {
+      if (!isUserAdmin(currentUser)) return showToast('Admin access required.');
+      const card = inventory.find(c => c.id === cardId);
+      if (!card) return;
+
+      document.getElementById('inv-form-title').innerText = `Edit ${card.serial}`;
+      document.getElementById('inv-input-id').value = card.id;
+      document.getElementById('inv-input-serial').value = card.serial;
+      document.getElementById('inv-input-name').value = card.name;
+      document.getElementById('inv-input-type').value = card.type;
+      document.getElementById('inv-input-price').value = card.price;
+      document.getElementById('inv-input-img').value = card.imgUrl;
+      document.getElementById('inv-input-status').value = card.status;
+      document.getElementById('inv-input-owner').value = card.owner || '';
+      document.getElementById('inv-submit-btn').innerText = "Update Card";
+    }
+
+    function deleteInventoryCard(cardId) {
+      if (!isUserAdmin(currentUser)) return showToast('Admin access required.');
+      if (!confirm('Permanently delete card?')) return;
+      inventory = inventory.filter(c => c.id !== cardId);
+      saveInventoryState();
+      showToast('Card deleted.');
+    }
+
+    function resetInventoryForm() {
+      document.getElementById('inv-form-title').innerText = "Mint New Card";
+      document.getElementById('inventory-editor-form').reset();
+      document.getElementById('inv-input-id').value = '';
+      document.getElementById('inv-submit-btn').innerText = "Mint Card";
+    }
+
+    function renderInventoryTable() {
+      const tbody = document.getElementById('inventory-table-body');
+      if (!tbody) return;
+
+      const searchVal = (document.getElementById('inventory-search-input')?.value || '').toLowerCase();
+      const filtered = inventory.filter(c => 
+        c.serial.toLowerCase().includes(searchVal) ||
+        c.name.toLowerCase().includes(searchVal) ||
+        (c.owner && c.owner.toLowerCase().includes(searchVal))
+      );
+
+      document.getElementById('inv-total-count').innerText = filtered.length;
+
+      tbody.innerHTML = filtered.map(card => `
+        <tr class="hover:bg-gray-800/40">
+          <td class="p-3 font-mono font-bold text-blue-400 flex items-center gap-2">
+            <img src="${card.imgUrl}" class="w-6 h-8 object-contain rounded bg-gray-950 border border-gray-800" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=N/A'">
+            <span>${escapeHTML(card.serial)} (${escapeHTML(card.name)})</span>
+          </td>
+          <td class="p-3 font-semibold text-gray-300">${card.type}</td>
+          <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
+          <td class="p-3">
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span>
+            ${card.owner ? `<span class="block text-[10px] text-gray-400 font-mono mt-0.5">@${escapeHTML(card.owner)}</span>` : ''}
+          </td>
+          <td class="p-3 text-right space-x-1">
+            <button onclick="editInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-gray-700 text-amber-300 rounded-lg"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-rose-500/20 text-rose-400 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+          </td>
         </tr>
       `).join('');
     }
