@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Working Private Messenger</title>
+  <title>Eugene Card Marketplace | Supabase Live Configured</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%233b82f6' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%233b82f6'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
@@ -93,7 +93,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-sm tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Messenger Fixed</span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Supabase Connected</span>
           </div>
         </div>
       </div>
@@ -343,7 +343,7 @@
       <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
     </section>
 
-    <!-- MESSENGER VIEW (REWORKED & FIXED) -->
+    <!-- MESSENGER VIEW -->
     <section id="view-inbox" class="hidden space-y-6">
       <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
         <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
@@ -374,7 +374,6 @@
             </button>
           </div>
 
-          <!-- FIXED CHAT CONTAINER CSS -->
           <div id="chat-messages" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-80 p-2 text-xs text-gray-400">
             <div class="h-full flex flex-col items-center justify-center text-center text-xs text-gray-500 py-10">
               <i class="fa-solid fa-comments text-3xl text-gray-800 mb-2"></i>
@@ -471,7 +470,7 @@
               </div>
               <div>
                 <label class="text-[10px] font-bold text-gray-400 uppercase">Price (IDR)</label>
-                <input type="number" id="inv-input-price" required min="0" placeholder="500000" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <input type="number" id="inv-input-price" required min="0" placeholder="500000" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
               </div>
             </div>
             <div>
@@ -528,16 +527,18 @@
   </div>
 
   <script>
-    // Supabase Credentials Placeholder
-    const SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_ID.supabase.co";
+    // Live Supabase API Credentials
+    const SUPABASE_URL = "https://yswwicdycbscurnpbqjb.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlzd3dpY2R5Y2JzY3VybnBicWpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyOTUzNjAsImV4cCI6MjEwMDg3MTM2MH0.FESrSxt3ys6WJXF768q1lXJceQrff6T6WLgCn8prEw8";
 
+    // Initialize Real Supabase Client
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    // QRIS String Payload
+    // QRIS Payload String
     const QRIS_PAYLOAD_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
     const QRIS_IMAGE_DATA_URI = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(QRIS_PAYLOAD_STRING)}`;
 
+    // Strictly Authorized Admins
     const ADMIN_EMAILS = [
       'eugene.aquila06@gmail.com',
       'yujinybwork@gmail.com'
@@ -563,7 +564,7 @@
       return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
-    // Load Data
+    // Load Local Fallbacks
     function loadAppData() {
       const savedAccs = localStorage.getItem('eugene_custom_accounts');
       if (savedAccs) {
@@ -633,9 +634,10 @@
       populateOwnerSelectDropdown();
     });
 
-    // Supabase Auth Handling
+    // Supabase Auth Integration
     async function initSupabaseAuthListener() {
       if (!supabaseClient) return;
+      
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (session) handleSupabaseUserSession(session.user);
 
@@ -679,15 +681,7 @@
     }
 
     async function loginWithGoogleOAuth() {
-      if (!supabaseClient || SUPABASE_URL.includes("YOUR_SUPABASE")) {
-        const inputEmail = prompt("Enter your Google Account email:", "eugene.aquila06@gmail.com");
-        if (!inputEmail) return;
-        const cleanEmail = inputEmail.trim().toLowerCase();
-        handleSupabaseUserSession({ id: 'demo-' + Date.now(), email: cleanEmail, user_metadata: { name: cleanEmail.split('@')[0] } });
-        closeAuthModal();
-        return;
-      }
-
+      if (!supabaseClient) return;
       const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: window.location.href }
@@ -701,12 +695,7 @@
       const password = document.getElementById('auth-input-password').value;
       const name = document.getElementById('auth-input-name').value.trim();
 
-      if (!supabaseClient || SUPABASE_URL.includes("YOUR_SUPABASE")) {
-        handleSupabaseUserSession({ id: 'demo-' + Date.now(), email, user_metadata: { name: name || email.split('@')[0] } });
-        closeAuthModal();
-        showToast('Signed in!');
-        return;
-      }
+      if (!supabaseClient) return;
 
       if (isSignUpMode) {
         const { error } = await supabaseClient.auth.signUp({
@@ -726,9 +715,7 @@
     }
 
     async function logoutUser() {
-      if (supabaseClient && !SUPABASE_URL.includes("YOUR_SUPABASE")) {
-        await supabaseClient.auth.signOut();
-      }
+      if (supabaseClient) await supabaseClient.auth.signOut();
       currentUser = null;
       renderAuthHeader();
       renderVaultGrid();
@@ -778,9 +765,7 @@
       }
     }
 
-    // ----------------------------------------------------
-    // REWORKED & FIXED MESSENGER MODULE
-    // ----------------------------------------------------
+    // Messenger Module Logic
     function searchUsersForChat() {
       const listContainer = document.getElementById('user-search-list');
       if (!listContainer) return;
@@ -837,7 +822,6 @@
         return;
       }
 
-      // Filter pair thread
       const thread = chatMessages.filter(m => 
         (m.from === currentUser.username && m.to === activeChatPartner) ||
         (m.from === activeChatPartner && m.to === currentUser.username)
@@ -911,7 +895,7 @@
       renderPrivateMessages();
     }
 
-    // --- CHECKOUT & CATALOG INVENTORY LOGIC ---
+    // Checkout & Catalog Logic
     function openCardDetailsModal(cardId) {
       const card = inventory.find(c => c.id === cardId);
       if (!card) return;
@@ -1189,6 +1173,16 @@
           </td>
         </tr>
       `).join('');
+    }
+
+    function populateOwnerSelectDropdown() {
+      const select = document.getElementById('inv-input-owner');
+      if (!select) return;
+
+      const currentValue = select.value;
+      select.innerHTML = '<option value="">(None - System)</option>' + 
+        customAccounts.map(u => `<option value="${escapeHTML(u.username)}">@${escapeHTML(u.username)} (${escapeHTML(u.name)})</option>`).join('');
+      select.value = currentValue;
     }
 
     function updateAIPrediction() {
