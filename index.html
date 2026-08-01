@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Secure Edition</title>
+  <title>Eugene Card Marketplace | QRIS Payload Edition</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%233b82f6' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%233b82f6'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
@@ -90,7 +90,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-sm tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">v3.0 Secure</span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">QRIS Integrated</span>
           </div>
         </div>
       </div>
@@ -245,13 +245,15 @@
         <div class="flex items-center justify-center gap-2 text-rose-500 font-black text-sm uppercase tracking-wider">
           <i class="fa-solid fa-qrcode"></i> <span>QRIS Payment</span>
         </div>
-        <p class="text-xs text-gray-400">Scan QRIS below using your mobile banking or e-wallet app.</p>
+        <p class="text-xs text-gray-400">Scan QRIS below using GoPay, OVO, ShopeePay, BCA, or any banking app.</p>
       </div>
 
-      <!-- Attached QRIS Image Container -->
+      <!-- QRIS Code Image generated directly from provided string payload -->
       <div class="bg-white p-3 rounded-2xl inline-block shadow-lg border border-gray-200">
         <img id="qris-code-image" src="" alt="QRIS Code" class="w-56 h-56 object-contain mx-auto rounded-lg">
       </div>
+      
+      <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Merchant: <span class="text-white font-bold">Eugene Card, Toko Kartu & (Toraja Utara)</span></p>
 
       <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 space-y-1 text-left">
         <div class="flex justify-between text-xs">
@@ -511,10 +513,13 @@
   </div>
 
   <script>
-    // Embedded QRIS Code Image
-    const QRIS_IMAGE_DATA_URI = "data:image/png;base64,iVBORw0KGgoAAAANSUMBGG..." || "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021126580014ID.GO.QRIS.WWW011893600911002202607155204581253033605802ID5911EUGENE_CARD6009SINGAPORE6304A1B2";
+    // Exact QRIS Text String Payload provided
+    const QRIS_PAYLOAD_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
 
-    // Strictly Authorized Admin List
+    // Dynamic QR Generator API using exact string
+    const QRIS_IMAGE_DATA_URI = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(QRIS_PAYLOAD_STRING)}`;
+
+    // Authorized Admins
     const ADMIN_EMAILS = [
       'eugene.aquila06@gmail.com',
       'yujinybwork@gmail.com'
@@ -747,7 +752,6 @@
       }
     }
 
-    // --- INVENTORY CONTROL STUDIO HANDLERS ---
     function handleInventorySubmit(e) {
       e.preventDefault();
       if (!isUserAdmin(currentUser)) return showToast('Admin permission required.');
@@ -847,7 +851,6 @@
       `).join('');
     }
 
-    // --- CARD DETAILS & QRIS CHECKOUT MODAL LOGIC ---
     function openCardDetailsModal(cardId) {
       const card = inventory.find(c => c.id === cardId);
       if (!card) return;
@@ -942,7 +945,6 @@
     function closeQRISModal() { document.getElementById('qris-modal').classList.add('hidden'); }
     function closeCardDetailsModal() { document.getElementById('card-details-modal').classList.add('hidden'); }
 
-    // --- RENDER HELPERS ---
     function renderCardGrid() {
       const grid = document.getElementById('card-grid');
       if (!grid) return;
