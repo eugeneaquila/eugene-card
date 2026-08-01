@@ -1,1221 +1,447 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Supabase Live Configured</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eugene Card — Registry &amp; Exchange</title>
+<meta name="description" content="A registry and exchange for fifty one-of-one Beta Edition cards. Every card is numbered, owned, and tracked." />
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%233b82f6' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%233b82f6'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              dark: '#080d1a',
-              card: '#111827',
-              border: '#1f2937',
-              accent: '#3b82f6'
-            }
-          },
-          fontFamily: { sans: ['Inter', 'sans-serif'] }
-        }
-      }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink: { DEFAULT: '#10141A', 2: '#171C24', 3: '#1D232D', line: '#2A313C' },
+          parchment: { DEFAULT: '#E7E4D4', 2: '#DCD8C4', ink: '#1B1B16', muted: '#5B5A4E' },
+          brass: { DEFAULT: '#C79A46', bright: '#E0B563', dim: '#8A6B32' },
+          emerald: { DEFAULT: '#1F5C48', bright: '#2F8464', dim: '#153F32' },
+          oxblood: { DEFAULT: '#8A3A34', bright: '#B0504A' },
+        },
+        fontFamily: {
+          display: ['Fraunces', 'serif'],
+          mono: ['"IBM Plex Mono"', 'monospace'],
+          sans: ['Inter', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+
+<style>
+  :root {
+    --ink: #10141A;
+    --ink-2: #171C24;
+    --ink-3: #1D232D;
+    --line: #2A313C;
+    --parchment: #E7E4D4;
+    --parchment-2: #DCD8C4;
+    --paper-ink: #1B1B16;
+    --paper-muted: #5B5A4E;
+    --brass: #C79A46;
+    --brass-bright: #E0B563;
+    --brass-dim: #8A6B32;
+    --emerald: #1F5C48;
+    --emerald-bright: #2F8464;
+    --oxblood: #8A3A34;
+    --text: #EDEAE0;
+    --text-muted: #9BA3AD;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--brass); color: var(--ink); }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--ink); }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--brass-dim); }
+
+  .font-display { font-family: 'Fraunces', serif; }
+  .font-mono { font-family: 'IBM Plex Mono', monospace; }
+
+  .bg-noise {
+    background-image: radial-gradient(circle at 1px 1px, rgba(199,154,70,0.05) 1px, transparent 0);
+    background-size: 22px 22px;
+  }
+
+  .rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+  }
+
+  .rule-brass {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brass-dim) 15%, var(--brass) 50%, var(--brass-dim) 85%, transparent);
+  }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--brass-bright);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
     }
-  </script>
+  }
 
-  <!-- FontAwesome Icons & Google Fonts -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  /* Registry status strip — the signature element */
+  .ledger-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--line);
+    background: var(--ink-2);
+  }
+  .ledger-cell {
+    padding: 18px 14px;
+    border-right: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .ledger-cell:last-child { border-right: none; }
+  .ledger-cell::before {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 0; height: 2px;
+    background: var(--cell-accent, var(--brass));
+  }
+  .ledger-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    line-height: 1;
+  }
+  .ledger-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 8px;
+    display: block;
+  }
 
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  /* Card registry entry */
+  .card-entry {
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+  .card-entry:hover {
+    transform: translateY(-3px);
+    border-color: var(--brass-dim);
+    box-shadow: 0 12px 28px -14px rgba(0,0,0,0.6);
+  }
+  .card-serial {
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.02em;
+  }
 
-  <style>
-    body { font-family: 'Inter', sans-serif; background-color: #080d1a; color: #f3f4f6; }
-    
-    .card-glow-premium {
-      background: linear-gradient(145deg, #1e1b4b 0%, #111827 100%);
-      border: 1px solid rgba(99, 102, 241, 0.35);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .card-glow-premium:hover { 
-      border-color: rgba(129, 140, 248, 0.8); 
-      transform: translateY(-4px); 
-      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25); 
-    }
-    
-    .card-glow-standard {
-      background: linear-gradient(145deg, #1f2937 0%, #0f172a 100%);
-      border: 1px solid #374151;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .card-glow-standard:hover { 
-      border-color: #4b5563; 
-      transform: translateY(-4px); 
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6); 
-    }
+  .status-stamp {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+  }
 
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #080d1a; }
-    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 9999px; }
-  </style>
+  .btn-brass {
+    background: var(--brass);
+    color: var(--ink);
+    font-weight: 600;
+    transition: background 150ms ease, transform 150ms ease;
+  }
+  .btn-brass:hover { background: var(--brass-bright); }
+  .btn-brass:active { transform: scale(0.98); }
+  .btn-brass:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-ghost {
+    border: 1px solid var(--line);
+    color: var(--text);
+    transition: border-color 150ms ease, background 150ms ease;
+  }
+  .btn-ghost:hover { border-color: var(--brass-dim); background: rgba(199,154,70,0.06); }
+
+  .tab-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 4px;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    transition: color 150ms ease, border-color 150ms ease;
+    white-space: nowrap;
+  }
+  .tab-btn.active { color: var(--brass-bright); border-color: var(--brass); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  .input-field {
+    background: var(--ink-3);
+    border: 1px solid var(--line);
+    color: var(--text);
+    transition: border-color 150ms ease;
+  }
+  .input-field:focus { border-color: var(--brass-dim); outline: none; }
+  .input-field::placeholder { color: var(--text-muted); }
+
+  .modal-backdrop {
+    background: rgba(8,10,13,0.78);
+    backdrop-filter: blur(3px);
+  }
+
+  .modal-panel {
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+  }
+
+  .parchment-panel {
+    background: var(--parchment);
+    color: var(--paper-ink);
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--ink-2) 0%, var(--ink-3) 50%, var(--ink-2) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  .toast-enter { animation: toast-in 220ms ease-out; }
+  @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .fade-in { animation: fade-in 320ms ease-out; }
+  @keyframes fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  [x-view] { display: none; }
+  [x-view].active { display: block; }
+
+  .avatar-ring {
+    background: conic-gradient(from 0deg, var(--brass), var(--emerald), var(--brass));
+    padding: 2px;
+    border-radius: 999px;
+  }
+
+  .notif-dot {
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+</style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+<body class="bg-noise min-h-screen">
 
-  <!-- Embedded Logo SVG -->
-  <svg style="display: none;">
-    <defs>
-      <g id="eugene-logo-mark">
-        <circle cx="50" cy="50" r="42" fill="none" stroke="#3b82f6" stroke-width="5" stroke-dasharray="210 50" transform="rotate(-45 50 50)"/>
-        <polygon points="50,18 80,35 80,68 50,85 20,68 20,35" fill="#3b82f6"/>
-        <path d="M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
-      </g>
-    </defs>
-  </svg>
+<!-- ============ TOAST CONTAINER ============ -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 items-end"></div>
 
-  <!-- Header -->
-  <header class="sticky top-0 z-40 bg-gray-900/90 backdrop-blur-md border-b border-gray-800/80 px-4 lg:px-8 py-3">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      
-      <!-- Brand Logo -->
-      <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('catalog')">
-        <div class="w-9 h-9 rounded-xl overflow-hidden bg-gray-800 border border-gray-700 p-1.5 flex items-center justify-center">
-          <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-sm tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Supabase Connected</span>
-          </div>
-        </div>
-      </div>
+<!-- ============ TOP NAV ============ -->
+<header class="sticky top-0 z-40 bg-ink/95 backdrop-blur border-b border-ink-line" style="border-color:var(--line)">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <button onclick="setView('marketplace')" class="flex items-baseline gap-2 shrink-0">
+        <span class="font-display text-xl sm:text-2xl tracking-tight text-parchment">Eugene <em class="not-italic text-brass">Card</em></span>
+      </button>
 
-      <!-- Navigation Tabs -->
-      <nav class="flex items-center gap-1 bg-gray-800/60 p-1.5 rounded-2xl border border-gray-700/60 overflow-x-auto max-w-full">
-        <button id="nav-catalog" onclick="switchTab('catalog')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white bg-blue-600 flex items-center gap-1.5 whitespace-nowrap transition-all shadow-sm">
-          <i class="fa-solid fa-layer-group"></i> <span>Collection</span>
-        </button>
-        <button id="nav-trade" onclick="switchTab('trade')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-gray-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-right-left text-blue-400"></i> <span>Trade Market</span>
-        </button>
-        <button id="nav-auction" onclick="switchTab('auction')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-gray-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-gavel text-emerald-400"></i> <span>Auctions</span>
-        </button>
-        <button id="nav-inbox" onclick="switchTab('inbox')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-gray-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-comments text-indigo-400"></i> <span>Messenger</span>
-        </button>
-        <button id="nav-holders" onclick="switchTab('holders')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-gray-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-users text-teal-400"></i> <span>Collectors</span>
-        </button>
-        <button id="nav-history" onclick="switchTab('history')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-gray-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> <span>Ledger</span>
-        </button>
-        <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-gray-400 hover:text-white flex items-center gap-1.5 whitespace-nowrap transition-all">
-          <i class="fa-solid fa-vault text-amber-400"></i> <span>My Vault</span>
-        </button>
-
-        <!-- Admin Nav Separator -->
-        <div id="admin-nav-separator" class="h-4 w-px bg-gray-700/80 mx-1 self-center hidden"></div>
-
-        <button id="nav-ai-prediction" onclick="switchTab('ai-prediction')" class="admin-only-nav hidden px-3.5 py-1.5 rounded-xl text-xs font-medium text-emerald-300 hover:text-white flex items-center gap-1.5 bg-emerald-950/40 border border-emerald-500/30">
-          <i class="fa-solid fa-brain text-emerald-400"></i> <span>AI Analytics</span>
-        </button>
-        <button id="nav-inventory" onclick="switchTab('inventory')" class="admin-only-nav hidden px-3.5 py-1.5 rounded-xl text-xs font-medium text-amber-300 hover:text-white flex items-center gap-1.5 bg-amber-950/40 border border-amber-500/30">
-          <i class="fa-solid fa-boxes-stacked text-amber-400"></i> <span>Inventory Studio</span>
-        </button>
+      <nav class="hidden md:flex items-center gap-6 overflow-x-auto hide-scrollbar" id="main-nav">
+        <button class="tab-btn active" data-view="marketplace" onclick="setView('marketplace')">Registry</button>
+        <button class="tab-btn" data-view="auctions" onclick="setView('auctions')">Live Lot</button>
+        <button class="tab-btn" data-view="trades" onclick="setView('trades')">Exchange</button>
+        <button class="tab-btn" data-view="wishlist" onclick="setView('wishlist')">Wishlist</button>
+        <button class="tab-btn" data-view="vault" onclick="setView('vault')">Your Vault</button>
+        <button class="tab-btn hidden" data-view="admin" id="admin-tab-btn" onclick="setView('admin')">Registrar</button>
       </nav>
 
-      <!-- User Auth Header Button -->
-      <div id="auth-header-container"></div>
-    </div>
-  </header>
-
-  <!-- AUTHENTICATION MODAL -->
-  <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-6 space-y-5 relative shadow-2xl">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-gray-800 text-gray-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="text-center space-y-1.5">
-        <div class="w-12 h-12 rounded-2xl mx-auto bg-gray-800 border border-gray-700 p-2 flex items-center justify-center">
-          <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
-        </div>
-        <h3 id="auth-modal-title" class="text-base font-bold text-white">Sign In to Eugene Card</h3>
-        <p id="auth-modal-sub" class="text-xs text-gray-400">Sign in with Google OAuth or email via Supabase Auth.</p>
-      </div>
-
-      <!-- Real Google OAuth Button -->
-      <button onclick="loginWithGoogleOAuth()" class="w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all border border-gray-200">
-        <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Sign In with Google</span>
-      </button>
-
-      <div class="flex items-center gap-3">
-        <div class="h-px bg-gray-800 flex-1"></div>
-        <span class="text-[10px] text-gray-500 font-bold uppercase">or email address</span>
-        <div class="h-px bg-gray-800 flex-1"></div>
-      </div>
-
-      <!-- Custom Supabase Auth Form -->
-      <form id="custom-auth-form" onsubmit="handleCustomAuthSubmit(event)" class="space-y-3">
-        <div id="auth-name-field" class="hidden space-y-1">
-          <label class="text-[10px] font-bold text-gray-400 uppercase">Display Name</label>
-          <input type="text" id="auth-input-name" placeholder="Eugene Collector" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-        </div>
-
-        <div class="space-y-1">
-          <label class="text-[10px] font-bold text-gray-400 uppercase">Email Address</label>
-          <input type="email" id="auth-input-username" required placeholder="collector@gmail.com" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-        </div>
-
-        <div class="space-y-1">
-          <label class="text-[10px] font-bold text-gray-400 uppercase">Password</label>
-          <input type="password" id="auth-input-password" required placeholder="••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-        </div>
-
-        <button type="submit" id="auth-submit-btn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all mt-2">
-          Sign In
+      <div class="flex items-center gap-3 shrink-0">
+        <button onclick="openCartModal()" class="relative btn-ghost rounded-full w-9 h-9 flex items-center justify-center" aria-label="Cart">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span id="cart-count" class="hidden absolute -top-1.5 -right-1.5 bg-brass text-ink text-[10px] font-mono font-bold rounded-full w-4 h-4 items-center justify-center">0</span>
         </button>
-      </form>
 
-      <div class="text-center pt-1 border-t border-gray-800">
-        <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-blue-400 hover:underline">
-          Don't have an account? Register
+        <div class="relative">
+          <button onclick="toggleNotifPanel()" class="relative btn-ghost rounded-full w-9 h-9 flex items-center justify-center" aria-label="Notifications">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span id="notif-dot" class="hidden notif-dot absolute -top-0.5 -right-0.5 bg-oxblood-bright rounded-full w-2.5 h-2.5" style="background:var(--oxblood)"></span>
+          </button>
+          <div id="notif-panel" class="hidden absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto modal-panel rounded-lg shadow-2xl p-2 z-50"></div>
+        </div>
+
+        <div id="auth-slot"></div>
+
+        <button onclick="toggleMobileNav()" class="md:hidden btn-ghost rounded-md w-9 h-9 flex items-center justify-center" aria-label="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
       </div>
     </div>
+
+    <nav id="mobile-nav" class="hidden md:hidden flex flex-col pb-3 gap-1">
+      <button class="tab-btn active text-left !border-b-0 py-2" data-view="marketplace" onclick="setView('marketplace')">Registry</button>
+      <button class="tab-btn text-left !border-b-0 py-2" data-view="auctions" onclick="setView('auctions')">Live Lot</button>
+      <button class="tab-btn text-left !border-b-0 py-2" data-view="trades" onclick="setView('trades')">Exchange</button>
+      <button class="tab-btn text-left !border-b-0 py-2" data-view="wishlist" onclick="setView('wishlist')">Wishlist</button>
+      <button class="tab-btn text-left !border-b-0 py-2" data-view="vault" onclick="setView('vault')">Your Vault</button>
+      <button class="tab-btn hidden text-left !border-b-0 py-2" data-view="admin" id="admin-tab-btn-mobile" onclick="setView('admin')">Registrar</button>
+    </nav>
   </div>
+</header>
 
-  <!-- CARD DETAILS MODAL -->
-  <div id="card-details-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl space-y-5">
-      <button onclick="closeCardDetailsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-gray-800 text-gray-400 hover:text-white text-xs flex items-center justify-center z-10">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div class="bg-gray-950 rounded-xl border border-gray-800 p-2 flex items-center justify-center overflow-hidden min-h-[220px]">
-          <img id="detail-card-img" src="" class="w-full h-auto max-h-64 object-contain rounded-lg" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=Image+Unavailable'">
-        </div>
-
-        <div class="space-y-3 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span id="detail-card-type" class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full"></span>
-              <span id="detail-card-serial" class="text-xs font-mono font-bold text-blue-400"></span>
-            </div>
-            <h3 id="detail-card-name" class="text-lg font-bold text-white leading-tight"></h3>
-            <p id="detail-card-status" class="text-[11px] text-gray-400 mt-1"></p>
-          </div>
-
-          <div class="space-y-1.5 bg-gray-800/50 p-3 rounded-xl border border-gray-800">
-            <div class="flex justify-between items-center text-xs">
-              <span class="text-gray-400">Base Price:</span>
-              <span id="detail-base-price" class="font-mono text-gray-300">IDR 0</span>
-            </div>
-            <div class="flex justify-between items-center text-xs">
-              <span class="text-gray-400">Tax (+2%):</span>
-              <span id="detail-tax-price" class="font-mono text-blue-400">+IDR 0</span>
-            </div>
-            <div class="border-t border-gray-700/80 pt-1 flex justify-between items-center">
-              <span class="text-[10px] uppercase font-bold text-gray-400">Total Amount:</span>
-              <span id="detail-card-price" class="text-base font-mono font-bold text-emerald-400">IDR 0</span>
-            </div>
-          </div>
-
-          <div id="detail-action-container" class="space-y-2 pt-2"></div>
-        </div>
+<!-- ============ HERO / REGISTRY STATUS (signature element) ============ -->
+<section class="border-b" style="border-color:var(--line)">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-8">
+    <p class="font-mono text-[0.65rem] tracking-[0.2em] uppercase text-brass mb-3">Registry of One-of-One Cards · Beta Edition</p>
+    <h1 class="font-display text-3xl sm:text-4xl md:text-5xl leading-[1.08] text-parchment max-w-3xl">
+      Fifty cards exist.<br class="hidden sm:block"> Every one is numbered, owned, and traceable.
+    </h1>
+    <p class="text-text-muted mt-4 max-w-xl text-sm sm:text-base" style="color:var(--text-muted)">
+      No reprints, no duplicates. Each entry below is a single physical card with a serial, a provenance, and — right now — an owner or an opening.
+    </p>
+  </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-10">
+    <div class="ledger-strip rounded-sm overflow-hidden">
+      <div class="ledger-cell" style="--cell-accent:var(--brass)">
+        <span class="ledger-num text-parchment" id="stat-total">—</span>
+        <span class="ledger-label">Minted</span>
+      </div>
+      <div class="ledger-cell" style="--cell-accent:var(--emerald-bright)">
+        <span class="ledger-num" style="color:var(--emerald-bright)" id="stat-available">—</span>
+        <span class="ledger-label">Available</span>
+      </div>
+      <div class="ledger-cell" style="--cell-accent:#7C8CA6">
+        <span class="ledger-num" style="color:#B9C2D0" id="stat-owned">—</span>
+        <span class="ledger-label">In Collectors' Vaults</span>
+      </div>
+      <div class="ledger-cell" style="--cell-accent:var(--oxblood-bright)">
+        <span class="ledger-num" style="color:#D98E86" id="stat-auction">—</span>
+        <span class="ledger-label">Under the Hammer</span>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- QRIS PAYMENT MODAL -->
-  <div id="qris-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-6 text-center space-y-4 relative shadow-2xl">
-      <button onclick="closeQRISModal()" class="absolute top-4 right-4 w-8 h-8 rounded-xl bg-gray-800 text-gray-400 hover:text-white text-xs flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+<!-- ============ MAIN ============ -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
-      <div class="space-y-1">
-        <div class="flex items-center justify-center gap-2 text-rose-500 font-black text-sm uppercase tracking-wider">
-          <i class="fa-solid fa-qrcode"></i> <span>QRIS Payment</span>
-        </div>
-        <p class="text-xs text-gray-400">Scan QRIS below using GoPay, OVO, ShopeePay, BCA, or any banking app.</p>
+  <!-- MARKETPLACE VIEW -->
+  <div x-view id="view-marketplace" class="active fade-in">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+      <div>
+        <h2 class="font-display text-2xl text-parchment">The Registry</h2>
+        <p class="text-sm mt-1" style="color:var(--text-muted)">Browse every card by tier, edition, or serial.</p>
       </div>
-
-      <div class="bg-white p-3 rounded-2xl inline-block shadow-lg border border-gray-200">
-        <img id="qris-code-image" src="" alt="QRIS Code" class="w-56 h-56 object-contain mx-auto rounded-lg">
+      <div class="flex flex-wrap gap-2">
+        <input id="search-input" type="text" placeholder="Search name or serial…" class="input-field rounded-md px-3 py-2 text-sm w-full sm:w-56" oninput="renderMarketplace()">
+        <select id="filter-status" class="input-field rounded-md px-3 py-2 text-sm" onchange="renderMarketplace()">
+          <option value="">All statuses</option>
+          <option value="AVAILABLE">Available</option>
+          <option value="SOLD">Owned</option>
+          <option value="PENDING">Pending</option>
+        </select>
+        <select id="filter-tier" class="input-field rounded-md px-3 py-2 text-sm" onchange="renderMarketplace()">
+          <option value="">All tiers</option>
+        </select>
+        <select id="sort-order" class="input-field rounded-md px-3 py-2 text-sm" onchange="renderMarketplace()">
+          <option value="serial">Sort: Serial</option>
+          <option value="price-asc">Sort: Price ↑</option>
+          <option value="price-desc">Sort: Price ↓</option>
+        </select>
       </div>
-      
-      <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Merchant: <span class="text-white font-bold">Eugene Card, Toko Kartu & (Toraja Utara)</span></p>
+    </div>
+    <div id="marketplace-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+  </div>
 
-      <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 space-y-1 text-left">
-        <div class="flex justify-between text-xs">
-          <span class="text-gray-400">Item Serial:</span>
-          <span id="qris-card-serial" class="font-mono font-bold text-blue-400">*01</span>
-        </div>
-        <div class="flex justify-between text-xs">
-          <span class="text-gray-400">Base Price:</span>
-          <span id="qris-base-price" class="font-mono text-gray-300">IDR 0</span>
-        </div>
-        <div class="flex justify-between text-xs">
-          <span class="text-gray-400">Market Fee (2% Tax):</span>
-          <span id="qris-tax-price" class="font-mono text-blue-400">+IDR 0</span>
-        </div>
-        <div class="border-t border-gray-700 pt-1 flex justify-between text-xs font-bold">
-          <span class="text-white">Total Payment:</span>
-          <span id="qris-total-price" class="font-mono text-emerald-400">IDR 0</span>
-        </div>
-      </div>
-
-      <div class="space-y-2">
-        <button onclick="confirmQRISPayment()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-          <i class="fa-solid fa-circle-check"></i> <span>I Have Paid (Confirm)</span>
-        </button>
-        <button onclick="closeQRISModal()" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs rounded-xl transition-all">
-          Cancel
-        </button>
-      </div>
+  <!-- AUCTIONS VIEW -->
+  <div x-view id="view-auctions" class="fade-in">
+    <div class="mb-6">
+      <h2 class="font-display text-2xl text-parchment">Live Lot</h2>
+      <p class="text-sm mt-1" style="color:var(--text-muted)">Only one card goes under the hammer at a time.</p>
+    </div>
+    <div id="auction-content"></div>
+    <div class="mt-10">
+      <h3 class="font-display text-lg text-parchment mb-3">Past Lots</h3>
+      <div id="auction-history" class="space-y-2"></div>
     </div>
   </div>
 
-  <!-- MAIN BODY CONTENT -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8">
-    
-    <!-- COLLECTION VIEW -->
-    <section id="view-catalog" class="space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-        <div class="flex items-center gap-4">
-          <div class="w-10 h-10 rounded-xl bg-gray-800 border border-gray-700 p-1.5 flex items-center justify-center">
-            <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
-          </div>
-          <div>
-            <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 tracking-wider">PRIMARY COLLECTION</span>
-            <h2 class="text-base font-bold text-white mt-0.5">Available Card Inventory</h2>
-            <p class="text-xs text-gray-400">Official card releases (+2% tax added at checkout).</p>
-          </div>
-        </div>
-        
-        <div class="bg-gray-800/80 px-5 py-2.5 rounded-xl border border-gray-700 text-center sm:text-right w-full sm:w-auto">
-          <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Remaining Cards</p>
-          <p class="text-xl font-bold font-mono text-blue-400"><span id="remaining-cards-count">0</span> <span class="text-gray-400 text-xs font-normal">Available</span></p>
-        </div>
-      </div>
-
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-gray-900 p-2.5 rounded-xl border border-gray-800">
-        <div class="relative flex-1">
-          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-          <input type="text" id="search-input" oninput="renderCardGrid()" placeholder="Search serial (*01) or card title..." class="w-full bg-gray-800 border border-gray-700 rounded-lg pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-        </div>
-        <div class="flex items-center gap-1.5">
-          <button onclick="setFilter('ALL')" id="filter-ALL" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition-all">All</button>
-          <button onclick="setFilter('PREMIUM')" id="filter-PREMIUM" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800 text-gray-400 hover:text-white transition-all">Premium</button>
-          <button onclick="setFilter('STANDARD')" id="filter-STANDARD" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800 text-gray-400 hover:text-white transition-all">Standard</button>
-        </div>
-      </div>
-
-      <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-    </section>
-
-    <!-- TRADE MARKET VIEW -->
-    <section id="view-trade" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-right-left text-blue-400 mr-2"></i> Secondary Trade Market</h2>
-        <p class="text-xs text-gray-400 mt-1">Peer-to-peer trading room.</p>
-      </div>
-      <div id="trade-listings-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
-    </section>
-
-    <!-- AUCTIONS VIEW -->
-    <section id="view-auction" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-gavel text-emerald-400 mr-2"></i> Live Auction House</h2>
-        <p class="text-xs text-gray-400 mt-1">Realtime bids on high-tier cards.</p>
-      </div>
-      <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-    </section>
-
-    <!-- MESSENGER VIEW -->
-    <section id="view-inbox" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase flex items-center gap-2">
-          <i class="fa-solid fa-comments text-indigo-400"></i> MESSENGER & DIRECT CHAT
-        </h2>
-        <p class="text-xs text-gray-400 mt-1">Select a collector handle to open an isolated private conversation.</p>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Sidebar Collectors Search -->
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-4">
-          <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-            <input type="text" id="user-search-chat" oninput="searchUsersForChat()" placeholder="Search collectors..." class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-          </div>
-          <div id="user-search-list" class="space-y-1.5 max-h-80 overflow-y-auto pr-1"></div>
-        </div>
-
-        <!-- DM Conversation Box -->
-        <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col justify-between min-h-[440px]">
-          <div id="chat-header" class="border-b border-gray-800 pb-3 flex items-center justify-between">
-            <div>
-              <h4 id="chat-active-username" class="text-xs font-bold text-white">Select a collector</h4>
-              <p id="chat-active-badge" class="text-[10px] text-gray-500">Private Channel</p>
-            </div>
-            <button onclick="sendTradePromptInChat()" class="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
-              <i class="fa-solid fa-handshake"></i> Propose Trade
-            </button>
-          </div>
-
-          <div id="chat-messages" class="flex-1 my-4 space-y-3 overflow-y-auto max-h-80 p-2 text-xs text-gray-400">
-            <div class="h-full flex flex-col items-center justify-center text-center text-xs text-gray-500 py-10">
-              <i class="fa-solid fa-comments text-3xl text-gray-800 mb-2"></i>
-              <span>Select a user handle from the sidebar to open direct messages.</span>
-            </div>
-          </div>
-
-          <!-- Message Input Bar -->
-          <form onsubmit="handleChatFormSubmit(event)" class="flex items-center gap-2 border-t border-gray-800 pt-3">
-            <input type="text" id="chat-message-input" placeholder="Type a message..." class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
-            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1">
-              <i class="fa-solid fa-paper-plane"></i> <span>Send</span>
-            </button>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <!-- COLLECTORS VIEW -->
-    <section id="view-holders" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-users text-teal-400 mr-2"></i> Active Collectors</h2>
-      </div>
-      <div id="holders-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    </section>
-
-    <!-- LEDGER VIEW -->
-    <section id="view-history" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-clock-rotate-left text-cyan-400 mr-2"></i> Audit Ledger</h2>
-      </div>
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-        <table class="w-full text-left text-xs text-gray-300">
-          <thead class="bg-gray-800/80 text-[10px] uppercase text-gray-400 font-semibold border-b border-gray-800">
-            <tr><th class="p-3">Time</th><th class="p-3">Type</th><th class="p-3">Serial</th><th class="p-3">User</th><th class="p-3 text-right">Value (Inc. Tax)</th></tr>
-          </thead>
-          <tbody id="history-table-body" class="divide-y divide-gray-800"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- MY VAULT VIEW -->
-    <section id="view-dashboard" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-vault text-amber-400 mr-2"></i> My Personal Vault</h2>
-      </div>
-      <div id="owned-cards-grid" class="bg-gray-900 border border-gray-800 rounded-2xl p-6"></div>
-    </section>
-
-    <!-- AI ANALYTICS VIEW -->
-    <section id="view-ai-prediction" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-brain text-emerald-400 mr-2"></i> Revenue Analytics</h2>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Total Base Market Value</p>
-          <p id="ai-projected-volume" class="text-xl font-bold font-mono text-emerald-400 mt-1">IDR 0</p>
-        </div>
-        <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl">
-          <p class="text-[10px] uppercase font-bold text-gray-400">Est. 2% Revenue Tax</p>
-          <p id="ai-projected-tax" class="text-xl font-bold font-mono text-blue-400 mt-1">IDR 0</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- INVENTORY CONTROL STUDIO VIEW -->
-    <section id="view-inventory" class="hidden space-y-6">
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white uppercase"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-2"></i> Inventory Control Studio</h2>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-          <h3 id="inv-form-title" class="text-xs font-bold text-white uppercase">Mint / Edit Card</h3>
-
-          <form id="inventory-editor-form" onsubmit="handleInventorySubmit(event)" class="space-y-3">
-            <input type="hidden" id="inv-input-id">
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Serial Code (*01)</label>
-              <input type="text" id="inv-input-serial" required placeholder="*01" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
-            </div>
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Card Name</label>
-              <input type="text" id="inv-input-name" required placeholder="Eugene Card #01" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase">Tier</label>
-                <select id="inv-input-type" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-                  <option value="PREMIUM">PREMIUM</option>
-                  <option value="STANDARD">STANDARD</option>
-                </select>
-              </div>
-              <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase">Price (IDR)</label>
-                <input type="number" id="inv-input-price" required min="0" placeholder="500000" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
-              </div>
-            </div>
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Image URL Link</label>
-              <input type="url" id="inv-input-img" required placeholder="https://..." class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase">Status</label>
-                <select id="inv-input-status" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-                  <option value="AVAILABLE">AVAILABLE</option>
-                  <option value="OWNED">OWNED</option>
-                </select>
-              </div>
-              <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase">Card Owner</label>
-                <select id="inv-input-owner" class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-                  <option value="">(None - System)</option>
-                </select>
-              </div>
-            </div>
-            <div class="pt-2 flex gap-2">
-              <button type="submit" id="inv-submit-btn" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all">Mint Card</button>
-              <button type="button" onclick="resetInventoryForm()" class="px-3 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs rounded-xl transition-all">Reset</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden space-y-3 p-4">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-            <h3 class="text-xs font-bold text-white uppercase">Inventory Catalog (<span id="inv-total-count">0</span>)</h3>
-            <div class="relative w-full sm:w-64">
-              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-              <input type="text" id="inventory-search-input" oninput="renderInventoryTable()" placeholder="Search serial, name, owner..." class="w-full bg-gray-800 border border-gray-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
-            </div>
-          </div>
-          <div class="overflow-x-auto rounded-xl border border-gray-800">
-            <table class="w-full text-left text-xs text-gray-300">
-              <thead class="bg-gray-800/80 text-[10px] uppercase text-gray-400 font-semibold border-b border-gray-800">
-                <tr><th class="p-3">Card</th><th class="p-3">Tier</th><th class="p-3">Price</th><th class="p-3">Status / Owner</th><th class="p-3 text-right">Actions</th></tr>
-              </thead>
-              <tbody id="inventory-table-body" class="divide-y divide-gray-800"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-6 right-6 z-[10000] bg-gray-900 border border-blue-500/40 text-blue-400 text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all pointer-events-none">
-    <span id="toast-msg">Action completed.</span>
+  <!-- TRADES VIEW -->
+  <div x-view id="view-trades" class="fade-in">
+    <div class="mb-6">
+      <h2 class="font-display text-2xl text-parchment">The Exchange Desk</h2>
+      <p class="text-sm mt-1" style="color:var(--text-muted)">Offer a card, offer cash, or both — collectors settle payment between themselves.</p>
+    </div>
+    <div class="flex gap-6 border-b mb-6" style="border-color:var(--line)">
+      <button class="tab-btn active" data-tradetab="incoming" onclick="setTradeTab('incoming')">Incoming</button>
+      <button class="tab-btn" data-tradetab="outgoing" onclick="setTradeTab('outgoing')">Outgoing</button>
+      <button class="tab-btn" data-tradetab="history" onclick="setTradeTab('history')">History</button>
+    </div>
+    <div id="trades-content" class="space-y-3"></div>
   </div>
 
-  <script>
-    // Live Supabase API Credentials
-    const SUPABASE_URL = "https://yswwicdycbscurnpbqjb.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlzd3dpY2R5Y2JzY3VybnBicWpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyOTUzNjAsImV4cCI6MjEwMDg3MTM2MH0.FESrSxt3ys6WJXF768q1lXJceQrff6T6WLgCn8prEw8";
-
-    // Initialize Real Supabase Client
-    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-    // QRIS Payload String
-    const QRIS_PAYLOAD_STRING = "00020101021126610014COM.GO-JEK.WWW01189360091430419400360210G0419400360303UMI51440014ID.CO.QRIS.WWW0215ID10265490344800303UMI5204594453033605802ID5925Eugene Card, Toko Kartu &6012TORAJA UTARA61059183162070703A0163048BD9";
-    const QRIS_IMAGE_DATA_URI = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(QRIS_PAYLOAD_STRING)}`;
-
-    // Strictly Authorized Admins
-    const ADMIN_EMAILS = [
-      'eugene.aquila06@gmail.com',
-      'yujinybwork@gmail.com'
-    ];
-
-    let currentUser = null;
-    let isSignUpMode = false;
-    let inventory = [];
-    let customAccounts = [];
-    let historyLogs = [];
-    let chatMessages = [];
-    let activeChatPartner = null;
-    let activeCheckoutCardId = null;
-
-    function isUserAdmin(user) {
-      if (!user) return false;
-      const emailOrUser = (user.email || user.username || '').toLowerCase();
-      return ADMIN_EMAILS.some(adm => emailOrUser === adm || emailOrUser.startsWith(adm.split('@')[0]));
-    }
-
-    function escapeHTML(str) {
-      if (typeof str !== 'string') return str;
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
-    }
-
-    // Load Local Fallbacks
-    function loadAppData() {
-      const savedAccs = localStorage.getItem('eugene_custom_accounts');
-      if (savedAccs) {
-        try { customAccounts = JSON.parse(savedAccs); } catch(e) { customAccounts = []; }
-      } else {
-        customAccounts = [
-          { username: 'eugene.aquila06@gmail.com', email: 'eugene.aquila06@gmail.com', name: 'Eugene Aquila', isAdmin: true, avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=eugene' },
-          { username: 'yujinybwork@gmail.com', email: 'yujinybwork@gmail.com', name: 'Yujin Work', isAdmin: true, avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=yujin' },
-          { username: 'alex_collector@gmail.com', email: 'alex_collector@gmail.com', name: 'Alex Johnson', isAdmin: false, avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=alex' }
-        ];
-        localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
-      }
-
-      const savedInv = localStorage.getItem('eugene_inventory');
-      if (savedInv) {
-        try { inventory = JSON.parse(savedInv); } catch(e) { inventory = []; }
-      }
-      if (!inventory || inventory.length === 0) {
-        inventory = Array.from({ length: 15 }, (_, i) => {
-          const num = String(i + 1).padStart(2, '0');
-          const isPrem = i < 8;
-          return {
-            id: `card-${i + 1}`,
-            serial: `*${num}`,
-            name: isPrem ? `Eugene Premium #${num}` : `Eugene Standard #${num}`,
-            type: isPrem ? 'PREMIUM' : 'STANDARD',
-            price: isPrem ? 500000 : 100000,
-            status: i === 1 ? 'OWNED' : 'AVAILABLE',
-            owner: i === 1 ? 'alex_collector@gmail.com' : null,
-            imgUrl: `https://placehold.co/1080x1350/111827/3b82f6?text=*${num}`
-          };
-        });
-        localStorage.setItem('eugene_inventory', JSON.stringify(inventory));
-      }
-
-      const savedHistory = localStorage.getItem('eugene_history');
-      if (savedHistory) {
-        try { historyLogs = JSON.parse(savedHistory); } catch(e) { historyLogs = []; }
-      }
-
-      const savedChats = localStorage.getItem('eugene_chat_messages');
-      if (savedChats) {
-        try { chatMessages = JSON.parse(savedChats); } catch(e) { chatMessages = []; }
-      }
-    }
-
-    function saveInventoryState() {
-      localStorage.setItem('eugene_inventory', JSON.stringify(inventory));
-      renderCardGrid();
-      renderInventoryTable();
-      renderVaultGrid();
-      updateAIPrediction();
-      populateOwnerSelectDropdown();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadAppData();
-      initSupabaseAuthListener();
-      renderAuthHeader();
-      renderCardGrid();
-      renderInventoryTable();
-      renderVaultGrid();
-      renderHoldersList();
-      renderHistoryTable();
-      searchUsersForChat();
-      updateAIPrediction();
-      populateOwnerSelectDropdown();
-    });
-
-    // Supabase Auth Integration
-    async function initSupabaseAuthListener() {
-      if (!supabaseClient) return;
-      
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (session) handleSupabaseUserSession(session.user);
-
-      supabaseClient.auth.onAuthStateChange((event, session) => {
-        if (session?.user) {
-          handleSupabaseUserSession(session.user);
-        } else if (event === 'SIGNED_OUT') {
-          currentUser = null;
-          renderAuthHeader();
-          renderVaultGrid();
-        }
-      });
-    }
-
-    function handleSupabaseUserSession(user) {
-      const email = user.email || '';
-      const username = email || user.user_metadata?.username || `user_${user.id.substring(0, 5)}`;
-      const name = user.user_metadata?.full_name || user.user_metadata?.name || username.split('@')[0];
-      const isAdmin = isUserAdmin({ email, username });
-
-      currentUser = {
-        id: user.id,
-        username,
-        email,
-        name,
-        isAdmin,
-        authType: user.app_metadata?.provider || 'supabase',
-        avatar: user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`
-      };
-
-      if (!customAccounts.some(u => u.username === currentUser.username)) {
-        customAccounts.push(currentUser);
-        localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
-      }
-
-      renderAuthHeader();
-      renderVaultGrid();
-      renderHoldersList();
-      searchUsersForChat();
-      populateOwnerSelectDropdown();
-    }
-
-    async function loginWithGoogleOAuth() {
-      if (!supabaseClient) return;
-      const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.href }
-      });
-      if (error) showToast(`Google Auth Error: ${error.message}`);
-    }
-
-    async function handleCustomAuthSubmit(e) {
-      e.preventDefault();
-      const email = document.getElementById('auth-input-username').value.trim();
-      const password = document.getElementById('auth-input-password').value;
-      const name = document.getElementById('auth-input-name').value.trim();
-
-      if (!supabaseClient) return;
-
-      if (isSignUpMode) {
-        const { error } = await supabaseClient.auth.signUp({
-          email,
-          password,
-          options: { data: { name: name || email.split('@')[0] } }
-        });
-        if (error) return showToast(`Sign Up Error: ${error.message}`);
-        showToast('Registration complete! Check your email to confirm or sign in.');
-      } else {
-        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) return showToast(`Sign In Error: ${error.message}`);
-        showToast('Signed in successfully!');
-      }
-
-      closeAuthModal();
-    }
-
-    async function logoutUser() {
-      if (supabaseClient) await supabaseClient.auth.signOut();
-      currentUser = null;
-      renderAuthHeader();
-      renderVaultGrid();
-      showToast('Logged out.');
-    }
-
-    function renderAuthHeader() {
-      const container = document.getElementById('auth-header-container');
-      const adminNavs = document.querySelectorAll('.admin-only-nav');
-      const adminSep = document.getElementById('admin-nav-separator');
-
-      const adminAccess = isUserAdmin(currentUser);
-
-      if (currentUser) {
-        if (adminAccess) {
-          adminNavs.forEach(el => el.classList.remove('hidden'));
-          if (adminSep) adminSep.classList.remove('hidden');
-        } else {
-          adminNavs.forEach(el => el.classList.add('hidden'));
-          if (adminSep) adminSep.classList.add('hidden');
-        }
-
-        container.innerHTML = `
-          <div class="flex items-center gap-2 bg-gray-800/90 border border-gray-700/80 rounded-xl p-1.5 pl-2.5">
-            <img src="${currentUser.avatar}" class="w-6 h-6 rounded-full bg-gray-900 border border-gray-700">
-            <div class="flex flex-col text-left">
-              <span class="text-xs font-bold text-white leading-tight flex items-center gap-1">
-                ${escapeHTML(currentUser.name)}
-                ${adminAccess ? '<span class="text-[8px] bg-amber-500/20 text-amber-300 font-bold px-1 rounded">ADMIN</span>' : ''}
-              </span>
-              <span class="text-[9px] font-semibold text-blue-400 font-mono">${escapeHTML(currentUser.username)}</span>
-            </div>
-            <button onclick="logoutUser()" title="Log Out" class="p-1.5 bg-gray-900 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-lg ml-1">
-              <i class="fa-solid fa-right-from-bracket text-xs"></i>
-            </button>
-          </div>
-        `;
-      } else {
-        adminNavs.forEach(el => el.classList.add('hidden'));
-        if (adminSep) adminSep.classList.add('hidden');
-
-        container.innerHTML = `
-          <button onclick="openAuthModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-user"></i> <span>Sign In</span>
-          </button>
-        `;
-      }
-    }
-
-    // Messenger Module Logic
-    function searchUsersForChat() {
-      const listContainer = document.getElementById('user-search-list');
-      if (!listContainer) return;
-
-      const query = (document.getElementById('user-search-chat')?.value || '').toLowerCase();
-      const filtered = customAccounts.filter(u => 
-        currentUser ? u.username !== currentUser.username : true
-      ).filter(u => u.username.toLowerCase().includes(query) || u.name.toLowerCase().includes(query));
-
-      if (filtered.length === 0) {
-        listContainer.innerHTML = `<p class="text-[11px] text-gray-500 text-center py-2">No collectors found</p>`;
-        return;
-      }
-
-      listContainer.innerHTML = filtered.map(u => `
-        <div onclick="startChatWithUser('${u.username}', '${escapeHTML(u.name)}')" class="p-2.5 bg-gray-800/80 hover:bg-gray-700/80 rounded-xl cursor-pointer flex items-center justify-between border border-gray-700/60 transition-all ${activeChatPartner === u.username ? 'border-blue-500/80 bg-blue-950/30' : ''}">
-          <div class="flex items-center gap-2.5">
-            <img src="${u.avatar}" class="w-7 h-7 rounded-full bg-gray-900 border border-gray-700">
-            <div>
-              <p class="text-xs font-bold text-white leading-tight">${escapeHTML(u.name)}</p>
-              <p class="text-[10px] text-gray-400 font-mono">${escapeHTML(u.username)}</p>
-            </div>
-          </div>
-          <i class="fa-solid fa-chevron-right text-[10px] text-gray-500"></i>
-        </div>
-      `).join('');
-    }
-
-    function startChatWithUser(username, name) {
-      if (!currentUser) return openAuthModal();
-
-      activeChatPartner = username;
-      document.getElementById('chat-active-username').innerText = `${name} (@${username})`;
-      document.getElementById('chat-active-badge').innerText = `Private Thread (@${currentUser.username} ↔ @${username})`;
-
-      searchUsersForChat();
-      renderPrivateMessages();
-
-      const input = document.getElementById('chat-message-input');
-      if (input) input.focus();
-    }
-
-    function renderPrivateMessages() {
-      const chatContainer = document.getElementById('chat-messages');
-      if (!chatContainer) return;
-
-      if (!currentUser || !activeChatPartner) {
-        chatContainer.innerHTML = `
-          <div class="h-full flex flex-col items-center justify-center text-center text-xs text-gray-500 py-10">
-            <i class="fa-solid fa-lock text-3xl text-gray-800 mb-2"></i>
-            <span>Select a collector handle to open a private conversation.</span>
-          </div>
-        `;
-        return;
-      }
-
-      const thread = chatMessages.filter(m => 
-        (m.from === currentUser.username && m.to === activeChatPartner) ||
-        (m.from === activeChatPartner && m.to === currentUser.username)
-      );
-
-      if (thread.length === 0) {
-        chatContainer.innerHTML = `
-          <div class="h-full flex flex-col items-center justify-center text-center text-xs text-gray-500 py-10">
-            <i class="fa-solid fa-comments text-3xl text-gray-800 mb-2"></i>
-            <span>No previous messages with @${escapeHTML(activeChatPartner)}. Say hello!</span>
-          </div>
-        `;
-        return;
-      }
-
-      chatContainer.innerHTML = thread.map(msg => {
-        const isMe = msg.from === currentUser.username;
-        return `
-          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} mb-2">
-            <div class="p-3 ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-gray-800 text-gray-200 border border-gray-700 rounded-2xl rounded-tl-none'} max-w-sm text-xs shadow-md">
-              <div class="flex justify-between items-center gap-3 mb-1">
-                <span class="font-bold text-[10px] ${isMe ? 'text-blue-200' : 'text-blue-400'}">@${escapeHTML(msg.from)}</span>
-                <span class="text-[8px] opacity-70 font-mono">${msg.timestamp}</span>
-              </div>
-              <p class="leading-relaxed">${escapeHTML(msg.text)}</p>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    function handleChatFormSubmit(e) {
-      e.preventDefault();
-      sendChatMessage();
-    }
-
-    function sendChatMessage() {
-      if (!currentUser) return openAuthModal();
-      if (!activeChatPartner) return showToast('Please select a collector to chat with.');
-
-      const input = document.getElementById('chat-message-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      chatMessages.push({
-        from: currentUser.username,
-        to: activeChatPartner,
-        text: text,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      });
-
-      localStorage.setItem('eugene_chat_messages', JSON.stringify(chatMessages));
-      input.value = '';
-      renderPrivateMessages();
-    }
-
-    function sendTradePromptInChat() {
-      if (!currentUser) return openAuthModal();
-      if (!activeChatPartner) return showToast('Please select a collector to request a trade.');
-
-      chatMessages.push({
-        from: currentUser.username,
-        to: activeChatPartner,
-        text: `🤝 TRADE PROPOSAL: @${currentUser.username} requested a direct card trade offer!`,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      });
-
-      localStorage.setItem('eugene_chat_messages', JSON.stringify(chatMessages));
-      renderPrivateMessages();
-    }
-
-    // Checkout & Catalog Logic
-    function openCardDetailsModal(cardId) {
-      const card = inventory.find(c => c.id === cardId);
-      if (!card) return;
-
-      activeCheckoutCardId = card.id;
-      const tax = Math.round(card.price * 0.02);
-      const total = card.price + tax;
-
-      document.getElementById('detail-card-img').src = card.imgUrl;
-      document.getElementById('detail-card-serial').innerText = card.serial;
-      document.getElementById('detail-card-name').innerText = card.name;
-      document.getElementById('detail-base-price').innerText = `IDR ${card.price.toLocaleString()}`;
-      document.getElementById('detail-tax-price').innerText = `+IDR ${tax.toLocaleString()}`;
-      document.getElementById('detail-card-price').innerText = `IDR ${total.toLocaleString()}`;
-      document.getElementById('detail-card-type').innerText = card.type;
-      document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owned by @${card.owner})` : ''}`;
-
-      const actionBox = document.getElementById('detail-action-container');
-
-      if (card.status === 'OWNED') {
-        const isMyCard = currentUser && currentUser.username === card.owner;
-        actionBox.innerHTML = `
-          <button disabled class="w-full py-2.5 bg-gray-800 text-gray-500 font-bold text-xs rounded-xl border border-gray-700 cursor-not-allowed flex items-center justify-center gap-2">
-            <i class="fa-solid fa-lock"></i> ${isMyCard ? "Already In Your Vault" : `Owned by @${card.owner}`}
-          </button>
-          ${!isMyCard ? `
-            <button onclick="closeCardDetailsModal(); startChatWithUser('${card.owner}', '${card.owner}'); switchTab('inbox');" class="w-full py-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 font-bold text-xs rounded-xl border border-purple-500/30 transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-comments"></i> Offer Trade via Messenger
-            </button>
-          ` : ''}
-        `;
-      } else {
-        actionBox.innerHTML = `
-          <button onclick="openQRISCheckoutModal('${card.id}')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-qrcode"></i> Buy Card Now via QRIS
-          </button>
-        `;
-      }
-
-      document.getElementById('card-details-modal').classList.remove('hidden');
-    }
-
-    function openQRISCheckoutModal(cardId) {
-      if (!currentUser) {
-        closeCardDetailsModal();
-        return openAuthModal();
-      }
-
-      const card = inventory.find(c => c.id === cardId);
-      if (!card || card.status === 'OWNED') return;
-
-      activeCheckoutCardId = card.id;
-      const tax = Math.round(card.price * 0.02);
-      const total = card.price + tax;
-
-      document.getElementById('qris-code-image').src = QRIS_IMAGE_DATA_URI;
-      document.getElementById('qris-card-serial').innerText = card.serial;
-      document.getElementById('qris-base-price').innerText = `IDR ${card.price.toLocaleString()}`;
-      document.getElementById('qris-tax-price').innerText = `+IDR ${tax.toLocaleString()}`;
-      document.getElementById('qris-total-price').innerText = `IDR ${total.toLocaleString()}`;
-
-      closeCardDetailsModal();
-      document.getElementById('qris-modal').classList.remove('hidden');
-    }
-
-    function confirmQRISPayment() {
-      if (!activeCheckoutCardId || !currentUser) return;
-      const card = inventory.find(c => c.id === activeCheckoutCardId);
-      if (!card) return;
-
-      const tax = Math.round(card.price * 0.02);
-      const total = card.price + tax;
-
-      card.status = 'OWNED';
-      card.owner = currentUser.username;
-      saveInventoryState();
-
-      historyLogs.unshift({
-        timestamp: new Date().toLocaleTimeString(),
-        type: 'PURCHASE (QRIS)',
-        serial: card.serial,
-        user: currentUser.username,
-        amount: total
-      });
-      localStorage.setItem('eugene_history', JSON.stringify(historyLogs));
-      renderHistoryTable();
-
-      closeQRISModal();
-      showToast(`Payment Confirmed! ${card.serial} added to your vault.`);
-    }
-
-    function closeQRISModal() { document.getElementById('qris-modal').classList.add('hidden'); }
-    function closeCardDetailsModal() { document.getElementById('card-details-modal').classList.add('hidden'); }
-
-    function renderCardGrid() {
-      const grid = document.getElementById('card-grid');
-      if (!grid) return;
-
-      document.getElementById('remaining-cards-count').innerText = inventory.filter(c => c.status === 'AVAILABLE').length;
-
-      grid.innerHTML = inventory.map(card => `
-        <div onclick="openCardDetailsModal('${card.id}')" class="${card.type === 'PREMIUM' ? 'card-glow-premium' : 'card-glow-standard'} rounded-xl p-3 flex flex-col justify-between cursor-pointer relative">
-          <div class="absolute top-4 right-4 z-10">
-            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/80 text-white shadow' : 'bg-rose-500/80 text-white shadow'}">${card.status}</span>
-          </div>
-
-          <div class="w-full aspect-[4/5] bg-gray-950 rounded-lg border border-gray-800 p-1 mb-2 overflow-hidden flex items-center justify-center">
-            <img src="${card.imgUrl}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=Image+Unavailable'">
-          </div>
-          <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${escapeHTML(card.serial)}</p>
-          <p class="text-[11px] font-bold text-white truncate text-center">${escapeHTML(card.name)}</p>
-        </div>
-      `).join('');
-    }
-
-    function renderVaultGrid() {
-      const container = document.getElementById('owned-cards-grid');
-      if (!container) return;
-
-      if (!currentUser) {
-        container.innerHTML = `<p class="text-center text-xs text-gray-400">Log in to view your private vault cards.</p>`;
-        return;
-      }
-
-      const owned = inventory.filter(c => c.owner === currentUser.username);
-      if (owned.length === 0) {
-        container.innerHTML = `<p class="text-center text-xs text-gray-400">Your vault is empty. Visit the Collection tab to purchase available cards!</p>`;
-        return;
-      }
-
-      container.innerHTML = `
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          ${owned.map(card => `
-            <div class="${card.type === 'PREMIUM' ? 'card-glow-premium' : 'card-glow-standard'} rounded-xl p-3 flex flex-col justify-between">
-              <div class="w-full aspect-[4/5] bg-gray-950 rounded-lg border border-gray-800 p-1 mb-2">
-                <img src="${card.imgUrl}" class="w-full h-full object-contain rounded" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=Image+Unavailable'">
-              </div>
-              <p class="text-center font-bold text-blue-400 font-mono text-xs mb-0.5">${escapeHTML(card.serial)}</p>
-              <p class="text-[11px] font-bold text-white truncate text-center">${escapeHTML(card.name)}</p>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    function renderHoldersList() {
-      const container = document.getElementById('holders-content');
-      if (!container) return;
-
-      container.innerHTML = customAccounts.map(u => `
-        <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <img src="${u.avatar}" class="w-9 h-9 rounded-full bg-gray-950 border border-gray-800">
-            <div>
-              <h4 class="text-xs font-bold text-white">${escapeHTML(u.name)}</h4>
-              <p class="text-[10px] text-gray-400 font-mono">${escapeHTML(u.username)}</p>
-            </div>
-          </div>
-          <button onclick="startChatWithUser('${u.username}', '${escapeHTML(u.name)}'); switchTab('inbox');" class="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-xl text-xs font-bold border border-blue-500/30 transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-comments"></i> Chat
-          </button>
-        </div>
-      `).join('');
-    }
-
-    function renderHistoryTable() {
-      const tbody = document.getElementById('history-table-body');
-      if (!tbody) return;
-
-      tbody.innerHTML = historyLogs.map(log => `
-        <tr>
-          <td class="p-3 text-gray-400 font-mono">${log.timestamp || 'Just now'}</td>
-          <td class="p-3"><span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">${log.type || 'TRADE'}</span></td>
-          <td class="p-3 font-mono text-blue-400 font-bold">${escapeHTML(log.serial)}</td>
-          <td class="p-3 text-white">@${escapeHTML(log.user)}</td>
-          <td class="p-3 font-mono text-emerald-400 text-right">IDR ${(log.amount || 0).toLocaleString()}</td>
-        </tr>
-      `).join('');
-    }
-
-    function handleInventorySubmit(e) {
-      e.preventDefault();
-      if (!isUserAdmin(currentUser)) return showToast('Admin permission required.');
-
-      const cardId = document.getElementById('inv-input-id').value;
-      const serial = escapeHTML(document.getElementById('inv-input-serial').value.trim());
-      const name = escapeHTML(document.getElementById('inv-input-name').value.trim());
-      const type = document.getElementById('inv-input-type').value;
-      const price = parseInt(document.getElementById('inv-input-price').value, 10);
-      const imgUrl = document.getElementById('inv-input-img').value.trim();
-      let status = document.getElementById('inv-input-status').value;
-      const owner = document.getElementById('inv-input-owner').value || null;
-
-      if (owner && status === 'AVAILABLE') status = 'OWNED';
-
-      if (!imgUrl.startsWith('http://') && !imgUrl.startsWith('https://')) {
-        return showToast('Image URL must start with http:// or https://');
-      }
-
-      if (cardId) {
-        const idx = inventory.findIndex(c => c.id === cardId);
-        if (idx !== -1) {
-          inventory[idx] = { ...inventory[idx], serial, name, type, price, imgUrl, status, owner };
-        }
-        showToast(`Updated card ${serial}.`);
-      } else {
-        inventory.unshift({ id: `card-${Date.now()}`, serial, name, type, price, imgUrl, status, owner });
-        showToast(`Minted ${serial}!`);
-      }
-
-      saveInventoryState();
-      resetInventoryForm();
-    }
-
-    function editInventoryCard(cardId) {
-      if (!isUserAdmin(currentUser)) return showToast('Admin access required.');
-      const card = inventory.find(c => c.id === cardId);
-      if (!card) return;
-
-      document.getElementById('inv-form-title').innerText = `Edit ${card.serial}`;
-      document.getElementById('inv-input-id').value = card.id;
-      document.getElementById('inv-input-serial').value = card.serial;
-      document.getElementById('inv-input-name').value = card.name;
-      document.getElementById('inv-input-type').value = card.type;
-      document.getElementById('inv-input-price').value = card.price;
-      document.getElementById('inv-input-img').value = card.imgUrl;
-      document.getElementById('inv-input-status').value = card.status;
-      document.getElementById('inv-input-owner').value = card.owner || '';
-      document.getElementById('inv-submit-btn').innerText = "Update Card";
-    }
-
-    function deleteInventoryCard(cardId) {
-      if (!isUserAdmin(currentUser)) return showToast('Admin access required.');
-      if (!confirm('Permanently delete card?')) return;
-      inventory = inventory.filter(c => c.id !== cardId);
-      saveInventoryState();
-      showToast('Card deleted.');
-    }
-
-    function resetInventoryForm() {
-      document.getElementById('inv-form-title').innerText = "Mint New Card";
-      document.getElementById('inventory-editor-form').reset();
-      document.getElementById('inv-input-id').value = '';
-      document.getElementById('inv-submit-btn').innerText = "Mint Card";
-    }
-
-    function renderInventoryTable() {
-      const tbody = document.getElementById('inventory-table-body');
-      if (!tbody) return;
-
-      const searchVal = (document.getElementById('inventory-search-input')?.value || '').toLowerCase();
-      const filtered = inventory.filter(c => 
-        c.serial.toLowerCase().includes(searchVal) ||
-        c.name.toLowerCase().includes(searchVal) ||
-        (c.owner && c.owner.toLowerCase().includes(searchVal))
-      );
-
-      document.getElementById('inv-total-count').innerText = filtered.length;
-
-      tbody.innerHTML = filtered.map(card => `
-        <tr class="hover:bg-gray-800/40">
-          <td class="p-3 font-mono font-bold text-blue-400 flex items-center gap-2">
-            <img src="${card.imgUrl}" class="w-6 h-8 object-contain rounded bg-gray-950 border border-gray-800" onerror="this.src='https://placehold.co/1080x1350/111827/9ca3af?text=N/A'">
-            <span>${escapeHTML(card.serial)} (${escapeHTML(card.name)})</span>
-          </td>
-          <td class="p-3 font-semibold text-gray-300">${card.type}</td>
-          <td class="p-3 font-mono text-emerald-400">IDR ${card.price.toLocaleString()}</td>
-          <td class="p-3">
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${card.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">${card.status}</span>
-            ${card.owner ? `<span class="block text-[10px] text-gray-400 font-mono mt-0.5">@${escapeHTML(card.owner)}</span>` : ''}
-          </td>
-          <td class="p-3 text-right space-x-1">
-            <button onclick="editInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-gray-700 text-amber-300 rounded-lg"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteInventoryCard('${card.id}')" class="p-1.5 bg-gray-800 hover:bg-rose-500/20 text-rose-400 rounded-lg"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function populateOwnerSelectDropdown() {
-      const select = document.getElementById('inv-input-owner');
-      if (!select) return;
-
-      const currentValue = select.value;
-      select.innerHTML = '<option value="">(None - System)</option>' + 
-        customAccounts.map(u => `<option value="${escapeHTML(u.username)}">@${escapeHTML(u.username)} (${escapeHTML(u.name)})</option>`).join('');
-      select.value = currentValue;
-    }
-
-    function updateAIPrediction() {
-      const baseTotal = inventory.reduce((sum, c) => sum + (c.price || 0), 0);
-      const taxTotal = Math.round(baseTotal * 0.02);
-      document.getElementById('ai-projected-volume').innerText = `IDR ${baseTotal.toLocaleString()}`;
-      document.getElementById('ai-projected-tax').innerText = `IDR ${taxTotal.toLocaleString()}`;
-    }
-
-    function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
-    function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
-
-    function switchTab(tabName) {
-      const allTabs = ['catalog', 'trade', 'auction', 'inbox', 'holders', 'history', 'dashboard', 'ai-prediction', 'inventory'];
-      allTabs.forEach(t => {
-        const view = document.getElementById(`view-${t}`);
-        if (view) view.classList.add('hidden');
-      });
-      const activeView = document.getElementById(`view-${tabName}`);
-      if (activeView) activeView.classList.remove('hidden');
-    }
-
-    function setFilter(type) {
-      currentFilter = type;
-      renderCardGrid();
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toast-msg').innerText = msg;
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
-    }
-  </script>
+  <!-- WISHLIST VIEW -->
+  <div x-view id="view-wishlist" class="fade-in">
+    <div class="mb-6">
+      <h2 class="font-display text-2xl text-parchment">Wishlist</h2>
+      <p class="text-sm mt-1" style="color:var(--text-muted)">Cards you're watching.</p>
+    </div>
+    <div id="wishlist-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+  </div>
+
+  <!-- VAULT (PROFILE) VIEW -->
+  <div x-view id="view-vault" class="fade-in">
+    <div id="vault-content"></div>
+  </div>
+
+  <!-- ADMIN VIEW -->
+  <div x-view id="view-admin" class="fade-in">
+    <div class="mb-6">
+      <h2 class="font-display text-2xl text-parchment">Registrar's Office</h2>
+      <p class="text-sm mt-1" style="color:var(--text-muted)">Manage the registry and review submitted payments.</p>
+    </div>
+    <div class="flex gap-6 border-b mb-6 overflow-x-auto hide-scrollbar" style="border-color:var(--line)">
+      <button class="tab-btn active" data-admintab="orders" onclick="setAdminTab('orders')">Pending Orders</button>
+      <button class="tab-btn" data-admintab="cards" onclick="setAdminTab('cards')">Manage Cards</button>
+      <button class="tab-btn" data-admintab="auction" onclick="setAdminTab('auction')">Auction Control</button>
+    </div>
+    <div id="admin-content"></div>
+  </div>
+
+</main>
+
+<footer class="border-t mt-10" style="border-color:var(--line)">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row justify-between gap-3 text-xs" style="color:var(--text-muted)">
+    <p class="font-mono">EUGENE CARD REGISTRY · 50 / 50 SERIALIZED</p>
+    <p>Beta Edition · One card, one owner, one record.</p>
+  </div>
+</footer>
+
+<!-- ============ MODALS (populated by JS) ============ -->
+<div id="modal-root"></div>
+
+<script>
+/* =====================================================================
+   EUGENE CARD — REGISTRY & EXCHANGE
+   Single-file marketplace backed by Supabase (project: eugene-card-2)
+   ===================================================================== */
+</script>
 </body>
 </html>
