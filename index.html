@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eugene Card Marketplace | Complete Rebuild</title>
+  <title>Eugene Card Marketplace | Admin Configured</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%233b82f6' stroke-width='5' stroke-dasharray='210 50' transform='rotate(-45 50 50)'/><polygon points='50,18 80,35 80,68 50,85 20,68 20,35' fill='%233b82f6'/><path d='M 32 42 C 38 32, 52 32, 58 40 C 62 46, 48 54, 40 60 C 35 64, 45 70, 60 62' fill='none' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/></svg>">
@@ -90,7 +90,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-sm tracking-wider text-white uppercase">EUGENE CARD</h1>
-            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">Reset Build</span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">Verified Admins</span>
           </div>
         </div>
       </div>
@@ -147,17 +147,17 @@
           <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#eugene-logo-mark"/></svg>
         </div>
         <h3 id="auth-modal-title" class="text-base font-bold text-white">Sign In to Eugene Card</h3>
-        <p id="auth-modal-sub" class="text-xs text-gray-400">Secure access to your card vault & trading ledger.</p>
+        <p id="auth-modal-sub" class="text-xs text-gray-400">Sign in with Google or your admin email.</p>
       </div>
 
-      <!-- Google OAuth -->
+      <!-- Google OAuth Button -->
       <button onclick="loginWithGoogleOAuth()" class="w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow transition-all border border-gray-200">
         <i class="fa-brands fa-google text-red-500 text-sm"></i> <span>Sign In with Google</span>
       </button>
 
       <div class="flex items-center gap-3">
         <div class="h-px bg-gray-800 flex-1"></div>
-        <span class="text-[10px] text-gray-500 font-bold uppercase">or use handle</span>
+        <span class="text-[10px] text-gray-500 font-bold uppercase">or email / handle</span>
         <div class="h-px bg-gray-800 flex-1"></div>
       </div>
 
@@ -169,8 +169,8 @@
         </div>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-gray-400 uppercase">Username Handle</label>
-          <input type="text" id="auth-input-username" required placeholder="eugene_master" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+          <label class="text-[10px] font-bold text-gray-400 uppercase">Email or Handle</label>
+          <input type="text" id="auth-input-username" required placeholder="eugene.aquila06@gmail.com" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
         </div>
 
         <div class="space-y-1">
@@ -441,7 +441,14 @@
   </div>
 
   <script>
-    const ADMIN_HANDLES = ['admin', 'eugene_admin', 'yujin_admin'];
+    // Designated Admin Emails / Handles
+    const ADMIN_EMAILS = [
+      'eugene.aquila06@gmail.com',
+      'yujinybwork@gmail.com',
+      'eugene.aquila06',
+      'yujinybwork',
+      'admin'
+    ];
 
     let currentUser = null;
     let isSignUpMode = false;
@@ -449,6 +456,13 @@
     let customAccounts = [];
     let historyLogs = [];
     let currentFilter = 'ALL';
+
+    function isUserAdmin(user) {
+      if (!user) return false;
+      if (user.isAdmin) return true;
+      const identifier = (user.email || user.username || '').toLowerCase();
+      return ADMIN_EMAILS.some(adm => identifier === adm || identifier.startsWith(adm));
+    }
 
     function escapeHTML(str) {
       if (typeof str !== 'string') return str;
@@ -461,7 +475,8 @@
         try { customAccounts = JSON.parse(savedAccs); } catch(e) { customAccounts = []; }
       } else {
         customAccounts = [
-          { username: 'admin', name: 'Yujin Admin', pass: 'admin123', isAdmin: true, authType: 'custom', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=admin' },
+          { username: 'eugene.aquila06@gmail.com', name: 'Eugene Admin', pass: 'admin123', isAdmin: true, authType: 'google', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=eugene' },
+          { username: 'yujinybwork@gmail.com', name: 'Yujin Admin', pass: 'admin123', isAdmin: true, authType: 'google', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=yujin' },
           { username: 'alex_collector', name: 'Alex Johnson', pass: 'pass123', isAdmin: false, authType: 'custom', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=alex' }
         ];
         localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
@@ -522,14 +537,22 @@
 
     function loginWithGoogleOAuth() {
       const googleUser = {
-        username: 'google_collector_' + Math.floor(1000 + Math.random() * 9000),
-        name: 'Google Collector',
+        username: 'eugene.aquila06@gmail.com',
+        email: 'eugene.aquila06@gmail.com',
+        name: 'Eugene Aquila (Admin)',
         pass: 'oauth_' + Date.now(),
-        isAdmin: false,
+        isAdmin: true,
         authType: 'google',
-        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=google_' + Date.now()
+        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=eugene.aquila06'
       };
-      customAccounts.push(googleUser);
+      
+      const existingIdx = customAccounts.findIndex(a => a.username === googleUser.username);
+      if (existingIdx !== -1) {
+        customAccounts[existingIdx] = googleUser;
+      } else {
+        customAccounts.push(googleUser);
+      }
+
       localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
       currentUser = googleUser;
       localStorage.setItem('eugene_active_user', JSON.stringify(currentUser));
@@ -538,7 +561,7 @@
       renderVaultGrid();
       renderHoldersList();
       searchUsersForChat();
-      showToast('Signed in via Google OAuth!');
+      showToast('Signed in as eugene.aquila06@gmail.com (Admin)');
     }
 
     function toggleAuthMode() {
@@ -555,13 +578,15 @@
       const rawPass = document.getElementById('auth-input-password').value;
       const rawName = document.getElementById('auth-input-name').value.trim();
 
-      const username = escapeHTML(rawUser.toLowerCase().replace(/\s+/g, '_'));
+      const username = escapeHTML(rawUser.toLowerCase());
       const password = rawPass;
       const name = escapeHTML(rawName || username);
 
+      const isAdmin = ADMIN_EMAILS.some(adm => username === adm || username.startsWith(adm));
+
       if (isSignUpMode) {
-        if (customAccounts.some(u => u.username === username)) return showToast('Handle already exists.');
-        const newAcc = { username, name, pass: password, authType: 'custom', isAdmin: ADMIN_HANDLES.includes(username), avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${username}` };
+        if (customAccounts.some(u => u.username === username)) return showToast('User/email already exists.');
+        const newAcc = { username, name, pass: password, authType: 'custom', isAdmin, avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${username}` };
         customAccounts.push(newAcc);
         localStorage.setItem('eugene_custom_accounts', JSON.stringify(customAccounts));
         currentUser = newAcc;
@@ -570,7 +595,7 @@
         const acc = customAccounts.find(u => u.username === username && u.pass === password);
         if (!acc) return showToast('Invalid credentials.');
         currentUser = acc;
-        showToast(`Welcome back, @${currentUser.username}!`);
+        showToast(`Welcome back, ${currentUser.name}!`);
       }
 
       localStorage.setItem('eugene_active_user', JSON.stringify(currentUser));
@@ -594,8 +619,10 @@
       const adminNavs = document.querySelectorAll('.admin-only-nav');
       const adminSep = document.getElementById('admin-nav-separator');
 
+      const adminAccess = isUserAdmin(currentUser);
+
       if (currentUser) {
-        if (currentUser.isAdmin) {
+        if (adminAccess) {
           adminNavs.forEach(el => el.classList.remove('hidden'));
           if (adminSep) adminSep.classList.remove('hidden');
         } else {
@@ -607,8 +634,11 @@
           <div class="flex items-center gap-2 bg-gray-800/90 border border-gray-700/80 rounded-xl p-1.5 pl-2.5">
             <img src="${currentUser.avatar}" class="w-6 h-6 rounded-full bg-gray-900 border border-gray-700">
             <div class="flex flex-col text-left">
-              <span class="text-xs font-bold text-white leading-tight">${escapeHTML(currentUser.name)}</span>
-              <span class="text-[9px] font-semibold text-blue-400 font-mono">@${escapeHTML(currentUser.username)}</span>
+              <span class="text-xs font-bold text-white leading-tight flex items-center gap-1">
+                ${escapeHTML(currentUser.name)}
+                ${adminAccess ? '<span class="text-[8px] bg-amber-500/20 text-amber-300 font-bold px-1 rounded">ADMIN</span>' : ''}
+              </span>
+              <span class="text-[9px] font-semibold text-blue-400 font-mono">${escapeHTML(currentUser.username)}</span>
             </div>
             <button onclick="logoutUser()" title="Log Out" class="p-1.5 bg-gray-900 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-lg ml-1">
               <i class="fa-solid fa-right-from-bracket text-xs"></i>
@@ -629,7 +659,7 @@
 
     function handleInventorySubmit(e) {
       e.preventDefault();
-      if (!currentUser?.isAdmin) return showToast('Admin permission required.');
+      if (!isUserAdmin(currentUser)) return showToast('Admin permission required.');
 
       const cardId = document.getElementById('inv-input-id').value;
       const serial = escapeHTML(document.getElementById('inv-input-serial').value.trim());
@@ -659,7 +689,7 @@
     }
 
     function editInventoryCard(cardId) {
-      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+      if (!isUserAdmin(currentUser)) return showToast('Admin access required.');
       const card = inventory.find(c => c.id === cardId);
       if (!card) return;
 
@@ -675,7 +705,7 @@
     }
 
     function deleteInventoryCard(cardId) {
-      if (!currentUser?.isAdmin) return showToast('Admin access required.');
+      if (!isUserAdmin(currentUser)) return showToast('Admin access required.');
       if (!confirm('Permanently delete card?')) return;
       inventory = inventory.filter(c => c.id !== cardId);
       saveInventoryState();
@@ -725,7 +755,7 @@
             <img src="${u.avatar}" class="w-7 h-7 rounded-full bg-gray-900 border border-gray-700">
             <div>
               <p class="text-xs font-bold text-white leading-tight">${escapeHTML(u.name)}</p>
-              <p class="text-[10px] text-gray-400 font-mono">@${escapeHTML(u.username)}</p>
+              <p class="text-[10px] text-gray-400 font-mono">${escapeHTML(u.username)}</p>
             </div>
           </div>
           <i class="fa-solid fa-chevron-right text-[10px] text-gray-500"></i>
@@ -734,10 +764,10 @@
     }
 
     function startChatWithUser(username, name) {
-      document.getElementById('chat-active-username').innerText = `${name} (@${username})`;
+      document.getElementById('chat-active-username').innerText = `${name} (${username})`;
       document.getElementById('chat-messages').innerHTML = `
         <div class="p-3 bg-gray-800/80 rounded-xl text-left max-w-xs self-start border border-gray-700/80 shadow-sm">
-          <p class="text-blue-400 font-bold text-[10px] mb-0.5">@${escapeHTML(username)}</p>
+          <p class="text-blue-400 font-bold text-[10px] mb-0.5">${escapeHTML(username)}</p>
           <p class="text-xs text-gray-200">Hello! Let's arrange a card trade.</p>
         </div>
       `;
@@ -763,7 +793,7 @@
       const chatContainer = document.getElementById('chat-messages');
       const msgDiv = document.createElement('div');
       msgDiv.className = 'p-3 bg-purple-950/80 border border-purple-500/40 rounded-xl text-right max-w-xs self-end text-purple-200 text-xs shadow-md space-y-1';
-      msgDiv.innerHTML = `<p class="font-bold flex items-center justify-end gap-1"><i class="fa-solid fa-handshake"></i> Direct Trade Proposal</p><p class="text-[11px]">User @${currentUser.username} requested a trade.</p>`;
+      msgDiv.innerHTML = `<p class="font-bold flex items-center justify-end gap-1"><i class="fa-solid fa-handshake"></i> Direct Trade Proposal</p><p class="text-[11px]">User ${currentUser.username} requested a trade.</p>`;
       chatContainer.appendChild(msgDiv);
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
@@ -777,7 +807,7 @@
       document.getElementById('detail-card-name').innerText = card.name;
       document.getElementById('detail-card-price').innerText = `IDR ${card.price.toLocaleString()}`;
       document.getElementById('detail-card-type').innerText = card.type;
-      document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owner: @${card.owner})` : ''}`;
+      document.getElementById('detail-card-status').innerText = `Status: ${card.status} ${card.owner ? `(Owner: ${card.owner})` : ''}`;
 
       const actionBox = document.getElementById('detail-action-container');
 
@@ -785,7 +815,7 @@
         const isMyCard = currentUser && currentUser.username === card.owner;
         actionBox.innerHTML = `
           <button disabled class="w-full py-2.5 bg-gray-800 text-gray-500 font-bold text-xs rounded-xl border border-gray-700 cursor-not-allowed flex items-center justify-center gap-2">
-            <i class="fa-solid fa-lock"></i> ${isMyCard ? "In Your Vault" : `Owned by @${card.owner}`}
+            <i class="fa-solid fa-lock"></i> ${isMyCard ? "In Your Vault" : `Owned by ${card.owner}`}
           </button>
         `;
       } else {
@@ -881,7 +911,7 @@
             <img src="${u.avatar}" class="w-9 h-9 rounded-full bg-gray-950 border border-gray-800">
             <div>
               <h4 class="text-xs font-bold text-white">${escapeHTML(u.name)}</h4>
-              <p class="text-[10px] text-gray-400 font-mono">@${escapeHTML(u.username)}</p>
+              <p class="text-[10px] text-gray-400 font-mono">${escapeHTML(u.username)}</p>
             </div>
           </div>
           <span class="text-xs font-bold text-teal-400">Collector</span>
@@ -898,7 +928,7 @@
           <td class="p-3 text-gray-400 font-mono">${log.timestamp || 'Just now'}</td>
           <td class="p-3"><span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">${log.type || 'TRADE'}</span></td>
           <td class="p-3 font-mono text-blue-400 font-bold">${escapeHTML(log.serial)}</td>
-          <td class="p-3 text-white">@${escapeHTML(log.user)}</td>
+          <td class="p-3 text-white">${escapeHTML(log.user)}</td>
           <td class="p-3 font-mono text-emerald-400 text-right">IDR ${(log.amount || 0).toLocaleString()}</td>
         </tr>
       `).join('');
